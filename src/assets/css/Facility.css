@@ -1,0 +1,74 @@
+.facility-section {
+    background-color: #fff;
+}
+
+.facility-title {
+    font-family: 'serif', 'Times New Roman', serif;
+    font-weight: 500;
+    color: #161616;
+    letter-spacing: 2px;
+}
+
+.yellow-divider-center {
+    width: 150px;
+    height: 3px;
+    background-color: #ffd700;
+}
+
+.facility-subtitle {
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+
+/* গ্রিড বক্স স্টাইল */
+
+.facility-card {
+    height: 140px;
+    /* বক্সের উচ্চতা ঠিক রাখা হয়েছে */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.facility-card:hover {
+    background-color: #fcfcfc;
+    /* হালকা হোভার ইফেক্ট */
+}
+
+.facility-icon {
+    font-size: 1.2rem;
+    /* আইকনের সাইজ */
+}
+
+.facility-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #333;
+    letter-spacing: 1px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+
+/* বর্ডার কালার ফিক্স */
+
+.border-top,
+.border-start,
+.border-end,
+.border-bottom {
+    border-color: #333 !important;
+    /* ইমেজের মতো গাঢ় বর্ডার */
+}
+
+@media (max-width: 768px) {
+    .facility-card {
+        height: 120px;
+    }
+    .facility-name {
+        font-size: 0.7rem;
+    }
+}

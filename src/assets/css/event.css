@@ -1,0 +1,125 @@
+.event-section {
+    background-color: #f8f9fa;
+}
+
+.serif {
+    font-family: 'serif', 'Times New Roman', serif;
+}
+
+
+/* Left List Styling */
+
+.event-list-item {
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+}
+
+
+/* User's requested color for active state */
+
+.event-list-item.active {
+    background-color: #6b9e3e !important;
+    /* Green Color */
+}
+
+.event-list-item.active .event-list-title,
+.event-list-item.active .text-muted {
+    color: #fff !important;
+}
+
+.event-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+
+/* Right Content Styling */
+
+.active-event-card {
+    border: 1px solid #eee;
+    min-height: 450px;
+    /* কার্ডের মিনিমাম হাইট ফিক্সড রাখা হয়েছে */
+}
+
+
+/* Image Container to maintain same height and width */
+
+.image-container {
+    width: 100%;
+    height: 450px;
+    /* সব ইমেজের জন্য একই উচ্চতা */
+    overflow: hidden;
+}
+
+.active-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* ইমেজ কেটে গেলেও ফিক্সড এরিয়াতে থাকবে */
+}
+
+
+/* Date overlay styling */
+
+.date-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #6b9e3e;
+    /* ম্যাচিং গ্রিন কালার */
+    color: #fff;
+    width: 70px;
+    padding: 10px 5px;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.date-overlay h3 {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.date-overlay span {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+
+/* Content Styling */
+
+.event-content-title {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.event-content-subtitle {
+    color: #6b9e3e;
+    font-size: 1rem;
+}
+
+.read-more-btn {
+    background-color: #6b9e3e;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.read-more-btn:hover {
+    background-color: #558032;
+}
+
+@media (max-width: 991px) {
+    .image-container {
+        height: 300px;
+    }
+    .active-event-card {
+        min-height: auto;
+    }
+}

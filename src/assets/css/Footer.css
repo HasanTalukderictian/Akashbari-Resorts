@@ -1,0 +1,156 @@
+.footer {
+    background: #f4f4f2;
+    padding: 60px 0 20px;
+}
+
+
+/* Top layout */
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+
+/* Columns */
+
+.footer-col h1 {
+    font-family: Gascogne, serif;
+}
+
+.footer-col h2 {
+    font-size: 28px;
+    letter-spacing: 6px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    font-family: Gascogne, serif;
+}
+
+.footer-col h3 {
+    letter-spacing: 5px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    font-family: Gascogne, serif;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 10px;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    text-align: left;
+}
+
+.footer-col ul li:hover {
+    color: #6b9e3e;
+}
+
+.footer-col ul li {
+    margin-bottom: 10px;
+    color: #555;
+    cursor: pointer;
+}
+
+.social-icons a {
+    color: inherit;
+    /* আগের কালার বজায় রাখবে */
+    text-decoration: none;
+    /* আন্ডারলাইন রিমুভ করবে */
+    font-size: 20px;
+    /* প্রয়োজন অনুযায়ী সাইজ বাড়িয়ে নিন */
+    margin: 0 10px;
+}
+
+
+/* CTA section */
+
+.cta h1 {
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.cta-btn {
+    background: #5f8f2f;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cta-btn:hover {
+    background: #2b8145;
+}
+
+
+/* Divider */
+
+.footer-divider {
+    border-top: 1px solid #666;
+    margin: 40px 0 20px;
+}
+
+
+/* Bottom */
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/* Social icons */
+
+.social-icons span {
+    margin: 0 8px;
+    width: 40px;
+    height: 40px;
+    background: #ddd;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+/* Right links */
+
+.footer-links span {
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.footer-logo img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    /* image distort হবে না */
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .footer-top {
+        flex-direction: column;
+    }
+    .cta h1 {
+        font-size: 32px;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+    }
+}

@@ -1,0 +1,51 @@
+.video-section {
+    background-color: #fff;
+    padding: 60px 0;
+}
+
+
+/* মাঝখানের ছোট ইয়েলো ডিভাইডার */
+
+.center-yellow-divider {
+    width: 100px;
+    height: 4px;
+    background-color: #ffd700;
+}
+
+.gateway-text {
+    font-family: 'serif', 'Times New Roman', serif;
+    font-size: 1.1rem;
+    color: #555;
+    margin-top: 15px;
+}
+
+.video-subtext {
+    font-weight: 400;
+    line-height: 1.5;
+    font-size: 1rem;
+    color: #777 !important;
+}
+
+
+/* ভিডিওর চারপাশের বর্ডার এবং শ্যাডো */
+
+.video-wrapper {
+    border: 12px solid #000;
+    /* ইমেজের মতো ব্ল্যাক ফ্রেম */
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+
+/* রেসপনসিভ মোবাইল ভিউ এর জন্য */
+
+@media (max-width: 768px) {
+    .video-wrapper {
+        border: 5px solid #000;
+        /* মোবাইলে বর্ডার একটু চিকন হবে */
+    }
+    .video-subtext {
+        font-size: 0.9rem;
+    }
+}

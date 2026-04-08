@@ -1,0 +1,149 @@
+.room-section {
+    background-color: #fff;
+    padding: 80px 0;
+}
+
+.explore-text {
+    font-family: 'Georgia', serif;
+    /* সুন্দর কার্সিভ ফন্ট ব্যবহার করতে পারেন */
+    color: #c5a059;
+    font-style: italic;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.rooms-title {
+    font-weight: 600;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+    /* This gives it that premium hotel look */
+    font-family: "Playfair Display", serif;
+    /* If you haven't imported Playfair, use the line below for a standard serif */
+    /* font-family: 'Times New Roman', Times, serif; */
+}
+
+
+/* This removes the default link underline */
+
+.view-all {
+    text-decoration: none !important;
+    color: #c5a059;
+    /* Your gold/brown color */
+    display: inline-block;
+    transition: 0.3s ease;
+}
+
+
+/* Optional: Add a subtle hover effect without an underline */
+
+.view-all:hover {
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+
+/* বড় ইমেজের বক্স অ্যাডজাস্টমেন্ট */
+
+.main-room {
+    position: relative;
+}
+
+.main-room .room-info {
+    position: absolute;
+    bottom: 8%;
+    /* ইমেজ থেকে একটু উপরে */
+    /* ইমেজ থেকে কিছুটা বামে বের হয়ে থাকবে */
+    background: #fff;
+    padding: 30px;
+    margin-top: -200px;
+    width: 50%;
+    z-index: 10;
+}
+
+
+/* ডান পাশের ছোট কার্ডগুলোর জন্য */
+
+.small-room {
+    position: relative;
+    overflow: visible;
+    /* বক্স বাইরে যাওয়ার জন্য এটি জরুরি */
+}
+
+
+/* ডাবল রুম (বক্স ডানে) */
+
+.room-info-side {
+    position: relative;
+    background: #fff;
+    padding: 25px;
+    margin-left: -37px;
+    /* এই নেগেটিভ মার্জিন বক্সকে ইমেজের ওপর নিয়ে আসবে */
+    z-index: 10;
+    width: 120%;
+    /* বক্সের সাইজ ইমেজের সাথে ব্যালেন্স করতে */
+}
+
+
+/* জুনিয়র স্যুইট (বক্স বামে) */
+
+.room-info-side-reverse {
+    position: relative;
+    background: #fff;
+    padding: 25px;
+    margin-right: -60px;
+    /* বক্সকে বাম দিকে ইমেজের ওপর নিয়ে আসবে */
+    z-index: 10;
+    width: 120%;
+    text-align: left;
+    /* টেক্সট বামে রাখার জন্য */
+}
+
+
+/* টেক্সট এবং ডিভাইডার স্টাইল */
+
+.room-info h4,
+.room-info-side h5,
+.room-info-side-reverse h5 {
+    font-family: 'serif';
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.room-meta {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.price-amount {
+    color: #c5a059;
+    font-weight: bold;
+}
+
+hr {
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+
+
+/* রেসপন্সিভ: মোবাইলে ওভারল্যাপ বন্ধ করা */
+
+@media (max-width: 991px) {
+    .main-room .room-info {
+        position: static;
+        width: 100%;
+        margin-left: 0;
+        margin-top: -30px;
+    }
+    .room-info-side,
+    .room-info-side-reverse {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        margin-top: -20px;
+    }
+    .small-room .col-8,
+    .small-room .col-4 {
+        width: 100%;
+        /* মোবাইলে ইমেজ আর লেখা নিচে নিচে আসবে */
+    }
+}

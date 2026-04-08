@@ -1,0 +1,95 @@
+/* Typography and Colors */
+
+.welcome-section {
+    background-color: #fdfdfb;
+    font-family: 'serif', 'Times New Roman', Times, serif;
+    padding: 20px;
+}
+
+
+/* টেক্সটগুলোকে বাম দিকে অ্যালাইন করার জন্য */
+
+.welcome-title,
+.welcome-subtitle {
+    color: #4a4a4a;
+    font-weight: 500;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    text-align: left;
+    /* বাম থেকে শুরু হবে */
+    margin-left: 0;
+    /* নিশ্চিত করবে কোনো বাম মার্জিন নেই */
+    padding-left: 0;
+}
+
+
+/* ইয়েলো ডিভাইডার বড় এবং বাম পাশে সেট করা */
+
+.yellow-divider {
+    width: 120px;
+    /* ডিভাইডার লাইনের সাইজ বড় করা হয়েছে (আগে ৬০/৮০ ছিল) */
+    height: 4px;
+    /* পুরুত্ব সামান্য বাড়ানো হয়েছে */
+    background-color: #ffd700;
+    margin-top: 10px;
+    margin-left: 0;
+    /* বাম পাশ থেকে শুরু হবে */
+}
+
+.welcome-text {
+    text-align: left;
+    /* প্যারাগ্রাফগুলো বাম থেকে শুরু হবে */
+}
+
+.welcome-text p {
+    color: #666;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    text-align: left;
+    display: block;
+}
+
+
+/* The Features Box */
+
+.features-box {
+    border: 1.5px solid #000;
+    background-color: #fff;
+    padding: 30px !important;
+}
+
+.features-title {
+    color: #4a4a4a;
+    font-weight: 500;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.features-list li {
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.features-list li::before {
+    content: '✓';
+    color: #5cb85c;
+    font-weight: bold;
+    margin-right: 12px;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .welcome-title,
+    .welcome-subtitle {
+        font-size: 1.8rem;
+    }
+    .features-box {
+        padding: 20px !important;
+    }
+}

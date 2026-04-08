@@ -1,0 +1,56 @@
+/* Sticky header */
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: #f8f8f8;
+    border-bottom: 2px solid #000;
+}
+
+
+/* Logo */
+
+.logo {
+    height: 55px;
+    object-fit: contain;
+}
+
+
+/* Menu spacing */
+
+.menu .nav-link {
+    margin: 0 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #000 !important;
+    letter-spacing: 0.5px;
+}
+
+
+/* Hover effect */
+
+.menu .nav-link:hover {
+    color: #2b8145 !important;
+}
+
+
+/* Contact button */
+
+.contact-btn {
+    background: #111;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    margin-left: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+
+/* Hover */
+
+.contact-btn:hover {
+    background: #6b9e3e;
+}
