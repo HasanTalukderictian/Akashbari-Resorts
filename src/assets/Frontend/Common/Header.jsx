@@ -12,8 +12,8 @@ const Header = () => {
       <Container fluid className="px-4">
         <Navbar expand="lg" className="py-2">
 
-          {/* Logo */}
-          <Navbar.Brand onClick={() => navigate("/")}>
+          {/* Logo - ক্লিক করলে হোমে যাবে */}
+          <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
             <img src={Logo} alt="Logo" className="logo" />
           </Navbar.Brand>
 
@@ -23,11 +23,14 @@ const Header = () => {
             <Nav className="ms-auto align-items-center menu">
               
               <Nav.Link onClick={() => navigate("/")}>HOME</Nav.Link>
-              <Nav.Link>PACKAGES</Nav.Link>
-              <Nav.Link>DESTINATIONS</Nav.Link>
-              <Nav.Link>HOTELS & RESORTS</Nav.Link>
-              <Nav.Link>ABOUT</Nav.Link>
-              <Nav.Link>AFFILIATES</Nav.Link>
+              <Nav.Link onClick={() => navigate("/packages")}>PACKAGES</Nav.Link>
+              <Nav.Link onClick={() => navigate("/destinations")}>DESTINATIONS</Nav.Link>
+              <Nav.Link onClick={() => navigate("/resorts")}>HOTELS & RESORTS</Nav.Link>
+              
+              {/* About Us Link যুক্ত করা হয়েছে */}
+              <Nav.Link onClick={() => navigate("/about")}>ABOUT US</Nav.Link>
+              
+              <Nav.Link onClick={() => navigate("/affiliates")}>AFFILIATES</Nav.Link>
 
               {/* Contact Button */}
               <button 

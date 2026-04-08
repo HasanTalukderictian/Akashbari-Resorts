@@ -1,0 +1,137 @@
+/* --- Banner Section --- */
+
+.about-banner {
+    min-height: 400px;
+    background-image: url('../image/page-header-bg.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    position: relative;
+    z-index: 1;
+}
+
+.about-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+}
+
+.banner-title {
+    font-size: 3.5rem;
+    font-weight: 500;
+}
+
+
+/* --- Welcome Section & Main Image --- */
+
+.main-img {
+    width: 100%;
+    height: 450px;
+    /* হাইট কমানো হয়েছে */
+    object-fit: cover;
+    border-radius: 4px;
+    transition: 0.3s ease;
+}
+
+.image-accent {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 80px;
+    height: 80px;
+    border-top: 10px solid #c5a059;
+    border-left: 10px solid #c5a059;
+    z-index: -1;
+}
+
+
+/* --- Gallery Thumbnails --- */
+
+.gallery-row {
+    overflow-x: auto;
+}
+
+.gallery-item {
+    position: relative;
+    flex: 1;
+    min-width: 90px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    filter: brightness(0.6);
+}
+
+
+/* সিলেক্টেড থাম্বনেইলের জন্য */
+
+.active-thumb {
+    border-color: #c5a059;
+}
+
+.active-thumb img {
+    filter: brightness(1);
+}
+
+.gallery-item p {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 9px;
+    text-align: center;
+    margin: 0;
+    padding: 2px 0;
+    font-weight: bold;
+}
+
+
+/* --- Features & General --- */
+
+.text-gold {
+    color: #c5a059 !important;
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+.serif {
+    font-family: 'serif', 'Times New Roman', serif;
+}
+
+.feature-box {
+    background-color: #fff;
+    transition: 0.3s;
+}
+
+.feature-box:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-color: #c5a059 !important;
+}
+
+
+/* --- Responsive --- */
+
+@media (max-width: 768px) {
+    .about-banner {
+        min-height: 250px;
+    }
+    .banner-title {
+        font-size: 2.5rem;
+    }
+    .main-img {
+        height: 300px;
+    }
+}
