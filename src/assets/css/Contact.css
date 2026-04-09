@@ -1,0 +1,277 @@
+/* --- Global & Typography --- */
+
+:root {
+    --gold: #bfa37c;
+    --gold-dark: #8e7042;
+    --cream: #fffaf0;
+    --dark-brown: #2c241a;
+    --hover-green: #6b9e3e;
+    /* Requested hover color */
+}
+
+.serif {
+    font-family: 'Playfair Display', serif;
+    /* Ensure you have this font imported */
+}
+
+.text-gold {
+    color: var(--gold);
+}
+
+.text-italic {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+.dot-icon {
+    font-size: 8px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+
+/* --- Blog Card Styling (2nd Section) --- */
+
+.blog-card {
+    background-color: var(--cream);
+    border: 1px solid #f2e8d5;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+}
+
+.blog-img-wrapper {
+    padding: 15px;
+}
+
+.blog-img-wrapper img {
+    border-radius: 12px;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.blog-card-title {
+    font-size: 1.15rem;
+    line-height: 1.4;
+    color: #2c2c2c;
+    font-weight: 500;
+}
+
+.read-more-btn-gold {
+    background-color: var(--gold);
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    width: fit-content;
+    transition: background 0.3s ease;
+}
+
+.read-more-btn-gold:hover {
+    background-color: var(--gold-dark);
+}
+
+
+/* --- Custom Outline Button with #6b9e3e Hover --- */
+
+.custom-btn-outline {
+    border-color: #343a40;
+    color: #343a40;
+    transition: all 0.3s ease;
+}
+
+.custom-btn-outline:hover {
+    background-color: var(--hover-green) !important;
+    border-color: var(--hover-green) !important;
+    color: #ffffff !important;
+}
+
+
+/* --- Contact / Enquiry Section (Equal Height Image) --- */
+
+.enquiry-section .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.contact-image-wrapper {
+    display: flex;
+    height: 100%;
+}
+
+.custom-enquiry-img {
+    width: 100%;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.custom-input {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.custom-input:focus {
+    box-shadow: none;
+    border-color: var(--gold);
+}
+
+.btn-submit-query {
+    background-color: var(--gold);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-submit-query:hover {
+    background-color: var(--gold-dark);
+}
+
+
+/* --- Blog Details Sidebar Styling --- */
+
+.sidebar-card {
+    background-color: var(--cream);
+    border-radius: 15px;
+    padding: 30px;
+    border: 1px solid #f2e8d5;
+}
+
+.recent-posts-list {
+    list-style: none;
+    padding: 0;
+}
+
+.recent-posts-list li {
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e9dfcc;
+    font-size: 0.95rem;
+    position: relative;
+    padding-left: 20px;
+}
+
+.recent-posts-list li::before {
+    content: "●";
+    color: var(--gold);
+    position: absolute;
+    left: 0;
+    font-size: 10px;
+    top: 4px;
+}
+
+.book-now-card {
+    background-color: var(--dark-brown);
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.book-img-overlay img {
+    height: 180px;
+    width: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+}
+
+.book-btn-white {
+    background-color: var(--gold);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+}
+
+
+/* --- Pagination Arrows --- */
+
+.nav-btn {
+    width: 40px;
+    height: 35px;
+    border: none;
+    background-color: #d8c3a5;
+    color: #fff;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.nav-btn.active {
+    background-color: var(--gold);
+}
+
+
+/* Contact Section Styling */
+
+.contact-card {
+    background-color: #fffaf0;
+    border: 1px solid #f2e8d5;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    /* Height komanor jonno padding komano hoyeche */
+    padding: 20px 10px !important;
+    /* Card gulo jate ekdom soman choto hoy */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 150px;
+    /* Apnar proyojon moto eiti kom-beshi korte paren */
+}
+
+.contact-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transform: translateY(-5px);
+}
+
+.contact-icon-wrapper {
+    margin-bottom: 15px !important;
+    /* Icon er nicher gap komano hoyeche */
+}
+
+.contact-icon-wrapper i {
+    font-size: 2.2rem;
+    /* Icon size aktu boro kora hoyeche image er moto */
+    color: #bfa37c;
+}
+
+
+/* Card er bhitorer text alignment */
+
+.contact-card h4 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+.contact-card p {
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+
+/* --- Responsive Helpers --- */
+
+@media (max-width: 991px) {
+    .contact-image-wrapper {
+        height: 400px;
+        margin-bottom: 20px;
+    }
+    .custom-enquiry-img {
+        height: 400px !important;
+    }
+}
