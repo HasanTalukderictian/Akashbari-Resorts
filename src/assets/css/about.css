@@ -228,7 +228,7 @@
 }
 
 .read-more-btn:hover {
-    background-color: #333;
+    background-color: #6b9e3e;
     /* হোভারে ডার্ক কালার */
     transform: translateY(-3px);
 }
@@ -252,6 +252,60 @@
 }
 
 
+/* Team Section Styles */
+
+.team-section {
+    background-color: #ffffff;
+}
+
+.text-italic {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.team-img-container {
+    overflow: hidden;
+    border-radius: 20px;
+    /* Adjust for that smooth rounded look */
+    aspect-ratio: 4 / 5;
+    /* Keeps all headshots uniform */
+}
+
+.team-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.team-card:hover .team-img {
+    transform: scale(1.05);
+    /* Subtle zoom effect on hover */
+}
+
+.team-card h4 {
+    color: #333;
+    letter-spacing: 0.5px;
+}
+
+.team-card p {
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    color: #bfa37c;
+    /* Gold color matching your theme */
+}
+
+
+/* Optional: Matching the Orrivaa title dot */
+
+.team-header span.text-gold::before {
+    content: "●";
+    font-size: 8px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+
 /* Responsive spacing */
 
 @media (max-width: 768px) {
@@ -260,6 +314,66 @@
         max-width: 280px;
         margin: auto;
     }
+}
+
+
+/* 4th section */
+
+
+/* --- 4th Section: Places to Visit --- */
+
+.places-section {
+    background-color: #fff;
+}
+
+
+/* ভিউ মোর বাটন স্টাইল */
+
+.view-more-btn {
+    background-color: #c5a059;
+    color: white;
+    border: none;
+    padding: 10px 35px;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: 0.3s;
+    width: fit-content;
+}
+
+.view-more-btn:hover {
+    background-color: #6b9e3e;
+    transform: translateY(-2px);
+}
+
+
+/* ইমেজ বক্স স্টাইল */
+
+.place-img-box {
+    overflow: hidden;
+    position: relative;
+    border-radius: 4px;
+}
+
+.place-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-height: 250px;
+    /* ইমেজের মিনিমাম উচ্চতা */
+    transition: transform 0.5s ease;
+}
+
+.place-img-box:hover img {
+    transform: scale(1.05);
+    /* হোভার এফেক্ট */
+}
+
+
+/* গ্রিডের প্যাসিং এবং হাইট অ্যাডজাস্টমেন্ট */
+
+.places-section .row.g-3>div {
+    min-height: 280px;
 }
 
 

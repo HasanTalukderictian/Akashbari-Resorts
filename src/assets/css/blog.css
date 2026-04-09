@@ -1,0 +1,128 @@
+.blog-banner {
+    min-height: 400px;
+    background-image: url('../image/section/blog.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    position: relative;
+    z-index: 1;
+}
+
+.blog-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(71, 70, 70, 0.6);
+    z-index: -1;
+}
+
+.blog-title {
+    font-size: 3.5rem;
+    font-weight: 500;
+}
+
+
+/* 2nd section css */
+
+
+/* Color & Typography Helpers */
+
+.text-gold {
+    color: #bfa37c;
+}
+
+.text-italic {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+.dot-icon {
+    font-size: 8px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+
+/* Blog Card Styling */
+
+.blog-card {
+    background-color: #fffaf0;
+    /* Light cream background from image */
+    border: 1px solid #f2e8d5;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+}
+
+.blog-img-wrapper {
+    padding: 15px;
+    /* Creates the inset look for the image */
+}
+
+.blog-img-wrapper img {
+    border-radius: 12px;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.blog-card-title {
+    font-family: 'serif';
+    /* Ensure you have a serif font linked */
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: #2c2c2c;
+    font-weight: 500;
+}
+
+
+/* Button Styling */
+
+.read-more-btn-gold {
+    background-color: #b08d57;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    width: fit-content;
+    transition: background 0.3s ease;
+}
+
+.read-more-btn-gold:hover {
+    background-color: #6b9e3e;
+}
+
+
+/* Pagination Buttons */
+
+.nav-btn {
+    width: 40px;
+    height: 35px;
+    border: none;
+    background-color: #d8c3a5;
+    color: #fff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn.active {
+    background-color: #b08d57;
+}
+
+.nav-btn:hover {
+    opacity: 0.8;
+}

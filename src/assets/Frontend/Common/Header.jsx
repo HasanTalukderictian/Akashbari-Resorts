@@ -30,7 +30,7 @@ const Header = () => {
               {/* About Us Link যুক্ত করা হয়েছে */}
               <Nav.Link onClick={() => navigate("/about")}>ABOUT US</Nav.Link>
               
-              <Nav.Link onClick={() => navigate("/affiliates")}>AFFILIATES</Nav.Link>
+              <Nav.Link onClick={() => navigate("/blog")}>Blog</Nav.Link>
 
               {/* Contact Button */}
               <button 
