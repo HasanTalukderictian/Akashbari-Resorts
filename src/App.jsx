@@ -4,6 +4,7 @@ import Homepage from './assets/Frontend/Homepage'
 import LandingPage from './assets/Frontend/LandingPage'
 import AboutUs from './assets/Frontend/AboutUs'
 import Blog from './assets/Frontend/Blog'
+import BlogDetails from './assets/Frontend/BlogDetails'
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path='/landingpage' element={<LandingPage />} />
              <Route path='/about' element={<AboutUs />} />
               <Route path='/blog' element={<Blog />} />
+              <Route path="/blog-details" element={<BlogDetails />} />
       </Routes>
     </BrowserRouter>
   )

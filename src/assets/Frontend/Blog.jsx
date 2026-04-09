@@ -10,11 +10,14 @@ import king3 from '../image/section/Blog/Blog_image-3.webp'
 import king4 from '../image/section/Blog/Blog_image-5.webp'
 import king5 from '../image/section/Blog/Blog_image-6.webp'
 import king6 from '../image/section/Blog/Blog_image-7.webp'
+import { useNavigate } from 'react-router-dom';
 
 
 
 
-const Blog = () => {
+const Blog = () => {  
+
+    const navigate = useNavigate();
 
     const blogData = [
         { id: 1, title: "What Makes a Suite Stay Feel Comfortable, Not Complicated", img: king1 },
@@ -24,6 +27,10 @@ const Blog = () => {
         { id: 5, title: "A Slow Afternoon at the Spa: What to Expect at Orrivaa", img: king5 },
         { id: 6, title: "Which Room at Orrivaa Fits Your Stay Best?", img: king6 },
     ];
+
+    const handleCardClick = (post) => {
+        navigate('/blog-details', { state: { post } }); 
+    };
 
     return (
         <>
@@ -51,22 +58,16 @@ const Blog = () => {
             {/* 2nd Section: Blog Grid */}
 
 
-            <section className="blog-content-section py-5">
+           <section className="blog-content-section py-5">
                 <div className="container">
-                    {/* Section Header */}
-                    <div className="text-center mb-5">
-                        <span className="text-gold text-uppercase ls-2 small fw-bold d-block mb-2">
-                            <span className="dot-icon">●</span> Quick Query
-                        </span>
-                        <h2 className="serif display-6">
-                            A Warm Welcome Awaits with <span className="text-italic">Contemporary Comfort</span>
-                        </h2>
-                    </div>
-
-                    {/* Blog Grid using Dynamic JSON */}
                     <div className="row g-4">
                         {blogData.map((post) => (
-                            <div className="col-lg-4 col-md-6" key={post.id}>
+                            <div 
+                                className="col-lg-4 col-md-6" 
+                                key={post.id} 
+                                onClick={() => handleCardClick(post)} // ক্লিক করলে ডেটা পাঠাবে
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <div className="blog-card h-100">
                                     <div className="blog-img-wrapper">
                                         <img src={post.img} alt={post.title} className="img-fluid" />
@@ -78,12 +79,6 @@ const Blog = () => {
                                 </div>
                             </div>
                         ))}
-                    </div>
-
-                    {/* Pagination Arrows */}
-                    <div className="d-flex justify-content-center mt-5 gap-2">
-                        <button className="nav-btn">&lt;</button>
-                        <button className="nav-btn active">&gt;</button>
                     </div>
                 </div>
             </section>

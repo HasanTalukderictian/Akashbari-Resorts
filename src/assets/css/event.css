@@ -7,6 +7,27 @@
 }
 
 
+/* Normal border and text color */
+
+.custom-btn-outline {
+    border-color: #343a40;
+    /* bootstrap dark color */
+    color: #343a40;
+    transition: all 0.3s ease;
+    /* Smooth hover transition */
+}
+
+
+/* Hover effect with your requested color #6b9e3e */
+
+.custom-btn-outline:hover {
+    background-color: #6b9e3e !important;
+    border-color: #6b9e3e !important;
+    color: #ffffff !important;
+    /* Text color becomes white on hover */
+}
+
+
 /* Left List Styling */
 
 .event-list-item {
