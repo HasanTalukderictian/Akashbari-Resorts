@@ -5,6 +5,7 @@ import Header from './Common/Header'
 import Welcome from './Common/Welcome'
 import Event from './Event'
 import Facility from './Facility'
+import Investment from './Investment'
 import Room from './Room'
 import Video from './Video'
 
@@ -18,6 +19,7 @@ const LandingPage = () => {
       <Room/>
       <Facility/>
       <Event/>
+      <Investment/>
       <Footer/>
     </>
   )

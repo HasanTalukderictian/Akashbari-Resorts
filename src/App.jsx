@@ -17,7 +17,7 @@ function App() {
         <Route path='/landingpage' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
-           <Route path='/blog' element={<Blog />} />
+        <Route path='/blog' element={<Blog />} />
         <Route path="/blog-details" element={<BlogDetails />} />
 
 
