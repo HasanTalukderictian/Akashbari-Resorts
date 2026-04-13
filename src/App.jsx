@@ -6,6 +6,7 @@ import AboutUs from './assets/Frontend/AboutUs'
 import Blog from './assets/Frontend/Blog'
 import BlogDetails from './assets/Frontend/BlogDetails'
 import Contact from './assets/Frontend/Contact'
+import Gallery from './assets/Frontend/Gallery'
 
 
 function App() {
@@ -18,7 +19,8 @@ function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/blog' element={<Blog />} />
-        <Route path="/blog-details" element={<BlogDetails />} />
+           <Route path="/blog-details" element={<BlogDetails />} />
+        <Route path="/gallery" element={<Gallery />} />
 
 
       </Routes>

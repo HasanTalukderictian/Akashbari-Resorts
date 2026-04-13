@@ -23,7 +23,7 @@ const Header = () => {
             <Nav className="ms-auto align-items-center menu">
               
               <Nav.Link onClick={() => navigate("/")}>HOME</Nav.Link>
-              <Nav.Link onClick={() => navigate("/packages")}>PACKAGES</Nav.Link>
+              <Nav.Link onClick={() => navigate("/gallery")}>GALLERY</Nav.Link>
               <Nav.Link onClick={() => navigate("/destinations")}>DESTINATIONS</Nav.Link>
               <Nav.Link onClick={() => navigate("/resorts")}>HOTELS & RESORTS</Nav.Link>
               
