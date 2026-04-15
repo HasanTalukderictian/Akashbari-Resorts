@@ -132,3 +132,123 @@
     display: flex;
     align-items: center;
 }
+
+
+/* 2nd div section code  */
+
+
+/* Benefits Section Styling */
+
+.benefits-container {
+    border: 1px solid #ddd;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+.benefits-badge {
+    background-color: #639c4e;
+    color: white;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.benefits-main-title {
+    color: #4a4a4a;
+    font-size: 2.2rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.benefits-sub-text {
+    color: #666;
+    font-size: 16px;
+}
+
+.benefit-item {
+    border: 1px solid #333;
+    padding: 10px 15px;
+    height: 100%;
+    background: #fff;
+}
+
+
+/* Hover state */
+
+.benefit-item:hover {
+    border-color: #639c4e;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    animation: vibrate 0.3s linear infinite;
+    /* Text styling */
+    color: #639c4e;
+    text-decoration-color: #639c4e;
+}
+
+
+/* Animation definition */
+
+@keyframes vibrate {
+    0% {
+        transform: translate(0);
+    }
+    25% {
+        transform: translate(2px, -2px);
+    }
+    50% {
+        transform: translate(-2px, 2px);
+    }
+    75% {
+        transform: translate(2px, 2px);
+    }
+    100% {
+        transform: translate(0);
+    }
+}
+
+.benefit-number {
+    background-color: #639c4e;
+    color: white;
+    padding: 2px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 15px;
+    min-width: 35px;
+    text-align: center;
+}
+
+.benefit-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+}
+
+
+/* Footer Section */
+
+.promo-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #639c4e;
+}
+
+.promo-question {
+    color: #4a4a4a;
+    font-weight: 600;
+}
+
+.promo-text {
+    color: #777;
+    font-style: italic;
+    font-size: 15px;
+}
+
+
+/* Responsive adjustment */
+
+@media (max-width: 768px) {
+    .benefits-main-title {
+        font-size: 1.5rem;
+    }
+}
