@@ -1,0 +1,121 @@
+.login-container {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    /* Mobile-e card jate screen er sathe lege na jay */
+    background: url('https://i.ibb.co.com/LDK7jcrp/geometric-dark-background-with-gradient-shapes-composition-good-for-posters-design-illustration-vect.jpg') no-repeat center center/cover;
+}
+
+.login-glass-card {
+    width: 100%;
+    /* Default width full thakbe */
+    max-width: 400px;
+    /* Kintu 400px er boro hobe na */
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.login-title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    font-weight: 600;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    color: white;
+    padding: 8px 0;
+    outline: none;
+    font-size: 1rem;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 30px;
+}
+
+.remember-me input {
+    margin-right: 5px;
+}
+
+.forgot-pass {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 30px;
+    border: none;
+    background: white;
+    color: #333;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.register-text {
+    margin-top: 25px;
+    font-size: 0.9rem;
+}
+
+.register-text a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
+/* --- Mobile Responsive Media Query --- */
+
+@media (max-width: 480px) {
+    .login-glass-card {
+        padding: 30px 20px;
+        /* Mobile-e padding ektu komiye dewa hoyeche */
+        border-radius: 20px;
+    }
+    .login-title {
+        font-size: 1.75rem;
+        margin-bottom: 30px;
+    }
+    .form-options {
+        flex-direction: column;
+        /* Small mobile-e checkbox ar link niche niche thakbe */
+        gap: 15px;
+        align-items: flex-start;
+    }
+}
