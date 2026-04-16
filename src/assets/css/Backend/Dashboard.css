@@ -1,0 +1,61 @@
+/* Custom CSS for Purple Dashboard */
+
+:root {
+    --purple-main: #b66dff;
+    --bg-light: #f2edf3;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.sidebar {
+    min-height: 100vh;
+    background: white;
+    padding-top: 20px;
+}
+
+.nav-link {
+    color: #3e4b5b;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.nav-link.active {
+    color: var(--purple-main);
+    font-weight: bold;
+}
+
+.card-sales {
+    background: linear-gradient(to right, #ffbf96, #fe7096);
+    border: none;
+    color: white;
+}
+
+.card-orders {
+    background: linear-gradient(to right, #90caf9, #047edf);
+    border: none;
+    color: white;
+}
+
+.card-visitors {
+    background: linear-gradient(to right, #84d9d2, #07cdae);
+    border: none;
+    color: white;
+}
+
+.stat-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    opacity: 0.3;
+}
+
+.navbar-custom {
+    background: white;
+    padding: 15px 25px;
+    border-bottom: 1px solid #ebedf2;
+}
