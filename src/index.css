@@ -48,13 +48,32 @@ body {
     margin: 0;
 }
 
-#root {
+
+/* #root {
     width: 1126px;
     max-width: 100%;
     margin: 0 auto;
     text-align: center;
     border-inline: 1px solid var(--border);
     min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+} */
+
+#root {
+    /* width: 1126px; <--- এই লাইনটি ডিলিট করুন অথবা কমেন্ট আউট করুন */
+    width: 100%;
+    /* এটি পুরো স্ক্রিন জুড়ে নিয়ে নেবে */
+    max-width: 100%;
+    margin: 0;
+    /* ড্যাশবোর্ডের জন্য অটো মার্জিনের দরকার নেই */
+    text-align: left;
+    /* ড্যাশবোর্ডের টেক্সট সাধারণত বাম দিকে থাকে, center এর বদলে left দিন */
+    border-inline: none;
+    /* সাইডের বর্ডারটি রিমুভ করে দিন */
+    min-height: 100vh;
+    /*svh এর বদলে vh ব্যবহার করতে পারেন সব ব্রাউজারের জন্য */
     display: flex;
     flex-direction: column;
     box-sizing: border-box;

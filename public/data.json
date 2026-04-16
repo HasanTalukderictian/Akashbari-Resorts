@@ -1,0 +1,26 @@
+{
+    "stats": [
+        { "id": 1, "type": "sales", "label": "Weekly Sales", "value": "$ 15,000", "trend": "Increased by 5%" },
+        { "id": 2, "type": "orders", "label": "Weekly Orders", "value": "45,633", "trend": "Increased by 10%" },
+        { "id": 3, "type": "visitors", "label": "Visitors Online", "value": "95,574", "trend": "Increased by 2%" }
+    ],
+    "barData": [
+        { "name": "JAN", "visits": 4000, "sales": 2400 },
+        { "name": "FEB", "visits": 3000, "sales": 1398 },
+        { "name": "MAR", "visits": 2000, "sales": 9800 },
+        { "name": "APR", "visits": 2780, "sales": 3908 },
+        { "name": "MAY", "visits": 1890, "sales": 4800 },
+        { "name": "JUN", "visits": 2390, "sales": 3800 }
+    ],
+    "pieData": [
+        { "name": "Search Engines", "value": 30, "color": "#047edf" },
+        { "name": "Direct Click", "value": 30, "color": "#07cdae" },
+        { "name": "Bookmarks", "value": 40, "color": "#fe7096" }
+    ],
+    "tasks": [
+        { "id": 1, "title": "Update the documentation", "priority": "High", "color": "danger", "completed": false },
+        { "id": 2, "title": "Fix navigation bug in mobile", "priority": "Medium", "color": "warning", "completed": false },
+        { "id": 3, "title": "Design new landing page", "priority": "Low", "color": "info", "completed": true },
+        { "id": 4, "title": "API Integration for checkout", "priority": "High", "color": "danger", "completed": false }
+    ]
+}
