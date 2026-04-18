@@ -54,3 +54,21 @@
 .contact-btn:hover {
     background: #6b9e3e;
 }
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
+    width: 100%;
+    /* Background full width thakbe */
+    /* border-radius dorkar thakle sudhu bhetorer content-e dite paren, header-e na */
+}
+
+
+/* Menu link gulo ke ektu gap deyar jonno */
+
+.menu .nav-link {
+    margin: 0 15px;
+    font-weight: 500;
+}

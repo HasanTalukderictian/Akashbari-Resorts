@@ -3,14 +3,15 @@ import "../../css/Footer.css";
 import logo from '../../image/Akashbari  resort logo png-01.png'
 
 const Footer = () => {
+  // Automatically gets the current year
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="footer">
       <div className="container footer-top">
-
         {/* Left Section */}
         <div className="footer-col brand">
           <h2>AKASHBARI<br />HOLIDAYS</h2>
-
           <ul>
             <li>Home</li>
             <li>About</li>
@@ -22,7 +23,6 @@ const Footer = () => {
         {/* Middle Section */}
         <div className="footer-col services">
           <h3>SERVICES</h3>
-
           <ul>
             <li>Packages</li>
             <li>Destinations</li>
@@ -34,12 +34,26 @@ const Footer = () => {
         {/* Right Section */}
         <div className="footer-col cta">
           <h3>Design your<br />customized package</h3>
-
           <button className="cta-btn">
             CONTACT US NOW →
           </button>
         </div>
+      </div>
 
+      {/* --- Added Copyright Section Above Divider --- */}
+      <div className="container text-center mb-3">
+        <p className="footer-copyright-text">
+          &copy; {currentYear} AkashBari Resorts. Design and Development By{" "}
+          <a
+            href="https://hasan-portfilo.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="developer-link"
+            style={{ textDecoration: "none" }}
+          >
+            Hasan Talukder
+          </a>
+        </p>
       </div>
 
       {/* Divider */}
@@ -47,7 +61,6 @@ const Footer = () => {
 
       {/* Bottom Section */}
       <div className="footer-bottom container">
-
         <div className="footer-logo">
           <img src={logo} alt="logo" />
         </div>
@@ -71,7 +84,6 @@ const Footer = () => {
           <span>About</span>
           <span>Contact</span>
         </div>
-
       </div>
     </footer>
   );
