@@ -1,4 +1,4 @@
-
+import { useRef } from "react";
 import Banner from './Banner'
 import Footer from './Common/Footer'
 import Header from './Common/Header'
@@ -11,11 +11,22 @@ import Testominal from './Testominal'
 import Video from './Video'
 
 const LandingPage = () => {
+
+  const welcomeRef = useRef(null);
+
+  const scrollToWelcome = () => {
+    welcomeRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <>
       <Header/>
-      <Banner/>
-      <Welcome/>
+      <Banner onDiscoverClick={scrollToWelcome} />
+
+      <div ref={welcomeRef}>
+        <Welcome/>
+      </div>
+
       <Video/>
       <Room/>
       <Facility/>

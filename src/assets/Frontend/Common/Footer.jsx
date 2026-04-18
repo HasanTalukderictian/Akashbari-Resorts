@@ -1,6 +1,7 @@
 import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn } from "react-icons/fa";
 import "../../css/Footer.css";
 import logo from '../../image/Akashbari  resort logo png-01.png'
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   // Automatically gets the current year
@@ -11,11 +12,11 @@ const Footer = () => {
       <div className="container footer-top">
         {/* Left Section */}
         <div className="footer-col brand">
-          <h2>AKASHBARI<br />HOLIDAYS</h2>
+          <h2>AKASHBARI<br />RESORTS</h2>
           <ul>
             <li>Home</li>
             <li>About</li>
-            <li>Akashbari Resort</li>
+            <li>Gallery</li>
             <li>Contact</li>
           </ul>
         </div>
@@ -24,23 +25,24 @@ const Footer = () => {
         <div className="footer-col services">
           <h3>SERVICES</h3>
           <ul>
-            <li>Packages</li>
-            <li>Destinations</li>
-            <li>Medical Tourism</li>
-            <li>Price List</li>
+            <li>Rooms</li>
+            <li>Investment</li>
+            <li>Events</li>
+            <li>Facilities</li>
           </ul>
         </div>
 
         {/* Right Section */}
         <div className="footer-col cta">
           <h3>Design your<br />customized package</h3>
-          <button className="cta-btn">
-            CONTACT US NOW →
-          </button>
+          
+             <Link to="/contact" className="cta-btn"> CONTACT US NOW →</Link>
+       
         </div>
       </div>
 
       {/* --- Added Copyright Section Above Divider --- */}
+
       <div className="container text-center mb-3">
         <p className="footer-copyright-text">
           &copy; {currentYear} AkashBari Resorts. Design and Development By{" "}
@@ -55,6 +57,7 @@ const Footer = () => {
           </a>
         </p>
       </div>
+      
 
       {/* Divider */}
       <div className="footer-divider"></div>
@@ -81,8 +84,8 @@ const Footer = () => {
         </div>
 
         <div className="footer-links">
-          <span>About</span>
-          <span>Contact</span>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
         </div>
       </div>
     </footer>
