@@ -16,12 +16,12 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        <Route path='/' element={<Homepage />} />
-        <Route path='/landingpage' element={<LandingPage />} />
+        <Route path='/home' element={<Homepage />} />
+        <Route path='/' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/blog' element={<Blog />} />
-           <Route path="/blog-details" element={<BlogDetails />} />
+        <Route path="/blog-details" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/dashboard" element={<Dashbord />} />
         <Route path="/login" element={<Login />} />

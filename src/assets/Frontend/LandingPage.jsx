@@ -7,6 +7,7 @@ import Event from './Event'
 import Facility from './Facility'
 import Investment from './Investment'
 import Room from './Room'
+import Testominal from './Testominal'
 import Video from './Video'
 
 const LandingPage = () => {
@@ -20,6 +21,7 @@ const LandingPage = () => {
       <Facility/>
       <Event/>
       <Investment/>
+      <Testominal/>
       <Footer/>
     </>
   )
