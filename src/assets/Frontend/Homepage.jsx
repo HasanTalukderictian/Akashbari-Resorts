@@ -6,7 +6,7 @@ const Homepage = () => {
         <div
             style={{
                 height: "100vh",
-                backgroundImage: "url('https://i.ibb.co.com/F4pR05Pb/hilton-moorea-lagoon-resort-spa-moorea-french-poly-110160-1.jpg')",
+                backgroundImage: "url('https://i.ibb.co.com/yBcPqBqZ/d1-1715829836350.jpg')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 display: "flex",
@@ -42,7 +42,7 @@ const Homepage = () => {
                 {/* Responsive logo + title */}
                 <div className="d-flex flex-column flex-md-row align-items-center gap-3 mb-3 text-center text-md-start">
                     <img
-                        src={logo}
+                        src="https://i.ibb.co.com/21J7GS2S/Akashbari-resort-logo-png-01.png"
                         alt="logo"
                         style={{ width: "120px" }}
                     />
