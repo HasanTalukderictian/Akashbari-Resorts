@@ -1,8 +1,10 @@
 import React from 'react';
-import '../css/Investment.css'; // নিচের CSS ফাইলটি তৈরি করে এখানে ইম্পোর্ট করুন
+import { useNavigate } from 'react-router-dom'; // ১. ইম্পোর্ট করুন
+import '../css/Investment.css';
 
 const Investment = () => {
-    // এই ডাটাগুলো আপনি পরবর্তীতে JSON API থেকে লোড করতে পারবেন
+    const navigate = useNavigate(); // ২. নেভিগেট হুক ডিক্লেয়ার করুন
+
     const packages = [
         {
             id: 1,
@@ -54,6 +56,14 @@ const Investment = () => {
         }
     ];
 
+    // ৩. কার্ডে ক্লিক করলে কাজ করবে এমন ফাংশন
+    const handleCardClick = (pkg) => {
+        if (!pkg.isSoldOut) {
+            // আইডি অনুযায়ী ডাইনামিক ইউআরএল-এ নিয়ে যাবে
+            navigate(`/package-details/${pkg.id}`, { state: { packageData: pkg } });
+        }
+    };
+
     return (
         <section className="investment-section py-5">
             <div className="container text-center">
@@ -65,7 +75,12 @@ const Investment = () => {
                 <div className="row g-4 justify-content-center">
                     {packages.map((pkg) => (
                         <div className="col-lg-3 col-md-6" key={pkg.id}>
-                            <div className={`investment-card ${pkg.isPopular ? 'popular-border' : ''}`}>
+                            {/* ৪. এখানে onClick ইভেন্ট যোগ করা হয়েছে */}
+                            <div 
+                                className={`investment-card ${pkg.isPopular ? 'popular-border' : ''} ${pkg.isSoldOut ? 'sold-out-card' : 'clickable-card'}`}
+                                onClick={() => handleCardClick(pkg)}
+                                style={{ cursor: pkg.isSoldOut ? 'default' : 'pointer' }}
+                            >
 
                                 {pkg.isPopular && (
                                     <div className="popular-badge">
@@ -97,7 +112,7 @@ const Investment = () => {
                                     )}
 
                                     <button className={`inquire-btn mt-auto ${pkg.isPopular ? 'popular-btn' : pkg.isSoldOut ? 'sold-out-footer' : ''}`}>
-                                        INQUIRE NOW
+                                        {pkg.isSoldOut ? "NOT AVAILABLE" : "INQUIRE NOW"}
                                     </button>
                                 </div>
                             </div>
@@ -105,8 +120,10 @@ const Investment = () => {
                     ))}
                 </div>
             </div>
+            
+            {/* বাকি বেনিফিট অংশ একই থাকবে... */}
 
-            <div className="benefits-container container mt-5 p-5 bg-white">
+             <div className="benefits-container container mt-5 p-5 bg-white">
                 <div className="text-center mb-4">
                     <span className="benefits-badge">WHY INVEST WITH US</span>
                     <h2 className="benefits-main-title">EXCLUSIVE INVESTMENT BENEFITS</h2>
@@ -154,6 +171,7 @@ const Investment = () => {
                     <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
                 </div>
             </div>
+            
         </section>
     );
 };

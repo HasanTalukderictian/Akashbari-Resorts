@@ -9,6 +9,7 @@ import Contact from './assets/Frontend/Contact'
 import Gallery from './assets/Frontend/Gallery'
 import Dashbord from './Backend/Dashbord'
 import Login from './Backend/Login'
+import PackageDetails from './assets/Frontend/PackageDetails'
 
 
 function App() {
@@ -16,13 +17,14 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        <Route path='/' element={<Homepage />} />
-        <Route path='/home' element={<LandingPage />} />
+        <Route path='/home' element={<Homepage />} />
+        <Route path='/' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/blog' element={<Blog />} />
         <Route path="/blog-details" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/dashboard" element={<Dashbord />} />
         <Route path="/login" element={<Login />} />
 
