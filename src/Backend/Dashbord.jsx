@@ -1,22 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from './Header'; 
 import Sidebar from './Sidebar'; 
-import Footer from './Footer'; // এটি যুক্ত করা হয়েছে এরর দূর করতে
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell, Legend
-} from 'recharts';
+import Footer from './Footer';
+import Users from './Users'; // নিশ্চিত করুন Users.jsx আপনার একই ফোল্ডারে আছে
 
 const Dashbord = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [activeView, setActiveView] = useState('dashboard');
-
-    const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-    const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
-    // --- ১. থিম ডাটা ---
+    const location = useLocation();
+    
+    // ১. থিম ডাটা (এটি renderContent এর উপরে থাকতে হবে)
     const theme = {
+        isDarkMode: isDarkMode,
         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
         card: isDarkMode ? '#16213e' : '#ffffff',
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
@@ -25,84 +21,79 @@ const Dashbord = () => {
         gridColor: isDarkMode ? '#2d3436' : '#f5f5f5'
     };
 
-    // --- ২. স্টাইল অবজেক্ট ---
+    // ২. URL দেখে activeView সেট করা
+    const [activeView, setActiveView] = useState('dashboard');
+
+    useEffect(() => {
+        const path = location.pathname.replace('/', '');
+        if (path) {
+            setActiveView(path);
+        } else {
+            setActiveView('dashboard');
+        }
+    }, [location]);
+
+    const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+    const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+
+    const handleLogout = () => {
+        if (window.confirm("Are you sure?")) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+    };
+
+    // ৩. স্টাইল অবজেক্ট
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', color: theme.text, transition: 'all 0.3s ease' },
         sidebar: { 
-            width: isCollapsed ? '70px' : '260px', 
+            width: isCollapsed ? '80px' : '260px', 
             backgroundColor: theme.card, 
             height: '100vh', 
             position: 'sticky', 
             top: 0, 
             transition: 'width 0.3s ease', 
-            overflowY: 'auto', 
-            whiteSpace: 'nowrap', 
             borderRight: `1px solid ${theme.border}`,
-            zIndex: 1000
+            zIndex: 1000,
+            overflowX: 'hidden'
         },
         mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
         contentScroll: { 
             flexGrow: 1, 
             overflowY: 'auto', 
-            backgroundColor: theme.bg, 
             padding: '24px',
             display: 'flex',
-            flexDirection: 'column' // ফুটারকে নিচে রাখার জন্য
+            flexDirection: 'column'
         },
-        navLink: (view) => ({
-            color: activeView === view ? '#b66dff' : theme.sidebarText,
-            padding: '12px 25px',
-            textDecoration: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '14px',
-            fontWeight: activeView === view ? 'bold' : 'normal',
-            cursor: 'pointer',
-            backgroundColor: activeView === view ? (isDarkMode ? '#1a1a2e' : '#f8f9fa') : 'transparent'
-        }),
+        purpleIcon: { backgroundColor: '#b66dff', color: 'white', padding: '8px', borderRadius: '5px', marginRight: '10px' },
         statCard: (type) => {
             let gradient = type === 'sales' ? 'linear-gradient(to right, #ffbf96, #fe7096)' :
-                type === 'orders' ? 'linear-gradient(to right, #90caf9, #047edf)' :
-                    'linear-gradient(to right, #84d9d2, #07cdae)';
-            return { background: gradient, border: 'none', borderRadius: '10px', color: 'white' };
-        },
-        purpleIcon: { backgroundColor: '#b66dff', color: 'white', padding: '8px', borderRadius: '5px', marginRight: '10px' }
+                           type === 'orders' ? 'linear-gradient(to right, #90caf9, #047edf)' :
+                           'linear-gradient(to right, #84d9d2, #07cdae)';
+            return { background: gradient, border: 'none', borderRadius: '12px', color: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
+        }
     };
 
-    // --- ৩. চার্ট ডাটা ---
-    const barData = [
-        { name: 'JAN', visits: 4000, sales: 2400 },
-        { name: 'FEB', visits: 3000, sales: 1398 },
-        { name: 'MAR', visits: 2000, sales: 9800 }
-    ];
-
-    const pieData = [
-        { name: 'Search', value: 30, color: '#047edf' },
-        { name: 'Direct', value: 30, color: '#07cdae' },
-        { name: 'Bookmarks', value: 40, color: '#fe7096' }
-    ];
-
-    const handleLogout = () => {
-    // লগআউট লজিক (উদাহরণস্বরূপ: টোকেন রিমুভ করা এবং লগইন পেজে পাঠানো)
-    console.log("Logging out...");
-    localStorage.removeItem('token'); // আপনার টোকেনের নাম অনুযায়ী পরিবর্তন করুন
-    window.location.href = '/login'; // বা useNavigate ব্যবহার করতে পারেন
-};
-
-    // --- ৪. রেন্ডার কন্টেন্ট ফাংশন ---
+    // ৪. কন্টেন্ট রেন্ডার ফাংশন
     const renderContent = () => {
         switch (activeView) {
-            case 'ui-elements':
-                return <div className="animate__animated animate__fadeIn">UI Elements Content</div>;
+            case 'users':
+                return <Users theme={theme} />;
             case 'tasks':
-                return <div className="animate__animated animate__fadeIn">Tasks Content</div>;
+                return (
+                    <div className="card p-4 border-0 shadow-sm" style={{ backgroundColor: theme.card }}>
+                        <h4>Task Management</h4>
+                        <p className="text-muted">Task lists will appear here...</p>
+                    </div>
+                );
+            case 'dashboard':
             default:
                 return (
                     <div className="animate__animated animate__fadeIn">
                         <div className="row g-4 mb-4">
                             {['sales', 'orders', 'visitors'].map((type) => (
                                 <div className="col-md-4" key={type}>
-                                    <div className="card p-4 shadow-sm h-100" style={styles.statCard(type)}>
+                                    <div className="card p-4 h-100 shadow-sm" style={styles.statCard(type)}>
                                         <h5 className="fw-normal text-capitalize">{type}</h5>
                                         <h2 className="my-3">
                                             {type === 'sales' ? '$ 15,000' : type === 'orders' ? '45,633' : '95,574'}
@@ -112,7 +103,10 @@ const Dashbord = () => {
                                 </div>
                             ))}
                         </div>
-                        {/* গ্রাফ এরিয়া চাইলে এখানে আপনার আগের কোড থেকে চার্ট বসাতে পারেন */}
+                        <div className="card p-4 border-0 shadow-sm" style={{ backgroundColor: theme.card, color: theme.text }}>
+                            <h5>Welcome Back, Hasan!</h5>
+                            <p className="text-muted mb-0">System performance is stable at 98%.</p>
+                        </div>
                     </div>
                 );
         }
@@ -120,29 +114,29 @@ const Dashbord = () => {
 
     return (
         <div style={styles.container} className="container-fluid p-0">
-            <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
+            <div className="d-flex">
                 {/* সাইডবার */}
                 <Sidebar 
                     theme={theme} 
                     isCollapsed={isCollapsed} 
-                    activeView={activeView} 
-                    setActiveView={setActiveView} 
+                    activeView={activeView}
                     styles={styles} 
                 />
                 
                 <div style={styles.mainArea} className="flex-grow-1">
                     {/* হেডার */}
-                  <Header 
-        theme={theme} 
-        isDarkMode={isDarkMode} 
-        toggleDarkMode={toggleDarkMode} 
-        toggleSidebar={toggleSidebar} 
-        onLogout={handleLogout} // <--- এই লাইনটি যোগ করুন
-    />
-                    {/* মেইন কন্টেন্ট এবং ফুটার */}
+                    <Header 
+                        theme={theme} 
+                        isDarkMode={isDarkMode} 
+                        toggleDarkMode={toggleDarkMode} 
+                        toggleSidebar={toggleSidebar} 
+                        onLogout={handleLogout} 
+                    />
+                    
+                    {/* কন্টেন্ট এরিয়া */}
                     <div style={styles.contentScroll}>
                         <div className="flex-grow-1">
-                            <h4 className="mb-4 text-capitalize d-flex align-items-center">
+                            <h4 className="mb-4 text-capitalize d-flex align-items-center fw-bold">
                                 <span style={styles.purpleIcon}>
                                     <i className="bi bi-grid-fill"></i>
                                 </span>

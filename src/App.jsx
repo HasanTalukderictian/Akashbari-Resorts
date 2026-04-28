@@ -10,6 +10,7 @@ import Gallery from './assets/Frontend/Gallery'
 import Dashbord from './Backend/Dashbord'
 import Login from './Backend/Login'
 import PackageDetails from './assets/Frontend/PackageDetails'
+import Users from './Backend/Users'
 
 
 function App() {
@@ -26,7 +27,8 @@ function App() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/dashboard" element={<Dashbord />} />
-        <Route path="/login" element={<Login />} />
+         <Route path="/login" element={<Login />} />
+        <Route path="/users" element={<Users />} />
 
 
 
