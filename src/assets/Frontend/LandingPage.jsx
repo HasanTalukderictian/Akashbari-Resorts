@@ -20,20 +20,21 @@ const LandingPage = () => {
 
   return (
     <>
-      <Header/>
+      <Header />
       <Banner onDiscoverClick={scrollToWelcome} />
 
       <div ref={welcomeRef}>
-        <Welcome/>
+        <Welcome />
       </div>
 
-      <Video/>
-      <Room/>
-      <Facility/>
-      <Event/>
-      <Investment/>
-      <Testominal/>
-      <Footer/>
+      <Video />
+      <Investment />
+      <Room />
+      <Facility />
+      <Event />
+
+      <Testominal />
+      <Footer />
     </>
   )
 }
