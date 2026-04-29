@@ -11,6 +11,7 @@ import Dashbord from './Backend/Dashbord'
 import Login from './Backend/Login'
 import PackageDetails from './assets/Frontend/PackageDetails'
 import Users from './Backend/Users'
+import Content from './Backend/Content'
 
 
 function App() {
@@ -28,7 +29,8 @@ function App() {
         <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/dashboard" element={<Dashbord />} />
          <Route path="/login" element={<Login />} />
-        <Route path="/users" element={<Users />} />
+          <Route path="/users" element={<Users />} />
+        <Route path="/content" element={<Content />} />
 
 
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header'; 
 import Sidebar from './Sidebar'; 
 import Footer from './Footer';
@@ -9,6 +9,7 @@ const Dashbord = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     
     // ১. থিম ডাটা (এটি renderContent এর উপরে থাকতে হবে)
     const theme = {
@@ -36,12 +37,7 @@ const Dashbord = () => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    const handleLogout = () => {
-        if (window.confirm("Are you sure?")) {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-    };
+
 
     // ৩. স্টাইল অবজেক্ট
     const styles = {
@@ -130,7 +126,7 @@ const Dashbord = () => {
                         isDarkMode={isDarkMode} 
                         toggleDarkMode={toggleDarkMode} 
                         toggleSidebar={toggleSidebar} 
-                        onLogout={handleLogout} 
+                       
                     />
                     
                     {/* কন্টেন্ট এরিয়া */}

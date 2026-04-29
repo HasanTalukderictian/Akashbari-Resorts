@@ -1,20 +1,31 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-const Sidebar = ({ theme, isCollapsed, styles }) => {
+const Sidebar = ({ theme, isCollapsed, styles = {} }) => { // styles কে ডিফল্ট খালি অবজেক্ট দিন
     
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: 'house-door', path: '/dashboard' },
         { id: 'users', label: 'Users', icon: 'people', path: '/users' },
-        { id: 'tasks', label: 'Tasks', icon: 'list-check', path: '/tasks' },
+        { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
         { id: 'analytics', label: 'Analytics', icon: 'pie-chart', path: '/analytics' },
         { id: 'messages', label: 'Messages', icon: 'envelope', path: '/messages' },
         { id: 'settings', label: 'Settings', icon: 'sliders', path: '/settings' },
         { id: 'profile', label: 'Profile', icon: 'person-badge', path: '/profile' }
     ];
 
+    // ব্যাকআপ স্টাইল যদি styles প্রপস না পাঠানো হয়
+    const sidebarBg = {
+        width: isCollapsed ? '80px' : '260px',
+        backgroundColor: theme?.card || '#fff',
+        height: '100vh',
+        transition: 'width 0.3s ease',
+        borderRight: `1px solid ${theme?.border || '#eee'}`
+    };
+
     return (
-        <div className="d-none d-md-block shadow-sm" style={styles.sidebar}>
+        // styles.sidebar না থাকলে sidebarBg ব্যবহার করবে
+        <div className="d-none d-md-block shadow-sm" style={styles?.sidebar || sidebarBg}>
+            
             {/* --- লোগো সেকশন --- */}
             <div className="p-4 mb-2 text-center">
                 {isCollapsed ? (
@@ -31,14 +42,14 @@ const Sidebar = ({ theme, isCollapsed, styles }) => {
 
             {/* --- ইউজার কার্ড --- */}
             <div className="mx-3 mb-4 p-2 d-flex align-items-center rounded-3" 
-                 style={{ backgroundColor: theme.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
+                 style={{ backgroundColor: theme?.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
                 <img src="https://i.pravatar.cc/40?img=12" 
                      className="rounded-circle shadow-sm" 
                      alt="user" 
                      style={{ border: '2px solid #b66dff', padding: '2px' }} />
                 {!isCollapsed && (
                     <div className="ms-3 overflow-hidden">
-                        <p className="m-0 fw-bold small text-truncate" style={{ color: theme.text }}>Hasan Talukder</p>
+                        <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Hasan Talukder</p>
                         <span className="text-muted" style={{ fontSize: '11px' }}>Premium Admin</span>
                     </div>
                 )}
@@ -52,8 +63,8 @@ const Sidebar = ({ theme, isCollapsed, styles }) => {
                         to={item.path}
                         className="nav-link-custom"
                         style={({ isActive }) => ({
-                            ...styles.navLink,
-                            color: isActive ? '#fff' : theme.sidebarText,
+                            ...(styles?.navLink || {}), // optional chaining ব্যবহার করা হয়েছে
+                            color: isActive ? '#fff' : theme?.sidebarText,
                             background: isActive ? 'linear-gradient(to right, #da8cff, #9a55ff)' : 'transparent',
                             borderRadius: '8px',
                             marginBottom: '5px',
@@ -71,17 +82,6 @@ const Sidebar = ({ theme, isCollapsed, styles }) => {
                     </NavLink>
                 ))}
             </div>
-
-            {/* --- প্রমো কার্ড (শুধুমাত্র বড় থাকলে দেখাবে) --- */}
-            
-            {/* {!isCollapsed && (
-                <div className="mt-5 mx-3 p-3 rounded-4 text-white text-center" 
-                     style={{ background: 'linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b)', fontSize: '12px' }}>
-                    <p className="m-0">Need Help?</p>
-                    <button className="btn btn-sm btn-light mt-2 py-1 px-3 fw-bold" style={{ fontSize: '10px', borderRadius: '20px' }}>Contact Support</button>
-                </div>
-            )} */}
-
         </div>
     );
 };

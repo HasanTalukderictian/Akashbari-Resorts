@@ -27,6 +27,7 @@ const Login = () => {
       if (response.data.status === 'success') {
         // টোকেন সেভ করা
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('Role', response.role);
         // ড্যাশবোর্ডে পাঠানো
         navigate('/dashboard');
       }
