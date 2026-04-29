@@ -1,8 +1,32 @@
-import React from 'react';
-import '../../css/welcome.css'; // Make sure to create this file
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Make sure to install axios: npm install axios
+import '../../css/welcome.css'; 
 import logo from '../../image/Akashbari  resort logo png-01.png';
 
 const Welcome = () => {
+  // State for storing API data
+  const [features, setFeatures] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetching data from API
+  useEffect(() => {
+    const fetchFeatures = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/get-about-features');
+        if (response.data.status === "success") {
+          // Accessing the details array from the first object of data
+          setFeatures(response.data.data[0].details);
+        }
+      } catch (error) {
+        console.error("Error fetching features:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatures();
+  }, []);
+
   return (
     <section className="welcome-section py-5">
       <div className="container">
@@ -43,20 +67,22 @@ const Welcome = () => {
             </div>
           </div>
 
-          {/* Right Features Side */}
+          {/* Right Features Side - Dynamic Part */}
           <div className="col-lg-5 offset-lg-1">
             <div className="features-box p-4 p-md-5">
               <h2 className="features-title text-center text-uppercase mb-4">Resort Features</h2>
-              <ul className="list-unstyled features-list">
-                <li><i className="bi bi-check2"></i> Total Land Area: 22 Bigha</li>
-                <li><i className="bi bi-check2"></i> Number of Rooms: 102</li>
-                <li><i className="bi bi-check2"></i> 40+ Premium Facilities</li>
-                <li><i className="bi bi-check2"></i> Presidential Suites</li>
-                <li><i className="bi bi-check2"></i> Premium Suites</li>
-                <li><i className="bi bi-check2"></i> Deluxe Rooms</li>
-                <li><i className="bi bi-check2"></i> Villa Suites</li>
-                <li><i className="bi bi-check2"></i> Swimming Pool: 01</li>
-              </ul>
+              
+              {loading ? (
+                <p className="text-center">Loading...</p>
+              ) : (
+                <ul className="list-unstyled features-list">
+                  {features.map((item, index) => (
+                    <li key={index}>
+                      <i className="bi bi-check2"></i> {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>
