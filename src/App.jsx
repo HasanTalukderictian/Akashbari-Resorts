@@ -12,6 +12,7 @@ import Login from './Backend/Login'
 import PackageDetails from './assets/Frontend/PackageDetails'
 import Users from './Backend/Users'
 import Content from './Backend/Content'
+import Welcome from './Backend/Welcome'
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
          <Route path="/login" element={<Login />} />
           <Route path="/users" element={<Users />} />
         <Route path="/content" element={<Content />} />
+         <Route path="/welcome" element={<Welcome />} />
 
 
 

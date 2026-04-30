@@ -1,43 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Make sure to install axios: npm install axios
+import axios from 'axios'; 
 import '../../css/welcome.css'; 
 import logo from '../../image/Akashbari  resort logo png-01.png';
 
 const Welcome = () => {
   // State for storing API data
   const [features, setFeatures] = useState([]);
+  const [welcomeData, setWelcomeData] = useState(null); // Left side data state
   const [loading, setLoading] = useState(true);
 
-  // Fetching data from API
+  // Fetching data from APIs
   useEffect(() => {
-    const fetchFeatures = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/get-about-features');
-        if (response.data.status === "success") {
-          // Accessing the details array from the first object of data
-          setFeatures(response.data.data[0].details);
+        // Fetching Left Side (Welcome) Data
+        const welcomeRes = await axios.get('http://127.0.0.1:8000/api/get-welcomes');
+        if (welcomeRes.data.success && welcomeRes.data.data.length > 0) {
+          setWelcomeData(welcomeRes.data.data[0]);
+        }
+
+        // Fetching Right Side (Features) Data
+        const featuresRes = await axios.get('http://127.0.0.1:8000/api/get-about-features');
+        if (featuresRes.data.status === "success") {
+          setFeatures(featuresRes.data.data[0].details);
         }
       } catch (error) {
-        console.error("Error fetching features:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFeatures();
+    fetchData();
   }, []);
 
   return (
     <section className="welcome-section py-5">
       <div className="container">
         <div className="row align-items-center">
-          {/* Left Content Side */}
+          
+          {/* Left Content Side - Now Dynamic */}
           <div className="col-lg-6 mb-4 mb-lg-0">
             <div className="d-flex align-items-center gap-3">
               {/* Left Side: Text Div */}
               <div>
-                <h3 className="welcome-title text-uppercase mb-0">Welcome To</h3>
-                <h3 className="welcome-subtitle text-uppercase mb-0">Akashbari Resort</h3>
+                <h3 className="welcome-title text-uppercase mb-0">
+                   {/* splitting "Welcome To Akashbari Resort" if needed, or just showing title */}
+                   {welcomeData ? welcomeData.title.split(' ').slice(0, 2).join(' ') : "Welcome To"}
+                </h3>
+                <h3 className="welcome-subtitle text-uppercase mb-0">
+                   {welcomeData ? welcomeData.title.split(' ').slice(2).join(' ') : "Akashbari Resort"}
+                </h3>
               </div>
 
               {/* Right Side: Image Div */}
@@ -52,18 +65,14 @@ const Welcome = () => {
             <div className="yellow-divider mb-4"></div>
 
             <div className="welcome-text">
-              <p>
-                Akashbari Hotel & Resorts is another step forward in expanding the Akashbari brand,
-                offering premium hospitality and world-class accommodation services.
-              </p>
-              <p>
-                Akashbari Hotels & Resorts is a premium hospitality venture under the renowned
-                Akashbari Holidays brand. Located in the serene and nature-rich area of Gazipur,
-                the resort is designed to provide guests with an exceptional blend of comfort,
-                luxury, and tranquility. Built with a vision to redefine leisure and corporate
-                hospitality in Bangladesh, Akashbari Hotels & Resorts offers a refreshing escape
-                from the hustle and bustle of city life.
-              </p>
+              {/* API theke asha description render hocche */}
+              {welcomeData ? (
+                welcomeData.description.split('\r\n\r\n').map((para, index) => (
+                  <p key={index}>{para}</p>
+                ))
+              ) : (
+                <p>Loading description...</p>
+              )}
             </div>
           </div>
 

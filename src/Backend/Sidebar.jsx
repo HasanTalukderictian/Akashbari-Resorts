@@ -7,7 +7,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => { // styles কে ড�
         { id: 'dashboard', label: 'Dashboard', icon: 'house-door', path: '/dashboard' },
         { id: 'users', label: 'Users', icon: 'people', path: '/users' },
         { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
-        { id: 'analytics', label: 'Analytics', icon: 'pie-chart', path: '/analytics' },
+        { id: 'welcome', label: 'Welcome Section', icon: 'pie-chart', path: '/welcome' },
         { id: 'messages', label: 'Messages', icon: 'envelope', path: '/messages' },
         { id: 'settings', label: 'Settings', icon: 'sliders', path: '/settings' },
         { id: 'profile', label: 'Profile', icon: 'person-badge', path: '/profile' }
