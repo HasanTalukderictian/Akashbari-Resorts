@@ -3,7 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header'; 
 import Sidebar from './Sidebar'; 
 import Footer from './Footer';
-import Users from './Users'; // নিশ্চিত করুন Users.jsx আপনার একই ফোল্ডারে আছে
+import Users from './Users'; 
+
+// Dummy components for illustration if not imported
+const Welcome = () => <div className="card p-4 border-0 shadow-sm"><h4>Welcome Section</h4></div>;
+const VideoSection = () => <div className="card p-4 border-0 shadow-sm"><h4>Video Section</h4></div>;
 
 const Dashbord = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -11,7 +15,6 @@ const Dashbord = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    // ১. থিম ডাটা (এটি renderContent এর উপরে থাকতে হবে)
     const theme = {
         isDarkMode: isDarkMode,
         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
@@ -22,7 +25,6 @@ const Dashbord = () => {
         gridColor: isDarkMode ? '#2d3436' : '#f5f5f5'
     };
 
-    // ২. URL দেখে activeView সেট করা
     const [activeView, setActiveView] = useState('dashboard');
 
     useEffect(() => {
@@ -37,9 +39,6 @@ const Dashbord = () => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-
-
-    // ৩. স্টাইল অবজেক্ট
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', color: theme.text, transition: 'all 0.3s ease' },
         sidebar: { 
@@ -58,31 +57,20 @@ const Dashbord = () => {
             flexGrow: 1, 
             overflowY: 'auto', 
             padding: '24px',
-            display: 'flex',
-            flexDirection: 'column'
+            display: 'flex',          // Flex ব্যবহার করা হয়েছে
+            flexDirection: 'column'   // কলাম ডিরেকশন
         },
         purpleIcon: { backgroundColor: '#b66dff', color: 'white', padding: '8px', borderRadius: '5px', marginRight: '10px' },
-        statCard: (type) => {
-            let gradient = type === 'sales' ? 'linear-gradient(to right, #ffbf96, #fe7096)' :
-                           type === 'orders' ? 'linear-gradient(to right, #90caf9, #047edf)' :
-                           'linear-gradient(to right, #84d9d2, #07cdae)';
-            return { background: gradient, border: 'none', borderRadius: '12px', color: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' };
-        }
     };
 
-    // ৪. কন্টেন্ট রেন্ডার ফাংশন
     const renderContent = () => {
         switch (activeView) {
             case 'users':
                 return <Users theme={theme} />;
-            case 'tasks':
-                return (
-                    <div className="card p-4 border-0 shadow-sm" style={{ backgroundColor: theme.card }}>
-                        <h4>Task Management</h4>
-                        <p className="text-muted">Task lists will appear here...</p>
-                    </div>
-                );
-                
+            case 'welcome':
+                return <Welcome />;
+            case 'video':
+                return <VideoSection />;
             case 'dashboard':
             default:
                 return (
@@ -90,7 +78,12 @@ const Dashbord = () => {
                         <div className="row g-4 mb-4">
                             {['sales', 'orders', 'visitors'].map((type) => (
                                 <div className="col-md-4" key={type}>
-                                    <div className="card p-4 h-100 shadow-sm" style={styles.statCard(type)}>
+                                    <div className="card p-4 h-100 shadow-sm" style={{ 
+                                        background: type === 'sales' ? 'linear-gradient(to right, #ffbf96, #fe7096)' :
+                                                   type === 'orders' ? 'linear-gradient(to right, #90caf9, #047edf)' :
+                                                   'linear-gradient(to right, #84d9d2, #07cdae)',
+                                        color: 'white', border: 'none', borderRadius: '12px' 
+                                    }}>
                                         <h5 className="fw-normal text-capitalize">{type}</h5>
                                         <h2 className="my-3">
                                             {type === 'sales' ? '$ 15,000' : type === 'orders' ? '45,633' : '95,574'}
@@ -106,15 +99,12 @@ const Dashbord = () => {
                         </div>
                     </div>
                 );
-
-                
         }
     };
 
     return (
         <div style={styles.container} className="container-fluid p-0">
             <div className="d-flex">
-                {/* সাইডবার */}
                 <Sidebar 
                     theme={theme} 
                     isCollapsed={isCollapsed} 
@@ -123,17 +113,17 @@ const Dashbord = () => {
                 />
                 
                 <div style={styles.mainArea} className="flex-grow-1">
-                    {/* হেডার */}
                     <Header 
                         theme={theme} 
                         isDarkMode={isDarkMode} 
                         toggleDarkMode={toggleDarkMode} 
                         toggleSidebar={toggleSidebar} 
-                       
                     />
                     
-                    {/* কন্টেন্ট এরিয়া */}
+                    {/* SCROLLABLE AREA */}
                     <div style={styles.contentScroll}>
+                        
+                        {/* কন্টেন্ট র্যাপার: flex-grow-1 ফুটারকে নিচে ঠেলে দেবে */}
                         <div className="flex-grow-1">
                             <h4 className="mb-4 text-capitalize d-flex align-items-center fw-bold">
                                 <span style={styles.purpleIcon}>
@@ -144,8 +134,10 @@ const Dashbord = () => {
                             {renderContent()}
                         </div>
                         
-                        {/* ফুটার */}
-                        <Footer theme={theme} />
+                        {/* স্টিকি ফুটার */}
+                        <div className="mt-4">
+                            <Footer theme={theme} />
+                        </div>
                     </div>
                 </div>
             </div>

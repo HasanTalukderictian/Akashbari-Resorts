@@ -16,6 +16,7 @@ const Welcome = ({ theme: propsTheme }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
+        
         image: null
     });
 

@@ -10,8 +10,8 @@ const Content = ({ theme: propsTheme }) => {
     const [loading, setLoading] = useState(false);
 
     // --- API Data States ---
-    const [featureTitles, setFeatureTitles] = useState([]); // Dropdown er jonno
-    const [groupedFeatures, setGroupedFeatures] = useState([]); // 2nd Table er jonno
+    const [featureTitles, setFeatureTitles] = useState([]); 
+    const [groupedFeatures, setGroupedFeatures] = useState([]); 
 
     // --- Modal & Form States ---
     const [showModal, setShowModal] = useState(false);
@@ -35,7 +35,7 @@ const Content = ({ theme: propsTheme }) => {
         border: isDarkMode ? '#2d3436' : '#ebedf2'
     };
 
-    // --- 1. Fetch Main Banners ---
+    // --- API Functions ---
     const fetchBanners = async () => {
         try {
             setLoading(true);
@@ -48,26 +48,20 @@ const Content = ({ theme: propsTheme }) => {
         finally { setLoading(false); }
     };
 
-    // --- 2. Fetch Feature Titles for Dropdown ---
     const fetchFeatureTitles = async () => {
         try {
             const res = await fetch('http://127.0.0.1:8000/api/get-features');
             const result = await res.json();
-            if (result.status === 'success') {
-                setFeatureTitles(result.data);
-            }
-        } catch (err) { console.error("Dropdown fetch error:", err); }
+            if (result.status === 'success') setFeatureTitles(result.data);
+        } catch (err) { console.error(err); }
     };
 
-    // --- 3. Fetch Grouped Features (for 2nd Table) ---
     const fetchGroupedFeatures = async () => {
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/get-about-features'); // Change API URL if needed
+            const res = await fetch('http://127.0.0.1:8000/api/get-about-features'); 
             const result = await res.json();
-            if (result.status === 'success') {
-                setGroupedFeatures(result.data);
-            }
-        } catch (err) { console.error("Grouped data fetch error:", err); }
+            if (result.status === 'success') setGroupedFeatures(result.data);
+        } catch (err) { console.error(err); }
     };
 
     useEffect(() => {
@@ -76,7 +70,6 @@ const Content = ({ theme: propsTheme }) => {
         fetchGroupedFeatures();
     }, []);
 
-    // --- Add Header Title API ---
     const handleAddAboutTitle = async () => {
         if (!formData.aboutTitle) return alert("Title is required");
         try {
@@ -94,7 +87,6 @@ const Content = ({ theme: propsTheme }) => {
         } catch (err) { console.error(err); }
     };
 
-    // --- Submit Logic (Hero & About) ---
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -108,20 +100,14 @@ const Content = ({ theme: propsTheme }) => {
                 const url = editId ? `http://127.0.0.1:8000/api/v1/update-banners/${editId}` : 'http://127.0.0.1:8000/api/v1/add-banners';
                 const res = await fetch(url, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
                 const result = await res.json();
-
                 if (result.status === 'success') {
                     alert("Hero Banner Saved!");
                     setShowModal(false); resetForm(); fetchBanners();
                 }
             } else {
-                // About Section Save Logic
                 const res = await fetch('http://127.0.0.1:8000/api/save-about-features', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    // Key-ti oboshoy 'aboutFeatures' hote hobe
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({ aboutFeatures: aboutFeatures })
                 });
                 const result = await res.json();
@@ -186,6 +172,7 @@ const Content = ({ theme: propsTheme }) => {
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }} className="container-fluid p-0 d-flex flex-column">
 
+            {/* MODAL SECTION */}
             {showModal && (
                 <div style={styles.modalOverlay} onClick={() => { setShowModal(false); resetForm(); }}>
                     <div style={styles.modalCard} onClick={e => e.stopPropagation()}>
@@ -241,7 +228,6 @@ const Content = ({ theme: propsTheme }) => {
                                             <button onClick={handleAddAboutTitle} className="btn btn-primary px-3" style={{ background: '#9a55ff', border: 'none' }}>Add</button>
                                         </div>
                                     </div>
-
                                     <div className="p-3 rounded border bg-light">
                                         <div className="d-flex justify-content-between align-items-center mb-3">
                                             <h6 className="fw-bold text-info m-0">Features Section</h6>
@@ -251,7 +237,7 @@ const Content = ({ theme: propsTheme }) => {
                                             <div key={index} className="row g-2 mb-3 border-bottom pb-3">
                                                 <div className="col-md-5">
                                                     <select className="form-select" value={feat.category} onChange={(e) => handleFeatureChange(index, 'category', e.target.value)}>
-                                                        <option value="">Select Category</option>
+                                                        <option value="">Category</option>
                                                         {featureTitles.map((item) => (
                                                             <option key={item.id} value={item.title}>{item.title}</option>
                                                         ))}
@@ -277,86 +263,90 @@ const Content = ({ theme: propsTheme }) => {
                 </div>
             )}
 
-            <div className="d-flex flex-grow-1">
+            {/* MAIN CONTENT AREA */}
+            <div className="d-flex flex-grow-1" style={{ minHeight: '100vh' }}>
                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="content" />
-                <div className="flex-grow-1 d-flex flex-column" style={{ height: '100vh' }}>
+                
+                {/* Right Side Column */}
+                <div className="flex-grow-1 d-flex flex-column" style={{ height: '100vh', overflow: 'hidden' }}>
                     <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} toggleSidebar={() => setIsCollapsed(!isCollapsed)} />
-                    <div className="flex-grow-1 overflow-auto p-4">
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="fw-bold m-0" style={{ color: theme.text }}>Page Management</h4>
-                            <button className="btn btn-primary px-4 shadow-sm fw-bold" style={{ background: 'linear-gradient(to right, #da8cff, #9a55ff)', border: 'none', borderRadius: '12px' }} onClick={() => { resetForm(); setShowModal(true); }}>+ Add New</button>
-                        </div>
+                    
+                    {/* Scrollable Container */}
+                    <div className="flex-grow-1 overflow-auto d-flex flex-column">
+                        
+                        {/* Main Padding Wrapper */}
+                        <div className="p-4 flex-grow-1">
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h4 className="fw-bold m-0" style={{ color: theme.text }}>Page Management</h4>
+                                <button className="btn btn-primary px-4 shadow-sm fw-bold" style={{ background: 'linear-gradient(to right, #da8cff, #9a55ff)', border: 'none', borderRadius: '12px' }} onClick={() => { resetForm(); setShowModal(true); }}>+ Add New</button>
+                            </div>
 
-                        {/* --- TABLE 1: MAIN BANNERS --- */}
-                        <div style={styles.tableCard}>
-                            <table className="table m-0" style={{ color: theme.text }}>
-                                <thead style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : '#fcfcfc' }}>
-                                    <tr>
-                                        <th className="py-3 px-4 border-0">Title</th>
-                                        <th className="py-3 border-0">Type</th>
-                                        <th className="py-3 px-4 border-0 text-end">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {banners.map((b) => (
-                                        <tr key={b.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
-                                            <td className="py-3 px-4 align-middle">
-                                                <div className="fw-bold">{b.title}</div>
-                                                <div className="small text-muted">{b.slug ? `/${b.slug}` : 'About Section'}</div>
-                                            </td>
-                                            <td className="py-3 align-middle"><span className={`badge rounded-pill ${b.slug ? 'bg-primary' : 'bg-info'}`}>{b.slug ? 'Hero' : 'About'}</span></td>
-                                            <td className="py-3 px-4 text-end align-middle">
-                                                <button className="btn btn-outline-primary" style={styles.actionBtn} onClick={() => handleEdit(b)}><i className="bi bi-pencil-square"></i></button>
-                                                <button className="btn btn-outline-danger" style={styles.actionBtn} onClick={() => handleDelete(b.id)}><i className="bi bi-trash3"></i></button>
-                                            </td>
+                            {/* TABLE 1 */}
+                            <div style={styles.tableCard} className="mb-5">
+                                <table className="table m-0" style={{ color: theme.text }}>
+                                    <thead style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : '#fcfcfc' }}>
+                                        <tr>
+                                            <th className="py-3 px-4 border-0">Title</th>
+                                            <th className="py-3 border-0">Type</th>
+                                            <th className="py-3 px-4 border-0 text-end">Action</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* --- TABLE 2: GROUPED ABOUT FEATURES --- */}
-                        <div className="mt-5 mb-3">
-                            <h6 className="fw-bold text-muted">Grouped About Features</h6>
-                        </div>
-                        <div style={styles.tableCard}>
-                            <table className="table m-0" style={{ color: theme.text }}>
-                                <thead style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : '#fcfcfc' }}>
-                                    <tr>
-                                        <th className="py-3 px-4 border-0">Category Name</th>
-                                        <th className="py-3 border-0">Features Details</th>
-                                        <th className="py-3 px-4 border-0 text-end">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {groupedFeatures.length > 0 ? (
-                                        groupedFeatures.map((group, index) => (
-                                            <tr key={index} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                                    </thead>
+                                    <tbody>
+                                        {banners.map((b) => (
+                                            <tr key={b.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
                                                 <td className="py-3 px-4 align-middle">
-                                                    <div className="fw-bold text-primary">{group.category}</div>
+                                                    <div className="fw-bold">{b.title}</div>
+                                                    <div className="small text-muted">{b.slug ? `/${b.slug}` : 'About Section'}</div>
                                                 </td>
-                                                <td className="py-3 align-middle">
-                                                    <ul className="m-0 p-0" style={{ listStyle: 'none' }}>
-                                                        {group.details && group.details.map((detail, i) => (
-                                                            <li key={i} className="small mb-1 text-muted">
-                                                                <i className="bi bi-check2-circle text-success me-2"></i>{detail}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </td>
+                                                <td className="py-3 align-middle"><span className={`badge rounded-pill ${b.slug ? 'bg-primary' : 'bg-info'}`}>{b.slug ? 'Hero' : 'About'}</span></td>
                                                 <td className="py-3 px-4 text-end align-middle">
-                                                    <span className="badge bg-success rounded-pill">Active</span>
+                                                    <button className="btn btn-outline-primary" style={styles.actionBtn} onClick={() => handleEdit(b)}><i className="bi bi-pencil-square"></i></button>
+                                                    <button className="btn btn-outline-danger" style={styles.actionBtn} onClick={() => handleDelete(b.id)}><i className="bi bi-trash3"></i></button>
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr><td colSpan="3" className="text-center py-4 text-muted">No features found.</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* TABLE 2 */}
+                            <div className="mb-3"><h6 className="fw-bold text-muted">Grouped About Features</h6></div>
+                            <div style={styles.tableCard}>
+                                <table className="table m-0" style={{ color: theme.text }}>
+                                    <thead style={{ backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : '#fcfcfc' }}>
+                                        <tr>
+                                            <th className="py-3 px-4 border-0">Category Name</th>
+                                            <th className="py-3 border-0">Features Details</th>
+                                            <th className="py-3 px-4 border-0 text-end">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {groupedFeatures.length > 0 ? (
+                                            groupedFeatures.map((group, index) => (
+                                                <tr key={index} style={{ borderBottom: `1px solid ${theme.border}` }}>
+                                                    <td className="py-3 px-4 align-middle"><div className="fw-bold text-primary">{group.category}</div></td>
+                                                    <td className="py-3 align-middle">
+                                                        <ul className="m-0 p-0" style={{ listStyle: 'none' }}>
+                                                            {group.details && group.details.map((detail, i) => (
+                                                                <li key={i} className="small mb-1 text-muted"><i className="bi bi-check2-circle text-success me-2"></i>{detail}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </td>
+                                                    <td className="py-3 px-4 text-end align-middle"><span className="badge bg-success rounded-pill">Active</span></td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr><td colSpan="3" className="text-center py-4 text-muted">No features found.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <div className="mt-auto pt-4"><Footer theme={theme} /></div>
+                        {/* STICKY FOOTER */}
+                        <div className="mt-auto border-top">
+                            <Footer theme={theme} />
+                        </div>
                     </div>
                 </div>
             </div>
