@@ -15,6 +15,7 @@ import Content from './Backend/Content'
 import Welcome from './Backend/Welcome'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import VideoSection from './Backend/VideoSection'
+import OwnerSection from './Backend/Ownersection'
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
         <Route path="/content" element={<Content />} />
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/video" element={<VideoSection />} />
+         <Route path="/owner-section" element={<OwnerSection />} />
 
 
 

@@ -17,6 +17,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
         { id: 'welcome', label: 'Welcome Section', icon: 'pie-chart', path: '/welcome' },
         { id: 'video', label: 'Video Section', icon: 'envelope', path: '/video' },
+         { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-workspace', path: '/owner-section' },
     ];
 
     const sidebarBg = {

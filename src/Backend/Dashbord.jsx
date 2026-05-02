@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Header from './Header'; 
-import Sidebar from './Sidebar'; 
+import Header from './Header';
+import Sidebar from './Sidebar';
 import Footer from './Footer';
-import Users from './Users'; 
+import Users from './Users';
+import OwnerSection from './Ownersection';
 
 // Dummy components for illustration if not imported
 const Welcome = () => <div className="card p-4 border-0 shadow-sm"><h4>Welcome Section</h4></div>;
@@ -14,7 +15,7 @@ const Dashbord = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    
+
     const theme = {
         isDarkMode: isDarkMode,
         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
@@ -41,21 +42,21 @@ const Dashbord = () => {
 
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', color: theme.text, transition: 'all 0.3s ease' },
-        sidebar: { 
-            width: isCollapsed ? '80px' : '260px', 
-            backgroundColor: theme.card, 
-            height: '100vh', 
-            position: 'sticky', 
-            top: 0, 
-            transition: 'width 0.3s ease', 
+        sidebar: {
+            width: isCollapsed ? '80px' : '260px',
+            backgroundColor: theme.card,
+            height: '100vh',
+            position: 'sticky',
+            top: 0,
+            transition: 'width 0.3s ease',
             borderRight: `1px solid ${theme.border}`,
             zIndex: 1000,
             overflowX: 'hidden'
         },
         mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-        contentScroll: { 
-            flexGrow: 1, 
-            overflowY: 'auto', 
+        contentScroll: {
+            flexGrow: 1,
+            overflowY: 'auto',
             padding: '24px',
             display: 'flex',          // Flex ব্যবহার করা হয়েছে
             flexDirection: 'column'   // কলাম ডিরেকশন
@@ -69,8 +70,8 @@ const Dashbord = () => {
                 return <Users theme={theme} />;
             case 'welcome':
                 return <Welcome />;
-            case 'video':
-                return <VideoSection />;
+            case 'owner':
+               return <OwnerSection theme={theme ? theme : {}} />;
             case 'dashboard':
             default:
                 return (
@@ -78,11 +79,11 @@ const Dashbord = () => {
                         <div className="row g-4 mb-4">
                             {['sales', 'orders', 'visitors'].map((type) => (
                                 <div className="col-md-4" key={type}>
-                                    <div className="card p-4 h-100 shadow-sm" style={{ 
+                                    <div className="card p-4 h-100 shadow-sm" style={{
                                         background: type === 'sales' ? 'linear-gradient(to right, #ffbf96, #fe7096)' :
-                                                   type === 'orders' ? 'linear-gradient(to right, #90caf9, #047edf)' :
-                                                   'linear-gradient(to right, #84d9d2, #07cdae)',
-                                        color: 'white', border: 'none', borderRadius: '12px' 
+                                            type === 'orders' ? 'linear-gradient(to right, #90caf9, #047edf)' :
+                                                'linear-gradient(to right, #84d9d2, #07cdae)',
+                                        color: 'white', border: 'none', borderRadius: '12px'
                                     }}>
                                         <h5 className="fw-normal text-capitalize">{type}</h5>
                                         <h2 className="my-3">
@@ -105,24 +106,24 @@ const Dashbord = () => {
     return (
         <div style={styles.container} className="container-fluid p-0">
             <div className="d-flex">
-                <Sidebar 
-                    theme={theme} 
-                    isCollapsed={isCollapsed} 
+                <Sidebar
+                    theme={theme}
+                    isCollapsed={isCollapsed}
                     activeView={activeView}
-                    styles={styles} 
+                    styles={styles}
                 />
-                
+
                 <div style={styles.mainArea} className="flex-grow-1">
-                    <Header 
-                        theme={theme} 
-                        isDarkMode={isDarkMode} 
-                        toggleDarkMode={toggleDarkMode} 
-                        toggleSidebar={toggleSidebar} 
+                    <Header
+                        theme={theme}
+                        isDarkMode={isDarkMode}
+                        toggleDarkMode={toggleDarkMode}
+                        toggleSidebar={toggleSidebar}
                     />
-                    
+
                     {/* SCROLLABLE AREA */}
                     <div style={styles.contentScroll}>
-                        
+
                         {/* কন্টেন্ট র্যাপার: flex-grow-1 ফুটারকে নিচে ঠেলে দেবে */}
                         <div className="flex-grow-1">
                             <h4 className="mb-4 text-capitalize d-flex align-items-center fw-bold">
@@ -133,7 +134,7 @@ const Dashbord = () => {
                             </h4>
                             {renderContent()}
                         </div>
-                        
+
                         {/* স্টিকি ফুটার */}
                         <div className="mt-4">
                             <Footer theme={theme} />

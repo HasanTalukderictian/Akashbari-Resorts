@@ -2,15 +2,22 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Owner = () => {
-    const [content, setContent] = useState(null);
+    const [property, setProperty] = useState(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    // API base URL for images
+    const BASE_URL = "http://127.0.0.1:8000/storage/";
 
     useEffect(() => {
         const fetchContent = async () => {
             try {
-                const response = await axios.get('../../../public/owner.json');
-                setContent(response.data);
+                // local json bad diye ekhon direct API theke data asche
+                const response = await axios.get('http://127.0.0.1:8000/api/get-property-offers');
+                if (response.data.status && response.data.data.data.length > 0) {
+                    // Prothom property data-ti set kora holo
+                    setProperty(response.data.data.data[0]);
+                }
             } catch (error) {
                 console.error("Content loading failed:", error);
             } finally {
@@ -20,27 +27,33 @@ const Owner = () => {
         fetchContent();
     }, []);
 
+    // Slider Interval Logic
     useEffect(() => {
-        if (content?.hero?.slider_images) {
+        if (property?.slider_images) {
             const interval = setInterval(() => {
-                setActiveIndex((prev) => (prev === content.hero.slider_images.length - 1 ? 0 : prev + 1));
+                setActiveIndex((prev) => (prev === property.slider_images.length - 1 ? 0 : prev + 1));
             }, 4000);
             return () => clearInterval(interval);
         }
-    }, [content]);
+    }, [property]);
 
     // WhatsApp Redirect Function
     const handleWhatsAppClick = () => {
-        if (content?.hero?.whatsapp_number) {
-            const number = content.hero.whatsapp_number;
-            // Number thik thak format korar jonno (optional)
-            const cleanNumber = number.replace(/\D/g, ''); 
+        if (property?.whatsapp_number) {
+            const cleanNumber = property.whatsapp_number.replace(/\D/g, ''); 
             window.open(`https://wa.me/${cleanNumber}`, '_blank');
         }
     };
 
     if (loading) return <div className="text-center py-5">Loading Content...</div>;
-    if (!content) return null;
+    if (!property) return <div className="text-center py-5">No Property Data Found</div>;
+
+    // Static Benefits (যেহেতু এটা API এ নেই, ডিজাইন ঠিক রাখতে আমরা এটা হার্ডকোড রাখতে পারি)
+    const benefits = [
+        { icon: "bi-graph-up-arrow", title: "High ROI", desc: "Get consistent yearly profit shares from your investment.", color: "#b66dff" },
+        { icon: "bi-shield-check", title: "Secure Ownership", desc: "Lifetime legal ownership with verified documentation.", color: "#639c4e" },
+        { icon: "bi-building-heart", title: "Luxury Stay", desc: "Enjoy complimentary stays at our premium resorts.", color: "#d4af37" }
+    ];
 
     return (
         <div className="container-fluid py-5" style={{ background: '#f8f9fa', minHeight: '100vh' }}>
@@ -49,7 +62,7 @@ const Owner = () => {
 
                     {/* Slider Column */}
                     <div className="col-lg-6 position-relative overflow-hidden" style={{ height: '550px' }}>
-                        {content.hero.slider_images.map((img, index) => (
+                        {property.slider_images.map((img, index) => (
                             <div
                                 key={index}
                                 style={{
@@ -58,12 +71,13 @@ const Owner = () => {
                                     transition: 'opacity 1s ease-in-out', zIndex: activeIndex === index ? 1 : 0
                                 }}
                             >
-                                <img src={img} className="w-100 h-100" alt="Resort" style={{ objectFit: 'cover' }} />
+                                {/* API URL check and display */}
+                                <img src={`${BASE_URL}${img}`} className="w-100 h-100" alt="Resort" style={{ objectFit: 'cover' }} />
                             </div>
                         ))}
 
                         <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2" style={{ zIndex: 10 }}>
-                            {content.hero.slider_images.map((_, index) => (
+                            {property.slider_images.map((_, index) => (
                                 <div
                                     key={index} onClick={() => setActiveIndex(index)}
                                     style={{
@@ -83,20 +97,20 @@ const Owner = () => {
                                Investment Opportunity
                             </h6>
                             <h2
-                                className="display-4 fw-bold mb-4"
+                                className="display-5 fw-bold mb-4"
                                 style={{
                                     color: '#3e4b5b',
                                     lineHeight: '1.2',
-                                    fontWeight: '400'
+                                    fontWeight: '700'
                                 }}
                             >
-                                {content.hero.title}
-                                <span style={{ color: '#d4af37', marginLeft: '10px' }}>{content.hero.brand_name}</span>
+                                {property.title}
+                                <div style={{ color: '#d4af37' }}>{property.brand_name}</div>
                             </h2>
-                            <p className="lead text-muted mb-4">{content.hero.description}</p>
+                            <p className="lead text-muted mb-4">{property.description}</p>
 
                             <div className="mb-4">
-                                {content.hero.features.map((text, i) => (
+                                {property.features.map((text, i) => (
                                     <div className="d-flex align-items-center mb-2" key={i}>
                                         <i className="bi bi-check-circle-fill text-success me-2"></i>
                                         <span>{text}</span>
@@ -104,7 +118,6 @@ const Owner = () => {
                                 ))}
                             </div>
 
-                            {/* Updated Button with onClick */}
                             <button 
                                 onClick={handleWhatsAppClick}
                                 className="btn btn-lg text-white px-5 py-3 fw-bold shadow-lg"
@@ -116,6 +129,7 @@ const Owner = () => {
                 </div>
             </div>
 
+            {/* Benefits Section */}
             <div className="container">
                 <div className="text-center mb-5 pt-4">
                     <h3 className="fw-bold mb-2">Why Invest with Us?</h3>
@@ -123,7 +137,7 @@ const Owner = () => {
                 </div>
 
                 <div className="row g-4">
-                    {content.benefits.map((item, index) => (
+                    {benefits.map((item, index) => (
                         <div className="col-md-4" key={index}>
                             <div className="card h-100 border-0 shadow-sm p-4 text-center transition-hover" style={{ borderRadius: '20px' }}>
                                 <div className="d-inline-flex align-items-center justify-content-center mb-4 mx-auto shadow-sm"
