@@ -9,6 +9,7 @@ import Investment from './Investment'
 import Room from './Room'
 import Testominal from './Testominal'
 import Video from './Video'
+import Owner from "./Owner";
 
 const LandingPage = () => {
 
@@ -28,6 +29,7 @@ const LandingPage = () => {
       </div>
 
       <Video />
+      <Owner/>
       <Investment />
       <Room />
       <Facility />

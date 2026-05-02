@@ -1,0 +1,37 @@
+{
+    "hero": {
+        "title": "Become a Property Owner at",
+        "brand_name": "Akashbari Resorts",
+        "whatsapp_number": "01768712230",
+        "description": "Invest once, earn forever. Join our family of successful property owners and secure your future with luxury real estate.",
+        "features": [
+            "Yearly Profit Share & Lifetime Ownership",
+            "2 Days Complimentary Resort Stay Yearly",
+            "6 Years Akashbari Club Membership"
+        ],
+        "slider_images": [
+            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1000&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=1000&auto=format&fit=crop"
+        ]
+    },
+    "benefits": [{
+            "title": "Lifetime Profit Share",
+            "desc": "Become a property owner and enjoy a guaranteed yearly profit for a lifetime.",
+            "icon": "bi-graph-up-arrow"
+
+        },
+        {
+            "title": "Free Luxury Stay",
+            "desc": "Enjoy 2 days of complimentary stay every year at our world-class resorts.",
+            "icon": "bi-house-heart"
+
+        },
+        {
+            "title": "Club Membership",
+            "desc": "Exclusive 6-year membership to the prestigious Akashbari Club with premium perks.",
+            "icon": "bi-card-checklist"
+
+        }
+    ]
+}

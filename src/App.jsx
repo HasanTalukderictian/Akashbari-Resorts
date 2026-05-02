@@ -13,6 +13,7 @@ import PackageDetails from './assets/Frontend/PackageDetails'
 import Users from './Backend/Users'
 import Content from './Backend/Content'
 import Welcome from './Backend/Welcome'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import VideoSection from './Backend/VideoSection'
 
 

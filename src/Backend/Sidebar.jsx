@@ -1,29 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
-const Sidebar = ({ theme, isCollapsed, styles = {} }) => { // styles কে ডিফল্ট খালি অবজেক্ট দিন
-    
+const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
+    // Sub-menu open/close state
+    const [isLandingOpen, setIsLandingOpen] = useState(false);
+
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: 'house-door', path: '/dashboard' },
         { id: 'users', label: 'Users', icon: 'people', path: '/users' },
-        { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
-        { id: 'welcome', label: 'Welcome Section', icon: 'pie-chart', path: '/welcome' },
-        { id: 'video', label: 'Video Section', icon: 'envelope', path: '/video' },
+        // Landing Page section defined separately below for sub-menu logic
         { id: 'settings', label: 'Settings', icon: 'sliders', path: '/settings' },
         { id: 'profile', label: 'Profile', icon: 'person-badge', path: '/profile' }
     ];
 
-    // ব্যাকআপ স্টাইল যদি styles প্রপস না পাঠানো হয়
+    const landingSubItems = [
+        { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
+        { id: 'welcome', label: 'Welcome Section', icon: 'pie-chart', path: '/welcome' },
+        { id: 'video', label: 'Video Section', icon: 'envelope', path: '/video' },
+    ];
+
     const sidebarBg = {
         width: isCollapsed ? '80px' : '260px',
         backgroundColor: theme?.card || '#fff',
         height: '100vh',
         transition: 'width 0.3s ease',
-        borderRight: `1px solid ${theme?.border || '#eee'}`
+        borderRight: `1px solid ${theme?.border || '#eee'}`,
+        overflowY: 'auto',
+        overflowX: 'hidden'
     };
 
+    const navLinkStyle = (isActive) => ({
+        ...(styles?.navLink || {}),
+        color: isActive ? '#fff' : theme?.sidebarText,
+        background: isActive ? 'linear-gradient(to right, #da8cff, #9a55ff)' : 'transparent',
+        borderRadius: '8px',
+        marginBottom: '5px',
+        textDecoration: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        padding: isCollapsed ? '12px 0' : '12px 20px',
+        justifyContent: isCollapsed ? 'center' : 'flex-start',
+        boxShadow: isActive ? '0 4px 15px rgba(154, 85, 255, 0.3)' : 'none',
+        transition: 'all 0.3s ease',
+        cursor: 'pointer',
+        border: 'none',
+        width: '100%'
+    });
+
     return (
-        // styles.sidebar না থাকলে sidebarBg ব্যবহার করবে
         <div className="d-none d-md-block shadow-sm" style={styles?.sidebar || sidebarBg}>
             
             {/* --- লোগো সেকশন --- */}
@@ -57,26 +81,50 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => { // styles কে ড�
 
             {/* --- মেনু আইটেমসমূহ --- */}
             <div className="px-2">
-                {menuItems.map((item) => (
-                    <NavLink 
-                        key={item.id} 
-                        to={item.path}
-                        className="nav-link-custom"
-                        style={({ isActive }) => ({
-                            ...(styles?.navLink || {}), // optional chaining ব্যবহার করা হয়েছে
-                            color: isActive ? '#fff' : theme?.sidebarText,
-                            background: isActive ? 'linear-gradient(to right, #da8cff, #9a55ff)' : 'transparent',
-                            borderRadius: '8px',
-                            marginBottom: '5px',
-                            textDecoration: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: isCollapsed ? '12px 0' : '12px 20px',
-                            justifyContent: isCollapsed ? 'center' : 'flex-start',
-                            boxShadow: isActive ? '0 4px 15px rgba(154, 85, 255, 0.3)' : 'none',
-                            transition: 'all 0.3s ease'
-                        })}
+                {/* Dashboard & Users */}
+                {menuItems.slice(0, 2).map((item) => (
+                    <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
+                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i> 
+                        {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
+                    </NavLink>
+                ))}
+
+                {/* --- Landing Page Mother Menu (Sub-menu logic) --- */}
+                <div className="w-100">
+                    <div 
+                        onClick={() => !isCollapsed && setIsLandingOpen(!isLandingOpen)}
+                        style={navLinkStyle(false)}
                     >
+                        <i className={`bi bi-browser-safari ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
+                        {!isCollapsed && (
+                            <div className="d-flex justify-content-between align-items-center w-100">
+                                <span style={{ fontSize: '14px', fontWeight: '500' }}>Landing Page</span>
+                                <i className={`bi bi-chevron-${isLandingOpen ? 'down' : 'right'}`} style={{ fontSize: '12px' }}></i>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Sub-items rendering */}
+                    {!isCollapsed && isLandingOpen && (
+                        <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
+                            {landingSubItems.map((sub) => (
+                                <NavLink key={sub.id} to={sub.path} style={({ isActive }) => ({
+                                    ...navLinkStyle(isActive),
+                                    padding: '10px 15px',
+                                    marginBottom: '2px',
+                                    fontSize: '13px'
+                                })}>
+                                    <i className={`bi bi-${sub.icon} me-3`}></i>
+                                    <span>{sub.label}</span>
+                                </NavLink>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Settings & Profile */}
+                {menuItems.slice(2).map((item) => (
+                    <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
                         <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i> 
                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
                     </NavLink>
