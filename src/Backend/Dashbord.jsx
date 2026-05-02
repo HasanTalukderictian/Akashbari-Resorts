@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import Users from './Users';
 import OwnerSection from './Ownersection';
+import OwnerBenefit from './OwnerBenefit';
 
 // Dummy components for illustration if not imported
 const Welcome = () => <div className="card p-4 border-0 shadow-sm"><h4>Welcome Section</h4></div>;
@@ -72,6 +73,8 @@ const Dashbord = () => {
                 return <Welcome />;
             case 'owner':
                return <OwnerSection theme={theme ? theme : {}} />;
+               case 'benefit':
+               return <OwnerBenefit theme={theme ? theme : {}} />;
             case 'dashboard':
             default:
                 return (

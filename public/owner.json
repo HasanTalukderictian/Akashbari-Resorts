@@ -18,19 +18,19 @@
     "benefits": [{
             "title": "Lifetime Profit Share",
             "desc": "Become a property owner and enjoy a guaranteed yearly profit for a lifetime.",
-            "icon": "bi-graph-up-arrow"
+
 
         },
         {
             "title": "Free Luxury Stay",
             "desc": "Enjoy 2 days of complimentary stay every year at our world-class resorts.",
-            "icon": "bi-house-heart"
+
 
         },
         {
             "title": "Club Membership",
             "desc": "Exclusive 6-year membership to the prestigious Akashbari Club with premium perks.",
-            "icon": "bi-card-checklist"
+
 
         }
     ]
