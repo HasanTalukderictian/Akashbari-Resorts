@@ -73,27 +73,10 @@ const Users = ({ theme: propsTheme }) => {
 
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
-        // ✅ Main Area fixes
-        mainArea: { 
-            height: '100vh', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            overflow: 'hidden' 
-        },
-        // ✅ Content Scroll logic to push footer down
-        contentContainer: {
-            flex: 1, 
-            overflowY: 'auto', 
-            display: 'flex', 
-            flexDirection: 'column'
-        },
-        contentScroll: { 
-            flex: '1 0 auto', // এটি কন্টেন্টকে যতটুকু জায়গা দরকার নেবে কিন্তু ফুটারকে নিচে ঠেলে দেবে
-            padding: '24px' 
-        },
-        footerWrapper: {
-            flexShrink: 0 // ফুটার যাতে সংকুচিত না হয়
-        },
+        mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+        contentContainer: { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' },
+        contentScroll: { flex: '1 0 auto', padding: '24px' },
+        footerWrapper: { flexShrink: 0 },
         card: {
             backgroundColor: theme.card,
             color: theme.text,
@@ -127,7 +110,6 @@ const Users = ({ theme: propsTheme }) => {
 
     return (
         <div style={styles.container} className="container-fluid p-0">
-            {/* MODAL */}
             {showModal && (
                 <div style={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
                     <div style={styles.modalBox}>
@@ -153,7 +135,6 @@ const Users = ({ theme: propsTheme }) => {
                 <div style={styles.mainArea} className="flex-grow-1">
                     <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar} />
 
-                    {/* ✅ Wrapper for Content and Footer */}
                     <div style={styles.contentContainer}>
                         <div style={styles.contentScroll}>
                             <div className="animate__animated animate__fadeIn">
@@ -167,21 +148,35 @@ const Users = ({ theme: propsTheme }) => {
                                             </button>
                                         </div>
                                         <div className="table-responsive">
-                                            <table className="table table-hover" style={{ color: theme.text }}>
+                                            {/* ✅ Table Fixed for Night Mode */}
+                                            <table className={`table table-hover ${isDarkMode ? 'table-dark' : ''}`} style={{ color: theme.text }}>
                                                 <thead>
-                                                    <tr style={{color: theme.text}}>
-                                                        <th>Name</th><th>Email</th><th>Role</th><th>Status</th><th className="text-end">Action</th>
+                                                    <tr style={{ borderBottom: `1px solid ${theme.border}` }}>
+                                                        <th style={{ color: theme.text }}>Name</th>
+                                                        <th style={{ color: theme.text }}>Email</th>
+                                                        <th style={{ color: theme.text }}>Role</th>
+                                                        <th style={{ color: theme.text }}>Status</th>
+                                                        <th className="text-end" style={{ color: theme.text }}>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {loading ? <tr><td colSpan="5">Loading...</td></tr> : 
+                                                    {loading ? (
+                                                        <tr><td colSpan="5" className="text-center py-4" style={{ color: theme.text }}>Loading...</td></tr>
+                                                    ) : (
                                                         users.map((user) => (
-                                                        <tr key={user.id}>
-                                                            <td>{user.name}</td><td>{user.email}</td><td>{user.role}</td>
-                                                            <td><span style={styles.badge('Active')}>Active</span></td>
-                                                            <td className="text-end"><button onClick={() => handleDelete(user.id)} className="btn btn-link text-danger"><i className="bi bi-trash3"></i></button></td>
-                                                        </tr>
-                                                    ))}
+                                                            <tr key={user.id} style={{ borderColor: theme.border }}>
+                                                                <td style={{ color: theme.text }}>{user.name}</td>
+                                                                <td style={{ color: theme.text }}>{user.email}</td>
+                                                                <td style={{ color: theme.text }}>{user.role}</td>
+                                                                <td><span style={styles.badge('Active')}>Active</span></td>
+                                                                <td className="text-end">
+                                                                    <button onClick={() => handleDelete(user.id)} className="btn btn-link text-danger p-0">
+                                                                        <i className="bi bi-trash3"></i>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    )}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -190,7 +185,6 @@ const Users = ({ theme: propsTheme }) => {
                             </div>
                         </div>
 
-                        {/* ✅ Footer wrapped to stay at bottom */}
                         <div style={styles.footerWrapper}>
                             <Footer theme={theme} />
                         </div>

@@ -11,7 +11,6 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(false);
     
-    // Edit state logic
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
@@ -46,7 +45,6 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
 
     useEffect(() => { fetchProperties(); }, []);
 
-    // --- Edit Mode Logic ---
     const handleEditClick = (item) => {
         setIsEditing(true);
         setEditId(item.id);
@@ -57,7 +55,6 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
             description: item.description,
             features: item.features && item.features.length > 0 ? item.features : [''],
         });
-        // Existing images preview (Backend storage path)
         const existingPreviews = item.slider_images.map(img => `http://127.0.0.1:8000/storage/${img}`);
         setPreviews(existingPreviews);
         setShowModal(true);
@@ -105,13 +102,11 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
             if (feature.trim() !== '') data.append(`features[${index}]`, feature);
         });
 
-        // Notoon image thakle pathabe
         if (selectedImages.length > 0) {
             selectedImages.forEach(img => data.append('slider_images[]', img));
         }
 
         try {
-            // URL dynamic: edit hole edit-property-offers/{id} ar add hole add-property-offers
             const url = isEditing 
                 ? `http://127.0.0.1:8000/api/edit-property-offers/${editId}`
                 : `http://127.0.0.1:8000/api/add-property-offers`;
@@ -164,19 +159,20 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
 
                         <div className="card border-0 shadow-sm rounded-4 overflow-hidden" style={{ backgroundColor: theme.card }}>
                             <div className="table-responsive">
-                                <table className="table align-middle mb-0" style={{ color: theme.text }}>
+                                {/* 'table-dark' class added conditionally for night mode */}
+                                <table className={`table align-middle mb-0 ${isDarkMode ? 'table-dark' : ''}`} style={{ color: theme.text, backgroundColor: 'transparent' }}>
                                     <thead style={{ backgroundColor: isDarkMode ? '#0f172a' : '#f8f9fa' }}>
                                         <tr>
-                                            <th className="ps-4 py-3 border-0">Image & Title</th>
-                                            <th className="py-3 border-0">Brand</th>
-                                            <th className="py-3 border-0">WhatsApp</th>
-                                            <th className="py-3 border-0 text-center">Action</th>
+                                            <th className="ps-4 py-3 border-0" style={{ color: theme.text }}>Image & Title</th>
+                                            <th className="py-3 border-0" style={{ color: theme.text }}>Brand</th>
+                                            <th className="py-3 border-0" style={{ color: theme.text }}>WhatsApp</th>
+                                            <th className="py-3 border-0 text-center" style={{ color: theme.text }}>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody style={{ borderTop: 'none' }}>
                                         {properties.map((item) => (
-                                            <tr key={item.id} style={{ borderBottom: `1px solid ${theme.border}` }}>
-                                                <td className="ps-4 py-3">
+                                            <tr key={item.id} style={{ borderBottom: `1px solid ${theme.border}`, backgroundColor: 'transparent' }}>
+                                                <td className="ps-4 py-3" style={{ color: theme.text }}>
                                                     <div className="d-flex align-items-center gap-3">
                                                         <img 
                                                             src={`http://127.0.0.1:8000/storage/${item.slider_images[0]}`} 
@@ -187,8 +183,8 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                                                         <span className="fw-bold">{item.title}</span>
                                                     </div>
                                                 </td>
-                                                <td>{item.brand_name}</td>
-                                                <td>{item.whatsapp_number}</td>
+                                                <td style={{ color: theme.text }}>{item.brand_name}</td>
+                                                <td style={{ color: theme.text }}>{item.whatsapp_number}</td>
                                                 <td className="text-center">
                                                     <div className="d-flex justify-content-center gap-2">
                                                         <button onClick={() => handleEditClick(item)} className="btn btn-sm btn-outline-primary border-0"><i className="bi bi-pencil-square"></i></button>
@@ -206,7 +202,7 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                 </div>
             </div>
 
-            {/* Modal - Both Add & Edit */}
+            {/* Modal */}
             {showModal && (
                 <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', zIndex: 1060 }}>
                     <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -219,19 +215,19 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                                 <div className="row g-3">
                                     <div className="col-12">
                                         <label className="form-label small fw-bold">Title</label>
-                                        <input type="text" required className="form-control" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                                        <input type="text" required className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
                                     </div>
                                     <div className="col-md-6">
                                         <label className="form-label small fw-bold">Brand Name</label>
-                                        <input type="text" required className="form-control" value={formData.brand_name} onChange={e => setFormData({...formData, brand_name: e.target.value})} />
+                                        <input type="text" required className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.brand_name} onChange={e => setFormData({...formData, brand_name: e.target.value})} />
                                     </div>
                                     <div className="col-md-6">
                                         <label className="form-label small fw-bold">WhatsApp</label>
-                                        <input type="text" required className="form-control" value={formData.whatsapp_number} onChange={e => setFormData({...formData, whatsapp_number: e.target.value})} />
+                                        <input type="text" required className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.whatsapp_number} onChange={e => setFormData({...formData, whatsapp_number: e.target.value})} />
                                     </div>
                                     <div className="col-12">
                                         <label className="form-label small fw-bold">Description</label>
-                                        <textarea className="form-control" rows="2" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
+                                        <textarea className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} rows="2" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
                                     </div>
                                     <div className="col-12">
                                         <label className="form-label small fw-bold d-flex justify-content-between">
@@ -239,12 +235,12 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                                             <button type="button" className="btn btn-sm btn-link p-0 text-decoration-none" style={{color: theme.accent}} onClick={addFeatureField}>+ Add More</button>
                                         </label>
                                         {formData.features.map((f, i) => (
-                                            <input key={i} type="text" className="form-control mb-2" value={f} onChange={e => handleFeatureChange(i, e.target.value)} />
+                                            <input key={i} type="text" className={`form-control mb-2 ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={f} onChange={e => handleFeatureChange(i, e.target.value)} />
                                         ))}
                                     </div>
                                     <div className="col-12">
                                         <label className="form-label small fw-bold">Images {isEditing && "(Leave blank to keep old ones)"}</label>
-                                        <input type="file" multiple className="form-control" accept="image/*" onChange={handleImageChange} />
+                                        <input type="file" multiple className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} accept="image/*" onChange={handleImageChange} />
                                         <div className="d-flex flex-wrap gap-2 mt-3">
                                             {previews.map((src, i) => (
                                                 <img key={i} src={src} alt="preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
@@ -253,7 +249,7 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                                     </div>
                                 </div>
                                 <div className="modal-footer border-0 p-0 mt-4 d-flex gap-2">
-                                    <button type="button" className="btn btn-light px-4" onClick={closeModal}>Cancel</button>
+                                    <button type="button" className={`btn ${isDarkMode ? 'btn-dark' : 'btn-light'} px-4`} onClick={closeModal}>Cancel</button>
                                     <button type="submit" disabled={loading} className="btn text-white px-5 shadow-sm" style={{ backgroundColor: theme.accent }}>
                                         {loading ? 'Processing...' : (isEditing ? 'Update Changes' : 'Save Property')}
                                     </button>

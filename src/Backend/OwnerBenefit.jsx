@@ -9,21 +9,18 @@ const OwnerBenefit = ({ theme }) => {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     
-    // ডাটা স্টেট (সবসময় অ্যারে দিয়ে শুরু হবে)
     const [benefits, setBenefits] = useState([]);
     const [formData, setFormData] = useState({ id: '', title: '', desc: '' });
     const [isEditing, setIsEditing] = useState(false);
 
     const API_BASE = "http://127.0.0.1:8000/api";
 
-    // ১. ডাটা ফেচ করা (Pagination Format অনুযায়ী)
     const fetchBenefits = async () => {
         try {
             setLoading(true);
             const response = await fetch(`${API_BASE}/get-property-benifit`);
             const result = await response.json();
             
-            // আপনার রেসপন্স অনুযায়ী: result.data.data হচ্ছে আসল অ্যারে
             if (result.status && result.data && Array.isArray(result.data.data)) {
                 setBenefits(result.data.data);
             } else {
@@ -41,64 +38,50 @@ const OwnerBenefit = ({ theme }) => {
         fetchBenefits();
     }, []);
 
-    // ২. অ্যাড এবং এডিট হ্যান্ডলার
-  const handleSave = async (e) => {
-    e.preventDefault();
-    
-    // এডিট হলে ইউআরএল হবে: /api/edit-property-benifit/5
-    // অ্যাড হলে ইউআরএল হবে: /api/add-property-benifit
-    const url = isEditing 
-        ? `${API_BASE}/edit-property-benifit/${formData.id}` 
-        : `${API_BASE}/add-property-benifit`;
+    const handleSave = async (e) => {
+        e.preventDefault();
+        const url = isEditing 
+            ? `${API_BASE}/edit-property-benifit/${formData.id}` 
+            : `${API_BASE}/add-property-benifit`;
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST', // লারাভেল রাউটে যেহেতু POST দেওয়া
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: formData.title,
-                desc: formData.desc
-            }),
-        });
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formData.title,
+                    desc: formData.desc
+                }),
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if (result.status) {
-            await fetchBenefits(); // লিস্ট আপডেট করুন
-            closeModal();
-        } else {
-            alert(result.message || "Error saving data");
+            if (result.status) {
+                await fetchBenefits(); 
+                closeModal();
+            } else {
+                alert(result.message || "Error saving data");
+            }
+        } catch (error) {
+            console.error("Save error:", error);
         }
-    } catch (error) {
-        console.error("Save error:", error);
-        alert("Server error, check console.");
-    }
-};
+    };
 
-    // ৩. ডিলিট হ্যান্ডলার (ID টা বডিতে বা URL এ দিতে হয়)
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this?")) return;
-
-    try {
-        // ইউআরএল হবে: /api/delete-property-benifit/5
-        const response = await fetch(`${API_BASE}/delete-property-benifit/${id}`, {
-            method: 'DELETE', // রাউট অনুযায়ী DELETE মেথড
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        const result = await response.json();
-
-        if (result.status) {
-            // স্টেট থেকে সরাসরি ডিলিট করে দিলে রিফ্রেশ কম লাগবে
-            setBenefits(prev => prev.filter(item => item.id !== id));
-        } else {
-            alert(result.message || "Delete failed");
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this?")) return;
+        try {
+            const response = await fetch(`${API_BASE}/delete-property-benifit/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.status) {
+                setBenefits(prev => prev.filter(item => item.id !== id));
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
         }
-    } catch (error) {
-        console.error("Delete error:", error);
-        alert("Failed to delete. Check network/server.");
-    }
-};
+    };
 
     const openModal = (item = null) => {
         if (item) {
@@ -143,23 +126,24 @@ const OwnerBenefit = ({ theme }) => {
                         <div className="card border-0 shadow-sm" style={{ backgroundColor: currentTheme.card, color: currentTheme.text, borderRadius: '15px' }}>
                             <div className="card-body p-0">
                                 <div className="table-responsive">
-                                    <table className="table table-hover mb-0" style={{ color: currentTheme.text }}>
+                                    <table className={`table table-hover mb-0 ${isDarkMode ? 'table-dark' : ''}`} style={{ color: currentTheme.text, backgroundColor: 'transparent' }}>
                                         <thead>
                                             <tr>
-                                                <th className="px-4 py-3">Title</th>
-                                                <th className="px-4 py-3">Description</th>
-                                                <th className="px-4 py-3 text-end">Action</th>
+                                                <th className="px-4 py-3" style={{ backgroundColor: 'transparent', color: currentTheme.text, borderColor: currentTheme.border }}>Title</th>
+                                                <th className="px-4 py-3" style={{ backgroundColor: 'transparent', color: currentTheme.text, borderColor: currentTheme.border }}>Description</th>
+                                                <th className="px-4 py-3 text-end" style={{ backgroundColor: 'transparent', color: currentTheme.text, borderColor: currentTheme.border }}>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {loading ? (
-                                                <tr><td colSpan="3" className="text-center py-4">Loading Data...</td></tr>
+                                                <tr><td colSpan="3" className="text-center py-4" style={{ backgroundColor: 'transparent', color: currentTheme.text }}>Loading Data...</td></tr>
                                             ) : benefits.length > 0 ? (
                                                 benefits.map((item) => (
-                                                    <tr key={item.id}>
-                                                        <td className="px-4 py-3 fw-semibold">{item.title}</td>
-                                                        <td className="px-4 py-3 text-muted">{item.desc}</td>
-                                                        <td className="px-4 py-3 text-end">
+                                                    <tr key={item.id} style={{ borderColor: currentTheme.border }}>
+                                                        <td className="px-4 py-3 fw-semibold" style={{ backgroundColor: 'transparent', color: currentTheme.text }}>{item.title}</td>
+                                                        {/* নিচের লাইনে কালার পরিবর্তন করা হয়েছে */}
+                                                        <td className="px-4 py-3" style={{ backgroundColor: 'transparent', color: isDarkMode ? '#e0e0e0' : '#555555' }}>{item.desc}</td>
+                                                        <td className="px-4 py-3 text-end" style={{ backgroundColor: 'transparent' }}>
                                                             <button className="btn btn-sm text-info" onClick={() => openModal(item)}>
                                                                 <i className="bi bi-pencil-square fs-5"></i>
                                                             </button>
@@ -170,7 +154,7 @@ const OwnerBenefit = ({ theme }) => {
                                                     </tr>
                                                 ))
                                             ) : (
-                                                <tr><td colSpan="3" className="text-center py-4 text-muted">No records found.</td></tr>
+                                                <tr><td colSpan="3" className="text-center py-4" style={{ backgroundColor: 'transparent', color: currentTheme.text }}>No records found.</td></tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -189,13 +173,13 @@ const OwnerBenefit = ({ theme }) => {
                         <form className="modal-content" onSubmit={handleSave} style={{ backgroundColor: currentTheme.card, color: currentTheme.text }}>
                             <div className="modal-header border-0">
                                 <h5 className="modal-title">{isEditing ? "Edit" : "Add"} Benefit</h5>
-                                <button type="button" className="btn-close" onClick={closeModal}></button>
+                                <button type="button" className={`btn-close ${isDarkMode ? 'btn-close-white' : ''}`} onClick={closeModal}></button>
                             </div>
                             <div className="modal-body">
                                 <div className="mb-3">
                                     <label className="form-label">Title</label>
                                     <input 
-                                        type="text" className="form-control" 
+                                        type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} 
                                         value={formData.title} required
                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
                                     />
@@ -203,7 +187,7 @@ const OwnerBenefit = ({ theme }) => {
                                 <div className="mb-3">
                                     <label className="form-label">Description</label>
                                     <textarea 
-                                        className="form-control" rows="3" 
+                                        className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} rows="3" 
                                         value={formData.desc} required
                                         onChange={(e) => setFormData({...formData, desc: e.target.value})}
                                     ></textarea>

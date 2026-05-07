@@ -1,68 +1,46 @@
-// import React from 'react';
-// import { useNavigate } from 'react-router-dom'; // ১. ইম্পোর্ট করুন
+
+
+// import React, { useState, useEffect } from 'react';
+// import { useNavigate } from 'react-router-dom';
 // import '../css/Investment.css';
 
 // const Investment = () => {
-//     const navigate = useNavigate(); // ২. নেভিগেট হুক ডিক্লেয়ার করুন
+//     const navigate = useNavigate();
+//     const [packages, setPackages] = useState([]);
+//     const [loading, setLoading] = useState(true);
 
-//     const packages = [
-//         {
-//             id: 1,
-//             title: "SUPERIOR DELUXE",
-//             price: "299,900",
-//             discount: "50,000",
-//             land: "14 sft",
-//             building: "11 sft",
-//             totalSize: "328 sft",
-//             description: "Entry-level investment package with land, building space, and amenities.",
-//             isPopular: true,
-//             isSoldOut: false
-//         },
-//         {
-//             id: 2,
-//             title: "PREMIUM SUITES",
-//             price: "399,900",
-//             discount: "60,000",
-//             land: "26 sft",
-//             building: "22 sft",
-//             totalSize: "430 sft",
-//             description: "Mid-tier investment with enhanced space and premium benefits.",
-//             isPopular: false,
-//             isSoldOut: false
-//         },
-//         {
-//             id: 3,
-//             title: "VILLA",
-//             price: "",
-//             discount: "",
-//             land: "",
-//             building: "",
-//             totalSize: "",
-//             description: "",
-//             isPopular: false,
-//             isSoldOut: true
-//         },
-//         {
-//             id: 4,
-//             title: "PRESIDENTIAL SUITES",
-//             price: "599,900",
-//             discount: "1,00,000",
-//             land: "38 sft",
-//             building: "31 sft",
-//             totalSize: "1,710 sft",
-//             description: "Elite investment package with maximum space and exclusive.",
-//             isPopular: false,
-//             isSoldOut: false
+//     const API_URL = "http://127.0.0.1:8000/api/get-investment"; // আপনার প্যাকেজ লিস্ট পাওয়ার এপিআই
+
+//     // এপিআই থেকে ডাটা ফেচ করা
+//     const fetchPackages = async () => {
+//         try {
+//             setLoading(true);
+//             const response = await fetch(API_URL);
+//             const result = await response.json();
+//             if (result.status) {
+//                 setPackages(result.data);
+//             }
+//         } catch (error) {
+//             console.error("Error fetching packages:", error);
+//         } finally {
+//             setLoading(false);
 //         }
-//     ];
+//     };
 
-//     // ৩. কার্ডে ক্লিক করলে কাজ করবে এমন ফাংশন
+//     useEffect(() => {
+//         fetchPackages();
+//     }, []);
+
 //     const handleCardClick = (pkg) => {
-//         if (!pkg.isSoldOut) {
-//             // আইডি অনুযায়ী ডাইনামিক ইউআরএল-এ নিয়ে যাবে
+//         // এপিআই থেকে আসা is_sold_out সাধারণত 1 বা 0 হয়, তাই == 1 দিয়ে চেক করা ভালো
+//         if (pkg.is_sold_out != 1) {
 //             navigate(`/package-details/${pkg.id}`, { state: { packageData: pkg } });
 //         }
 //     };
+
+//     if (loading) {
+//         return <div className="text-center py-5">Loading Investment Packages...</div>;
+//     }
 
 //     return (
 //         <section className="investment-section py-5">
@@ -75,14 +53,13 @@
 //                 <div className="row g-4 justify-content-center">
 //                     {packages.map((pkg) => (
 //                         <div className="col-lg-3 col-md-6" key={pkg.id}>
-//                             {/* ৪. এখানে onClick ইভেন্ট যোগ করা হয়েছে */}
 //                             <div 
-//                                 className={`investment-card ${pkg.isPopular ? 'popular-border' : ''} ${pkg.isSoldOut ? 'sold-out-card' : 'clickable-card'}`}
+//                                 className={`investment-card ${pkg.is_popular == 1 ? 'popular-border' : ''} ${pkg.is_sold_out == 1 ? 'sold-out-card' : 'clickable-card'}`}
 //                                 onClick={() => handleCardClick(pkg)}
-//                                 style={{ cursor: pkg.isSoldOut ? 'default' : 'pointer' }}
+//                                 style={{ cursor: pkg.is_sold_out == 1 ? 'default' : 'pointer' }}
 //                             >
 
-//                                 {pkg.isPopular && (
+//                                 {pkg.is_popular == 1 && (
 //                                     <div className="popular-badge">
 //                                         <span>★ MOST POPULAR ★</span>
 //                                     </div>
@@ -91,7 +68,7 @@
 //                                 <div className="card-content d-flex flex-column h-100">
 //                                     <h3 className="pkg-title mt-4">{pkg.title}</h3>
 
-//                                     {pkg.isSoldOut ? (
+//                                     {pkg.is_sold_out == 1 ? (
 //                                         <div className="sold-out-container my-auto">
 //                                             <div className="sold-out-btn">SOLD OUT</div>
 //                                         </div>
@@ -101,9 +78,9 @@
 //                                             <p className="pkg-discount">Discount: ৳BDT {pkg.discount}</p>
 
 //                                             <ul className="pkg-features text-start ps-4 mt-3">
-//                                                 <li><strong>Land:</strong> {pkg.land}</li>
-//                                                 <li><strong>Building:</strong> {pkg.building}</li>
-//                                                 <li><strong>Total Room Size:</strong> {pkg.totalSize}</li>
+//                                                 <li><strong>Land:</strong> {pkg.land || 'N/A'}</li>
+//                                                 <li><strong>Building:</strong> {pkg.building || 'N/A'}</li>
+//                                                 <li><strong>Total Room Size:</strong> {pkg.total_size || 'N/A'}</li>
 //                                                 <li>+ Amenities</li>
 //                                             </ul>
 
@@ -111,8 +88,8 @@
 //                                         </>
 //                                     )}
 
-//                                     <button className={`inquire-btn mt-auto ${pkg.isPopular ? 'popular-btn' : pkg.isSoldOut ? 'sold-out-footer' : ''}`}>
-//                                         {pkg.isSoldOut ? "NOT AVAILABLE" : "INQUIRE NOW"}
+//                                     <button className={`inquire-btn mt-auto ${pkg.is_popular == 1 ? 'popular-btn' : pkg.is_sold_out == 1 ? 'sold-out-footer' : ''}`}>
+//                                         {pkg.is_sold_out == 1 ? "NOT AVAILABLE" : "INQUIRE NOW"}
 //                                     </button>
 //                                 </div>
 //                             </div>
@@ -121,9 +98,9 @@
 //                 </div>
 //             </div>
             
-//             {/* বাকি বেনিফিট অংশ একই থাকবে... */}
+//             {/* Benefits Container */}
 
-//              <div className="benefits-container container mt-5 p-5 bg-white">
+//             <div className="benefits-container container mt-5 p-5 bg-white">
 //                 <div className="text-center mb-4">
 //                     <span className="benefits-badge">WHY INVEST WITH US</span>
 //                     <h2 className="benefits-main-title">EXCLUSIVE INVESTMENT BENEFITS</h2>
@@ -152,7 +129,6 @@
 //                         </div>
 //                     ))}
 
-//                     {/* Special Box 19 */}
 //                     <div className="col-12">
 //                         <div className="benefit-item d-flex align-items-start">
 //                             <span className="benefit-number">19</span>
@@ -171,7 +147,7 @@
 //                     <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
 //                 </div>
 //             </div>
-            
+
 //         </section>
 //     );
 // };
@@ -186,32 +162,46 @@ import '../css/Investment.css';
 const Investment = () => {
     const navigate = useNavigate();
     const [packages, setPackages] = useState([]);
+    const [benefitsData, setBenefitsData] = useState(null); // বেনিফিট ডাটা স্টেট
     const [loading, setLoading] = useState(true);
 
-    const API_URL = "http://127.0.0.1:8000/api/get-investment"; // আপনার প্যাকেজ লিস্ট পাওয়ার এপিআই
+    const API_URL = "http://127.0.0.1:8000/api/get-investment";
+    const BENEFITS_API_URL = "http://127.0.0.1:8000/api/get-investment-benefits";
 
-    // এপিআই থেকে ডাটা ফেচ করা
-    const fetchPackages = async () => {
+    const fetchData = async () => {
         try {
             setLoading(true);
-            const response = await fetch(API_URL);
-            const result = await response.json();
-            if (result.status) {
-                setPackages(result.data);
+            
+            // একই সাথে দুটি API কল করা হচ্ছে
+            const [packageRes, benefitsRes] = await Promise.all([
+                fetch(API_URL),
+                fetch(BENEFITS_API_URL)
+            ]);
+
+            const packageResult = await packageRes.json();
+            const benefitsResult = await benefitsRes.json();
+
+            if (packageResult.status) {
+                setPackages(packageResult.data);
             }
+
+            if (benefitsResult.status) {
+                // প্যাগিনেশন রেসপন্স থেকে প্রথম অবজেক্টটি নেওয়া হচ্ছে
+                setBenefitsData(benefitsResult.data.data[0]);
+            }
+
         } catch (error) {
-            console.error("Error fetching packages:", error);
+            console.error("Error fetching data:", error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchPackages();
+        fetchData();
     }, []);
 
     const handleCardClick = (pkg) => {
-        // এপিআই থেকে আসা is_sold_out সাধারণত 1 বা 0 হয়, তাই == 1 দিয়ে চেক করা ভালো
         if (pkg.is_sold_out != 1) {
             navigate(`/package-details/${pkg.id}`, { state: { packageData: pkg } });
         }
@@ -237,7 +227,6 @@ const Investment = () => {
                                 onClick={() => handleCardClick(pkg)}
                                 style={{ cursor: pkg.is_sold_out == 1 ? 'default' : 'pointer' }}
                             >
-
                                 {pkg.is_popular == 1 && (
                                     <div className="popular-badge">
                                         <span>★ MOST POPULAR ★</span>
@@ -255,14 +244,12 @@ const Investment = () => {
                                         <>
                                             <h2 className="pkg-price">৳BDT {pkg.price}</h2>
                                             <p className="pkg-discount">Discount: ৳BDT {pkg.discount}</p>
-
                                             <ul className="pkg-features text-start ps-4 mt-3">
                                                 <li><strong>Land:</strong> {pkg.land || 'N/A'}</li>
                                                 <li><strong>Building:</strong> {pkg.building || 'N/A'}</li>
                                                 <li><strong>Total Room Size:</strong> {pkg.total_size || 'N/A'}</li>
                                                 <li>+ Amenities</li>
                                             </ul>
-
                                             <p className="pkg-desc px-3 mt-3">{pkg.description}</p>
                                         </>
                                     )}
@@ -277,54 +264,33 @@ const Investment = () => {
                 </div>
             </div>
             
-            {/* Benefits Container */}
-            <div className="benefits-container container mt-5 p-5 bg-white">
-                <div className="text-center mb-4">
-                    <span className="benefits-badge">WHY INVEST WITH US</span>
-                    <h2 className="benefits-main-title">EXCLUSIVE INVESTMENT BENEFITS</h2>
-                    <p className="benefits-sub-text">Unlock premium advantages and long-term value with your investment</p>
-                </div>
+            {/* Dynamic Benefits Container */}
+            {benefitsData && (
+                <div className="benefits-container container mt-5 p-5 bg-white">
+                    <div className="text-center mb-4">
+                        <span className="benefits-badge">WHY INVEST WITH US</span>
+                        <h2 className="benefits-main-title">{benefitsData.title}</h2>
+                        <p className="benefits-sub-text">{benefitsData.subtitle}</p>
+                    </div>
 
-                <div className="row g-3">
-                    {[
-                        "Saaf-Qabla Registration", "Return annual profit by utilizing our whole resort",
-                        "Yearly increase in asset worth", "Passive income",
-                        "Permanent source of life in a good community", "Money-Back Guarantee",
-                        "Free stay facilities per share yearly: 02 nights 03 days on accommodation", "Discount on accommodation all over the year: 40%",
-                        "Discount all over the year on membership card facilities in Akashbari Hotel & Resorts and Akashbari Holidays", "No Down Payment",
-                        "Get 36-month, interest-free EMI option", "EMI Facilities",
-                        "A discount of BDT 50,000 is available on the Superior Deluxe package, priced at BDT 299,900, which includes 14 sft of land, 11 sft of building space, and amenities",
-                        "A discount of BDT 60,000 is available on the Premium Suites package, priced at BDT 399,900, which includes 26 sft of land, 22 sft of building space, and amenities",
-                        "A discount of BDT 75,000 is available on the Villa package, priced at BDT 499,900, which includes 32 sft of land, 29 sft of building space, and amenities",
-                        "A discount of BDT 1,00,000 is available on the Presidential suites package, priced at BDT 599,900, which includes 48 sft of land, 45 sft of building space, and amenities",
-                        "Free worldwide Hotel accommodation", "Free Air Ticket and Package"
-                    ].map((benefit, index) => (
-                        <div className="col-md-6" key={index}>
-                            <div className="benefit-item d-flex align-items-center">
-                                <span className="benefit-number">{String(index + 1).padStart(2, '0')}</span>
-                                <span className="benefit-text">{benefit}</span>
+                    <div className="row g-3">
+                        {benefitsData.benefits && benefitsData.benefits.map((benefit, index) => (
+                            <div className={index === benefitsData.benefits.length - 1 ? "col-12" : "col-md-6"} key={index}>
+                                <div className={`benefit-item d-flex ${index === benefitsData.benefits.length - 1 ? "align-items-start" : "align-items-center"}`}>
+                                    <span className="benefit-number">{String(index + 1).padStart(2, '0')}</span>
+                                    <span className="benefit-text">{benefit}</span>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
 
-                    <div className="col-12">
-                        <div className="benefit-item d-flex align-items-start">
-                            <span className="benefit-number">19</span>
-                            <span className="benefit-text">
-                                Based on construction progress, the share price will be increased every six months in phases,
-                                according to demand and supply. By the handover stage, the price of the lowest category of
-                                shares may reach up to 990,000 taka
-                            </span>
-                        </div>
+                    <div className="footer-promo text-center mt-5">
+                        <div className="promo-divider mb-4"></div>
+                        <h4 className="promo-question">Ready to Secure Your Future?</h4>
+                        <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
                     </div>
                 </div>
-
-                <div className="footer-promo text-center mt-5">
-                    <div className="promo-divider mb-4"></div>
-                    <h4 className="promo-question">Ready to Secure Your Future?</h4>
-                    <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
-                </div>
-            </div>
+            )}
         </section>
     );
 };

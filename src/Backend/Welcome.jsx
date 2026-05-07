@@ -205,7 +205,6 @@
 // };
 
 // export default Welcome;
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './Header';
@@ -213,7 +212,7 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 
 const Welcome = ({ theme: propsTheme }) => {
-    // LocalStorage theke state nite hobe properly
+    // LocalStorage theke state properly initialize kora hoyeche
     const [isCollapsed, setIsCollapsed] = useState(() => {
         return localStorage.getItem("sidebar") === "true";
     });
@@ -232,7 +231,7 @@ const Welcome = ({ theme: propsTheme }) => {
         image: null
     });
 
-    // Sidebar collapse toggle handle function
+    // Sidebar collapse toggle logic
     const toggleSidebar = () => {
         const newState = !isCollapsed;
         setIsCollapsed(newState);
@@ -323,7 +322,7 @@ const Welcome = ({ theme: propsTheme }) => {
 
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh', display: 'flex' }}>
-            {/* Sidebar wrap kora hoyeche jate width fixed thake */}
+            {/* Sidebar Section */}
             <div style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="welcome" />
             </div>
@@ -344,7 +343,7 @@ const Welcome = ({ theme: propsTheme }) => {
 
                     <div className="table-responsive p-3 shadow-sm" style={{ background: theme.card, borderRadius: "12px" }}>
                         {loading ? (
-                            <div className="text-center p-5">Loading data...</div>
+                            <div className="text-center p-5" style={{ color: theme.text }}>Loading data...</div>
                         ) : (
                             <table className={`table ${isDarkMode ? 'table-dark' : ''} align-middle mb-0`}>
                                 <thead>
@@ -363,18 +362,26 @@ const Welcome = ({ theme: propsTheme }) => {
                                                     <img src={b.image} alt="thumb" style={{width: '60px', height: '40px', borderRadius: '5px', objectFit: 'cover'}} />
                                                 ) : <span className="text-muted small">No Image</span>}
                                             </td>
-                                            <td className="fw-bold">{b.title}</td>
-                                            <td className="text-muted small" style={{ maxWidth: '400px' }}>{b.description}</td>
+                                            {/* Title color adjust kora hoyeche */}
+                                            <td className="fw-bold" style={{ color: theme.text }}>{b.title}</td>
+                                            {/* Description e 'isDarkMode' check kore white color deya hoyeche */}
+                                            <td style={{ 
+                                                color: isDarkMode ? '#ffffff' : '#6c757d', 
+                                                fontSize: '0.9rem',
+                                                maxWidth: '400px' 
+                                            }}>
+                                                {b.description}
+                                            </td>
                                             <td className="text-end">
                                                 <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(b.id)}>
-                                                    <i className="bi bi-trash"></i> Delete
+                                                    Delete
                                                 </button>
                                             </td>
                                         </tr>
                                     ))}
                                     {banners.length === 0 && (
                                         <tr>
-                                            <td colSpan="4" className="text-center p-4">No records found.</td>
+                                            <td colSpan="4" className="text-center p-4" style={{ color: theme.text }}>No records found.</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -383,47 +390,46 @@ const Welcome = ({ theme: propsTheme }) => {
                     </div>
                 </div>
 
-                <Footer theme={theme} />
-            </div>
-
-            {/* MODAL (Same as before) */}
-            {showModal && (
-                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content" style={{ backgroundColor: theme.card, color: theme.text, border: `1px solid ${theme.border}` }}>
-                            <div className="modal-header border-bottom-0">
-                                <h5 className="modal-title">Add Welcome Section</h5>
-                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
+                {/* MODAL SECTION */}
+                {showModal && (
+                    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content" style={{ backgroundColor: theme.card, color: theme.text, border: `1px solid ${theme.border}` }}>
+                                <div className="modal-header border-bottom-0">
+                                    <h5 className="modal-title">Add Welcome Section</h5>
+                                    <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
+                                </div>
+                                <form onSubmit={handleSubmit}>
+                                    <div className="modal-body">
+                                        <div className="mb-3">
+                                            <label className="form-label fw-bold">Title</label>
+                                            <input type="text" name="title" className="form-control shadow-none" style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} onChange={handleChange} required />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label fw-bold">Description</label>
+                                            <textarea name="description" className="form-control shadow-none" rows="3" style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} onChange={handleChange} required></textarea>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label fw-bold">Upload Image</label>
+                                            <input type="file" className="form-control shadow-none" accept="image/*" style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} onChange={handleImageChange} />
+                                            {imagePreview && (
+                                                <div className="mt-3 text-center">
+                                                    <img src={imagePreview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px' }} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer border-top-0">
+                                        <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                                        <button type="submit" className="btn btn-primary px-4">Submit</button>
+                                    </div>
+                                </form>
                             </div>
-                            <form onSubmit={handleSubmit}>
-                                <div className="modal-body">
-                                    <div className="mb-3">
-                                        <label className="form-label fw-bold">Title</label>
-                                        <input type="text" name="title" className="form-control shadow-none" style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} onChange={handleChange} required />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label className="form-label fw-bold">Description</label>
-                                        <textarea name="description" className="form-control shadow-none" rows="3" style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} onChange={handleChange} required></textarea>
-                                    </div>
-                                    <div className="mb-3">
-                                        <label className="form-label fw-bold">Upload Image</label>
-                                        <input type="file" className="form-control shadow-none" accept="image/*" style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} onChange={handleImageChange} />
-                                        {imagePreview && (
-                                            <div className="mt-3 text-center">
-                                                <img src={imagePreview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px' }} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="modal-footer border-top-0">
-                                    <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary px-4">Submit</button>
-                                </div>
-                            </form>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+                <Footer theme={theme} />
+            </div>
         </div>
     );
 };

@@ -18,6 +18,7 @@ import VideoSection from './Backend/VideoSection'
 import OwnerSection from './Backend/Ownersection'
 import OwnerBenefit from './Backend/OwnerBenefit'
 import Investment from './Backend/Investment'
+import InvestmentBenefit from './Backend/InvestmentBenefit'
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
         <Route path="/owner-section" element={<OwnerSection />} />
         <Route path="/owner-benefit" element={<OwnerBenefit />} />
         <Route path="/admin-investment" element={<Investment />} />
+        <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
 
 
 
