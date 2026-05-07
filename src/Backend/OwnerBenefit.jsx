@@ -42,55 +42,63 @@ const OwnerBenefit = ({ theme }) => {
     }, []);
 
     // ২. অ্যাড এবং এডিট হ্যান্ডলার
-    const handleSave = async (e) => {
-        e.preventDefault();
-        
-        // এডিট এর জন্য id দরকার, এড এর জন্য দরকার নেই
-        const payload = isEditing 
-            ? { id: formData.id, title: formData.title, desc: formData.desc }
-            : { title: formData.title, desc: formData.desc };
+  const handleSave = async (e) => {
+    e.preventDefault();
+    
+    // এডিট হলে ইউআরএল হবে: /api/edit-property-benifit/5
+    // অ্যাড হলে ইউআরএল হবে: /api/add-property-benifit
+    const url = isEditing 
+        ? `${API_BASE}/edit-property-benifit/${formData.id}` 
+        : `${API_BASE}/add-property-benifit`;
 
-        const url = isEditing 
-            ? `${API_BASE}/edit-property-benifit` 
-            : `${API_BASE}/add-property-benifit`;
+    try {
+        const response = await fetch(url, {
+            method: 'POST', // লারাভেল রাউটে যেহেতু POST দেওয়া
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: formData.title,
+                desc: formData.desc
+            }),
+        });
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+        const result = await response.json();
 
-            if (response.ok) {
-                await fetchBenefits(); // ডাটা রিফ্রেশ
-                closeModal();
-            } else {
-                alert("Failed to save. Check if the API supports this method.");
-            }
-        } catch (error) {
-            console.error("Save error:", error);
+        if (result.status) {
+            await fetchBenefits(); // লিস্ট আপডেট করুন
+            closeModal();
+        } else {
+            alert(result.message || "Error saving data");
         }
-    };
+    } catch (error) {
+        console.error("Save error:", error);
+        alert("Server error, check console.");
+    }
+};
 
     // ৩. ডিলিট হ্যান্ডলার (ID টা বডিতে বা URL এ দিতে হয়)
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure?")) return;
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this?")) return;
 
-        try {
-            // অনেক সময় লারাভেলে POST দিয়ে id পাঠাতে হয় ডিলিটের জন্য, অথবা URL এ
-            const response = await fetch(`${API_BASE}/delete-property-benifit`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id }),
-            });
+    try {
+        // ইউআরএল হবে: /api/delete-property-benifit/5
+        const response = await fetch(`${API_BASE}/delete-property-benifit/${id}`, {
+            method: 'DELETE', // রাউট অনুযায়ী DELETE মেথড
+            headers: { 'Content-Type': 'application/json' }
+        });
 
-            if (response.ok) {
-                fetchBenefits();
-            }
-        } catch (error) {
-            console.error("Delete error:", error);
+        const result = await response.json();
+
+        if (result.status) {
+            // স্টেট থেকে সরাসরি ডিলিট করে দিলে রিফ্রেশ কম লাগবে
+            setBenefits(prev => prev.filter(item => item.id !== id));
+        } else {
+            alert(result.message || "Delete failed");
         }
-    };
+    } catch (error) {
+        console.error("Delete error:", error);
+        alert("Failed to delete. Check network/server.");
+    }
+};
 
     const openModal = (item = null) => {
         if (item) {

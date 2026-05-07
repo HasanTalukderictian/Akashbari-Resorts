@@ -6,6 +6,7 @@ import Footer from './Footer';
 import Users from './Users';
 import OwnerSection from './Ownersection';
 import OwnerBenefit from './OwnerBenefit';
+import Investment from './Investment';
 
 // Dummy components for illustration if not imported
 const Welcome = () => <div className="card p-4 border-0 shadow-sm"><h4>Welcome Section</h4></div>;
@@ -75,6 +76,8 @@ const Dashbord = () => {
                return <OwnerSection theme={theme ? theme : {}} />;
                case 'benefit':
                return <OwnerBenefit theme={theme ? theme : {}} />;
+               case 'investment':
+               return <Investment theme={theme ? theme : {}} />;
             case 'dashboard':
             default:
                 return (

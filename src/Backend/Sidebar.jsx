@@ -17,8 +17,9 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
         { id: 'welcome', label: 'Welcome Section', icon: 'pie-chart', path: '/welcome' },
         { id: 'video', label: 'Video Section', icon: 'envelope', path: '/video' },
-         { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-workspace', path: '/owner-section' },
-          { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-person-workspace', path: '/owner-benefit' },
+        { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-workspace', path: '/owner-section' },
+        { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-person-workspace', path: '/owner-benefit' },
+        { id: 'investment', label: 'Investment Package', icon: 'bi bi-person-workspace', path: '/admin-investment' },
     ];
 
     const sidebarBg = {
