@@ -1,0 +1,31 @@
+{
+    "sectionId": "places",
+    "subtitle": "See Place",
+    "title": "Places Around The Hotel To Visit This Summer",
+    "buttonText": "View More",
+    "images": [{
+            "id": 1,
+            "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+            "alt": "Coastal View",
+            "colSize": "col-md-7"
+        },
+        {
+            "id": 2,
+            "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+            "alt": "Traveler",
+            "colSize": "col-md-5"
+        },
+        {
+            "id": 3,
+            "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
+            "alt": "Promenade",
+            "colSize": "col-md-5"
+        },
+        {
+            "id": 4,
+            "image": "https://images.unsplash.com/photo-1499856871958-5b9627545d1a",
+            "alt": "Ancient Architecture",
+            "colSize": "col-md-7"
+        }
+    ]
+}

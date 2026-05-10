@@ -1,0 +1,54 @@
+{
+    "sectionId": "welcome",
+    "subtitle": "About Us",
+    "title": "Welcome To Our Best luxury stay in the city.",
+    "highlightText": "the city",
+    "description": "Welcome to Akashbari Resort, where luxury meets comfort in the heart of nature. Since 1999, we have been dedicated to providing an exceptional stay for our guests, blending modern amenities with timeless elegance.",
+    "features": [{
+            "id": 1,
+            "icon": "⭐",
+            "title": "350 Best Rooms 5 Star"
+        },
+        {
+            "id": 2,
+            "icon": "☕",
+            "title": "Breakfast each morning"
+        },
+        {
+            "id": 3,
+            "icon": "🛀",
+            "title": "Double Whirlpool Jacuzzi Tub"
+        },
+        {
+            "id": 4,
+            "icon": "🍷",
+            "title": "Wet Bar with Refrigerator"
+        }
+    ],
+    "gallery": [{
+            "id": 1,
+            "image": "https://images.unsplash.com/photo-1618773928121-c32242e63f39",
+            "title": "King Room"
+        },
+        {
+            "id": 2,
+            "image": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
+            "title": "Suits Room"
+        },
+        {
+            "id": 3,
+            "image": "https://images.unsplash.com/photo-1611892440504-42a792e24d32",
+            "title": "Lake View"
+        },
+        {
+            "id": 4,
+            "image": "https://images.unsplash.com/photo-1617098891799-3f2c1b3e3e3b",
+            "title": "City View"
+        },
+        {
+            "id": 5,
+            "image": "https://images.unsplash.com/photo-1631049307264-da0ec9d70304",
+            "title": "Family Room"
+        }
+    ]
+}

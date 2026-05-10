@@ -1,0 +1,8 @@
+{
+    "title": "About",
+    "subtitle": "Discover Our Story",
+    "breadcrumb": {
+        "home": "/",
+        "current": "About"
+    },
+    "backgroundImage": "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3"

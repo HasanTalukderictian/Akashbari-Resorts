@@ -1,0 +1,43 @@
+{
+    "sectionId": "team",
+    "subtitle": "Our Team",
+    "title": "The People Behind Akashbari Resort",
+    "description": "Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment. From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.",
+    "members": [{
+            "id": 1,
+            "name": "Sofia Bennett",
+            "role": "General Manager",
+            "image": "https://randomuser.me/api/portraits/women/68.jpg"
+        },
+        {
+            "id": 2,
+            "name": "Daniel Wright",
+            "role": "Guest Experience Lead",
+            "image": "https://randomuser.me/api/portraits/men/32.jpg"
+        },
+        {
+            "id": 3,
+            "name": "Alex Morgan",
+            "role": "Operations Manager",
+            "image": "https://randomuser.me/api/portraits/men/45.jpg"
+        },
+        {
+            "id": 4,
+            "name": "Emma Collins",
+            "role": "Events & Services Manager",
+            "image": "https://randomuser.me/api/portraits/women/44.jpg"
+        },
+        {
+            "id": 5,
+            "name": "Liam Parker",
+            "role": "Hospitality Coordinator",
+            "image": "https://randomuser.me/api/portraits/men/22.jpg"
+        },
+        {
+            "id": 6,
+            "name": "Olivia Reed",
+            "role": "Front Desk Supervisor",
+            "image": "https://randomuser.me/api/portraits/women/45.jpg"
+        }
+    ]
+}

@@ -10,6 +10,7 @@ import Room from './Room'
 import Testominal from './Testominal'
 import Video from './Video'
 import Owner from "./Owner";
+import Packagegrap from "./Packagegrap";
 
 const LandingPage = () => {
 
@@ -31,6 +32,7 @@ const LandingPage = () => {
       <Video />
       <Owner/>
       <Investment />
+      <Packagegrap/>
       <Room />
       <Facility />
       <Event />
