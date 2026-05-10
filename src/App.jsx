@@ -20,6 +20,8 @@ import OwnerBenefit from './Backend/OwnerBenefit'
 import Investment from './Backend/Investment'
 import InvestmentBenefit from './Backend/InvestmentBenefit'
 import Events from './Backend/Events'
+import AllEvents from './assets/Frontend/AllEvents'
+import EventsDetails from './assets/Frontend/EventsDetails'
 
 
 function App() {
@@ -46,6 +48,8 @@ function App() {
         <Route path="/admin-investment" element={<Investment />} />
         <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
         <Route path="/admin-events" element={<Events />} />
+        <Route path="/all-events" element={<AllEvents />} />
+       <Route path="/event/:id" element={<EventsDetails />} />  
 
 
       </Routes>
