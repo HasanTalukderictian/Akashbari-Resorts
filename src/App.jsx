@@ -19,6 +19,7 @@ import OwnerSection from './Backend/Ownersection'
 import OwnerBenefit from './Backend/OwnerBenefit'
 import Investment from './Backend/Investment'
 import InvestmentBenefit from './Backend/InvestmentBenefit'
+import Events from './Backend/Events'
 
 
 function App() {
@@ -44,7 +45,7 @@ function App() {
         <Route path="/owner-benefit" element={<OwnerBenefit />} />
         <Route path="/admin-investment" element={<Investment />} />
         <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
-
+        <Route path="/admin-events" element={<Events />} />
 
 
       </Routes>
