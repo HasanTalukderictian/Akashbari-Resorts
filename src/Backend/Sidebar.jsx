@@ -22,6 +22,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
          { id: 'investment', label: 'Investment Package', icon: 'bi bi-person-workspace', path: '/admin-investment' },
         { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-person-workspace', path: '/admin-investmentbenefit' },
          { id: 'events', label: 'Events', icon: 'bi bi-person-workspace', path: '/admin-events' },
+         { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-person-workspace', path: '/admin-luxury' },
     ];
 
     const sidebarBg = {

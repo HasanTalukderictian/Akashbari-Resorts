@@ -1,5 +1,5 @@
-import React from 'react'
-import logo from '../image/logo-removebg-preview.png';
+import React from 'react';
+import { Phone } from 'lucide-react'; // আইকন ব্যবহারের জন্য এটি ইনস্টল থাকতে হবে: npm install lucide-react
 
 const Homepage = () => {
     return (
@@ -15,7 +15,6 @@ const Homepage = () => {
                 position: "relative"
             }}
         >
-
             {/* Dark overlay */}
             <div
                 style={{
@@ -37,6 +36,7 @@ const Homepage = () => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
+                    padding: "0 20px"
                 }}
             >
                 {/* Responsive logo + title */}
@@ -51,23 +51,41 @@ const Homepage = () => {
                     </h1>
                 </div>
 
-                <h4 className="mb-4 px-3">
-                    This website is currently under Maintaince. <br />
+                <h4 className="mb-4">
+                    This website is currently under Maintenance. <br />
                     To view content from our existing website, please click the button below.
                 </h4>
 
-                <a
-                    href="https://www.akashbariholidays.com/resorts"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-warning px-4 py-2 fw-bold"
-                >
-                    Click here for Details
-                </a>
+                {/* Button and Call Icon Parallel Container */}
+                <div className="d-flex flex-column flex-sm-row align-items-center gap-3">
+                    <a
+                        href="https://www.akashbariholidays.com/resorts"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-warning px-4 py-2 fw-bold"
+                        style={{ borderRadius: "50px" }}
+                    >
+                        Click here for Details
+                    </a>
+
+                    <a 
+                        href="tel:01701294455" 
+                        className="d-flex align-items-center gap-2 text-decoration-none fw-bold"
+                        style={{ 
+                            color: "#ffc107", // Matching btn-warning color
+                            fontSize: "1.2rem",
+                            padding: "8px 15px",
+                            border: "2px solid #ffc107",
+                            borderRadius: "50px"
+                        }}
+                    >
+                        <Phone size={20} fill="#ffc107" />
+                        01701294455
+                    </a>
+                </div>
             </div>
-
         </div>
-    )
-}
+    );
+};
 
-export default Homepage
+export default Homepage;

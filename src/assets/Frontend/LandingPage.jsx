@@ -11,6 +11,7 @@ import Testominal from './Testominal'
 import Video from './Video'
 import Owner from "./Owner";
 import Packagegrap from "./Packagegrap";
+import Luxury from "./Luxury";
 
 const LandingPage = () => {
 
@@ -33,6 +34,7 @@ const LandingPage = () => {
       <Owner/>
       <Investment />
       <Packagegrap/>
+      <Luxury/>
       <Room />
       <Facility />
       <Event />
