@@ -76,7 +76,7 @@ const Welcome = () => {
             </div>
           </div>
 
-          {/* Right Features Side - Dynamic Part */}
+          {/* Right Features Side - Dynamic Part - Icons Removed */}
           <div className="col-lg-5 offset-lg-1">
             <div className="features-box p-4 p-md-5">
               <h2 className="features-title text-center text-uppercase mb-4">Resort Features</h2>
@@ -87,7 +87,7 @@ const Welcome = () => {
                 <ul className="list-unstyled features-list">
                   {features.map((item, index) => (
                     <li key={index}>
-                      <i className="bi bi-check2"></i> {item}
+                      {item}
                     </li>
                   ))}
                 </ul>

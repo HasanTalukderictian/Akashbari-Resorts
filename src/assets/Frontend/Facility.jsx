@@ -1,3 +1,4 @@
+import React from 'react';
 import '../css/Facility.css'; 
 
 const Facility = () => {
@@ -20,27 +21,29 @@ const Facility = () => {
     { name: "Car Parking Facility", icon: "🚗" },
     { name: "Heater and Air Conditioning", icon: "❄️" },
     { name: "Swimming Pool", icon: "🏊‍♂️" },
-    { name: "Guest Room with Elegant Decoration", icon: "✨" },
+    { name: "Guest Room", icon: "✨" },
     { name: "24/7 Room Service", icon: "🕒" },
   ];
 
   return (
-    <section className="facility-section py-5">
-      <div className="container text-center">
+    <section className="facility-section py-5" style={{ background: '#fcfcfc' }}>
+      <div className="container">
         {/* Header Section */}
-        <h2 className="facility-title text-uppercase">World-Class Facilities</h2>
-        <div className="yellow-divider-center mx-auto mb-3"></div>
-        <p className="facility-subtitle text-muted mb-5">
-          Experience premium amenities designed for your comfort and enjoyment
-        </p>
+        <div className="text-center mb-5">
+          <h6 className="text-primary fw-bold text-uppercase mb-2" style={{ letterSpacing: '2px' }}>Amenities</h6>
+          <h2 className="facility-main-title fw-bold">World-Class Facilities</h2>
+          <div className="custom-divider mx-auto"></div>
+        </div>
 
         {/* Facilities Grid */}
-        <div className="row g-0 border-top border-start ">
+        <div className="row g-4 justify-content-center">
           {facilities.map((item, index) => (
             <div key={index} className="col-6 col-md-4 col-lg-3">
-              <div className="facility-card border-end border-bottom py-5 px-5">
-                <div className="facility-icon mb-3">{item.icon}</div>
-                <h6 className="facility-name text-uppercase">{item.name}</h6>
+              <div className="facility-card-new">
+                <div className="icon-wrapper">
+                  <span className="icon-emoji">{item.icon}</span>
+                </div>
+                <h6 className="facility-name-text">{item.name}</h6>
               </div>
             </div>
           ))}

@@ -59,12 +59,16 @@ const Owner = () => {
         }
     };
 
+    const handleCallClick = () => {
+        window.location.href = 'tel:01701294455';
+    };
+
     if (loading) return <div className="text-center py-5">Loading Content...</div>;
     if (!property) return <div className="text-center py-5">No Property Data Found</div>;
 
     return (
         <div className="container-fluid py-5" style={{ background: '#f8f9fa', minHeight: '100vh' }}>
-            
+
             {/* MAIN SECTION */}
             <div className="container p-0 overflow-hidden shadow-sm bg-white rounded-4 mb-5">
                 <div className="row g-0 align-items-center">
@@ -137,17 +141,60 @@ const Owner = () => {
                                 ))}
                             </div>
 
-                            <button
-                                onClick={handleWhatsAppClick}
-                                className="btn btn-lg text-white px-5 py-3 fw-bold shadow-lg"
+                            {/* WhatsApp Button */}
+                            <div className="mb-3">
+                                <button
+                                    onClick={handleWhatsAppClick}
+                                    className="btn btn-lg text-white px-5 py-3 fw-bold shadow-lg w-100"
+                                    style={{
+                                        background: '#639c4e',
+                                        borderRadius: '30px',
+                                        border: 'none'
+                                    }}
+                                >
+                                    For Query <i className="bi bi-chat-dots ms-2"></i>
+                                </button>
+                            </div>
+
+                            {/* Call Button with Phone Number - Parallel */}
+                            {/* Call Button with Phone Number - Parallel */}
+                            <div
+                                className="d-flex align-items-center justify-content-between p-1 rounded-pill shadow-sm"
                                 style={{
-                                    background: '#639c4e',
-                                    borderRadius: '30px',
-                                    border: 'none'
+                                    background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+                                    border: '1px solid #e0e0e0',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
                                 }}
+                                onClick={handleCallClick}
+                                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)'}
+                                onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)'}
                             >
-                                For Query <i className="bi bi-chat-dots ms-2"></i>
-                            </button>
+                                <div className="d-flex align-items-center">
+                                    {/* Icon Circle */}
+                                    <div
+                                        className="d-flex align-items-center justify-content-center rounded-circle me-3"
+                                        style={{
+                                            width: '45px',
+                                            height: '45px',
+                                            background: '#333',
+                                            color: '#fff'
+                                        }}
+                                    >
+                                        <i className="bi bi-telephone-fill"></i>
+                                    </div>
+
+                                    {/* Number Text */}
+                                    <div className="d-flex flex-column">
+                                        <small className="text-muted" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Call Now</small>
+                                        <span className="fw-bold fs-5" style={{ color: '#333', letterSpacing: '1px', lineHeight: '1' }}>
+                                            01701 294455
+                                        </span>
+                                    </div>
+                                </div>
+
+                                
+                            </div>
                         </div>
                     </div>
 

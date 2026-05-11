@@ -1,74 +1,89 @@
-.facility-section {
-    background-color: #fff;
-}
+/* Custom Divider */
 
-.facility-title {
-    font-family: 'serif', 'Times New Roman', serif;
-    font-weight: 500;
-    color: #161616;
-    letter-spacing: 2px;
-}
-
-.yellow-divider-center {
-    width: 150px;
-    height: 3px;
-    background-color: #ffd700;
-}
-
-.facility-subtitle {
-    font-size: 0.9rem;
-    font-style: italic;
+.custom-divider {
+    width: 80px;
+    height: 4px;
+    background: #d4af37;
+    /* Gold color for premium feel */
+    border-radius: 10px;
 }
 
 
-/* গ্রিড বক্স স্টাইল */
+/* Facility Card Base */
 
-.facility-card {
-    height: 140px;
-    /* বক্সের উচ্চতা ঠিক রাখা হয়েছে */
+.facility-card-new {
+    background: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    height: 100%;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    background-color: #fff;
-    transition: background-color 0.3s ease;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
 }
 
-.facility-card:hover {
-    background-color: #fcfcfc;
-    /* হালকা হোভার ইফেক্ট */
+
+/* Icon Styling */
+
+.icon-wrapper {
+    width: 65px;
+    height: 65px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    transition: transform 0.3s ease;
 }
 
-.facility-icon {
-    font-size: 1.2rem;
-    /* আইকনের সাইজ */
-}
-
-.facility-name {
-    font-size: 0.75rem;
-    font-weight: 500;
+.facility-name-text {
+    font-size: 0.9rem;
+    font-weight: 600;
     color: #333;
-    letter-spacing: 1px;
-    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     margin: 0;
 }
 
 
-/* বর্ডার কালার ফিক্স */
+/* Hover Effects */
 
-.border-top,
-.border-start,
-.border-end,
-.border-bottom {
-    border-color: #333 !important;
-    /* ইমেজের মতো গাঢ় বর্ডার */
+.facility-card-new:hover {
+    transform: translateY(-10px);
+    background: #ffffff;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    border-color: #d4af37;
 }
 
-@media (max-width: 768px) {
-    .facility-card {
-        height: 120px;
+.facility-card-new:hover .icon-wrapper {
+    background: #fff9e6;
+    /* Very light gold */
+    transform: scale(1.1) rotate(5deg);
+}
+
+.facility-card-new:hover .facility-name-text {
+    color: #d4af37;
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 576px) {
+    .facility-card-new {
+        padding: 20px 10px;
     }
-    .facility-name {
-        font-size: 0.7rem;
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+    }
+    .facility-name-text {
+        font-size: 0.75rem;
     }
 }
