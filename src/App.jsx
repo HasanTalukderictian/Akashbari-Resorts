@@ -23,6 +23,7 @@ import Events from './Backend/Events'
 import AllEvents from './assets/Frontend/AllEvents'
 import EventsDetails from './assets/Frontend/EventsDetails'
 import LuxurySection from './Backend/LuxurySection'
+import Testominal from './Backend/Testominal'
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
         <Route path="/admin-investment" element={<Investment />} />
         <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
         <Route path="/admin-events" element={<Events />} />
+        <Route path="/admin-testo" element={<Testominal />} />
         <Route path="/admin-luxury" element={<LuxurySection />} />
         <Route path="/all-events" element={<AllEvents />} />
        <Route path="/event/:id" element={<EventsDetails />} />  

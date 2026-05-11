@@ -24,6 +24,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
         { id: 'events', label: 'Events', icon: 'bi bi-calendar2-week', path: '/admin-events' },
         { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
+          { id: 'testo', label: 'Testo Section', icon: 'bi bi-diamond', path: '/admin-testo' },
     ];
 
     // Check if any sub-menu item is active

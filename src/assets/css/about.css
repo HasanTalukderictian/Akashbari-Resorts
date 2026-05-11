@@ -1,51 +1,89 @@
-/* --- Banner Section --- */
+/* --- Root Variables for Branding --- */
 
-.about-banner {
-    min-height: 400px;
-    background-image: url('../image/page-header-bg.jpg');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    position: relative;
-    z-index: 1;
+:root {
+    --gold: #c5a059;
+    --gold-dark: #a38145;
+    --dark: #1a1a1a;
+    --text-muted: #6c757d;
+    --bg-light: #f9fbf7;
+    --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-.about-banner::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: -1;
+
+/* --- Global Typography --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&display=swap');
+.serif {
+    font-family: 'Playfair Display', serif !important;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--dark);
+    line-height: 1.7;
+}
+
+.text-gold {
+    color: var(--gold) !important;
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+
+/* --- Section 1: Banner --- */
+
+.about-banner {
+    min-height: 450px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('../image/page-header-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    /* Parallax effect */
 }
 
 .banner-title {
-    font-size: 3.5rem;
-    font-weight: 500;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    /* Responsive font size */
+    letter-spacing: 3px;
+}
+
+.breadcrumb-wrapper a {
+    transition: var(--transition);
+    opacity: 0.8;
+}
+
+.breadcrumb-wrapper a:hover {
+    opacity: 1;
+    color: var(--gold) !important;
 }
 
 
-/* --- Welcome Section & Main Image --- */
+/* --- Section 2: Welcome & Main Image --- */
+
+.main-image-wrapper {
+    z-index: 1;
+}
 
 .main-img {
     width: 100%;
-    height: 450px;
-    /* হাইট কমানো হয়েছে */
+    height: 500px;
     object-fit: cover;
-    border-radius: 4px;
-    transition: 0.3s ease;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
 }
 
 .image-accent {
     position: absolute;
-    top: -15px;
-    left: -15px;
-    width: 80px;
-    height: 80px;
-    border-top: 10px solid #c5a059;
-    border-left: 10px solid #c5a059;
+    top: -20px;
+    left: -20px;
+    width: 100px;
+    height: 100px;
+    border-top: 5px solid var(--gold);
+    border-left: 5px solid var(--gold);
     z-index: -1;
 }
 
@@ -53,340 +91,212 @@
 /* --- Gallery Thumbnails --- */
 
 .gallery-row {
-    overflow-x: auto;
+    padding: 10px 0;
 }
 
 .gallery-item {
-    position: relative;
-    flex: 1;
-    min-width: 90px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: 0.3s;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 3px solid transparent;
 }
 
 .gallery-item img {
+    height: 70px;
     width: 100%;
-    height: 80px;
     object-fit: cover;
-    filter: brightness(0.6);
+    filter: grayscale(40%);
+    transition: var(--transition);
 }
 
-
-/* সিলেক্টেড থাম্বনেইলের জন্য */
-
-.active-thumb {
-    border-color: #c5a059;
-}
-
-.active-thumb img {
-    filter: brightness(1);
-}
-
-.gallery-item p {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    font-size: 9px;
-    text-align: center;
-    margin: 0;
-    padding: 2px 0;
-    font-weight: bold;
-}
-
-
-/* --- Features & General --- */
-
-.text-gold {
-    color: #c5a059 !important;
-}
-
-.ls-2 {
-    letter-spacing: 2px;
-}
-
-.serif {
-    font-family: 'serif', 'Times New Roman', serif;
-}
-
-.feature-box {
-    background-color: #fff;
-    transition: 0.3s;
-}
-
-.feature-box:hover {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    border-color: #c5a059 !important;
-}
-
-
-/* new css */
-
-
-/* --- 3rd Section: Facilities Slider --- */
-
-.facility-slider-section {
-    background-color: #fdfdfd;
-    padding: 80px 0;
-}
-
-.facility-content {
-    flex-grow: 1;
-    padding-top: 20px !important;
-}
-
-.swiper-slide {
-    height: auto;
-    display: flex;
-}
-
-.facility-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    border: 1px solid #eee;
-    transition: all 0.3s ease;
-}
-
-.facility-card:hover {
-    border-color: #c5a059;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+.gallery-item:hover {
     transform: translateY(-5px);
 }
 
+.active-thumb {
+    border-color: var(--gold);
+    box-shadow: 0 8px 20px rgba(197, 160, 89, 0.3);
+}
+
+.active-thumb img {
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+
+/* --- Features Grid --- */
+
+.feature-box {
+    background: #fff;
+    border: 1px solid #f1f1f1 !important;
+    border-radius: 10px;
+    transition: var(--transition);
+}
+
+.feature-box:hover {
+    background: var(--bg-light);
+    border-color: var(--gold) !important;
+    transform: translateX(10px);
+}
+
+
+/* --- Section 3: Facilities --- */
+
+.facility-slider-section {
+    background-color: var(--bg-light);
+}
+
+.facility-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
 .facility-img-wrapper {
-    position: relative;
-    height: 170px;
-    width: 100%;
+    height: 200px;
+    overflow: hidden;
 }
 
 .facility-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    transition: 0.6s ease;
 }
 
-
-/* ইমেজের নিচের গোল আইকন - ইমেজের ডিজাইন অনুযায়ী */
+.facility-card:hover .facility-img-wrapper img {
+    transform: scale(1.15);
+}
 
 .facility-icon-circle {
+    background: #fff;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
     position: absolute;
-    bottom: -20px;
-    /* ইমেজ এবং কন্টেন্টের মাঝামাঝি পজিশন */
+    bottom: -27px;
     left: 50%;
     transform: translateX(-50%);
-    width: 45px;
-    height: 45px;
-    background: #fff;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-    z-index: 10;
-}
-
-.facility-icon-circle span {
-    color: #c5a059;
-    font-size: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    color: var(--gold);
+    font-size: 20px;
 }
 
 .facility-content {
-    padding: 40px 15px 20px 15px !important;
+    padding: 45px 25px 30px !important;
 }
-
-.facility-content h4 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-bottom: 15px;
-    margin-bottom: 10px;
-    color: #222;
-}
-
-.facility-content p {
-    color: #777;
-    line-height: 1.6;
-    font-size: 0.85rem;
-    margin-bottom: 20px;
-}
-
-
-/* Read More Button */
 
 .read-more-btn {
-    background-color: #c5a059;
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    font-size: 0.65rem;
-    text-transform: uppercase;
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
     font-weight: 600;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
+    border-radius: 50px;
+    padding: 8px 25px !important;
+    transition: var(--transition);
 }
 
 .read-more-btn:hover {
-    background-color: #6b9e3e;
-    /* হোভারে ডার্ক কালার */
-    transform: translateY(-3px);
+    background: var(--gold);
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(197, 160, 89, 0.4);
 }
 
 
-/* Swiper Pagination - ইমেজের নিচে ডটগুলো স্টাইল করার জন্য */
+/* --- Section 4: Places Section --- */
 
-.swiper-pagination {
-    display: none !important;
+.place-img-box {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
 
-.swiper-pagination-bullet {
-    width: 12px;
-    height: 12px;
-    background: #ddd;
-    opacity: 1;
+.place-img-box img {
+    transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.swiper-pagination-bullet-active {
-    background: #c5a059 !important;
+.place-img-box:hover img {
+    transform: scale(1.1) rotate(1deg);
+}
+
+.view-more-btn {
+    border-radius: 0;
+    /* Luxury sharp look */
+    background: var(--dark);
+    color: #fff;
+    padding: 12px 35px;
+    border: 1px solid var(--dark);
+    transition: var(--transition);
+}
+
+.view-more-btn:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    letter-spacing: 2px;
 }
 
 
-/* Team Section Styles */
+/* --- Section 5: Team Section --- */
 
-.team-section {
-    background-color: #ffffff;
+.team-card {
+    border-radius: 20px;
+    padding: 10px;
+    background: #fff;
+    transition: var(--transition);
+}
+
+.team-img-container {
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.team-img {
+    transition: 0.5s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-md);
+}
+
+.team-card:hover .team-img {
+    transform: scale(1.08);
 }
 
 .text-italic {
     font-style: italic;
     font-weight: 400;
-}
-
-.team-img-container {
-    overflow: hidden;
-    border-radius: 20px;
-    /* Adjust for that smooth rounded look */
-    aspect-ratio: 4 / 5;
-    /* Keeps all headshots uniform */
-}
-
-.team-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.team-card:hover .team-img {
-    transform: scale(1.05);
-    /* Subtle zoom effect on hover */
-}
-
-.team-card h4 {
-    color: #333;
-    letter-spacing: 0.5px;
-}
-
-.team-card p {
-    letter-spacing: 1px;
-    font-size: 0.8rem;
-    color: #bfa37c;
-    /* Gold color matching your theme */
+    color: var(--gold-dark);
 }
 
 
-/* Optional: Matching the Orrivaa title dot */
+/* --- Mobile Responsiveness --- */
 
-.team-header span.text-gold::before {
-    content: "●";
-    font-size: 8px;
-    vertical-align: middle;
-    margin-right: 8px;
-}
-
-
-/* Responsive spacing */
-
-@media (max-width: 768px) {
-    .facility-card {
-        margin-bottom: 40px;
-        max-width: 280px;
-        margin: auto;
+@media (max-width: 991px) {
+    .main-img {
+        height: 350px;
     }
-}
-
-
-/* 4th section */
-
-
-/* --- 4th Section: Places to Visit --- */
-
-.places-section {
-    background-color: #fff;
-}
-
-
-/* ভিউ মোর বাটন স্টাইল */
-
-.view-more-btn {
-    background-color: #c5a059;
-    color: white;
-    border: none;
-    padding: 10px 35px;
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    font-weight: 500;
-    transition: 0.3s;
-    width: fit-content;
-}
-
-.view-more-btn:hover {
-    background-color: #6b9e3e;
-    transform: translateY(-2px);
-}
-
-
-/* ইমেজ বক্স স্টাইল */
-
-.place-img-box {
-    overflow: hidden;
-    position: relative;
-    border-radius: 4px;
-}
-
-.place-img-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    min-height: 250px;
-    /* ইমেজের মিনিমাম উচ্চতা */
-    transition: transform 0.5s ease;
-}
-
-.place-img-box:hover img {
-    transform: scale(1.05);
-    /* হোভার এফেক্ট */
-}
-
-
-/* গ্রিডের প্যাসিং এবং হাইট অ্যাডজাস্টমেন্ট */
-
-.places-section .row.g-3>div {
-    min-height: 280px;
-}
-
-
-/* --- Responsive --- */
-
-@media (max-width: 768px) {
     .about-banner {
-        min-height: 250px;
+        min-height: 300px;
     }
     .banner-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
-    .main-img {
-        height: 300px;
+    .facility-card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .gallery-item img {
+        height: 50px;
+    }
+    .banner-title {
+        font-size: 2.2rem;
+    }
+    .facility-content h4 {
+        font-size: 1.1rem;
     }
 }

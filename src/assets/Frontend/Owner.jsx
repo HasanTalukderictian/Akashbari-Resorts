@@ -2,80 +2,139 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Owner = () => {
+
     const [property, setProperty] = useState(null);
+
     const [benefits, setBenefits] = useState([]);
+
     const [activeIndex, setActiveIndex] = useState(0);
+
     const [loading, setLoading] = useState(true);
 
     const BASE_URL = "http://127.0.0.1:8000/storage/";
 
     useEffect(() => {
+
         const fetchContent = async () => {
+
             try {
+
                 const response = await axios.get(
                     'http://127.0.0.1:8000/api/gets-property-offers'
                 );
 
                 if (response.data.status) {
+
                     const data = response.data.data;
 
-                    // Offer set
+                    // Offer
                     if (data.offers.data.length > 0) {
+
                         setProperty(data.offers.data[0]);
                     }
 
-                    // 🔥 Benefits set from API
+                    // Benefits
                     if (data.benefits && data.benefits.length > 0) {
+
                         setBenefits(data.benefits);
                     }
                 }
+
             } catch (error) {
+
                 console.error("Content loading failed:", error);
+
             } finally {
+
                 setLoading(false);
             }
         };
 
         fetchContent();
+
     }, []);
 
     // Slider
     useEffect(() => {
+
         if (property?.slider_images) {
+
             const interval = setInterval(() => {
+
                 setActiveIndex((prev) =>
-                    prev === property.slider_images.length - 1 ? 0 : prev + 1
+
+                    prev === property.slider_images.length - 1
+                        ? 0
+                        : prev + 1
                 );
+
             }, 4000);
 
             return () => clearInterval(interval);
         }
+
     }, [property]);
 
+    // WhatsApp
     const handleWhatsAppClick = () => {
+
         if (property?.whatsapp_number) {
+
             const cleanNumber = property.whatsapp_number.replace(/\D/g, '');
+
             window.open(`https://wa.me/${cleanNumber}`, '_blank');
         }
     };
 
+    // Call
     const handleCallClick = () => {
-        window.location.href = 'tel:01701294455';
+
+        if (property?.whatsapp_number) {
+
+            window.location.href = `tel:${property.whatsapp_number}`;
+        }
     };
 
-    if (loading) return <div className="text-center py-5">Loading Content...</div>;
-    if (!property) return <div className="text-center py-5">No Property Data Found</div>;
+    if (loading) {
+
+        return (
+            <div className="text-center py-5">
+                Loading Content...
+            </div>
+        );
+    }
+
+    if (!property) {
+
+        return (
+            <div className="text-center py-5">
+                No Property Data Found
+            </div>
+        );
+    }
 
     return (
-        <div className="container-fluid py-5" style={{ background: '#f8f9fa', minHeight: '100vh' }}>
+        <div
+            className="container-fluid py-5"
+            style={{
+                background: '#f8f9fa',
+                minHeight: '100vh'
+            }}
+        >
 
             {/* MAIN SECTION */}
             <div className="container p-0 overflow-hidden shadow-sm bg-white rounded-4 mb-5">
+
                 <div className="row g-0 align-items-center">
 
                     {/* SLIDER */}
-                    <div className="col-lg-6 position-relative overflow-hidden" style={{ height: '550px' }}>
+                    <div
+                        className="col-lg-6 position-relative overflow-hidden"
+                        style={{ height: '550px' }}
+                    >
+
                         {property.slider_images.map((img, index) => (
+
                             <div
                                 key={index}
                                 style={{
@@ -89,18 +148,22 @@ const Owner = () => {
                                     zIndex: activeIndex === index ? 1 : 0
                                 }}
                             >
+
                                 <img
                                     src={`${BASE_URL}${img}`}
                                     className="w-100 h-100"
                                     alt="Resort"
                                     style={{ objectFit: 'cover' }}
                                 />
+
                             </div>
                         ))}
 
-                        {/* dots */}
+                        {/* DOTS */}
                         <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2">
+
                             {property.slider_images.map((_, index) => (
+
                                 <div
                                     key={index}
                                     onClick={() => setActiveIndex(index)}
@@ -108,41 +171,67 @@ const Owner = () => {
                                         width: '12px',
                                         height: '12px',
                                         borderRadius: '50%',
-                                        backgroundColor: activeIndex === index ? '#d4af37' : 'white',
+                                        backgroundColor:
+                                            activeIndex === index
+                                                ? '#d4af37'
+                                                : 'white',
+
                                         cursor: 'pointer'
                                     }}
                                 />
                             ))}
+
                         </div>
                     </div>
 
                     {/* TEXT */}
                     <div className="col-lg-6">
-                        <div className="p-4 p-md-5 mx-auto" style={{ maxWidth: '600px' }}>
+
+                        <div
+                            className="p-4 p-md-5 mx-auto"
+                            style={{ maxWidth: '600px' }}
+                        >
+
                             <h6 className="text-uppercase fw-bold mb-3">
                                 Investment Opportunity
                             </h6>
 
                             <h2 className="display-5 fw-bold mb-4">
+
                                 {property.title}
-                                <div style={{ color: '#d4af37' }}>{property.brand_name}</div>
+
+                                <div style={{ color: '#d4af37' }}>
+                                    {property.brand_name}
+                                </div>
+
                             </h2>
 
                             <p className="lead text-muted mb-4">
                                 {property.description}
                             </p>
 
+                            {/* FEATURES */}
                             <div className="mb-4">
+
                                 {property.features.map((text, i) => (
-                                    <div className="d-flex align-items-center mb-2" key={i}>
+
+                                    <div
+                                        className="d-flex align-items-center mb-2"
+                                        key={i}
+                                    >
+
                                         <i className="bi bi-check-circle-fill text-success me-2"></i>
+
                                         <span>{text}</span>
+
                                     </div>
                                 ))}
+
                             </div>
 
-                            {/* WhatsApp Button */}
+                            {/* WHATSAPP BUTTON */}
                             <div className="mb-3">
+
                                 <button
                                     onClick={handleWhatsAppClick}
                                     className="btn btn-lg text-white px-5 py-3 fw-bold shadow-lg w-100"
@@ -152,12 +241,16 @@ const Owner = () => {
                                         border: 'none'
                                     }}
                                 >
-                                    For Query <i className="bi bi-chat-dots ms-2"></i>
+
+                                    For Query
+
+                                    <i className="bi bi-chat-dots ms-2"></i>
+
                                 </button>
+
                             </div>
 
-                            {/* Call Button with Phone Number - Parallel */}
-                            {/* Call Button with Phone Number - Parallel */}
+                            {/* CALL BUTTON */}
                             <div
                                 className="d-flex align-items-center justify-content-between p-1 rounded-pill shadow-sm"
                                 style={{
@@ -167,11 +260,19 @@ const Owner = () => {
                                     transition: 'all 0.3s ease'
                                 }}
                                 onClick={handleCallClick}
-                                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)'}
-                                onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)'}
+                                onMouseEnter={(e) =>
+                                    e.currentTarget.style.boxShadow =
+                                    '0 4px 15px rgba(0,0,0,0.1)'
+                                }
+                                onMouseLeave={(e) =>
+                                    e.currentTarget.style.boxShadow =
+                                    '0 2px 5px rgba(0,0,0,0.05)'
+                                }
                             >
+
                                 <div className="d-flex align-items-center">
-                                    {/* Icon Circle */}
+
+                                    {/* ICON */}
                                     <div
                                         className="d-flex align-items-center justify-content-center rounded-circle me-3"
                                         style={{
@@ -181,39 +282,83 @@ const Owner = () => {
                                             color: '#fff'
                                         }}
                                     >
+
                                         <i className="bi bi-telephone-fill"></i>
+
                                     </div>
 
-                                    {/* Number Text */}
+                                    {/* NUMBER */}
                                     <div className="d-flex flex-column">
-                                        <small className="text-muted" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>Call Now</small>
-                                        <span className="fw-bold fs-5" style={{ color: '#333', letterSpacing: '1px', lineHeight: '1' }}>
-                                            01701 294455
+
+                                        <small
+                                            className="text-muted"
+                                            style={{
+                                                fontSize: '10px',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '1px'
+                                            }}
+                                        >
+                                            Call Now
+                                        </small>
+
+                                        <span
+                                            className="fw-bold fs-5"
+                                            style={{
+                                                color: '#333',
+                                                letterSpacing: '1px',
+                                                lineHeight: '1'
+                                            }}
+                                        >
+                                            {property?.whatsapp_number || 'No Number'}
                                         </span>
+
                                     </div>
                                 </div>
-
-                                
                             </div>
+
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            {/* BENEFITS SECTION (🔥 API DATA) */}
+            {/* BENEFITS SECTION */}
             <div className="container">
+
                 <div className="text-center mb-5 pt-4">
-                    <h3 className="fw-bold mb-2">Why Invest with Us?</h3>
-                    <div className="mx-auto" style={{ width: '60px', height: '4px', background: '#b66dff' }}></div>
+
+                    <h3 className="fw-bold mb-2">
+                        Why Invest with Us?
+                    </h3>
+
+                    <div
+                        className="mx-auto"
+                        style={{
+                            width: '60px',
+                            height: '4px',
+                            background: '#b66dff'
+                        }}
+                    ></div>
+
                 </div>
 
                 <div className="row g-4">
+
                     {benefits.length > 0 ? (
+
                         benefits.map((item, index) => (
-                            <div className="col-md-4" key={index}>
-                                <div className="card h-100 border-0 shadow-sm p-4 text-center"
-                                    style={{ borderRadius: '20px' }}>
+
+                            <div
+                                className="col-md-4"
+                                key={index}
+                            >
+
+                                <div
+                                    className="card h-100 border-0 shadow-sm p-4 text-center"
+                                    style={{
+                                        borderRadius: '20px'
+                                    }}
+                                >
 
                                     <div
                                         className="d-inline-flex align-items-center justify-content-center mb-4 mx-auto"
@@ -224,17 +369,36 @@ const Owner = () => {
                                             borderRadius: '15px'
                                         }}
                                     >
-                                        <i className="bi bi-gem" style={{ fontSize: '2rem', color: '#b66dff' }}></i>
+
+                                        <i
+                                            className="bi bi-gem"
+                                            style={{
+                                                fontSize: '2rem',
+                                                color: '#b66dff'
+                                            }}
+                                        ></i>
+
                                     </div>
 
-                                    <h4 className="fw-bold mb-3">{item.title}</h4>
-                                    <p className="text-muted">{item.desc}</p>
+                                    <h4 className="fw-bold mb-3">
+                                        {item.title}
+                                    </h4>
+
+                                    <p className="text-muted">
+                                        {item.desc}
+                                    </p>
+
                                 </div>
                             </div>
                         ))
+
                     ) : (
-                        <p className="text-center">No benefits found</p>
+
+                        <p className="text-center">
+                            No benefits found
+                        </p>
                     )}
+
                 </div>
             </div>
 
