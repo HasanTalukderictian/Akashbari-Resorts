@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -19,7 +18,6 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -27,7 +25,7 @@ ChartJS.register(
 );
 
 const PackageGraph = () => {
-  const [chartType, setChartType] = useState('bar'); // 'bar' or 'line'
+  const [chartType, setChartType] = useState('line'); // 'bar' or 'line'
   const [selectedPackage, setSelectedPackage] = useState('all');
 
   // Package Data
@@ -214,219 +212,273 @@ const PackageGraph = () => {
     }
   };
 
-  // Calculate statistics
-  const getPriceChange = (current, previous) => {
-    const change = current - previous;
-    const percentage = (change / previous) * 100;
-    return { change, percentage };
-  };
-
   return (
     <div style={{
-      maxWidth: '1200px',
-      margin: '5px auto',
-      padding: '20px',
+      width: '100%',
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5',
       fontFamily: 'Poppins, sans-serif'
     }}>
-      {/* Header Section */}
+      {/* Main Content Container - Full Width */}
       <div style={{
-        textAlign: 'center',
-        marginBottom: '40px'
+        width: '100%',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '20px 24px'
       }}>
-        <h2 style={{
-          fontSize: '32px',
-          color: '#2c3e50',
-          marginBottom: '10px'
-        }}>
-          <i className="bi bi-graph-up" style={{ color: '#9a55ff', marginRight: '10px' }}></i>
-          Package Price History
-        </h2>
-        <p style={{ color: '#7f8c8d' }}>
-          Track price trends and make informed decisions
-        </p>
-      </div>
-
-     
-
-      {/* Chart Controls */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '15px',
-        marginBottom: '30px',
-        padding: '15px',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '10px'
-      }}>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            onClick={() => setChartType('bar')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: chartType === 'bar' ? '#9a55ff' : '#fff',
-              color: chartType === 'bar' ? '#fff' : '#2c3e50',
-              border: `1px solid ${chartType === 'bar' ? '#9a55ff' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            <i className="bi bi-bar-chart"></i> Bar Chart
-          </button>
-          <button
-            onClick={() => setChartType('line')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: chartType === 'line' ? '#9a55ff' : '#fff',
-              color: chartType === 'line' ? '#fff' : '#2c3e50',
-              border: `1px solid ${chartType === 'line' ? '#9a55ff' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            <i className="bi bi-graph-up"></i> Line Chart
-          </button>
-        </div>
-
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setSelectedPackage('all')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: selectedPackage === 'all' ? '#9a55ff' : '#fff',
-              color: selectedPackage === 'all' ? '#fff' : '#2c3e50',
-              border: `1px solid ${selectedPackage === 'all' ? '#9a55ff' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer'
-            }}
-          >
-            All Packages
-          </button>
-          <button
-            onClick={() => setSelectedPackage('superior')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: selectedPackage === 'superior' ? '#9a55ff' : '#fff',
-              color: selectedPackage === 'superior' ? '#fff' : '#2c3e50',
-              border: `1px solid ${selectedPackage === 'superior' ? '#9a55ff' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer'
-            }}
-          >
-            Superior Deluxe
-          </button>
-          <button
-            onClick={() => setSelectedPackage('executive')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: selectedPackage === 'executive' ? '#ff6b6b' : '#fff',
-              color: selectedPackage === 'executive' ? '#fff' : '#2c3e50',
-              border: `1px solid ${selectedPackage === 'executive' ? '#ff6b6b' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer'
-            }}
-          >
-            Executive Suite
-          </button>
-          <button
-            onClick={() => setSelectedPackage('earth')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: selectedPackage === 'earth' ? '#4ecdc4' : '#fff',
-              color: selectedPackage === 'earth' ? '#fff' : '#2c3e50',
-              border: `1px solid ${selectedPackage === 'earth' ? '#4ecdc4' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer'
-            }}
-          >
-            Earth Shelter
-          </button>
-          <button
-            onClick={() => setSelectedPackage('presidential')}
-            style={{
-              padding: '8px 20px',
-              backgroundColor: selectedPackage === 'presidential' ? '#f9ca24' : '#fff',
-              color: selectedPackage === 'presidential' ? '#2c3e50' : '#2c3e50',
-              border: `1px solid ${selectedPackage === 'presidential' ? '#f9ca24' : '#ddd'}`,
-              borderRadius: '25px',
-              cursor: 'pointer'
-            }}
-          >
-            Presidential Suite
-          </button>
-        </div>
-      </div>
-
-      {/* Chart Container */}
-      <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '15px',
-        padding: '20px',
-        boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
-        marginBottom: '30px',
-        height: '500px'
-      }}>
-        <Line data={getChartData()} options={chartOptions} />
-      </div>
-
-      {/* Summary Statistics */}
-      <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '15px',
-        padding: '20px',
-        boxShadow: '0 5px 20px rgba(0,0,0,0.08)'
-      }}>
-        <h4 style={{
-          marginBottom: '20px',
-          color: '#2c3e50'
-        }}>
-          <i className="bi bi-info-circle" style={{ color: '#9a55ff', marginRight: '10px' }}></i>
-          Key Insights
-        </h4>
-        
+        {/* Header Section */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '15px'
+          textAlign: 'center',
+          marginBottom: '40px',
+          marginTop: '20px'
         }}>
-          <div style={{ padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Highest Price Increase</span>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#e74c3c' }}>
-              Presidential Suite
-            </div>
-            <span style={{ fontSize: '12px', color: '#27ae60' }}>+16.5% from last month</span>
+          <h2 style={{
+            fontSize: '32px',
+            color: '#2c3e50',
+            marginBottom: '10px'
+          }}>
+            <i className="bi bi-graph-up" style={{ color: '#9a55ff', marginRight: '10px' }}></i>
+            Package Price History
+          </h2>
+          <p style={{ color: '#7f8c8d' }}>
+            Track price trends and make informed decisions
+          </p>
+        </div>
+
+        {/* Chart Type Toggle */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginBottom: '20px'
+        }}>
+          <div style={{
+            display: 'flex',
+            gap: '10px',
+            backgroundColor: '#fff',
+            padding: '5px',
+            borderRadius: '30px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          }}>
+            <button
+              onClick={() => setChartType('line')}
+              style={{
+                padding: '8px 24px',
+                backgroundColor: chartType === 'line' ? '#9a55ff' : 'transparent',
+                color: chartType === 'line' ? '#fff' : '#2c3e50',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Line Chart
+            </button>
+            <button
+              onClick={() => setChartType('bar')}
+              style={{
+                padding: '8px 24px',
+                backgroundColor: chartType === 'bar' ? '#9a55ff' : 'transparent',
+                color: chartType === 'bar' ? '#fff' : '#2c3e50',
+                border: 'none',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Bar Chart
+            </button>
           </div>
-          
-          <div style={{ padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Best Value Package</span>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#9a55ff' }}>
+        </div>
+
+        {/* Package Filters */}
+        <div style={{
+          marginBottom: '30px',
+          padding: '20px',
+          backgroundColor: '#fff',
+          borderRadius: '15px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '12px',
+            justifyContent: 'center'
+          }}>
+            <button
+              onClick={() => setSelectedPackage('all')}
+              style={{
+                padding: '10px 24px',
+                backgroundColor: selectedPackage === 'all' ? '#9a55ff' : '#f8f9fa',
+                color: selectedPackage === 'all' ? '#fff' : '#2c3e50',
+                border: `1px solid ${selectedPackage === 'all' ? '#9a55ff' : '#e0e0e0'}`,
+                borderRadius: '30px',
+                cursor: 'pointer',
+                fontWeight: selectedPackage === 'all' ? '600' : '400',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              All Packages
+            </button>
+            <button
+              onClick={() => setSelectedPackage('superior')}
+              style={{
+                padding: '10px 24px',
+                backgroundColor: selectedPackage === 'superior' ? '#9a55ff' : '#f8f9fa',
+                color: selectedPackage === 'superior' ? '#fff' : '#2c3e50',
+                border: `1px solid ${selectedPackage === 'superior' ? '#9a55ff' : '#e0e0e0'}`,
+                borderRadius: '30px',
+                cursor: 'pointer',
+                fontWeight: selectedPackage === 'superior' ? '600' : '400',
+                transition: 'all 0.3s ease'
+              }}
+            >
               Superior Deluxe
-            </div>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>With 14% discount</span>
-          </div>
-          
-          <div style={{ padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Most Popular</span>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ff6b6b' }}>
+            </button>
+            <button
+              onClick={() => setSelectedPackage('executive')}
+              style={{
+                padding: '10px 24px',
+                backgroundColor: selectedPackage === 'executive' ? '#ff6b6b' : '#f8f9fa',
+                color: selectedPackage === 'executive' ? '#fff' : '#2c3e50',
+                border: `1px solid ${selectedPackage === 'executive' ? '#ff6b6b' : '#e0e0e0'}`,
+                borderRadius: '30px',
+                cursor: 'pointer',
+                fontWeight: selectedPackage === 'executive' ? '600' : '400',
+                transition: 'all 0.3s ease'
+              }}
+            >
               Executive Suite
-            </div>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Highest booking rate</span>
-          </div>
-          
-          <div style={{ padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Price Stability</span>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#4ecdc4' }}>
+            </button>
+            <button
+              onClick={() => setSelectedPackage('earth')}
+              style={{
+                padding: '10px 24px',
+                backgroundColor: selectedPackage === 'earth' ? '#4ecdc4' : '#f8f9fa',
+                color: selectedPackage === 'earth' ? '#fff' : '#2c3e50',
+                border: `1px solid ${selectedPackage === 'earth' ? '#4ecdc4' : '#e0e0e0'}`,
+                borderRadius: '30px',
+                cursor: 'pointer',
+                fontWeight: selectedPackage === 'earth' ? '600' : '400',
+                transition: 'all 0.3s ease'
+              }}
+            >
               Earth Shelter
+            </button>
+            <button
+              onClick={() => setSelectedPackage('presidential')}
+              style={{
+                padding: '10px 24px',
+                backgroundColor: selectedPackage === 'presidential' ? '#f9ca24' : '#f8f9fa',
+                color: selectedPackage === 'presidential' ? '#2c3e50' : '#2c3e50',
+                border: `1px solid ${selectedPackage === 'presidential' ? '#f9ca24' : '#e0e0e0'}`,
+                borderRadius: '30px',
+                cursor: 'pointer',
+                fontWeight: selectedPackage === 'presidential' ? '600' : '400',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Presidential Suite
+            </button>
+          </div>
+        </div>
+
+        {/* Chart Container - Full Width */}
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '15px',
+          padding: '24px',
+          boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
+          marginBottom: '30px',
+          height: '500px',
+          width: '100%'
+        }}>
+          <Line data={getChartData()} options={chartOptions} />
+        </div>
+
+        {/* Summary Statistics - Full Width Grid */}
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '15px',
+          padding: '24px',
+          boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
+          marginBottom: '30px'
+        }}>
+          <h4 style={{
+            marginBottom: '20px',
+            color: '#2c3e50',
+            fontSize: '18px'
+          }}>
+            <i className="bi bi-info-circle" style={{ color: '#9a55ff', marginRight: '10px' }}></i>
+            Key Insights
+          </h4>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '20px'
+          }}>
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '12px',
+              borderLeft: '4px solid #e74c3c'
+            }}>
+              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Highest Price Increase
+              </span>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#e74c3c', marginTop: '8px' }}>
+                Presidential Suite
+              </div>
+              <span style={{ fontSize: '13px', color: '#27ae60', fontWeight: '500' }}>+16.5% from last month</span>
             </div>
-            <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Steady price increase</span>
+            
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '12px',
+              borderLeft: '4px solid #9a55ff'
+            }}>
+              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Best Value Package
+              </span>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#9a55ff', marginTop: '8px' }}>
+                Superior Deluxe
+              </div>
+              <span style={{ fontSize: '13px', color: '#7f8c8d' }}>With 14% discount</span>
+            </div>
+            
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '12px',
+              borderLeft: '4px solid #ff6b6b'
+            }}>
+              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Most Popular
+              </span>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff6b6b', marginTop: '8px' }}>
+                Executive Suite
+              </div>
+              <span style={{ fontSize: '13px', color: '#7f8c8d' }}>Highest booking rate</span>
+            </div>
+            
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '12px',
+              borderLeft: '4px solid #4ecdc4'
+            }}>
+              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Price Stability
+              </span>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4ecdc4', marginTop: '8px' }}>
+                Earth Shelter
+              </div>
+              <span style={{ fontSize: '13px', color: '#7f8c8d' }}>Steady price increase</span>
+            </div>
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 };

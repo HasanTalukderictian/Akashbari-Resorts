@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 
 const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     // Sub-menu open/close state
     const [isLandingOpen, setIsLandingOpen] = useState(false);
+    const location = useLocation();
 
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: 'house-door', path: '/dashboard' },
@@ -14,16 +15,28 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     ];
 
     const landingSubItems = [
-        { id: 'content', label: 'Contents', icon: 'list-check', path: '/content' },
-        { id: 'welcome', label: 'Welcome Section', icon: 'pie-chart', path: '/welcome' },
-        { id: 'video', label: 'Video Section', icon: 'envelope', path: '/video' },
-        { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-workspace', path: '/owner-section' },
-        { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-person-workspace', path: '/owner-benefit' },
-         { id: 'investment', label: 'Investment Package', icon: 'bi bi-person-workspace', path: '/admin-investment' },
-        { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-person-workspace', path: '/admin-investmentbenefit' },
-         { id: 'events', label: 'Events', icon: 'bi bi-person-workspace', path: '/admin-events' },
-         { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-person-workspace', path: '/admin-luxury' },
+        { id: 'content', label: 'Contents', icon: 'bi bi-files', path: '/content' },
+        { id: 'welcome', label: 'Welcome Section', icon: 'bi bi-emoji-smile', path: '/welcome' },
+        { id: 'video', label: 'Video Section', icon: 'bi bi-play-btn', path: '/video' },
+        { id: 'owner', label: 'Owner Section', icon: 'bi bi-people', path: '/owner-section' },
+        { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-star', path: '/owner-benefit' },
+        { id: 'investment', label: 'Investment Package', icon: 'bi bi-coin', path: '/admin-investment' },
+        { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
+        { id: 'events', label: 'Events', icon: 'bi bi-calendar2-week', path: '/admin-events' },
+        { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
     ];
+
+    // Check if any sub-menu item is active
+    const isAnySubItemActive = () => {
+        return landingSubItems.some(subItem => location.pathname === subItem.path);
+    };
+
+    // Auto-open submenu if any sub-item is active and sidebar is not collapsed
+    useEffect(() => {
+        if (!isCollapsed && isAnySubItemActive()) {
+            setIsLandingOpen(true);
+        }
+    }, [location.pathname, isCollapsed]);
 
     const sidebarBg = {
         width: isCollapsed ? '80px' : '260px',
@@ -56,7 +69,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     return (
         <div className="d-none d-md-block shadow-sm" style={styles?.sidebar || sidebarBg}>
             
-            {/* --- লোগো সেকশন --- */}
+            {/* Logo Section */}
             <div className="p-4 mb-2 text-center">
                 {isCollapsed ? (
                     <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto" 
@@ -70,7 +83,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                 )}
             </div>
 
-            {/* --- ইউজার কার্ড --- */}
+            {/* User Card */}
             <div className="mx-3 mb-4 p-2 d-flex align-items-center rounded-3" 
                  style={{ backgroundColor: theme?.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
                 <img src="https://i.pravatar.cc/40?img=12" 
@@ -85,7 +98,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                 )}
             </div>
 
-            {/* --- মেনু আইটেমসমূহ --- */}
+            {/* Menu Items */}
             <div className="px-2">
                 {/* Dashboard & Users */}
                 {menuItems.slice(0, 2).map((item) => (
@@ -95,11 +108,11 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                     </NavLink>
                 ))}
 
-                {/* --- Landing Page Mother Menu (Sub-menu logic) --- */}
+                {/* Landing Page Mother Menu */}
                 <div className="w-100">
                     <div 
                         onClick={() => !isCollapsed && setIsLandingOpen(!isLandingOpen)}
-                        style={navLinkStyle(false)}
+                        style={navLinkStyle(isAnySubItemActive())}
                     >
                         <i className={`bi bi-browser-safari ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
                         {!isCollapsed && (
@@ -110,17 +123,25 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                         )}
                     </div>
 
-                    {/* Sub-items rendering */}
+                    {/* Sub-items rendering - Keep submenu open when collapsed changes */}
                     {!isCollapsed && isLandingOpen && (
                         <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
                             {landingSubItems.map((sub) => (
-                                <NavLink key={sub.id} to={sub.path} style={({ isActive }) => ({
-                                    ...navLinkStyle(isActive),
-                                    padding: '10px 15px',
-                                    marginBottom: '2px',
-                                    fontSize: '13px'
-                                })}>
-                                    <i className={`bi bi-${sub.icon} me-3`}></i>
+                                <NavLink 
+                                    key={sub.id} 
+                                    to={sub.path} 
+                                    style={({ isActive }) => ({
+                                        ...navLinkStyle(isActive),
+                                        padding: '10px 15px',
+                                        marginBottom: '2px',
+                                        fontSize: '13px'
+                                    })}
+                                    onClick={() => {
+                                        // Keep submenu open when clicking sub-items
+                                        // No need to close it
+                                    }}
+                                >
+                                    <i className={`${sub.icon} me-3`}></i>
                                     <span>{sub.label}</span>
                                 </NavLink>
                             ))}

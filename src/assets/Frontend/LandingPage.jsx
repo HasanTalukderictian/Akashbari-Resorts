@@ -35,7 +35,7 @@ const LandingPage = () => {
       <Investment />
       <Packagegrap/>
       <Luxury/>
-      <Room />
+      {/* <Room /> */}
       <Facility />
       <Event />
 
