@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "../css/Gallery.css";
 import { FaSearchPlus, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Header from "./Common/Header";
@@ -6,24 +7,26 @@ import Footer from "./Common/Footer";
 
 const Gallery = () => {
     const [currentIndex, setCurrentIndex] = useState(null);
+    const [images, setImages] = useState([]); // API theke asha data ekhane thakbe
+    const [loading, setLoading] = useState(true);
 
-    const images = [
-        "https://i.ibb.co/sdZrB5bQ/restaurant-img333.jpg",
-        "https://i.ibb.co/vCQPNJqr/room-img3.jpg",
-        "https://i.ibb.co/RGJ1Sr7f/room-img2.jpg",
-        "https://i.ibb.co/Df0xszfx/room-img1.jpg",
-        "https://i.ibb.co/chd0bMgP/room-img6.jpg",
-        "https://i.ibb.co/rRtRpknT/room-img5.jpg",
-        "https://i.ibb.co/0pMJkBBn/room-img4.jpg",
-        "https://i.ibb.co.com/0pBxsngQ/5.jpg",
-        'https://i.ibb.co.com/pB7B0dHF/7.jpg',
-        'https://i.ibb.co.com/kWXFccP/8.jpg',
-        'https://i.ibb.co.com/7dcgX3ZF/9.jpg',
-        'https://i.ibb.co.com/RpPFJxKP/3.jpg'
+    // 👉 Fetch Gallery Data from API
+    useEffect(() => {
+        const fetchGallery = async () => {
+            try {
+                const response = await axios.get("http://localhost:8000/api/gallery");
+                setImages(response.data); // Database theke asha array set hobe
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching gallery:", error);
+                setLoading(false);
+            }
+        };
 
-    ];
+        fetchGallery();
+    }, []);
 
-    // 👉 next image
+    // 👉 next image logic
     const nextImage = (e) => {
         e.stopPropagation();
         setCurrentIndex((prev) =>
@@ -31,7 +34,7 @@ const Gallery = () => {
         );
     };
 
-    // 👉 previous image
+    // 👉 previous image logic
     const prevImage = (e) => {
         e.stopPropagation();
         setCurrentIndex((prev) =>
@@ -54,22 +57,32 @@ const Gallery = () => {
                         designed to give you the perfect escape from everyday life.
                     </p>
 
-                    <div className="row g-4">
-                        {images.map((img, index) => (
-                            <div className="col-lg-4 col-md-6" key={index}>
-                                <div
-                                    className="gallery-item"
-                                    onClick={() => setCurrentIndex(index)}
-                                >
-                                    <img src={img} alt="" className="img-fluid" />
+                    {loading ? (
+                        <div className="text-center py-5">Loading Gallery...</div>
+                    ) : (
+                        <div className="row g-4">
+                            {images.map((item, index) => (
+                                <div className="col-lg-4 col-md-6" key={item.id || index}>
+                                    <div
+                                        className="gallery-item"
+                                        onClick={() => setCurrentIndex(index)}
+                                    >
+                                        {/* API theke asha image_url use kora hoyeche */}
+                                        <img 
+                                            src={item.image_url} 
+                                            alt={item.title} 
+                                            className="img-fluid" 
+                                            loading="lazy"
+                                        />
 
-                                    <div className="overlay">
-                                        <FaSearchPlus color="#fff" size={30} />
+                                        <div className="overlay">
+                                            <FaSearchPlus color="#fff" size={30} />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -91,16 +104,22 @@ const Gallery = () => {
                     }}
                 >
                     {/* ❌ Close click prevent */}
-                    <img
-                        src={images[currentIndex]}
-                        alt=""
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                            maxWidth: "90%",
-                            maxHeight: "90%",
-                            borderRadius: "8px",
-                        }}
-                    />
+                    <div className="position-relative" style={{ maxWidth: "90%", maxHeight: "90%" }}>
+                        <img
+                            src={images[currentIndex].image_url}
+                            alt={images[currentIndex].title}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                width: "100%",
+                                height: "auto",
+                                maxHeight: "85vh",
+                                borderRadius: "8px",
+                            }}
+                        />
+                        <p className="text-center text-white mt-2 fw-bold">
+                            {images[currentIndex].title}
+                        </p>
+                    </div>
 
                     {/* ⬅️ Left Arrow */}
                     <button
@@ -116,6 +135,23 @@ const Gallery = () => {
                         style={arrowStyle("right")}
                     >
                         <FaChevronRight />
+                    </button>
+                    
+                    {/* Close Button */}
+                    <button 
+                        style={{
+                            position: "absolute",
+                            top: "20px",
+                            right: "20px",
+                            background: "none",
+                            border: "none",
+                            color: "white",
+                            fontSize: "30px",
+                            cursor: "pointer"
+                        }}
+                        onClick={() => setCurrentIndex(null)}
+                    >
+                        ×
                     </button>
                 </div>
             )}
@@ -138,6 +174,12 @@ const arrowStyle = (side) => ({
     padding: "10px",
     cursor: "pointer",
     borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "60px",
+    height: "60px",
+    transition: "0.3s"
 });
 
 export default Gallery;

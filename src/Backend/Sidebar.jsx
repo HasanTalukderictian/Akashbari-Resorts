@@ -10,6 +10,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'dashboard', label: 'Dashboard', icon: 'house-door', path: '/dashboard' },
         { id: 'users', label: 'Users', icon: 'people', path: '/users' },
         // Landing Page section defined separately below for sub-menu logic
+        { id: 'gallery', label: 'Gallery', icon: 'sliders', path: '/admin-gallery' },
         { id: 'settings', label: 'Settings', icon: 'sliders', path: '/settings' },
         { id: 'profile', label: 'Profile', icon: 'person-badge', path: '/profile' }
     ];
@@ -24,7 +25,8 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
         { id: 'events', label: 'Events', icon: 'bi bi-calendar2-week', path: '/admin-events' },
         { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
-          { id: 'testo', label: 'Testo Section', icon: 'bi bi-diamond', path: '/admin-testo' },
+        { id: 'testo', label: 'Testo Section', icon: 'bi bi-diamond', path: '/admin-testo' },
+        { id: 'client', label: 'Happy Client', icon: 'bi bi-diamond', path: '/admin-client' },
     ];
 
     // Check if any sub-menu item is active

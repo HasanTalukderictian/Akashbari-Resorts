@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// কাউন্টার লজিক
+// কাউন্টার কম্পোনেন্ট
 const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
     const [count, setCount] = useState(0);
 
@@ -27,8 +27,42 @@ const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
 };
 
 const HappyClient = () => {
+    // ইমেজ এবং কনফিগারেশন JSON
+    const pageConfig = {
+        heroBgImage: "https://img.freepik.com/free-vector/stock-market-trading-graph-blue-background_1017-31846.jpg",
+        overlayOpacity: 0.95
+    };
+
+    const featuresData = [
+        {
+            id: 1,
+            title: "Passive Income",
+            desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits."
+        },
+        {
+            id: 2,
+            title: "Elite Status",
+            desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club."
+        },
+        {
+            id: 3,
+            title: "Luxury Living",
+            desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort."
+        }
+    ];
+
+    const statsData = [
+        { id: 1, target: 4000, suffix: "+", prefix: "", label: "Happy Members" },
+        { id: 2, target: 12, suffix: "%", prefix: "Up to ", label: "Yearly Revenue" },
+        { id: 3, target: 25, suffix: "+", prefix: "", label: "Club Amenities" },
+        { id: 4, target: 15, suffix: "+", prefix: "", label: "Years of Trust" }
+    ];
+
+    const featureIcons = ["💰", "💎", "✨"];
+
+    // স্টাইল অবজেক্টে JSON ডেটা ব্যবহার করা হয়েছে
     const heroSectionStyle = {
-        background: 'linear-gradient(rgba(3, 27, 51, 0.85), rgba(3, 27, 51, 0.85)), url("https://img.freepik.com/free-vector/stock-market-trading-graph-blue-background_1017-31846.jpg")',
+        background: `linear-gradient(rgba(3, 27, 51, ${pageConfig.overlayOpacity}), rgba(3, 27, 51, ${pageConfig.overlayOpacity})), url("${pageConfig.heroBgImage}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '100px 0 160px 0',
@@ -47,7 +81,6 @@ const HappyClient = () => {
 
     return (
         <section>
-            {/* Hero Section */}
             <div style={heroSectionStyle}>
                 <div className="container">
                     <div className="row align-items-center">
@@ -66,39 +99,19 @@ const HappyClient = () => {
                                 <p className="lead mb-2">
                                     Become a proud <strong>Property Owner</strong> by investing in Akashbari Resort shares.
                                 </p>
+                                
                                 <div className="mt-4">
-                                    {/* Feature 1 */}
-                                    <div className="py-3 border-top border-white-25">
-                                        <div className="d-flex align-items-center">
-                                            <span className="fs-3 me-3">💰</span>
-                                            <div>
-                                                <h6 className="fw-bold mb-0">Passive Income</h6>
-                                                <p className="small mb-0 opacity-75">Maximize your wealth with guaranteed yearly revenue and steady annual profits.</p>
+                                    {featuresData.map((item, index) => (
+                                        <div key={item.id} className={`py-3 border-top border-white-25 ${index === featuresData.length - 1 ? 'border-bottom' : ''}`}>
+                                            <div className="d-flex align-items-center">
+                                                <span className="fs-3 me-3">{featureIcons[index]}</span>
+                                                <div>
+                                                    <h6 className="fw-bold mb-0">{item.title}</h6>
+                                                    <p className="small mb-0 opacity-75">{item.desc}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    {/* Feature 2 */}
-                                    <div className="py-3 border-top border-white-25">
-                                        <div className="d-flex align-items-center">
-                                            <span className="fs-3 me-3">💎</span>
-                                            <div>
-                                                <h6 className="fw-bold mb-0">Elite Status</h6>
-                                                <p className="small mb-0 opacity-75">Unlock premium benefits with exclusive membership to the prestigious Akashbari Club.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Feature 3 */}
-                                    <div className="py-3 border-top border-bottom border-white-25">
-                                        <div className="d-flex align-items-center">
-                                            <span className="fs-3 me-3">✨</span>
-                                            <div>
-                                                <h6 className="fw-bold mb-0">Luxury Living</h6>
-                                                <p className="small mb-0 opacity-75">Experience the perfect blend of modern lifestyle, elegance, and comfort.</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -106,28 +119,21 @@ const HappyClient = () => {
                 </div>
             </div>
 
-            {/* Stats Section */}
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-lg-11">
                         <div style={statsCardStyle} className="text-center">
                             <div className="row g-4">
-                                <div className="col-md-3 border-end">
-                                    <CountUpItem target={4000} suffix="+" />
-                                    <p className="text-muted fw-bold mb-0">Happy Members</p>
-                                </div>
-                                <div className="col-md-3 border-end">
-                                    <CountUpItem target={12} suffix="%" prefix="Up to " />
-                                    <p className="text-muted fw-bold mb-0">Yearly Revenue</p>
-                                </div>
-                                <div className="col-md-3 border-end">
-                                    <CountUpItem target={25} suffix="+" />
-                                    <p className="text-muted fw-bold mb-0">Club Amenities</p>
-                                </div>
-                                <div className="col-md-3">
-                                    <CountUpItem target={15} suffix="+" prefix="" />
-                                    <p className="text-muted fw-bold mb-0">Years of Trust</p>
-                                </div>
+                                {statsData.map((stat, index) => (
+                                    <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`}>
+                                        <CountUpItem 
+                                            target={stat.target} 
+                                            suffix={stat.suffix} 
+                                            prefix={stat.prefix} 
+                                        />
+                                        <p className="text-muted fw-bold mb-0">{stat.label}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

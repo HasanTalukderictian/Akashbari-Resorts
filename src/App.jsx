@@ -24,6 +24,8 @@ import AllEvents from './assets/Frontend/AllEvents'
 import EventsDetails from './assets/Frontend/EventsDetails'
 import LuxurySection from './Backend/LuxurySection'
 import Testominal from './Backend/Testominal'
+import HappyClientsection from './Backend/HappyClientsection'
+import GallerySection from './Backend/GallerySection'
 
 
 function App() {
@@ -51,6 +53,9 @@ function App() {
         <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
         <Route path="/admin-events" element={<Events />} />
         <Route path="/admin-testo" element={<Testominal />} />
+        <Route path="/admin-gallery" element={<GallerySection />} />
+        <Route path="/admin-client" element={<HappyClientsection />} />
+
         <Route path="/admin-luxury" element={<LuxurySection />} />
         <Route path="/all-events" element={<AllEvents />} />
        <Route path="/event/:id" element={<EventsDetails />} />  
