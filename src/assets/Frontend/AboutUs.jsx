@@ -64,183 +64,345 @@ const AboutUs = () => {
                 </div>
             </section>
 
-            {/* Section 2: Welcome Section */}
-            <section className="welcome-section py-5">
-                <div className="container">
-                    <div className="row align-items-center">
-                        <div className="col-lg-6 mb-5 mb-lg-0">
-                            <div className="main-image-wrapper position-relative">
-                                <img src={selectedImage} alt="Main Room" className="img-fluid main-img" />
-                                <div className="image-accent"></div>
+            {/* Section 2: Welcome Section - Modern Redesign */}
+<section className="welcome-section-modern py-5">
+    <div className="container">
+        <div className="row align-items-center g-5">
+            {/* Left Side - Image Gallery Modern */}
+            <div className="col-lg-6">
+                <div className="modern-gallery-wrapper">
+                    <div className="main-image-container">
+                        <img src={selectedImage} alt="Luxury Room" className="main-image-modern" />
+                        <div className="floating-badge">
+                            <span className="badge-icon">✨</span>
+                            <span>Luxury Since 1999</span>
+                        </div>
+                        <div className="image-overlay-gradient"></div>
+                    </div>
+                    
+                    <div className="thumbnail-strip">
+                        {galleryData.map((item) => (
+                            <div
+                                key={item.id}
+                                className={`thumbnail-item ${activeId === item.id ? 'active' : ''}`}
+                                onClick={() => {
+                                    setSelectedImage(item.img);
+                                    setActiveId(item.id);
+                                }}
+                            >
+                                <img src={item.img} alt={item.title} />
+                                <div className="thumbnail-label">{item.title}</div>
                             </div>
-                            <div className="gallery-row d-flex gap-2 mt-3">
-                                {galleryData.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className={`gallery-item ${activeId === item.id ? 'active-thumb' : ''}`}
-                                        onClick={() => {
-                                            setSelectedImage(item.img);
-                                            setActiveId(item.id);
-                                        }}
-                                    >
-                                        <img src={item.img} alt={item.title} />
-                                        <p>{item.title}</p>
-                                    </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Side - Content Modern */}
+            <div className="col-lg-6">
+                <div className="modern-content">
+                    <div className="section-badge">
+                        <span className="badge-dot"></span>
+                        ABOUT US
+                    </div>
+                    <h2 className="modern-title">
+                        Where Luxury Meets
+                        <span className="text-gradient"> Timeless Elegance</span>
+                    </h2>
+                    <p className="modern-description">
+                        Welcome to Hotelux, where luxury meets comfort in the heart of Paris. 
+                        Since 1999, we have been dedicated to providing an exceptional stay 
+                        for our guests, blending modern amenities with timeless elegance.
+                    </p>
+
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-number">350+</div>
+                            <div className="stat-label">Luxury Rooms</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-number">24/7</div>
+                            <div className="stat-label">Concierge Service</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-number">4.9</div>
+                            <div className="stat-label">Guest Rating</div>
+                        </div>
+                    </div>
+
+                    <div className="feature-list-modern">
+                        <div className="feature-item">
+                            <div className="feature-icon">🍳</div>
+                            <div className="feature-text">Complimentary Breakfast</div>
+                        </div>
+                        <div className="feature-item">
+                            <div className="feature-icon">🛁</div>
+                            <div className="feature-text">Whirlpool Jacuzzi Tub</div>
+                        </div>
+                        <div className="feature-item">
+                            <div className="feature-icon">🍷</div>
+                            <div className="feature-text">Private Wet Bar</div>
+                        </div>
+                        <div className="feature-item">
+                            <div className="feature-icon">🌊</div>
+                            <div className="feature-text">Ocean View Suites</div>
+                        </div>
+                    </div>
+
+                    <button className="explore-btn">
+                        Explore Our Story
+                        <svg className="btn-arrow" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{/* Section 3: Facilities - Modern Modern Redesign */}
+<section className="facilities-modern py-5">
+    <div className="container">
+        <div className="section-header-modern text-center">
+            <div className="header-badge">PREMIUM AMENITIES</div>
+            <h2 className="header-title">World-Class <span className="text-gradient">Facilities</span></h2>
+            <p className="header-subtitle">
+                Experience unparalleled luxury with our carefully curated amenities
+            </p>
+        </div>
+
+        <div className="facilities-grid">
+            {facilities.map((item, index) => (
+                <div className="facility-card-modern" key={item.id}>
+                    <div className="card-bg"></div>
+                    <div className="card-content">
+                        <div className="icon-wrapper">
+                            <span className="facility-icon">{item.icon}</span>
+                        </div>
+                        <h3 className="facility-title">{item.title}</h3>
+                        <p className="facility-description">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        </p>
+                        <div className="card-hover-effect">
+                            <button className="learn-more">
+                                Learn More
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="card-image" style={{backgroundImage: `url(${item.img})`}}></div>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+         {/* Section 4: Places Section - Modern Redesign */}
+<section className="places-section-modern py-5">
+    <div className="container">
+        <div className="places-wrapper">
+            {/* Left Side - Content */}
+            <div className="places-content">
+                <div className="section-tag">
+                    <span className="tag-line"></span>
+                    EXPLORE DESTINATIONS
+                </div>
+                <h2 className="places-title">
+                    Places Around <span className="text-gradient">The Hotel</span>
+                </h2>
+                <p className="places-description">
+                    Discover the most breathtaking locations near our hotel. 
+                    From pristine beaches to ancient architecture, experience 
+                    the best of what the city has to offer this summer.
+                </p>
+                
+                <div className="destination-stats">
+                    <div className="dest-stat">
+                        <div className="dest-stat-number">12+</div>
+                        <div className="dest-stat-label">Popular Spots</div>
+                    </div>
+                    <div className="dest-stat">
+                        <div className="dest-stat-number">30min</div>
+                        <div className="dest-stat-label">Average Distance</div>
+                    </div>
+                    <div className="dest-stat">
+                        <div className="dest-stat-number">24/7</div>
+                        <div className="dest-stat-label">Tour Support</div>
+                    </div>
+                </div>
+                
+                <button className="explore-places-btn">
+                    Discover All Places
+                    <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            {/* Right Side - Image Grid Modern */}
+            <div className="places-grid-modern">
+                <div className="grid-item grid-item-1">
+                    <div className="grid-image-wrapper">
+                        <img src={image1} alt="Coastal Paradise" />
+                        <div className="image-overlay">
+                            <div className="image-caption">
+                                <span className="caption-icon">🏖️</span>
+                                <span>Coastal Paradise</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid-item grid-item-2">
+                    <div className="grid-image-wrapper">
+                        <img src={image2} alt="Cultural Tours" />
+                        <div className="image-overlay">
+                            <div className="image-caption">
+                                <span className="caption-icon">🏛️</span>
+                                <span>Cultural Tours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid-item grid-item-3">
+                    <div className="grid-image-wrapper">
+                        <img src={image3} alt="Mountain Views" />
+                        <div className="image-overlay">
+                            <div className="image-caption">
+                                <span className="caption-icon">⛰️</span>
+                                <span>Mountain Views</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid-item grid-item-4">
+                    <div className="grid-image-wrapper">
+                        <img src={img4} alt="Ancient Architecture" />
+                        <div className="image-overlay">
+                            <div className="image-caption">
+                                <span className="caption-icon">🏰</span>
+                                <span>Heritage Sites</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{/* Section 5: Team Section - Modern Redesign */}
+<section className="team-section-modern py-5">
+    <div className="container">
+        {/* Section Header */}
+        <div className="team-header-modern text-center">
+            <div className="header-icon-wrapper">
+                <span className="header-icon">👥</span>
+            </div>
+            <div className="section-tag centered">
+                <span className="tag-dot"></span>
+                MEET OUR EXPERTS
+            </div>
+            <h2 className="team-title">
+                The Passionate <span className="text-gradient">People Behind</span><br />
+                Your Perfect Stay
+            </h2>
+            <p className="team-subtitle">
+                Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment.
+                From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
+            </p>
+        </div>
+
+        {/* Team Grid */}
+        <div className="team-grid-modern">
+            {[
+                { 
+                    name: "Sofia Bennett", 
+                    role: "General Manager", 
+                    img: team1,
+                    bio: "15+ years of luxury hospitality experience",
+                    social: ["linkedin", "twitter", "email"]
+                },
+                { 
+                    name: "Daniel Wright", 
+                    role: "Guest Experience Lead", 
+                    img: team2,
+                    bio: "Creating unforgettable moments for every guest",
+                    social: ["linkedin", "instagram", "email"]
+                },
+                { 
+                    name: "Alex Morgan", 
+                    role: "Operations Manager", 
+                    img: team3,
+                    bio: "Ensuring seamless daily operations",
+                    social: ["linkedin", "twitter", "email"]
+                },
+                { 
+                    name: "Emma Collins", 
+                    role: "Events & Services Manager", 
+                    img: team4,
+                    bio: "Crafting extraordinary events",
+                    social: ["instagram", "linkedin", "email"]
+                },
+                { 
+                    name: "Liam Parker", 
+                    role: "Hospitality Coordinator", 
+                    img: team5,
+                    bio: "Making every guest feel at home",
+                    social: ["twitter", "linkedin", "email"]
+                },
+                { 
+                    name: "Olivia Reed", 
+                    role: "Front Desk Supervisor", 
+                    img: team6,
+                    bio: "Your first friendly face at Akashbari",
+                    social: ["instagram", "linkedin", "email"]
+                },
+            ].map((member, index) => (
+                <div className="team-card-modern" key={index}>
+                    <div className="team-card-inner">
+                        <div className="team-image-wrapper">
+                            <img src={member.img} alt={member.name} className="team-image" />
+                            <div className="team-social-overlay">
+                                {member.social.map((social, idx) => (
+                                    <a key={idx} href="#" className="social-link">
+                                        <i className={`bi bi-${social}`}></i>
+                                    </a>
                                 ))}
                             </div>
                         </div>
-
-                        <div className="col-lg-6 ps-lg-5">
-                            <h6 className="text-gold text-uppercase ls-2">About Us</h6>
-                            <h2 className="display-6 serif mb-4 mt-2">
-                                Welcome To Our Best luxury stay in <span className="text-gold">the city.</span>
-                            </h2>
-                            <p className="text-muted mb-4">
-                                Welcome to Hotelux, where luxury meets comfort in the heart of Paris. Since 1999, we
-                                have been dedicated to providing an exceptional stay for our guests, blending modern
-                                amenities with timeless elegance.
-                            </p>
-
-                            <div className="row features-grid g-4">
-                                <div className="col-md-6">
-                                    <div className="feature-box d-flex align-items-center border p-3">
-                                        <span className="me-3">⭐</span>
-                                        <span className="fw-bold small">350 Best Rooms 5 Star</span>
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="feature-box d-flex align-items-center border p-3">
-                                        <span className="me-3">☕</span>
-                                        <span className="fw-bold small">Breakfast each morning</span>
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="feature-box d-flex align-items-center border p-3">
-                                        <span className="me-3">🛀</span>
-                                        <span className="fw-bold small">Double Whirlpool Jacuzzi Tub</span>
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="feature-box d-flex align-items-center border p-3">
-                                        <span className="me-3">🍷</span>
-                                        <span className="fw-bold small">Wet Bar with Refrigerator</span>
-                                    </div>
-                                </div>
+                        <div className="team-info">
+                            <h3 className="team-member-name">{member.name}</h3>
+                            <p className="team-member-role">{member.role}</p>
+                            <p className="team-member-bio">{member.bio}</p>
+                            <div className="team-divider"></div>
+                            <div className="team-contact-badge">
+                                <span>📧 Book a Meeting</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            ))}
+        </div>
 
-            {/* Section 3: Facilities Grid - Replacing Slider */}
-            <section className="facility-slider-section py-5">
-                <div className="container">
-                    <div className="text-center mb-5">
-                        <span className="text-gold text-uppercase ls-2 small fw-bold">Facilities</span>
-                        <h2 className="serif display-6 mt-2">Our Hotelux <span className="text-muted">Facilities</span></h2>
-                    </div>
-
-                    <div className="row g-4">
-                        {facilities.map((item) => (
-                            <div className="col-lg-3 col-md-6" key={item.id}>
-                                <div className="facility-card shadow-sm bg-white h-100">
-                                    <div className="facility-img-wrapper position-relative">
-                                        <img src={item.img} alt={item.title} className="img-fluid w-100" />
-                                        <div className="facility-icon-circle">
-                                            <span className="fs-4">{item.icon}</span>
-                                        </div>
-                                    </div>
-                                    <div className="facility-content text-center p-3">
-                                        <h4 className="serif mb-3">{item.title}</h4>
-                                        <p className="text-muted small">
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                        </p>
-                                        <button className="read-more-btn mt-3 py-1 px-2">Read More</button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Section 4: Places Section */}
-            <section className="places-section py-3">
-                <div className="container">
-                    <div className="row g-4">
-                        <div className="col-lg-4 d-flex flex-column justify-content-center">
-                            <div className="section-title-wrapper">
-                                <span className="text-gold text-uppercase ls-2 small fw-bold">See Place</span>
-                                <h3 className="serif display-6 mt-2 mb-4">
-                                    Places Around The Hotel <br />
-                                    <span className="text-muted">To Visit This Summer</span>
-                                </h3>
-                                <button className="view-more-btn">View More</button>
-                            </div>
-                        </div>
-
-                        <div className="col-lg-8">
-                            <div className="row g-3">
-                                <div className="col-md-7">
-                                    <div className="place-img-box h-100">
-                                        <img src={image1} alt="Coastal View" className="img-fluid w-100 h-100" style={{objectFit: 'cover'}} />
-                                    </div>
-                                </div>
-                                <div className="col-md-5">
-                                    <div className="place-img-box h-100">
-                                        <img src={image2} alt="Traveler" className="img-fluid w-100 h-100" style={{objectFit: 'cover'}} />
-                                    </div>
-                                </div>
-                                <div className="col-md-5">
-                                    <div className="place-img-box h-100">
-                                        <img src={image3} alt="Promenade" className="img-fluid w-100 h-100" style={{objectFit: 'cover'}} />
-                                    </div>
-                                </div>
-                                <div className="col-md-7">
-                                    <div className="place-img-box h-100">
-                                        <img src={img4} alt="Ancient Architecture" className="img-fluid w-100 h-100" style={{objectFit: 'cover'}} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Section 5: Team Section */}
-            <section className="team-section py-5">
-                <div className="container text-center">
-                    <div className="team-header mb-5">
-                        <span className="text-gold text-uppercase ls-2 small fw-bold">Our Team</span>
-                        <h2 className="serif display-6 mt-2">The People <span className="text-italic">Behind Akashbari Resort</span></h2>
-                        <p className="text-muted mx-auto" style={{ maxWidth: '700px' }}>
-                            Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment.
-                            From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
-                        </p>
-                    </div>
-
-                    <div className="row g-4">
-                        {[
-                            { name: "Sofia Bennett", role: "General Manager", img: team1 },
-                            { name: "Daniel Wright", role: "Guest Experience Lead", img: team2 },
-                            { name: "Alex Morgan", role: "Operations Manager", img: team3 },
-                            { name: "Emma Collins", role: "Events & Services Manager", img: team4 },
-                            { name: "Liam Parker", role: "Hospitality Coordinator", img: team5 },
-                            { name: "Olivia Reed", role: "Front Desk Supervisor", img: team6 },
-                        ].map((member, index) => (
-                            <div className="col-lg-4 col-md-6" key={index}>
-                                <div className="team-card">
-                                    <div className="team-img-container mb-3">
-                                        <img src={member.img} alt={member.name} className="img-fluid team-img" />
-                                    </div>
-                                    <h4 className="serif h5 mb-1">{member.name}</h4>
-                                    <p className="text-gold small text-uppercase fw-bold">{member.role}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+        {/* Join CTA */}
+        <div className="team-cta">
+            <div className="cta-content">
+                <span className="cta-icon">🌟</span>
+                <h4>Join Our Amazing Team</h4>
+                <p>We're always looking for passionate people to join our family</p>
+                <button className="join-team-btn">
+                    View Open Positions
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
 
             <Footer />
         </>

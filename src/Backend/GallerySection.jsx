@@ -21,6 +21,10 @@ const GallerySection = ({ theme: propsTheme }) => {
         imagePreview: ''
     });
 
+    // --- Pagination State ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
     // --- Dynamic Theme ---
     const theme = propsTheme || {
         isDarkMode,
@@ -28,7 +32,8 @@ const GallerySection = ({ theme: propsTheme }) => {
         card: isDarkMode ? '#1e1e1e' : '#ffffff',
         text: isDarkMode ? '#e0e0e0' : '#333333',
         border: isDarkMode ? '#333333' : '#e0e0e0',
-        primary: '#9a55ff'
+        primary: '#9a55ff',
+        tableHeader: isDarkMode ? '#2d2d2d' : '#f8f9fa'
     };
 
     // --- API Logic ---
@@ -48,6 +53,13 @@ const GallerySection = ({ theme: propsTheme }) => {
         fetchGallery();
     }, []);
 
+    // --- Pagination Calculation ---
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = galleryItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(galleryItems.length / itemsPerPage);
+
+    // --- Handlers ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -71,7 +83,7 @@ const GallerySection = ({ theme: propsTheme }) => {
 
         try {
             if (editingItem) {
-                // Laravel-e file update korle POST method best with _method hack ba direct route
+                // Use POST with _method spoofing for Laravel if needed, or direct POST
                 await axios.post(`${API_BASE_URL}/${editingItem.id}`, data);
             } else {
                 await axios.post(API_BASE_URL, data);
@@ -79,7 +91,7 @@ const GallerySection = ({ theme: propsTheme }) => {
             fetchGallery();
             closeModal();
         } catch (err) {
-            alert("Error saving data. Check console.");
+            alert("Error saving data.");
             console.error(err);
         }
     };
@@ -111,7 +123,7 @@ const GallerySection = ({ theme: propsTheme }) => {
         setFormData({ title: '', image: null, imagePreview: '' });
     };
 
-    // --- Styles (CSS-in-JS) ---
+    // --- Styles ---
     const styles = {
         container: {
             display: 'flex',
@@ -119,7 +131,8 @@ const GallerySection = ({ theme: propsTheme }) => {
             width: '100vw',
             backgroundColor: theme.bg,
             color: theme.text,
-            overflow: 'hidden'
+            overflow: 'hidden',
+            transition: 'all 0.3s ease'
         },
         mainWrapper: {
             display: 'flex',
@@ -132,7 +145,7 @@ const GallerySection = ({ theme: propsTheme }) => {
             flexGrow: 1,
             overflowY: 'auto',
             padding: '30px',
-            paddingBottom: '80px' // Space for fixed footer
+            paddingBottom: '100px'
         },
         footerFixed: {
             position: 'absolute',
@@ -143,6 +156,18 @@ const GallerySection = ({ theme: propsTheme }) => {
             borderTop: `1px solid ${theme.border}`,
             zIndex: 10
         },
+        card: {
+            backgroundColor: theme.card,
+            borderRadius: '12px',
+            border: `1px solid ${theme.border}`,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+        },
+        // IMPORTANT: Override for Table Cells in Night Mode
+        tableCell: {
+            backgroundColor: 'transparent', 
+            color: theme.text,
+            borderColor: theme.border
+        },
         modalOverlay: {
             position: 'fixed',
             inset: 0,
@@ -152,150 +177,158 @@ const GallerySection = ({ theme: propsTheme }) => {
             alignItems: 'center',
             zIndex: 2000,
             backdropFilter: 'blur(5px)'
-        },
-        card: {
-            backgroundColor: theme.card,
-            borderRadius: '12px',
-            border: `1px solid ${theme.border}`,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
         }
     };
 
     return (
         <div style={styles.container}>
-            {/* Sidebar */}
             <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="gallery" />
 
-            {/* Main Section */}
             <div style={styles.mainWrapper}>
                 <Header 
-                    theme={theme} 
+                    theme={theme} isDarkMode={isDarkMode}
                     toggleSidebar={() => setIsCollapsed(!isCollapsed)} 
                     toggleDarkMode={() => setIsDarkMode(!isDarkMode)} 
                 />
 
-                {/* Scrollable Content Area */}
                 <div style={styles.scrollContent}>
                     <div className="container-fluid">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h3 className="fw-bold m-0">Gallery Assets</h3>
+                            <h3 className="fw-bold m-0" style={{ color: theme.text }}>Gallery Assets</h3>
                             <button 
-                                className="btn text-white px-4 py-2 fw-semibold" 
-                                style={{ background: theme.primary, borderRadius: '8px' }}
+                                className="btn text-white px-4 py-2 fw-semibold shadow-sm" 
+                                style={{ background: theme.primary, borderRadius: '8px', border: 'none' }}
                                 onClick={() => setShowModal(true)}
                             >
                                 <i className="bi bi-plus-lg me-2"></i> Add New Image
                             </button>
                         </div>
 
-                        {/* Data Table */}
                         <div style={styles.card} className="overflow-hidden">
-                            <table className="table table-hover align-middle mb-0" style={{ color: theme.text }}>
-                                <thead style={{ backgroundColor: isDarkMode ? '#252525' : '#f8f9fa' }}>
-                                    <tr>
-                                        <th className="ps-4 py-3">Preview</th>
-                                        <th>Title</th>
-                                        <th>Created At</th>
-                                        <th className="text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {loading ? (
-                                        <tr><td colSpan="4" className="text-center py-5">Loading gallery...</td></tr>
-                                    ) : galleryItems.length > 0 ? (
-                                        galleryItems.map((item) => (
-                                            <tr key={item.id} style={{ borderColor: theme.border }}>
-                                                <td className="ps-4">
-                                                    <img 
-                                                        src={item.image_url} 
-                                                        alt={item.title} 
-                                                        style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px' }} 
-                                                    />
-                                                </td>
-                                                <td className="fw-medium">{item.title}</td>
-                                                <td className="text-muted small">
-                                                    {new Date(item.created_at).toLocaleDateString()}
-                                                </td>
-                                                <td className="text-center">
-                                                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => openEditModal(item)}>
-                                                        <i className="bi bi-pencil"></i> Edit
-                                                    </button>
-                                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(item.id)}>
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr><td colSpan="4" className="text-center py-5 text-muted">No images found in gallery.</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            <div className="table-responsive">
+                                <table className="table table-hover align-middle mb-0" style={{ color: theme.text }}>
+                                    <thead>
+                                        <tr style={{ backgroundColor: theme.tableHeader }}>
+                                            <th className="ps-4 py-3 border-0" style={{ color: theme.text }}>Preview</th>
+                                            <th className="border-0" style={{ color: theme.text }}>Title</th>
+                                            <th className="border-0" style={{ color: theme.text }}>Created At</th>
+                                            <th className="text-center border-0" style={{ color: theme.text }}>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style={{ borderTop: 'none' }}>
+                                        {loading ? (
+                                            <tr><td colSpan="4" className="text-center py-5" style={styles.tableCell}>Loading...</td></tr>
+                                        ) : currentItems.length > 0 ? (
+                                            currentItems.map((item) => (
+                                                <tr key={item.id}>
+                                                    <td className="ps-4" style={styles.tableCell}>
+                                                        <img 
+                                                            src={item.image_url} 
+                                                            alt="" 
+                                                            style={{ width: '60px', height: '45px', objectFit: 'cover', borderRadius: '6px' }} 
+                                                        />
+                                                    </td>
+                                                    <td className="fw-medium" style={styles.tableCell}>{item.title}</td>
+                                                    <td className="text-muted small" style={styles.tableCell}>{new Date(item.created_at).toLocaleDateString()}</td>
+                                                    <td className="text-center" style={styles.tableCell}>
+                                                        <button className="btn btn-sm btn-outline-primary me-2 border-0" onClick={() => openEditModal(item)}>
+                                                            <i className="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button className="btn btn-sm btn-outline-danger border-0" onClick={() => handleDelete(item.id)}>
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr><td colSpan="4" className="text-center py-5" style={styles.tableCell}>No data found.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* --- Pagination UI --- */}
+                            <div className="d-flex justify-content-between align-items-center p-3" style={{ borderTop: `1px solid ${theme.border}`, backgroundColor: theme.card }}>
+                                <span className="small opacity-75">
+                                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, galleryItems.length)} of {galleryItems.length}
+                                </span>
+                                <nav>
+                                    <ul className="pagination pagination-sm m-0 gap-1">
+                                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                            <button className="page-link border-0 rounded-circle" onClick={() => setCurrentPage(p => p - 1)} style={{ background: theme.bg, color: theme.text }}>
+                                                <i className="bi bi-chevron-left"></i>
+                                            </button>
+                                        </li>
+                                        {[...Array(totalPages)].map((_, i) => (
+                                            <li key={i} className="page-item">
+                                                <button 
+                                                    className="page-link border-0 rounded-circle mx-1" 
+                                                    onClick={() => setCurrentPage(i + 1)}
+                                                    style={{ 
+                                                        background: currentPage === i + 1 ? theme.primary : theme.bg,
+                                                        color: currentPage === i + 1 ? '#fff' : theme.text,
+                                                        width: '32px', height: '32px'
+                                                    }}
+                                                >
+                                                    {i + 1}
+                                                </button>
+                                            </li>
+                                        ))}
+                                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                            <button className="page-link border-0 rounded-circle" onClick={() => setCurrentPage(p => p + 1)} style={{ background: theme.bg, color: theme.text }}>
+                                                <i className="bi bi-chevron-right"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Fixed Footer */}
-                <div style={styles.footerFixed}>
-                    <Footer theme={theme} />
-                </div>
+                <div style={styles.footerFixed}><Footer theme={theme} /></div>
             </div>
 
-            {/* Modern Modal */}
+            {/* Modal */}
             <div style={styles.modalOverlay} onClick={closeModal}>
                 <div 
                     className="p-4" 
-                    style={{ ...styles.card, width: '450px' }} 
+                    style={{ ...styles.card, width: '450px', color: theme.text }} 
                     onClick={e => e.stopPropagation()}
                 >
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h5 className="fw-bold m-0">{editingItem ? 'Update Image' : 'Upload to Gallery'}</h5>
-                        <button className="btn-close" onClick={closeModal}></button>
+                        <h5 className="fw-bold m-0">{editingItem ? 'Update Image' : 'Upload Image'}</h5>
+                        <button className={`btn-close ${isDarkMode ? 'btn-close-white' : ''}`} onClick={closeModal}></button>
                     </div>
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label className="form-label small fw-bold">Image Title</label>
+                            <label className="form-label small fw-bold">Title</label>
                             <input 
                                 type="text" 
                                 className="form-control" 
-                                placeholder="e.g. Summer Beach View"
+                                style={{ backgroundColor: theme.bg, color: theme.text, borderColor: theme.border }}
                                 value={formData.title}
                                 onChange={e => setFormData({...formData, title: e.target.value})}
                                 required
                             />
                         </div>
-
                         <div className="mb-3">
-                            <label className="form-label small fw-bold">File Upload</label>
+                            <label className="form-label small fw-bold">Image File</label>
                             <input 
                                 type="file" 
                                 className="form-control" 
+                                style={{ backgroundColor: theme.bg, color: theme.text, borderColor: theme.border }}
                                 onChange={handleImageChange}
-                                accept="image/*"
                             />
                         </div>
-
                         {formData.imagePreview && (
-                            <div className="mb-4">
-                                <label className="form-label small fw-bold d-block">Preview</label>
-                                <img 
-                                    src={formData.imagePreview} 
-                                    className="rounded w-100 shadow-sm" 
-                                    style={{ height: '180px', objectFit: 'cover' }} 
-                                    alt="preview" 
-                                />
-                            </div>
+                            <img src={formData.imagePreview} className="rounded w-100 mb-3 shadow-sm" style={{ height: '150px', objectFit: 'cover' }} alt="preview" />
                         )}
-
                         <div className="d-flex gap-2">
-                            <button type="button" className="btn btn-light w-100" onClick={closeModal}>Cancel</button>
-                            <button 
-                                type="submit" 
-                                className="btn text-white w-100" 
-                                style={{ background: theme.primary }}
-                            >
-                                {editingItem ? 'Save Changes' : 'Upload Now'}
+                            <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
+                            <button type="submit" className="btn text-white w-100" style={{ background: theme.primary }}>
+                                {editingItem ? 'Update' : 'Upload'}
                             </button>
                         </div>
                     </form>

@@ -6,28 +6,27 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     const [isLandingOpen, setIsLandingOpen] = useState(false);
     const location = useLocation();
 
-    const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: 'house-door', path: '/dashboard' },
-        { id: 'users', label: 'Users', icon: 'people', path: '/users' },
-        // Landing Page section defined separately below for sub-menu logic
-        { id: 'gallery', label: 'Gallery', icon: 'sliders', path: '/admin-gallery' },
-        { id: 'settings', label: 'Settings', icon: 'sliders', path: '/settings' },
-        { id: 'profile', label: 'Profile', icon: 'person-badge', path: '/profile' }
-    ];
+   const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2', path: '/dashboard' },
+    { id: 'users', label: 'Users', icon: 'bi bi-people', path: '/users' },
+    { id: 'gallery', label: 'Gallery', icon: 'bi bi-images', path: '/admin-gallery' },
+    { id: 'settings', label: 'Settings', icon: 'bi bi-gear', path: '/settings' },
+    { id: 'profile', label: 'Profile', icon: 'bi bi-person-circle', path: '/profile' }
+];
 
-    const landingSubItems = [
-        { id: 'content', label: 'Contents', icon: 'bi bi-files', path: '/content' },
-        { id: 'welcome', label: 'Welcome Section', icon: 'bi bi-emoji-smile', path: '/welcome' },
-        { id: 'video', label: 'Video Section', icon: 'bi bi-play-btn', path: '/video' },
-        { id: 'owner', label: 'Owner Section', icon: 'bi bi-people', path: '/owner-section' },
-        { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-star', path: '/owner-benefit' },
-        { id: 'investment', label: 'Investment Package', icon: 'bi bi-coin', path: '/admin-investment' },
-        { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
-        { id: 'events', label: 'Events', icon: 'bi bi-calendar2-week', path: '/admin-events' },
-        { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
-        { id: 'testo', label: 'Testo Section', icon: 'bi bi-diamond', path: '/admin-testo' },
-        { id: 'client', label: 'Happy Client', icon: 'bi bi-diamond', path: '/admin-client' },
-    ];
+const landingSubItems = [
+    { id: 'content', label: 'Contents', icon: 'bi bi-files', path: '/content' },
+    { id: 'welcome', label: 'Welcome Section', icon: 'bi bi-emoji-smile', path: '/welcome' },
+    { id: 'video', label: 'Video Section', icon: 'bi bi-play-btn', path: '/video' },
+    { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-badge', path: '/owner-section' },
+    { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-gem', path: '/owner-benefit' },
+    { id: 'investment', label: 'Investment Package', icon: 'bi bi-piggy-bank', path: '/admin-investment' },
+    { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
+    { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
+    { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
+    { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
+    { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' }
+];
 
     // Check if any sub-menu item is active
     const isAnySubItemActive = () => {
