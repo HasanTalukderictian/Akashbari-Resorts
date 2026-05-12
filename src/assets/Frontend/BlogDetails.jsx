@@ -82,6 +82,8 @@ const BlogDetails = () => {
                     </div>
                 </div>
             </section>
+
+           
             <Footer />
         </>
     );

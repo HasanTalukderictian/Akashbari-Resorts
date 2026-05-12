@@ -12,6 +12,7 @@ import Video from './Video'
 import Owner from "./Owner";
 import Packagegrap from "./Packagegrap";
 import Luxury from "./Luxury";
+import HappyClient from "./HappyClient";
 
 const LandingPage = () => {
 
@@ -32,7 +33,9 @@ const LandingPage = () => {
 
       <Video />
       <Owner/>
+         <HappyClient/>
       <Investment />
+   
       <Packagegrap/>
       <Luxury/>
       {/* <Room /> */}

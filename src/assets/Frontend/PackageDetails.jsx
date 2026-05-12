@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Footer from './Common/Footer';
 import Header from './Common/Header';
+import Terms from '../../Backend/Terms';
 
 const PackageDetails = () => {
     const { id } = useParams();
@@ -128,6 +129,8 @@ const PackageDetails = () => {
                     </div>
                 )}
             </div>
+
+            <Terms/>
 
             <Footer />
 
