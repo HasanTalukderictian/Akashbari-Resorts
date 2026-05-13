@@ -26,6 +26,7 @@ import LuxurySection from './Backend/LuxurySection'
 import Testominal from './Backend/Testominal'
 import HappyClientsection from './Backend/HappyClientsection'
 import GallerySection from './Backend/GallerySection'
+import BlogSection from './Backend/BlogSection'
 
 
 function App() {
@@ -38,7 +39,7 @@ function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/blog' element={<Blog />} />
-        <Route path="/blog-details" element={<BlogDetails />} />
+       <Route path="/blog-details/:id" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/dashboard" element={<Dashbord />} />
@@ -55,10 +56,10 @@ function App() {
         <Route path="/admin-testo" element={<Testominal />} />
         <Route path="/admin-gallery" element={<GallerySection />} />
         <Route path="/admin-client" element={<HappyClientsection />} />
-
-        <Route path="/admin-luxury" element={<LuxurySection />} />
+        <Route path="/admin-client" element={<HappyClientsection />} />
+        <Route path="/admin-blog" element={<BlogSection />} />
         <Route path="/all-events" element={<AllEvents />} />
-       <Route path="/event/:id" element={<EventsDetails />} />  
+        <Route path="/event/:id" element={<EventsDetails />} />  
 
 
       </Routes>
