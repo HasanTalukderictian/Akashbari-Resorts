@@ -1,4 +1,5 @@
 import { useRef } from "react";
+
 import Banner from './Banner'
 import Footer from './Common/Footer'
 import Header from './Common/Header'
@@ -6,7 +7,6 @@ import Welcome from './Common/Welcome'
 import Event from './Event'
 import Facility from './Facility'
 import Investment from './Investment'
-import Room from './Room'
 import Testominal from './Testominal'
 import Video from './Video'
 import Owner from "./Owner";
@@ -17,14 +17,24 @@ import HappyClient from "./HappyClient";
 const LandingPage = () => {
 
   const welcomeRef = useRef(null);
+  const ownerRef = useRef(null);
 
   const scrollToWelcome = () => {
-    welcomeRef.current?.scrollIntoView({ behavior: "smooth" });
+    welcomeRef.current?.scrollIntoView({
+      behavior: "smooth"
+    });
+  };
+
+  const scrollToOwner = () => {
+    ownerRef.current?.scrollIntoView({
+      behavior: "smooth"
+    });
   };
 
   return (
     <>
-      <Header />
+      <Header scrollToOwner={scrollToOwner} />
+
       <Banner onDiscoverClick={scrollToWelcome} />
 
       <div ref={welcomeRef}>
@@ -32,20 +42,28 @@ const LandingPage = () => {
       </div>
 
       <Video />
-      <Owner/>
-         <HappyClient/>
+
+      <div ref={ownerRef} id="owner-section">
+        <Owner />
+      </div>
+
+      <HappyClient />
+
       <Investment />
-   
-      <Packagegrap/>
-      <Luxury/>
-      {/* <Room /> */}
+
+      <Packagegrap />
+
+      <Luxury />
+
       <Facility />
+
       <Event />
 
       <Testominal />
+
       <Footer />
     </>
   )
 }
 
-export default LandingPage
+export default LandingPage;

@@ -1,27 +1,41 @@
-import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 import "../../css/Footer.css";
 import logo from '../../image/Akashbari  resort logo png-01.png'
 import { Link } from "react-router-dom";
 
 const Footer = () => {
-  // Automatically gets the current year
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="footer">
       <div className="container footer-top">
-        {/* Left Section */}
+        {/* Left Section - Address & Contact */}
         <div className="footer-col brand">
           <h2>AKASHBARI<br />RESORTS</h2>
+          <div className="contact-info">
+            <p className="address">
+              <FaMapMarkerAlt className="contact-icon" />
+              House 43, Road 7, Block G, Banani, Dhaka 1213
+            </p>
+            <p className="phone">
+              <FaPhoneAlt className="contact-icon" />
+              +8801329737073
+            </p>
+          </div>
+        </div>
+
+        {/* Middle Section - Quick Links */}
+        <div className="footer-col quick-links">
+          <h3>QUICK LINKS</h3>
           <ul>
-            <li>Home</li>
-            <li>About</li>
-            <li>Gallery</li>
-            <li>Contact</li>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/about">About</Link></li>
+            <li><Link to="/gallery">Gallery</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
           </ul>
         </div>
 
-        {/* Middle Section */}
+        {/* Right Section - Services */}
         <div className="footer-col services">
           <h3>SERVICES</h3>
           <ul>
@@ -31,18 +45,9 @@ const Footer = () => {
             <li>Facilities</li>
           </ul>
         </div>
-
-        {/* Right Section */}
-        <div className="footer-col cta">
-          <h3>Design your<br />customized package</h3>
-          
-             <Link to="/contact" className="cta-btn"> CONTACT US NOW →</Link>
-       
-        </div>
       </div>
 
-      {/* --- Added Copyright Section Above Divider --- */}
-
+      {/* Copyright Section */}
       <div className="container text-center mb-3">
         <p className="footer-copyright-text">
           &copy; {currentYear} AkashBari Resorts. Design and Development By{" "}
@@ -51,21 +56,19 @@ const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="developer-link"
-            style={{ textDecoration: "none" }}
           >
             Hasan Talukder
           </a>
         </p>
       </div>
       
-
       {/* Divider */}
       <div className="footer-divider"></div>
 
       {/* Bottom Section */}
       <div className="footer-bottom container">
         <div className="footer-logo">
-          <img src={logo} alt="logo" />
+          <img src={logo} alt="Akashbari Resorts Logo" />
         </div>
 
         <div className="social-icons">

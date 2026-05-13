@@ -19,7 +19,7 @@ const Contact = () => {
         {
             id: 1,
             title: "Call Us",
-            detail: "(123) 456 7890",
+            detail: "01701294455",
             icon: "bi bi-telephone", // Bootstrap icons use kora hoyeche
         },
         {
@@ -31,7 +31,7 @@ const Contact = () => {
         {
             id: 3,
             title: "Visit Us",
-            detail: "Anywhere City, Central 123 Business area",
+            detail: "House 43, Road 7, Block G, Banani, Dhaka 1213",
             icon: "bi bi-geo-alt",
         }
     ];
