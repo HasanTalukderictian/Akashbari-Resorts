@@ -1,0 +1,218 @@
+/* Notice.css - Modern Marquee Style Notice Bar */
+
+.notice-container {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #ffd700;
+}
+
+.notice-wrapper {
+    display: flex;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+
+/* Left and Right Icons */
+
+.notice-icon-left,
+.notice-icon-right {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+    font-size: 24px;
+    z-index: 10;
+}
+
+.notice-icon-left {
+    border-right: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.notice-icon-right {
+    border-left: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+
+/* Scrolling Container */
+
+.notice-scroll {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    cursor: pointer;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+}
+
+.notice-scroll::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+}
+
+
+/* Scrolling Content */
+
+.notice-scroll-content {
+    display: flex;
+    white-space: nowrap;
+    animation: scrollNotice 30s linear infinite;
+}
+
+.notice-container:hover .notice-scroll-content {
+    animation-play-state: paused;
+}
+
+
+/* Notice Items */
+
+.notice-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    margin: 0 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    white-space: nowrap;
+}
+
+.notice-item:hover {
+    background: rgba(255, 215, 0, 0.15);
+    transform: translateY(-2px);
+    border-color: #ffd700;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
+}
+
+
+/* Notice Icon */
+
+.notice-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+
+/* Notice Text */
+
+.notice-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Notice Arrow */
+
+.notice-arrow {
+    font-size: 16px;
+    color: #ffd700;
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.3s ease;
+}
+
+.notice-item:hover .notice-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* Keyframe Animation for Scrolling */
+
+@keyframes scrollNotice {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .notice-icon-left,
+    .notice-icon-right {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    .notice-item {
+        padding: 10px 16px;
+        margin: 0 6px;
+    }
+    .notice-icon {
+        font-size: 16px;
+    }
+    .notice-text {
+        font-size: 12px;
+    }
+    .notice-arrow {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .notice-icon-left,
+    .notice-icon-right {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    .notice-item {
+        padding: 8px 12px;
+        margin: 0 4px;
+    }
+    .notice-icon {
+        font-size: 14px;
+    }
+    .notice-text {
+        font-size: 11px;
+    }
+}
+
+
+/* Pulse Animation for Icons */
+
+@keyframes pulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.notice-icon-left i,
+.notice-icon-right i {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.notice-icon-left i {
+    animation-delay: 0s;
+}
+
+.notice-icon-right i {
+    animation-delay: 0.5s;
+}

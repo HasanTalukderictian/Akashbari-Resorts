@@ -13,6 +13,7 @@ import Owner from "./Owner";
 import Packagegrap from "./Packagegrap";
 import Luxury from "./Luxury";
 import HappyClient from "./HappyClient";
+import Notice from "./Notice";
 
 const LandingPage = () => {
 
@@ -36,6 +37,7 @@ const LandingPage = () => {
       <Header scrollToOwner={scrollToOwner} />
 
       <Banner onDiscoverClick={scrollToWelcome} />
+      <Notice/>
 
       <div ref={welcomeRef}>
         <Welcome />

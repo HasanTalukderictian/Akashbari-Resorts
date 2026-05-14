@@ -97,10 +97,17 @@ const styles = {
     margin: '0 auto',
     padding: '80px 20px',
     fontFamily: "'Playfair Display', serif",
+    // Mobile padding adjustment
+    '@media (maxWidth: 768px)': {
+      padding: '40px 16px',
+    },
   },
   headerSection: {
     textAlign: 'center',
     marginBottom: '80px',
+    '@media (maxWidth: 768px)': {
+      marginBottom: '40px',
+    },
   },
   badge: {
     backgroundColor: '#76a34d',
@@ -111,12 +118,24 @@ const styles = {
     fontWeight: '700',
     borderRadius: '50px',
     boxShadow: '0 4px 10px rgba(118, 163, 77, 0.3)',
+    display: 'inline-block',
+    '@media (maxWidth: 768px)': {
+      fontSize: '11px',
+      padding: '4px 14px',
+    },
   },
   title: {
     fontSize: '56px',
     margin: '25px 0 15px',
     color: '#1a1a1a',
     fontWeight: '800',
+    '@media (maxWidth: 768px)': {
+      fontSize: '32px',
+      margin: '15px 0 10px',
+    },
+    '@media (maxWidth: 480px)': {
+      fontSize: '28px',
+    },
   },
   subtitle: {
     color: '#555',
@@ -124,6 +143,11 @@ const styles = {
     margin: '0 auto',
     lineHeight: '1.8',
     fontSize: '18px',
+    '@media (maxWidth: 768px)': {
+      fontSize: '15px',
+      lineHeight: '1.6',
+      padding: '0 10px',
+    },
   },
   underline: {
     width: '80px',
@@ -131,17 +155,27 @@ const styles = {
     backgroundColor: '#76a34d',
     margin: '30px auto 0',
     borderRadius: '2px',
+    '@media (maxWidth: 768px)': {
+      width: '60px',
+      margin: '20px auto 0',
+    },
   },
   grid: {
     display: 'flex',
     flexDirection: 'column',
     gap: '60px',
+    '@media (maxWidth: 768px)': {
+      gap: '30px',
+    },
   },
   row: {
     display: 'flex',
     alignItems: 'center',
     gap: '0px',
     flexWrap: 'wrap',
+    '@media (maxWidth: 992px)': {
+      flexDirection: 'column !important',
+    },
   },
   imageBox: {
     flex: '1',
@@ -154,10 +188,27 @@ const styles = {
     backgroundColor: '#fff',
     overflow: 'hidden',
     boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+    '@media (maxWidth: 992px)': {
+      minWidth: '100%',
+      height: '280px',
+      borderBottom: 'none',
+    },
+    '@media (maxWidth: 768px)': {
+      height: '220px',
+    },
+    '@media (maxWidth: 480px)': {
+      height: '180px',
+    },
   },
   imageWrapper: {
-    width: '70%', // Reduced slightly for better padding
+    width: '70%',
     transition: 'transform 0.5s ease',
+    '@media (maxWidth: 768px)': {
+      width: '50%',
+    },
+    '@media (maxWidth: 480px)': {
+      width: '60%',
+    },
   },
   textBox: {
     flex: '1',
@@ -172,22 +223,53 @@ const styles = {
     justifyContent: 'center',
     backgroundColor: '#fdfdfd',
     boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+    '@media (maxWidth: 992px)': {
+      minWidth: '100%',
+      height: 'auto',
+      padding: '40px 30px',
+      borderLeft: '1px solid #e0e0e0 !important',
+      borderRight: '1px solid #e0e0e0 !important',
+      borderTop: 'none',
+    },
+    '@media (maxWidth: 768px)': {
+      padding: '30px 20px',
+    },
+    '@media (maxWidth: 480px)': {
+      padding: '25px 15px',
+    },
   },
   logo: {
     width: '100%',
     height: 'auto',
+    objectFit: 'contain',
   },
   cardTitle: {
     fontSize: '32px',
     marginBottom: '20px',
     color: '#1a1a1a',
     lineHeight: '1.2',
+    '@media (maxWidth: 768px)': {
+      fontSize: '24px',
+      marginBottom: '15px',
+    },
+    '@media (maxWidth: 480px)': {
+      fontSize: '20px',
+      marginBottom: '12px',
+    },
   },
   cardText: {
     fontSize: '16px',
     color: '#666',
     lineHeight: '1.7',
     marginBottom: '30px',
+    '@media (maxWidth: 768px)': {
+      fontSize: '14px',
+      lineHeight: '1.6',
+      marginBottom: '20px',
+    },
+    '@media (maxWidth: 480px)': {
+      fontSize: '13px',
+    },
   },
   button: {
     backgroundColor: '#76a34d',
@@ -201,7 +283,117 @@ const styles = {
     transition: 'all 0.3s ease',
     fontSize: '14px',
     letterSpacing: '1px',
+    '@media (maxWidth: 768px)': {
+      padding: '10px 20px',
+      fontSize: '12px',
+      width: '100%',
+      textAlign: 'center',
+    },
+    '@media (maxWidth: 480px)': {
+      padding: '8px 16px',
+      fontSize: '11px',
+    },
   }
 };
+
+// Add responsive styles using CSS-in-JS with media queries
+const responsiveStyles = `
+  @media (max-width: 992px) {
+    .affiliates-row {
+      flex-direction: column !important;
+    }
+    .affiliates-image-box {
+      min-width: 100% !important;
+      height: 280px !important;
+      border-bottom: none !important;
+    }
+    .affiliates-text-box {
+      min-width: 100% !important;
+      height: auto !important;
+      padding: 40px 30px !important;
+      border-left: 1px solid #e0e0e0 !important;
+      border-right: 1px solid #e0e0e0 !important;
+      border-top: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .affiliates-container {
+      padding: 40px 16px !important;
+    }
+    .affiliates-header {
+      margin-bottom: 40px !important;
+    }
+    .affiliates-title {
+      font-size: 32px !important;
+      margin: 15px 0 10px !important;
+    }
+    .affiliates-subtitle {
+      font-size: 15px !important;
+      padding: 0 10px !important;
+    }
+    .affiliates-grid {
+      gap: 30px !important;
+    }
+    .affiliates-image-box {
+      height: 220px !important;
+    }
+    .affiliates-text-box {
+      padding: 30px 20px !important;
+    }
+    .affiliates-card-title {
+      font-size: 24px !important;
+      margin-bottom: 15px !important;
+    }
+    .affiliates-card-text {
+      font-size: 14px !important;
+      margin-bottom: 20px !important;
+    }
+    .affiliates-button {
+      padding: 10px 20px !important;
+      font-size: 12px !important;
+      width: 100% !important;
+      text-align: center !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .affiliates-title {
+      font-size: 28px !important;
+    }
+    .affiliates-image-box {
+      height: 180px !important;
+    }
+    .affiliates-text-box {
+      padding: 25px 15px !important;
+    }
+    .affiliates-card-title {
+      font-size: 20px !important;
+    }
+    .affiliates-card-text {
+      font-size: 13px !important;
+    }
+    .affiliates-button {
+      padding: 8px 16px !important;
+      font-size: 11px !important;
+    }
+  }
+
+  /* Hover Effects */
+  .affiliates-image-wrapper:hover {
+    transform: scale(1.05);
+  }
+  .affiliates-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(118, 163, 77, 0.3);
+  }
+`;
+
+// Inject styles into document
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement("style");
+  styleSheet.textContent = responsiveStyles;
+  document.head.appendChild(styleSheet);
+}
 
 export default Affiliates;

@@ -28,6 +28,7 @@ import HappyClientsection from './Backend/HappyClientsection'
 import GallerySection from './Backend/GallerySection'
 import BlogSection from './Backend/BlogSection'
 import Affliates from './assets/Frontend/Affliates'
+import NoticeSection from './Backend/NoticeSection'
 
 
 function App() {
@@ -39,9 +40,9 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
-          <Route path='/affliates' element={<Affliates />} />
+        <Route path='/affliates' element={<Affliates />} />
         <Route path='/blog' element={<Blog />} />
-       <Route path="/blog-details/:id" element={<BlogDetails />} />
+        <Route path="/blog-details/:id" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/dashboard" element={<Dashbord />} />
@@ -59,10 +60,11 @@ function App() {
         <Route path="/admin-testo" element={<Testominal />} />
         <Route path="/admin-gallery" element={<GallerySection />} />
         <Route path="/admin-client" element={<HappyClientsection />} />
+         <Route path="/admin-notice" element={<NoticeSection />} />
         <Route path="/admin-client" element={<HappyClientsection />} />
         <Route path="/admin-blog" element={<BlogSection />} />
         <Route path="/all-events" element={<AllEvents />} />
-        <Route path="/event/:id" element={<EventsDetails />} />  
+        <Route path="/event/:id" element={<EventsDetails />} />
 
 
       </Routes>
