@@ -144,7 +144,7 @@ const Luxury = () => {
           style={{ width: '80px', height: '4px', backgroundColor: '#FFD700' }}
         ></div>
         <p className="text-muted fst-italic">
-          Choose from our range of premium rooms and suites
+          Hotel Rooms and Suite Will be like this
         </p>
       </div>
 

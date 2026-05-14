@@ -1,29 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Header from './Common/Header';
 import Footer from './Common/Footer';
 import logo1 from '../../assets/image/section/Blog/ddd.jpg';
 import logo2 from '../../assets/image/section/Blog/hhh.jpg';
 import logo3 from '../../assets/image/section/Blog/kkk.jpg';
+import logo4 from '../../assets/image/section/Blog/logo (1).webp';
 
 const Affiliates = () => {
   const partners = [
     {
+      name: "Akashbari Holidays",
+      description: "Akashbari Holidays is your gateway to unforgettable adventures around the world. Whether you dream of a getaway to North America, an immersion in the cultural riches of Europe, or a luxurious adventure in French Polynesia, we offer exceptional trips that transcend simple vacations to become truly unforgettable experiences.",
+      logo: logo4,
+    },
+    {
       name: "Akashbari Global Service",
       description: "Akashbari Global Services known as AGS is one of the best education consultancy services in Bangladesh. Best services for Study Abroad & Visa Consultancy and student support from university application to immigration.",
       logo: logo1,
-      reverse: false
     },
     {
       name: "Rupkatha Adventure Tours",
       description: "Rupkatha Adventure Tours is a top-tier travel agency specializing in Holidays Packages, International Hotels, Air Tickets, and Visa processing with a focus on customer satisfaction.",
       logo: logo2,
-      reverse: true
     },
     {
       name: "Rupkatha Edu World",
       description: "A Bangladesh-based education consultancy that turns global dreams into achievable journeys through thoughtful counseling, seamless admissions, and scholarship guidance.",
       logo: logo3,
-      reverse: false
     }
   ];
 
@@ -44,32 +47,42 @@ const Affiliates = () => {
 
         {/* Partners Grid */}
         <section style={styles.grid}>
-          {partners.map((item, index) => (
-            <div key={index} style={{
-              ...styles.row,
-              flexDirection: item.reverse ? 'row-reverse' : 'row'
-            }}>
-              {/* Image Box with Hover Effect Container */}
-              <div style={styles.imageBox}>
-                <div style={styles.imageWrapper}>
-                  <img src={item.logo} alt={item.name} style={styles.logo} />
+          {partners.map((item, index) => {
+            // Automatically alternate: even index = Normal, odd index = Reverse
+            const isReverse = index % 2 !== 0;
+
+            return (
+              <div key={index} style={{
+                ...styles.row,
+                flexDirection: isReverse ? 'row-reverse' : 'row'
+              }}>
+                {/* Image Box */}
+                <div style={styles.imageBox}>
+                  <div style={styles.imageWrapper}>
+                    <img src={item.logo} alt={item.name} style={styles.logo} />
+                  </div>
+                </div>
+
+                {/* Text Box */}
+                <div style={{
+                  ...styles.textBox,
+                  // Fix: Remove border on the side that touches the image
+                  borderLeft: isReverse ? '1px solid #e0e0e0' : 'none',
+                  borderRight: isReverse ? 'none' : '1px solid #e0e0e0',
+                }}>
+                  <h2 style={styles.cardTitle}>{item.name}</h2>
+                  <p style={styles.cardText}>{item.description}</p>
+                  <button 
+                    style={styles.button}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#5e853d'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#76a34d'}
+                  >
+                    VIEW DETAILS ↗
+                  </button>
                 </div>
               </div>
-
-              {/* Text Box with Card Style */}
-              <div style={styles.textBox}>
-                <h2 style={styles.cardTitle}>{item.name}</h2>
-                <p style={styles.cardText}>{item.description}</p>
-                <button 
-                  style={styles.button}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#5e853d'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#76a34d'}
-                >
-                  VIEW DETAILS ↗
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
       </main>
 
@@ -83,7 +96,7 @@ const styles = {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '80px 20px',
-    fontFamily: "'Playfair Display', serif", // More elegant serif
+    fontFamily: "'Playfair Display', serif",
   },
   headerSection: {
     textAlign: 'center',
@@ -96,7 +109,7 @@ const styles = {
     fontSize: '13px',
     letterSpacing: '2px',
     fontWeight: '700',
-    borderRadius: '50px', // Rounded badge looks more modern
+    borderRadius: '50px',
     boxShadow: '0 4px 10px rgba(118, 163, 77, 0.3)',
   },
   title: {
@@ -127,9 +140,8 @@ const styles = {
   row: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0px', // Removed gap to allow the borders to "touch" or align closely
+    gap: '0px',
     flexWrap: 'wrap',
-    transition: 'transform 0.3s ease',
   },
   imageBox: {
     flex: '1',
@@ -144,14 +156,15 @@ const styles = {
     boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
   },
   imageWrapper: {
-    width: '80%',
+    width: '70%', // Reduced slightly for better padding
     transition: 'transform 0.5s ease',
   },
   textBox: {
     flex: '1',
     minWidth: '350px',
     height: '400px',
-    border: '1px solid #e0e0e0',
+    borderTop: '1px solid #e0e0e0',
+    borderBottom: '1px solid #e0e0e0',
     padding: '60px',
     textAlign: 'left',
     display: 'flex',
@@ -159,15 +172,13 @@ const styles = {
     justifyContent: 'center',
     backgroundColor: '#fdfdfd',
     boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
-    borderLeft: 'none', // Creates a seamless look on desktop
   },
   logo: {
     width: '100%',
     height: 'auto',
-    filter: 'grayscale(20%)', // Slight grayscale for professional look
   },
   cardTitle: {
-    fontSize: '36px',
+    fontSize: '32px',
     marginBottom: '20px',
     color: '#1a1a1a',
     lineHeight: '1.2',
@@ -175,7 +186,7 @@ const styles = {
   cardText: {
     fontSize: '16px',
     color: '#666',
-    lineHeight: '1.9',
+    lineHeight: '1.7',
     marginBottom: '30px',
   },
   button: {
@@ -190,7 +201,6 @@ const styles = {
     transition: 'all 0.3s ease',
     fontSize: '14px',
     letterSpacing: '1px',
-    boxShadow: '0 4px 15px rgba(118, 163, 77, 0.2)',
   }
 };
 

@@ -11,7 +11,10 @@ const Events = () => {
 
     const [events, setEvents] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingEvent, setEditingEvent] = useState(null);
+    const [deletingEvent, setDeletingEvent] = useState(null);
+    const [toast, setToast] = useState({ show: false, message: '', type: '' });
 
     const [formData, setFormData] = useState({
         title: '',
@@ -32,20 +35,34 @@ const Events = () => {
     const [featureInput, setFeatureInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetchLoading, setFetchLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     const theme = {
         isDarkMode,
-        bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-        card: isDarkMode ? '#16213e' : '#ffffff',
-        text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-        border: isDarkMode ? '#2d3436' : '#ebedf2',
-        tableHeader: isDarkMode ? '#0f3460' : '#f8f9fa',
-        tableRow: isDarkMode ? '#1a1a2e' : '#ffffff',
-        tableRowAlt: isDarkMode ? '#16213e' : '#f8f9fa',
+        bg: isDarkMode ? '#0f0f1a' : '#f8f9fc',
+        card: isDarkMode ? '#1a1a2e' : '#ffffff',
+        cardHover: isDarkMode ? '#22223b' : '#f8f9fa',
+        text: isDarkMode ? '#e9ecef' : '#2c3e50',
+        textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
+        border: isDarkMode ? '#2d2d3d' : '#e9ecef',
+        primary: '#9a55ff',
+        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        danger: '#ef4444',
+        success: '#10b981',
+        warning: '#f59e0b',
+        tableHeader: isDarkMode ? '#25253a' : '#f8f9fc'
     };
 
     const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
     const API_URL = 'http://127.0.0.1:8000';
+
+    // Show toast notification
+    const showToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: '' }), 3000);
+    };
 
     // Get Auth Token from localStorage
     const getAuthToken = () => {
@@ -57,7 +74,6 @@ const Events = () => {
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
-        // Remove duplicate /storage
         const cleanPath = imagePath.replace(/^\/storage\/storage\//, '/storage/');
         if (cleanPath.startsWith('/storage/')) {
             return `${API_URL}${cleanPath}`;
@@ -68,41 +84,20 @@ const Events = () => {
     // Create axios instance
     const axiosInstance = axios.create({
         baseURL: API_BASE,
-        headers: {
-            'Accept': 'application/json',
-        }
+        headers: { 'Accept': 'application/json' }
     });
 
     // Add token to every request
-    axiosInstance.interceptors.request.use(
-        (config) => {
-            const token = getAuthToken();
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-            if (config.data instanceof FormData) {
-                delete config.headers['Content-Type'];
-            }
-            return config;
-        },
-        (error) => {
-            return Promise.reject(error);
+    axiosInstance.interceptors.request.use((config) => {
+        const token = getAuthToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
-    );
-
-    // Response interceptor for handling 401 errors
-    axiosInstance.interceptors.response.use(
-        (response) => response,
-        (error) => {
-            if (error.response?.status === 401) {
-                localStorage.removeItem("token");
-                localStorage.removeItem("userRole");
-                localStorage.removeItem("userName");
-                window.location.href = '/';
-            }
-            return Promise.reject(error);
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
         }
-    );
+        return config;
+    });
 
     // Fetch Events
     const fetchEvents = async () => {
@@ -114,9 +109,7 @@ const Events = () => {
                 setFetchLoading(false);
                 return;
             }
-
             const res = await axiosInstance.get('/events/all');
-            
             if (res.data.success && res.data.data) {
                 setEvents(res.data.data);
             } else if (res.data.data) {
@@ -136,6 +129,18 @@ const Events = () => {
         fetchEvents();
     }, []);
 
+    // Filter and pagination
+    const filteredEvents = events.filter(event =>
+        event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.postedBy?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -143,9 +148,11 @@ const Events = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image size should be less than 5MB', 'error');
+                return;
+            }
             setFormData({ ...formData, [e.target.name]: file });
-            
-            // Create preview URL
             const previewUrl = URL.createObjectURL(file);
             if (e.target.name === 'thumb_img') {
                 setThumbPreview(previewUrl);
@@ -176,7 +183,7 @@ const Events = () => {
         
         const token = getAuthToken();
         if (!token) {
-            alert("Please login to add/edit events");
+            showToast("Please login to add/edit events", 'error');
             window.location.href = '/';
             return;
         }
@@ -213,30 +220,21 @@ const Events = () => {
             }
 
             if (res.data.success) {
-                alert(editingEvent ? 'Event updated successfully!' : 'Event created successfully!');
+                showToast(editingEvent ? 'Event updated successfully!' : 'Event created successfully!', 'success');
                 setShowModal(false);
                 resetForm();
                 fetchEvents();
             } else {
-                alert(res.data.message || 'Failed to save event');
+                showToast(res.data.message || 'Failed to save event', 'error');
             }
         } catch (err) {
             console.error("Submit error:", err);
             if (err.response?.status === 401) {
-                alert("Session expired. Please login again.");
+                showToast("Session expired. Please login again.", 'error');
                 localStorage.removeItem("token");
                 window.location.href = '/';
-            } else if (err.response?.data?.errors) {
-                const errors = err.response.data.errors;
-                let errorMsg = "Validation errors:\n";
-                Object.keys(errors).forEach(key => {
-                    errorMsg += `${key}: ${errors[key][0]}\n`;
-                });
-                alert(errorMsg);
-            } else if (err.response?.data?.message) {
-                alert(err.response.data.message);
             } else {
-                alert("Something went wrong! Please check console for details.");
+                showToast(err.response?.data?.message || "Something went wrong!", 'error');
             }
         } finally {
             setLoading(false);
@@ -244,23 +242,21 @@ const Events = () => {
     };
 
     // Delete Event
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this event?")) return;
-        
-        const token = getAuthToken();
-        if (!token) {
-            alert("Please login to delete events");
-            window.location.href = '/';
-            return;
-        }
-        
+    const confirmDelete = (event) => {
+        setDeletingEvent(event);
+        setShowDeleteModal(true);
+    };
+
+    const handleDelete = async () => {
         try {
-            await axiosInstance.delete(`/events/${id}`);
-            setEvents(events.filter(event => event.id !== id));
-            alert("Event deleted successfully!");
+            await axiosInstance.delete(`/events/${deletingEvent.id}`);
+            fetchEvents();
+            setShowDeleteModal(false);
+            setDeletingEvent(null);
+            showToast("Event deleted successfully!", 'success');
         } catch (err) {
             console.error("Delete error:", err);
-            alert("Failed to delete event: " + (err.response?.data?.message || err.message));
+            showToast("Failed to delete event", 'error');
         }
     };
 
@@ -268,7 +264,7 @@ const Events = () => {
     const handleEdit = (event) => {
         const token = getAuthToken();
         if (!token) {
-            alert("Please login to edit events");
+            showToast("Please login to edit events", 'error');
             window.location.href = '/';
             return;
         }
@@ -286,7 +282,6 @@ const Events = () => {
             main_img: null
         });
         
-        // Clear previews
         setThumbPreview(null);
         setMainPreview(null);
         setShowModal(true);
@@ -313,14 +308,313 @@ const Events = () => {
     const formatDateTime = (datetime) => {
         if (!datetime) return 'N/A';
         const date = new Date(datetime);
-        return date.toLocaleString();
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const getStatusColor = (datetime) => {
+        if (!datetime) return theme.secondary;
+        const eventDate = new Date(datetime);
+        const now = new Date();
+        return eventDate > now ? theme.success : theme.warning;
     };
 
     const isLoggedIn = !!getAuthToken();
 
+    // Styles
+    const styles = {
+        container: {
+            backgroundColor: theme.bg,
+            minHeight: '100vh',
+            transition: 'all 0.3s ease'
+        },
+        mainWrapper: {
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            height: '100vh',
+            overflow: 'hidden'
+        },
+        scrollContent: {
+            flex: 1,
+            overflowY: 'auto',
+            padding: '30px'
+        },
+        pageTitle: {
+            fontSize: '28px',
+            fontWeight: '700',
+            background: theme.primaryGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '8px'
+        },
+        statsContainer: {
+            display: 'flex',
+            gap: '20px',
+            marginBottom: '30px',
+            flexWrap: 'wrap'
+        },
+        statCard: {
+            backgroundColor: theme.card,
+            borderRadius: '16px',
+            padding: '20px',
+            flex: 1,
+            minWidth: '150px',
+            border: `1px solid ${theme.border}`,
+            transition: 'all 0.3s ease'
+        },
+        statIcon: {
+            fontSize: '32px',
+            marginBottom: '12px'
+        },
+        statValue: {
+            fontSize: '28px',
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: '4px'
+        },
+        statLabel: {
+            fontSize: '13px',
+            color: theme.textLight,
+            fontWeight: '500'
+        },
+        toolbar: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '30px',
+            flexWrap: 'wrap',
+            gap: '16px'
+        },
+        searchBox: {
+            padding: '12px 20px',
+            borderRadius: '12px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.card,
+            color: theme.text,
+            width: '300px',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s'
+        },
+        addBtn: {
+            background: theme.primaryGradient,
+            color: 'white',
+            border: 'none',
+            padding: '12px 28px',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+        },
+        eventGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+            gap: '24px',
+            marginBottom: '30px'
+        },
+        eventCard: {
+            backgroundColor: theme.card,
+            borderRadius: '20px',
+            overflow: 'hidden',
+            border: `1px solid ${theme.border}`,
+            transition: 'all 0.3s ease',
+            cursor: 'pointer',
+            position: 'relative'
+        },
+        eventImage: {
+            width: '100%',
+            height: '200px',
+            objectFit: 'cover',
+            transition: 'transform 0.5s ease'
+        },
+        cardOverlay: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(135deg, rgba(154, 85, 255, 0.95) 0%, rgba(192, 132, 252, 0.95) 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+            opacity: 0,
+            transition: 'all 0.3s ease'
+        },
+        cardContent: {
+            padding: '20px'
+        },
+        eventTitle: {
+            fontSize: '18px',
+            fontWeight: '600',
+            color: theme.text,
+            marginBottom: '8px'
+        },
+        eventMeta: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '12px',
+            fontSize: '13px',
+            color: theme.textLight
+        },
+        featureList: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            marginTop: '12px'
+        },
+        featureBadge: {
+            backgroundColor: theme.primary,
+            color: 'white',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: '500'
+        },
+        pagination: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '20px'
+        },
+        pageBtn: {
+            width: '40px',
+            height: '40px',
+            borderRadius: '12px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.card,
+            color: theme.text,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        activePage: {
+            background: theme.primaryGradient,
+            color: 'white',
+            border: 'none'
+        },
+        modalOverlay: {
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(8px)',
+            animation: 'fadeIn 0.3s ease'
+        },
+        modal: {
+            backgroundColor: theme.card,
+            borderRadius: '20px',
+            width: '800px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            animation: 'slideUp 0.3s ease'
+        },
+        modalHeader: {
+            padding: '20px 24px',
+            borderBottom: `1px solid ${theme.border}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: theme.card,
+            zIndex: 1
+        },
+        modalBody: {
+            padding: '24px'
+        },
+        input: {
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.bg,
+            color: theme.text,
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s'
+        },
+        textarea: {
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.bg,
+            color: theme.text,
+            fontSize: '14px',
+            outline: 'none',
+            minHeight: '100px',
+            resize: 'vertical'
+        },
+        imageUploadArea: {
+            border: `2px dashed ${theme.border}`,
+            borderRadius: '12px',
+            padding: '20px',
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            backgroundColor: theme.bg
+        },
+        imagePreview: {
+            width: '100%',
+            height: '150px',
+            borderRadius: '12px',
+            objectFit: 'cover',
+            marginBottom: '12px'
+        },
+        toast: {
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            padding: '14px 24px',
+            borderRadius: '12px',
+            color: 'white',
+            zIndex: 2000,
+            animation: 'slideInRight 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+        },
+        emptyState: {
+            textAlign: 'center',
+            padding: '60px',
+            color: theme.textLight
+        },
+        loadingSpinner: {
+            textAlign: 'center',
+            padding: '60px',
+            color: theme.textLight
+        }
+    };
+
+    // Calculate statistics
+    const totalEvents = events.length;
+    const upcomingEvents = events.filter(e => new Date(e.event_datetime) > new Date()).length;
+    const pastEvents = events.filter(e => new Date(e.event_datetime) <= new Date()).length;
+
     if (!isLoggedIn) {
         return (
-            <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
+            <div style={styles.container}>
                 <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
                     <Sidebar theme={theme} isCollapsed={isCollapsed} activeView={activeView} setActiveView={setActiveView} />
                     <div className="flex-grow-1 d-flex flex-column">
@@ -330,14 +624,13 @@ const Events = () => {
                             toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
                             toggleSidebar={() => setIsCollapsed(!isCollapsed)}
                         />
-                        <div className="text-center py-5">
-                            <div className="alert alert-warning m-5">
-                                <h4>Please Login First</h4>
-                                <p>You need to be logged in to access Event Management.</p>
-                                <button className="btn btn-primary mt-3" onClick={() => window.location.href = '/'}>
-                                    Go to Login
-                                </button>
-                            </div>
+                        <div style={styles.emptyState}>
+                            <div style={{ fontSize: '64px', marginBottom: '16px' }}>🔒</div>
+                            <h4>Please Login First</h4>
+                            <p>You need to be logged in to access Event Management.</p>
+                            <button className="btn btn-primary mt-3" onClick={() => window.location.href = '/'}>
+                                Go to Login
+                            </button>
                         </div>
                         <Footer theme={theme} />
                     </div>
@@ -347,13 +640,52 @@ const Events = () => {
     }
 
     return (
-        <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
+        <div style={styles.container}>
+            <style>
+                {`
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideUp {
+                        from { transform: translateY(50px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                    @keyframes slideInRight {
+                        from { transform: translateX(100px); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    .stat-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                    }
+                    .event-card:hover {
+                        transform: translateY(-8px);
+                        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+                    }
+                    .event-card:hover .card-overlay {
+                        opacity: 1;
+                    }
+                    .event-card:hover img {
+                        transform: scale(1.1);
+                    }
+                    button:hover {
+                        transform: translateY(-2px);
+                    }
+                    button:active {
+                        transform: translateY(0);
+                    }
+                    .search-box:focus {
+                        border-color: #9a55ff;
+                        box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1);
+                    }
+                `}
+            </style>
+
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
-                
                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView={activeView} setActiveView={setActiveView} />
 
-                <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
-                    
+                <div style={styles.mainWrapper}>
                     <Header 
                         theme={theme}
                         isDarkMode={isDarkMode}
@@ -361,344 +693,484 @@ const Events = () => {
                         toggleSidebar={() => setIsCollapsed(!isCollapsed)}
                     />
 
-                    {/* Content Area */}
-                    <div className="p-4 flex-grow-1" style={{ overflowY: 'auto' }}>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="fw-bold" style={{ color: theme.text }}>Event Management</h4>
+                    <div style={styles.scrollContent}>
+                        {/* Header Section */}
+                        <div style={{ marginBottom: '30px' }}>
+                            <h1 style={styles.pageTitle}>Event Management</h1>
+                            <p style={{ color: theme.textLight }}>Manage and organize your events</p>
+                        </div>
+
+                        {/* Statistics Cards */}
+                        <div style={styles.statsContainer}>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>📅</div>
+                                <div style={styles.statValue}>{totalEvents}</div>
+                                <div style={styles.statLabel}>Total Events</div>
+                            </div>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>⏰</div>
+                                <div style={styles.statValue}>{upcomingEvents}</div>
+                                <div style={styles.statLabel}>Upcoming Events</div>
+                            </div>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>✅</div>
+                                <div style={styles.statValue}>{pastEvents}</div>
+                                <div style={styles.statLabel}>Past Events</div>
+                            </div>
+                        </div>
+
+                        {/* Toolbar */}
+                        <div style={styles.toolbar}>
+                            <input
+                                type="text"
+                                placeholder="🔍 Search by title, main title, or posted by..."
+                                style={styles.searchBox}
+                                className="search-box"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
                             <button 
-                                className="btn text-white" 
-                                style={{ background: '#9a55ff', borderRadius: '8px' }}
+                                style={styles.addBtn}
                                 onClick={() => {
                                     resetForm();
                                     setShowModal(true);
                                 }}
+                                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                             >
-                                <i className="bi bi-plus-lg me-1"></i> Add Event
+                                + Add Event
                             </button>
                         </div>
 
-                        {fetchLoading && (
-                            <div className="text-center py-5">
+                        {/* Events Grid */}
+                        {fetchLoading ? (
+                            <div style={styles.loadingSpinner}>
                                 <div className="spinner-border text-primary" role="status">
                                     <span className="visually-hidden">Loading...</span>
                                 </div>
-                                <p className="mt-2">Loading events...</p>
+                                <p style={{ marginTop: '16px' }}>Loading events...</p>
                             </div>
-                        )}
-
-                        {!fetchLoading && (
-                            <div className="card shadow-sm border-0" style={{ backgroundColor: theme.card, borderRadius: '15px', overflow: 'hidden' }}>
-                                <div className="table-responsive">
-                                    <table className="table table-hover mb-0" style={{ color: theme.text }}>
-                                        <thead>
-                                            <tr style={{ 
-                                                backgroundColor: theme.tableHeader,
-                                                color: isDarkMode ? '#fff' : '#2c3e50',
-                                                borderBottom: `2px solid ${theme.border}`
-                                            }}>
-                                                <th className="py-3 px-4">Title</th>
-                                                <th className="py-3">Main Title</th>
-                                                <th className="py-3">Date & Time</th>
-                                                <th className="py-3">Posted By</th>
-                                                <th className="py-3">Status</th>
-                                                <th className="text-center py-3">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {events.length > 0 ? (
-                                                events.map((event, index) => (
-                                                    <tr key={event.id} style={{ 
-                                                        backgroundColor: index % 2 === 0 ? theme.tableRow : theme.tableRowAlt,
-                                                        borderBottom: `1px solid ${theme.border}`,
-                                                        color: theme.text
-                                                    }}>
-                                                        <td className="py-3 px-4">
-                                                            <div className="d-flex align-items-center gap-2">
-                                                                {event.thumbImg && (
-                                                                    <img 
-                                                                        src={getImageUrl(event.thumbImg)} 
-                                                                        alt={event.title}
-                                                                        style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }}
-                                                                        onError={(e) => {
-                                                                            e.target.onerror = null;
-                                                                            e.target.src = 'https://via.placeholder.com/40?text=No+Image';
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                                <span style={{ color: theme.text }}>{event.title}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ color: theme.text }}>{event.mainTitle}</td>
-                                                        <td style={{ color: theme.text }}>{event.time || formatDateTime(event.event_datetime)}</td>
-                                                        <td style={{ color: theme.text }}>{event.postedBy}</td>
-                                                        <td>
-                                                            <span className={`badge ${event.status === 'active' ? 'bg-success' : 'bg-secondary'}`}>
-                                                                {event.status || 'Active'}
+                        ) : currentItems.length > 0 ? (
+                            <>
+                                <div style={styles.eventGrid}>
+                                    {currentItems.map((event) => (
+                                        <div 
+                                            key={event.id} 
+                                            className="event-card"
+                                            style={styles.eventCard}
+                                        >
+                                            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                                                <img 
+                                                    src={getImageUrl(event.thumbImg) || 'https://via.placeholder.com/400x200?text=Event+Image'} 
+                                                    alt={event.title}
+                                                    style={styles.eventImage}
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = 'https://via.placeholder.com/400x200?text=Event+Image';
+                                                    }}
+                                                />
+                                                <div className="card-overlay" style={styles.cardOverlay}>
+                                                    <button 
+                                                        className="btn btn-light btn-sm rounded-circle"
+                                                        onClick={() => handleEdit(event)}
+                                                        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-light btn-sm rounded-circle"
+                                                        onClick={() => confirmDelete(event)}
+                                                        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div style={styles.cardContent}>
+                                                <div style={styles.eventTitle}>{event.title}</div>
+                                                <div style={styles.eventMeta}>
+                                                    <span>📅 {formatDateTime(event.event_datetime)}</span>
+                                                    <span>👤 {event.postedBy}</span>
+                                                </div>
+                                                <div style={{ fontSize: '14px', color: theme.textLight, marginBottom: '12px' }}>
+                                                    {event.mainTitle}
+                                                </div>
+                                                {event.features && event.features.length > 0 && (
+                                                    <div style={styles.featureList}>
+                                                        {event.features.slice(0, 3).map((feature, idx) => (
+                                                            <span key={idx} style={styles.featureBadge}>
+                                                                {feature}
                                                             </span>
-                                                        </td>
-                                                        <td className="text-center">
-                                                            <button 
-                                                                className="btn btn-outline-primary btn-sm me-2"
-                                                                onClick={() => handleEdit(event)}
-                                                            >
-                                                                <i className="bi bi-pencil"></i> Edit
-                                                            </button>
-                                                            <button 
-                                                                className="btn btn-outline-danger btn-sm"
-                                                                onClick={() => handleDelete(event.id)}
-                                                            >
-                                                                <i className="bi bi-trash"></i> Delete
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="6" className="text-center py-5">
-                                                        <div style={{ color: theme.text }}>
-                                                            <i className="bi bi-calendar-x display-4"></i>
-                                                            <p className="mt-2">No events found. Click "Add Event" to create one.</p>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                                        ))}
+                                                        {event.features.length > 3 && (
+                                                            <span style={styles.featureBadge}>
+                                                                +{event.features.length - 3} more
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div style={styles.pagination}>
+                                        <button
+                                            style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                        >
+                                            ←
+                                        </button>
+                                        {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+                                            let pageNum;
+                                            if (totalPages <= 5) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage <= 3) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage >= totalPages - 2) {
+                                                pageNum = totalPages - 4 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+                                            return (
+                                                <button
+                                                    key={i}
+                                                    style={{
+                                                        ...styles.pageBtn,
+                                                        ...(currentPage === pageNum && styles.activePage)
+                                                    }}
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
+                                        <button
+                                            style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            →
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div style={styles.emptyState}>
+                                <div style={{ fontSize: '64px', marginBottom: '16px' }}>📭</div>
+                                <h4>No events found</h4>
+                                <p style={{ color: theme.textLight, marginBottom: '20px' }}>
+                                    {searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first event'}
+                                </p>
+                                {!searchTerm && (
+                                    <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+                                        + Add Event
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
 
-                    {/* Footer */}
-                    <div style={{ flexShrink: 0 }}>
-                        <Footer theme={theme} />
-                    </div>
+                    <Footer theme={theme} />
                 </div>
             </div>
 
-            {/* Add/Edit Event Modal with Image Preview */}
+            {/* Add/Edit Event Modal */}
             {showModal && (
-                <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
-                    <div className="modal-dialog modal-dialog-centered modal-lg">
-                        <div className="modal-content" style={{ backgroundColor: theme.card, color: theme.text }}>
-                            <div className="modal-header" style={{ borderBottomColor: theme.border }}>
-                                <h5 className="modal-title">
-                                    <i className="bi bi-calendar-plus me-2"></i>
-                                    {editingEvent ? 'Edit Event' : 'Add New Event'}
-                                </h5>
-                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
-                            </div>
-                            <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                                <form onSubmit={handleSubmit}>
-                                    <div className="row">
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Title *</label>
+                <div style={styles.modalOverlay} onClick={() => {
+                    setShowModal(false);
+                    resetForm();
+                }}>
+                    <div style={styles.modal} onClick={e => e.stopPropagation()}>
+                        <div style={styles.modalHeader}>
+                            <h5 style={{ margin: 0, fontWeight: '600' }}>
+                                {editingEvent ? 'Edit Event' : 'Add New Event'}
+                            </h5>
+                            <button 
+                                className={`btn-close ${isDarkMode ? 'btn-close-white' : ''}`} 
+                                onClick={() => {
+                                    setShowModal(false);
+                                    resetForm();
+                                }}
+                            ></button>
+                        </div>
+                        <div style={styles.modalBody}>
+                            <form onSubmit={handleSubmit}>
+                                <div className="row">
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Event Title *</label>
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            value={formData.title}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            style={styles.input}
+                                            required
+                                            placeholder="Enter event title"
+                                        />
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Event Date & Time *</label>
+                                        <input
+                                            type="datetime-local"
+                                            name="event_datetime"
+                                            value={formData.event_datetime}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            style={styles.input}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Main Title *</label>
+                                        <input
+                                            type="text"
+                                            name="main_title"
+                                            value={formData.main_title}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            style={styles.input}
+                                            required
+                                            placeholder="Enter main title"
+                                        />
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Subtitle *</label>
+                                        <input
+                                            type="text"
+                                            name="subtitle"
+                                            value={formData.subtitle}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            style={styles.input}
+                                            required
+                                            placeholder="Enter subtitle"
+                                        />
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Posted By *</label>
+                                        <input
+                                            type="text"
+                                            name="posted_by"
+                                            value={formData.posted_by}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            style={styles.input}
+                                            required
+                                            placeholder="Enter your name"
+                                        />
+                                    </div>
+
+                                    <div className="col-12 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Description *</label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleChange}
+                                            className="form-control"
+                                            style={styles.textarea}
+                                            required
+                                            placeholder="Describe the event details..."
+                                        />
+                                    </div>
+
+                                    <div className="col-12 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Features</label>
+                                        <div className="input-group mb-2">
                                             <input
                                                 type="text"
-                                                name="title"
-                                                value={formData.title}
-                                                onChange={handleChange}
+                                                value={featureInput}
+                                                onChange={(e) => setFeatureInput(e.target.value)}
                                                 className="form-control"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required
+                                                style={styles.input}
+                                                placeholder="Add feature (e.g., 500+ Attendees)"
+                                                onKeyPress={(e) => e.key === 'Enter' && addFeature()}
                                             />
+                                            <button type="button" onClick={addFeature} className="btn" style={{ background: theme.primary, color: 'white' }}>
+                                                Add
+                                            </button>
                                         </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Event Date & Time *</label>
-                                            <input
-                                                type="datetime-local"
-                                                name="event_datetime"
-                                                value={formData.event_datetime}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Main Title *</label>
-                                            <input
-                                                type="text"
-                                                name="main_title"
-                                                value={formData.main_title}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Subtitle *</label>
-                                            <input
-                                                type="text"
-                                                name="subtitle"
-                                                value={formData.subtitle}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Posted By *</label>
-                                            <input
-                                                type="text"
-                                                name="posted_by"
-                                                value={formData.posted_by}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="col-12 mb-3">
-                                            <label className="form-label fw-bold">Description *</label>
-                                            <textarea
-                                                name="description"
-                                                value={formData.description}
-                                                onChange={handleChange}
-                                                className="form-control"
-                                                rows="3"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="col-12 mb-3">
-                                            <label className="form-label fw-bold">Features</label>
-                                            <div className="input-group mb-2">
-                                                <input
-                                                    type="text"
-                                                    value={featureInput}
-                                                    onChange={(e) => setFeatureInput(e.target.value)}
-                                                    className="form-control"
-                                                    placeholder="Add feature (e.g., 500 Best Rooms)"
-                                                    style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                    onKeyPress={(e) => e.key === 'Enter' && addFeature()}
-                                                />
-                                                <button type="button" onClick={addFeature} className="btn btn-secondary" style={{ backgroundColor: '#9a55ff', borderColor: '#9a55ff' }}>
-                                                    <i className="bi bi-plus"></i> Add
-                                                </button>
-                                            </div>
-                                            <div className="d-flex flex-wrap gap-2">
-                                                {formData.features.map((feature, index) => (
-                                                    <span key={index} className="badge p-2" style={{ backgroundColor: '#9a55ff' }}>
-                                                        {feature}
-                                                        <i 
-                                                            className="bi bi-x-circle ms-2" 
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={() => removeFeature(index)}
-                                                        ></i>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Thumbnail Image with Preview */}
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Thumbnail Image {!editingEvent && '*'}</label>
-                                            <input
-                                                type="file"
-                                                name="thumb_img"
-                                                onChange={handleFileChange}
-                                                className="form-control"
-                                                accept="image/*"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required={!editingEvent}
-                                            />
-                                            <small className="text-muted">Recommended: 300x200px</small>
-                                            {editingEvent && (
-                                                <small className="text-muted d-block">Leave empty to keep current image</small>
-                                            )}
-                                            {/* Thumbnail Preview */}
-                                            {(thumbPreview || (editingEvent && editingEvent.thumbImg)) && (
-                                                <div className="mt-2">
-                                                    <div className="border rounded p-2" style={{ display: 'inline-block', backgroundColor: theme.bg }}>
-                                                        <img 
-                                                            src={thumbPreview || getImageUrl(editingEvent?.thumbImg)} 
-                                                            alt="Thumbnail Preview"
-                                                            style={{ width: '100px', height: '70px', objectFit: 'cover', borderRadius: '5px' }}
-                                                            onError={(e) => {
-                                                                e.target.onerror = null;
-                                                                e.target.src = 'https://via.placeholder.com/100x70?text=Preview';
-                                                            }}
-                                                        />
-                                                        <p className="small text-muted mt-1 mb-0 text-center">Thumbnail Preview</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Main Image with Preview */}
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-bold">Main Image {!editingEvent && '*'}</label>
-                                            <input
-                                                type="file"
-                                                name="main_img"
-                                                onChange={handleFileChange}
-                                                className="form-control"
-                                                accept="image/*"
-                                                style={{ backgroundColor: isDarkMode ? '#1a1a2e' : '#fff', color: theme.text, borderColor: theme.border }}
-                                                required={!editingEvent}
-                                            />
-                                            <small className="text-muted">Recommended: 800x600px</small>
-                                            {editingEvent && (
-                                                <small className="text-muted d-block">Leave empty to keep current image</small>
-                                            )}
-                                            {/* Main Image Preview */}
-                                            {(mainPreview || (editingEvent && editingEvent.mainImg)) && (
-                                                <div className="mt-2">
-                                                    <div className="border rounded p-2" style={{ display: 'inline-block', backgroundColor: theme.bg }}>
-                                                        <img 
-                                                            src={mainPreview || getImageUrl(editingEvent?.mainImg)} 
-                                                            alt="Main Preview"
-                                                            style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '5px' }}
-                                                            onError={(e) => {
-                                                                e.target.onerror = null;
-                                                                e.target.src = 'https://via.placeholder.com/120x80?text=Preview';
-                                                            }}
-                                                        />
-                                                        <p className="small text-muted mt-1 mb-0 text-center">Main Image Preview</p>
-                                                    </div>
-                                                </div>
-                                            )}
+                                        <div className="d-flex flex-wrap gap-2 mt-2">
+                                            {formData.features.map((feature, index) => (
+                                                <span key={index} className="badge p-2" style={{ backgroundColor: theme.primary, color: 'white' }}>
+                                                    {feature}
+                                                    <i 
+                                                        className="bi bi-x-circle ms-2" 
+                                                        style={{ cursor: 'pointer' }}
+                                                        onClick={() => removeFeature(index)}
+                                                    ></i>
+                                                </span>
+                                            ))}
                                         </div>
                                     </div>
 
-                                    <div className="d-flex gap-2 mt-3">
-                                        <button type="submit" className="btn btn-primary flex-grow-1" style={{ backgroundColor: '#9a55ff', borderColor: '#9a55ff' }} disabled={loading}>
-                                            {loading ? (
+                                    {/* Thumbnail Image */}
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Thumbnail Image {!editingEvent && '*'}</label>
+                                        <div 
+                                            style={styles.imageUploadArea}
+                                            onClick={() => document.getElementById('thumbInput').click()}
+                                        >
+                                            {thumbPreview || (editingEvent && editingEvent.thumbImg) ? (
                                                 <>
-                                                    <span className="spinner-border spinner-border-sm me-2"></span>
-                                                    {editingEvent ? 'Updating...' : 'Saving...'}
+                                                    <img 
+                                                        src={thumbPreview || getImageUrl(editingEvent?.thumbImg)} 
+                                                        alt="Thumbnail Preview"
+                                                        style={styles.imagePreview}
+                                                    />
+                                                    <p style={{ fontSize: '13px', color: theme.textLight }}>
+                                                        Click to change image
+                                                    </p>
                                                 </>
                                             ) : (
-                                                editingEvent ? 'Update Event' : 'Save Event'
+                                                <>
+                                                    <div style={{ fontSize: '48px', marginBottom: '10px' }}>🖼️</div>
+                                                    <p>Click to upload thumbnail</p>
+                                                    <p style={{ fontSize: '12px', color: theme.textLight }}>Recommended: 300x200px, max 5MB</p>
+                                                </>
                                             )}
-                                        </button>
-                                        <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                                            Cancel
-                                        </button>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            id="thumbInput"
+                                            name="thumb_img"
+                                            onChange={handleFileChange}
+                                            style={{ display: 'none' }}
+                                            accept="image/*"
+                                            required={!editingEvent}
+                                        />
                                     </div>
-                                </form>
+
+                                    {/* Main Image */}
+                                    <div className="col-md-6 mb-3">
+                                        <label className="form-label fw-semibold mb-2">Main Image {!editingEvent && '*'}</label>
+                                        <div 
+                                            style={styles.imageUploadArea}
+                                            onClick={() => document.getElementById('mainInput').click()}
+                                        >
+                                            {mainPreview || (editingEvent && editingEvent.mainImg) ? (
+                                                <>
+                                                    <img 
+                                                        src={mainPreview || getImageUrl(editingEvent?.mainImg)} 
+                                                        alt="Main Preview"
+                                                        style={styles.imagePreview}
+                                                    />
+                                                    <p style={{ fontSize: '13px', color: theme.textLight }}>
+                                                        Click to change image
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div>
+                                                    <p>Click to upload main image</p>
+                                                    <p style={{ fontSize: '12px', color: theme.textLight }}>Recommended: 800x600px, max 5MB</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        <input
+                                            type="file"
+                                            id="mainInput"
+                                            name="main_img"
+                                            onChange={handleFileChange}
+                                            style={{ display: 'none' }}
+                                            accept="image/*"
+                                            required={!editingEvent}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="d-flex gap-2 mt-3">
+                                    <button 
+                                        type="submit" 
+                                        className="btn flex-grow-1" 
+                                        style={{ background: theme.primaryGradient, color: 'white', border: 'none' }} 
+                                        disabled={loading}
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                {editingEvent ? 'Updating...' : 'Saving...'}
+                                            </>
+                                        ) : (
+                                            editingEvent ? 'Update Event' : 'Save Event'
+                                        )}
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-secondary" 
+                                        onClick={() => {
+                                            setShowModal(false);
+                                            resetForm();
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div style={styles.modalOverlay} onClick={() => setShowDeleteModal(false)}>
+                    <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
+                        <div style={styles.modalHeader}>
+                            <h5 style={{ margin: 0, fontWeight: '600' }}>Confirm Delete</h5>
+                            <button 
+                                className={`btn-close ${isDarkMode ? 'btn-close-white' : ''}`} 
+                                onClick={() => setShowDeleteModal(false)}
+                            ></button>
+                        </div>
+                        <div style={styles.modalBody}>
+                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '10px' }}>⚠️</div>
+                                <p>Are you sure you want to delete <strong>{deletingEvent?.title}</strong>?</p>
+                                <p style={{ fontSize: '13px', color: theme.textLight }}>This action cannot be undone.</p>
+                            </div>
+                            <div className="d-flex gap-2">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-secondary w-100" 
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className="btn w-100"
+                                    style={{ background: theme.danger, color: 'white', border: 'none' }}
+                                    onClick={handleDelete}
+                                >
+                                    Delete
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Cleanup object URLs on unmount */}
-            {useEffect(() => {
-                return () => {
-                    if (thumbPreview) URL.revokeObjectURL(thumbPreview);
-                    if (mainPreview) URL.revokeObjectURL(mainPreview);
-                };
-            }, [thumbPreview, mainPreview])}
+            {/* Toast Notification */}
+            {toast.show && (
+                <div style={{
+                    ...styles.toast,
+                    backgroundColor: toast.type === 'success' ? '#10b981' : '#ef4444'
+                }}>
+                    {toast.type === 'success' ? '✅' : '❌'} {toast.message}
+                </div>
+            )}
         </div>
     );
 };

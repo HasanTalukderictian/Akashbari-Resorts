@@ -55,6 +55,7 @@ function App() {
         <Route path="/admin-investment" element={<Investment />} />
         <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
         <Route path="/admin-events" element={<Events />} />
+        <Route path="/admin-luxury" element={<LuxurySection />} />
         <Route path="/admin-testo" element={<Testominal />} />
         <Route path="/admin-gallery" element={<GallerySection />} />
         <Route path="/admin-client" element={<HappyClientsection />} />

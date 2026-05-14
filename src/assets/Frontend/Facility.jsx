@@ -31,7 +31,7 @@ const Facility = () => {
         {/* Header Section */}
         <div className="text-center mb-5">
           <h6 className="text-primary fw-bold text-uppercase mb-2" style={{ letterSpacing: '2px' }}>Amenities</h6>
-          <h2 className="facility-main-title fw-bold">World-Class Facilities</h2>
+          <h2 className="display-4 fw-normal text-uppercase mb-2" style={{ letterSpacing: '4px' }} >World-Class Facilities Include</h2>
           <div className="custom-divider mx-auto"></div>
         </div>
 

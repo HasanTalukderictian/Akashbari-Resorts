@@ -71,30 +71,43 @@ const GallerySection = ({ theme: propsTheme }) => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!formData.title) return alert("Title is required");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        const data = new FormData();
-        data.append('title', formData.title);
-        if (formData.image) {
-            data.append('image', formData.image);
+    const data = new FormData();
+    data.append('title', formData.title);
+    
+    // Check if formData.image is actually a File object
+    if (formData.image instanceof File) {
+        data.append('image', formData.image);
+    } 
+    // If it's not a file (i.e., it's null or a string), 
+    // we don't append it at all so the 'nullable' rule in Laravel works.
+
+    try {
+        const url = editingItem 
+            ? `${API_BASE_URL}/${editingItem.id}` 
+            : API_BASE_URL;
+
+        // Note: For Updates, your route is POST, so we don't strictly need _method spoofing,
+        // but adding it ensures Laravel handles it as a multipart request correctly.
+        if (editingItem) {
+            data.append('_method', 'POST'); 
         }
 
-        try {
-            if (editingItem) {
-                // Use POST with _method spoofing for Laravel if needed, or direct POST
-                await axios.post(`${API_BASE_URL}/${editingItem.id}`, data);
-            } else {
-                await axios.post(API_BASE_URL, data);
+        await axios.post(url, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
             }
-            fetchGallery();
-            closeModal();
-        } catch (err) {
-            alert("Error saving data.");
-            console.error(err);
-        }
-    };
+        });
+
+        fetchGallery();
+        closeModal();
+    } catch (err) {
+        console.error("Full Error Object:", err.response);
+        alert("Upload failed: " + JSON.stringify(err.response?.data?.errors));
+    }
+};
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure?')) {
