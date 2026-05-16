@@ -248,55 +248,7 @@ const AboutUs = () => {
            
 
             
-            {/* Section 4: Places Section */}
-            {/* <section className="places-section-modern py-5">
-                <div className="container">
-                    <div className="places-wrapper">
-                        <div className="places-content">
-                            <div className="section-tag">
-                                <span className="tag-line"></span>
-                                {placesContent.tag}
-                            </div>
-                            <h2 className="places-title">
-                                {placesContent.title} 
-                                <span className="text-gradient"> {placesContent.gradientText}</span>
-                            </h2>
-                            <p className="places-description">{placesContent.description}</p>
-                            <div className="destination-stats">
-                                {placesContent.stats.map((stat, idx) => (
-                                    <div className="dest-stat" key={idx}>
-                                        <div className="dest-stat-number">{stat.number}</div>
-                                        <div className="dest-stat-label">{stat.label}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <button className="explore-places-btn" onClick={() => window.location.href = placesContent.button.link}>
-                                {placesContent.button.text}
-                                <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
-                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div className="places-grid-modern">
-                            {placesList.map((place) => (
-                                <div key={place.id} className={`grid-item grid-item-${place.id}`}>
-                                    <div className="grid-image-wrapper">
-                                        <img src={place.img} alt={place.title} />
-                                        <div className="image-overlay">
-                                            <div className="image-caption">
-                                                <span className="caption-icon">{place.icon}</span>
-                                                <span>{place.title}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section> */}
-
+           
             {/* Section 5: Team Section */}
             <section className="team-section-modern py-5">
                 <div className="container">

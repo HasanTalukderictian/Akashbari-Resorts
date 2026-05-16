@@ -11,10 +11,16 @@ const Testominal = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [activeView, setActiveView] = useState('video');
     const [showModal, setShowModal] = useState(false);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     // Data States
     const [testimonials, setTestimonials] = useState([]);
     const [imagePreview, setImagePreview] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -26,93 +32,75 @@ const Testominal = () => {
 
     const theme = {
         isDarkMode,
-        bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-        card: isDarkMode ? '#16213e' : '#ffffff',
-        text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-        border: isDarkMode ? '#2d3436' : '#ebedf2',
+        bg: isDarkMode ? '#0f0f1a' : '#f8f9fc',
+        card: isDarkMode ? '#1a1a2e' : '#ffffff',
+        text: isDarkMode ? '#e9ecef' : '#2c3e50',
+        textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
+        border: isDarkMode ? '#2d2d3d' : '#e9ecef',
+        primary: '#9a55ff',
+        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        danger: '#ef4444',
+        success: '#10b981',
+        warning: '#f59e0b'
     };
 
     // Fetch Testimonials
     const fetchTestimonials = async () => {
-
+        setLoading(true);
         try {
-
             const res = await axios.get('http://127.0.0.1:8000/api/get-testimonials');
-
             setTestimonials(res.data.data || []);
-
         } catch (err) {
-
             console.error("Fetch Error:", err);
-
             setTestimonials([]);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-
         fetchTestimonials();
-
     }, []);
 
     // Handle Input Change
     const handleChange = (e) => {
-
         const { name, value, files } = e.target;
-
         if (name === 'image' && files && files[0]) {
-
             const file = files[0];
-
-            setFormData((prev) => ({
-                ...prev,
-                image: file
-            }));
-
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB');
+                return;
+            }
+            setFormData((prev) => ({ ...prev, image: file }));
             setImagePreview(URL.createObjectURL(file));
-
         } else {
-
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value
-            }));
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
     // Submit Form
     const handleSubmit = async (e) => {
-
         e.preventDefault();
-
+        setSubmitting(true);
+        
         const data = new FormData();
-
         data.append('name', formData.name);
-
         if (formData.image) {
             data.append('image', formData.image);
         }
-
         data.append('source', formData.source);
         data.append('stars', formData.stars);
         data.append('text', formData.text);
 
         try {
-
             const res = await axios.post(
                 'http://127.0.0.1:8000/api/add-testimonial',
                 data,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
+                { headers: { 'Content-Type': 'multipart/form-data' } }
             );
 
             if (res.status === 201) {
-
                 setShowModal(false);
-
                 setFormData({
                     name: '',
                     image: null,
@@ -120,68 +108,366 @@ const Testominal = () => {
                     stars: 5,
                     text: ''
                 });
-
                 setImagePreview(null);
-
                 fetchTestimonials();
             }
-
         } catch (err) {
-
             console.error("Submit Error:", err.response?.data || err);
-
             alert("Failed to save testimonial");
+        } finally {
+            setSubmitting(false);
         }
     };
 
     // Delete Testimonial
     const handleDelete = async (id) => {
-
-        if (!window.confirm("Are you sure you want to delete this?")) {
-            return;
-        }
-
         try {
-
             await axios.delete(`http://127.0.0.1:8000/api/del-testimonial/${id}`);
-
             fetchTestimonials();
-
+            setDeleteConfirm(null);
         } catch (err) {
-
             console.error("Delete Error:", err);
+            alert("Failed to delete testimonial");
+        }
+    };
+
+    // Filter and Pagination
+    const filteredTestimonials = testimonials.filter(item =>
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.source?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredTestimonials.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredTestimonials.length / itemsPerPage);
+
+    // Statistics
+    const totalTestimonials = testimonials.length;
+    const avgRating = testimonials.reduce((sum, item) => sum + (item.stars || 0), 0) / totalTestimonials || 0;
+
+    // Render Stars
+    const renderStars = (rating) => {
+        return Array(5).fill(0).map((_, i) => (
+            <i 
+                key={i} 
+                className={`bi bi-star${i < rating ? '-fill' : ''}`}
+                style={{ color: '#f59e0b', fontSize: '14px', marginRight: '2px' }}
+            ></i>
+        ));
+    };
+
+    const styles = {
+        container: {
+            backgroundColor: theme.bg,
+            minHeight: '100vh',
+            transition: 'all 0.3s ease'
+        },
+        mainContent: {
+            flex: 1,
+            overflowY: 'auto',
+            padding: '30px'
+        },
+        pageHeader: {
+            marginBottom: '30px'
+        },
+        pageTitle: {
+            fontSize: '28px',
+            fontWeight: '700',
+            background: theme.primaryGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '8px'
+        },
+        pageSubtitle: {
+            color: theme.textLight,
+            fontSize: '14px'
+        },
+        statCards: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '20px',
+            marginBottom: '30px'
+        },
+        statCard: {
+            backgroundColor: theme.card,
+            borderRadius: '16px',
+            padding: '20px',
+            border: `1px solid ${theme.border}`,
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+        },
+        statIcon: {
+            width: '50px',
+            height: '50px',
+            borderRadius: '12px',
+            background: theme.primaryGradient,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            marginBottom: '16px'
+        },
+        statValue: {
+            fontSize: '28px',
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: '4px'
+        },
+        statLabel: {
+            fontSize: '13px',
+            color: theme.textLight,
+            fontWeight: '500'
+        },
+        toolbar: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px',
+            flexWrap: 'wrap',
+            gap: '16px'
+        },
+        searchBox: {
+            padding: '12px 20px',
+            borderRadius: '12px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.card,
+            color: theme.text,
+            width: '300px',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s'
+        },
+        addBtn: {
+            background: theme.primaryGradient,
+            color: 'white',
+            border: 'none',
+            padding: '12px 28px',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+        },
+        testimonialsGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gap: '24px',
+            marginBottom: '30px'
+        },
+        testimonialCard: {
+            backgroundColor: theme.card,
+            borderRadius: '20px',
+            overflow: 'hidden',
+            border: `1px solid ${theme.border}`,
+            transition: 'all 0.3s ease',
+            position: 'relative'
+        },
+        cardHeader: {
+            padding: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '15px',
+            borderBottom: `1px solid ${theme.border}`
+        },
+        avatar: {
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            border: `3px solid ${theme.primary}`
+        },
+        userInfo: {
+            flex: 1
+        },
+        userName: {
+            fontSize: '18px',
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: '4px'
+        },
+        userSource: {
+            fontSize: '12px',
+            color: theme.textLight,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+        },
+        rating: {
+            marginBottom: '12px'
+        },
+        cardBody: {
+            padding: '20px'
+        },
+        reviewText: {
+            fontSize: '14px',
+            color: theme.textLight,
+            lineHeight: '1.6',
+            marginBottom: '16px'
+        },
+        cardActions: {
+            display: 'flex',
+            gap: '10px',
+            paddingTop: '16px',
+            borderTop: `1px solid ${theme.border}`
+        },
+        actionBtn: {
+            flex: 1,
+            padding: '8px',
+            borderRadius: '10px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            fontSize: '13px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+        },
+        deleteBtn: {
+            backgroundColor: `${theme.danger}20`,
+            color: theme.danger
+        },
+        pagination: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '20px'
+        },
+        pageBtn: {
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.card,
+            color: theme.text,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        activePage: {
+            background: theme.primaryGradient,
+            color: 'white',
+            border: 'none'
+        },
+        emptyState: {
+            textAlign: 'center',
+            padding: '60px',
+            color: theme.textLight
+        },
+        loadingSpinner: {
+            textAlign: 'center',
+            padding: '60px',
+            color: theme.textLight
+        },
+        modalOverlay: {
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(8px)'
+        },
+        modal: {
+            backgroundColor: theme.card,
+            borderRadius: '24px',
+            width: '550px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+        },
+        modalHeader: {
+            padding: '24px',
+            borderBottom: `1px solid ${theme.border}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: theme.card,
+            zIndex: 1
+        },
+        modalBody: {
+            padding: '24px'
+        },
+        modalFooter: {
+            padding: '20px 24px',
+            borderTop: `1px solid ${theme.border}`,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px'
+        },
+        input: {
+            width: '100%',
+            padding: '10px 14px',
+            borderRadius: '10px',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.bg,
+            color: theme.text,
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s'
+        },
+        label: {
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '600',
+            fontSize: '13px',
+            color: theme.text
         }
     };
 
     return (
+        <div style={styles.container}>
+            <style>
+                {`
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideUp {
+                        from { transform: translateY(30px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                    .stat-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                    }
+                    .testimonial-card:hover {
+                        transform: translateY(-6px);
+                        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+                    }
+                    button:hover {
+                        transform: translateY(-2px);
+                    }
+                    .search-box:focus {
+                        border-color: #9a55ff;
+                        box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1);
+                    }
+                    .testimonial-card {
+                        animation: slideUp 0.3s ease;
+                    }
+                `}
+            </style>
 
-        <div
-            style={{
-                backgroundColor: theme.bg,
-                minHeight: '100vh',
-                transition: 'all 0.3s'
-            }}
-        >
-
-            <div
-                className="d-flex"
-                style={{
-                    height: '100vh',
-                    overflow: 'hidden'
-                }}
-            >
-
+            <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
                 <Sidebar
                     theme={theme}
                     isCollapsed={isCollapsed}
                     activeView={activeView}
                 />
 
-                <div
-                    className="flex-grow-1 d-flex flex-column"
-                    style={{ minWidth: 0 }}
-                >
-
+                <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
                     <Header
                         theme={theme}
                         isDarkMode={isDarkMode}
@@ -189,353 +475,316 @@ const Testominal = () => {
                         toggleSidebar={() => setIsCollapsed(!isCollapsed)}
                     />
 
-                    <div
-                        className="p-4 flex-grow-1"
-                        style={{ overflowY: 'auto' }}
-                    >
-
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-
-                            <h4
-                                className="fw-bold"
-                                style={{ color: theme.text }}
-                            >
-                                Testimonial Management
-                            </h4>
-
-                            <button
-                                className="btn text-white"
-                                style={{
-                                    background: '#9a55ff',
-                                    borderRadius: '8px'
-                                }}
-                                onClick={() => setShowModal(true)}
-                            >
-                                <i className="bi bi-plus-lg me-1"></i>
-                                Add Testimonial
-                            </button>
-
+                    <div style={styles.mainContent}>
+                        {/* Header Section */}
+                        <div style={styles.pageHeader}>
+                            <h1 style={styles.pageTitle}>Testimonial Management</h1>
+                            <p style={styles.pageSubtitle}>Manage customer feedback and reviews</p>
                         </div>
 
-                        <div
-                            className="card shadow-sm border-0 p-3"
-                            style={{
-                                backgroundColor: theme.card,
-                                borderRadius: '15px'
-                            }}
-                        >
-
-                            <div className="table-responsive">
-
-                                <table
-                                    className="table"
-                                    style={{ color: theme.text }}
-                                >
-
-                                    <thead>
-
-                                        <tr style={{ color: theme.text }}>
-                                            <th>Image</th>
-                                            <th>Name</th>
-                                            <th>Source</th>
-                                            <th>Stars</th>
-                                            <th>Review</th>
-                                            <th>Action</th>
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody>
-
-                                        {Array.isArray(testimonials) && testimonials.length > 0 ? (
-
-                                            testimonials.map((item) => (
-
-                                                <tr
-                                                    key={item.id}
-                                                    style={{ verticalAlign: 'middle' }}
-                                                >
-
-                                                    <td>
-
-                                                        <img
-                                                            src={
-                                                                item.image_url ||
-                                                                'https://via.placeholder.com/40'
-                                                            }
-                                                            alt={item.name}
-                                                            style={{
-                                                                width: '40px',
-                                                                height: '40px',
-                                                                borderRadius: '50%',
-                                                                objectFit: 'cover'
-                                                            }}
-                                                        />
-
-                                                    </td>
-
-                                                    <td>{item.name}</td>
-
-                                                    <td>
-                                                        <span className="badge bg-info">
-                                                            {item.source || 'N/A'}
-                                                        </span>
-                                                    </td>
-
-                                                    <td>{item.stars} ⭐</td>
-
-                                                    <td
-                                                        style={{
-                                                            maxWidth: '200px',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis',
-                                                            whiteSpace: 'nowrap'
-                                                        }}
-                                                    >
-                                                        {item.text}
-                                                    </td>
-
-                                                    <td>
-
-                                                        <button
-                                                            onClick={() => handleDelete(item.id)}
-                                                            className="btn btn-sm btn-outline-danger"
-                                                        >
-                                                            <i className="bi bi-trash"></i>
-                                                        </button>
-
-                                                    </td>
-
-                                                </tr>
-
-                                            ))
-
-                                        ) : (
-
-                                            <tr>
-
-                                                <td
-                                                    colSpan="6"
-                                                    className="text-center py-5"
-                                                >
-                                                    No testimonials found.
-                                                </td>
-
-                                            </tr>
-
-                                        )}
-
-                                    </tbody>
-
-                                </table>
-
+                        {/* Statistics Cards */}
+                        <div style={styles.statCards}>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>💬</div>
+                                <div style={styles.statValue}>{totalTestimonials}</div>
+                                <div style={styles.statLabel}>Total Testimonials</div>
                             </div>
-
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>⭐</div>
+                                <div style={styles.statValue}>{avgRating.toFixed(1)}</div>
+                                <div style={styles.statLabel}>Average Rating</div>
+                            </div>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>👍</div>
+                                <div style={styles.statValue}>100%</div>
+                                <div style={styles.statLabel}>Satisfaction Rate</div>
+                            </div>
                         </div>
 
+                        {/* Toolbar */}
+                        <div style={styles.toolbar}>
+                            <input
+                                type="text"
+                                placeholder="🔍 Search by name or source..."
+                                style={styles.searchBox}
+                                className="search-box"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                            <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+                                <i className="bi bi-plus-circle"></i> Add Testimonial
+                            </button>
+                        </div>
+
+                        {/* Testimonials Grid */}
+                        {loading ? (
+                            <div style={styles.loadingSpinner}>
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                <p style={{ marginTop: '16px' }}>Loading testimonials...</p>
+                            </div>
+                        ) : currentItems.length > 0 ? (
+                            <>
+                                <div style={styles.testimonialsGrid}>
+                                    {currentItems.map((item) => (
+                                        <div key={item.id} className="testimonial-card" style={styles.testimonialCard}>
+                                            <div style={styles.cardHeader}>
+                                                <img
+                                                    src={item.image_url || 'https://via.placeholder.com/60?text=User'}
+                                                    alt={item.name}
+                                                    style={styles.avatar}
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = 'https://via.placeholder.com/60?text=User';
+                                                    }}
+                                                />
+                                                <div style={styles.userInfo}>
+                                                    <h3 style={styles.userName}>{item.name}</h3>
+                                                    <div style={styles.userSource}>
+                                                        <i className="bi bi-building"></i>
+                                                        <span>{item.source || 'Customer'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style={styles.cardBody}>
+                                                <div style={styles.rating}>
+                                                    {renderStars(item.stars)}
+                                                    <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.textLight }}>
+                                                        ({item.stars}/5)
+                                                    </span>
+                                                </div>
+                                                <p style={styles.reviewText}>
+                                                    "{item.text}"
+                                                </p>
+                                                <div style={styles.cardActions}>
+                                                    <button
+                                                        style={{...styles.actionBtn, ...styles.deleteBtn}}
+                                                        onClick={() => setDeleteConfirm(item)}
+                                                    >
+                                                        <i className="bi bi-trash"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div style={styles.pagination}>
+                                        <button
+                                            style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                        >
+                                            ←
+                                        </button>
+                                        {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+                                            let pageNum;
+                                            if (totalPages <= 5) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage <= 3) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage >= totalPages - 2) {
+                                                pageNum = totalPages - 4 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+                                            return (
+                                                <button
+                                                    key={i}
+                                                    style={{
+                                                        ...styles.pageBtn,
+                                                        ...(currentPage === pageNum && styles.activePage)
+                                                    }}
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
+                                        <button
+                                            style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            →
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div style={styles.emptyState}>
+                                <div style={{ fontSize: '64px', marginBottom: '16px' }}>💬</div>
+                                <h4>No Testimonials Found</h4>
+                                <p style={{ color: theme.textLight, marginBottom: '20px' }}>
+                                    {searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first testimonial'}
+                                </p>
+                                {!searchTerm && (
+                                    <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+                                        <i className="bi bi-plus-circle"></i> Add Testimonial
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <Footer theme={theme} />
-
                 </div>
-
             </div>
 
-            {/* Modal */}
+            {/* Add/Edit Modal */}
             {showModal && (
-
-                <div
-                    style={{
-                        background: "rgba(0,0,0,0.7)",
-                        position: "fixed",
-                        inset: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        zIndex: 1050
-                    }}
-                >
-
-                    <div
-                        style={{
-                            background: theme.card,
-                            color: theme.text,
-                            padding: '30px',
-                            width: '100%',
-                            maxWidth: '500px',
-                            borderRadius: '15px',
-                            maxHeight: '90vh',
-                            overflowY: 'auto'
-                        }}
-                    >
-
-                        <h4 className="mb-4 fw-bold">
-                            Add New Testimonial
-                        </h4>
-
+                <div style={styles.modalOverlay} onClick={() => setShowModal(false)}>
+                    <div style={styles.modal} onClick={e => e.stopPropagation()}>
+                        <div style={styles.modalHeader}>
+                            <h5 style={{ margin: 0, fontWeight: '600' }}>
+                                ✨ Add New Testimonial
+                            </h5>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: theme.text }}
+                            >
+                                ×
+                            </button>
+                        </div>
                         <form onSubmit={handleSubmit}>
+                            <div style={styles.modalBody}>
+                                <div className="mb-3">
+                                    <label style={styles.label}>Full Name *</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        style={styles.input}
+                                        placeholder="Enter customer name"
+                                        required
+                                    />
+                                </div>
 
-                            <div className="mb-3">
+                                <div className="mb-3">
+                                    <label style={styles.label}>Profile Image</label>
+                                    <input
+                                        type="file"
+                                        name="image"
+                                        accept="image/*"
+                                        onChange={handleChange}
+                                        style={styles.input}
+                                    />
+                                    {imagePreview && (
+                                        <div className="mt-3 text-center">
+                                            <img
+                                                src={imagePreview}
+                                                alt="Preview"
+                                                style={{
+                                                    width: '80px',
+                                                    height: '80px',
+                                                    borderRadius: '50%',
+                                                    objectFit: 'cover',
+                                                    border: `3px solid ${theme.primary}`
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
 
-                                <label className="form-label small fw-bold">
-                                    Name
-                                </label>
+                                <div className="mb-3">
+                                    <label style={styles.label}>Source</label>
+                                    <input
+                                        type="text"
+                                        name="source"
+                                        value={formData.source}
+                                        onChange={handleChange}
+                                        style={styles.input}
+                                        placeholder="e.g., Google, Facebook, TripAdvisor"
+                                    />
+                                </div>
 
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    className="form-control"
-                                    style={{
-                                        backgroundColor: isDarkMode ? '#1a1a2e' : '#fff',
-                                        color: theme.text,
-                                        borderColor: theme.border
-                                    }}
-                                    required
-                                />
-
-                            </div>
-
-                            <div className="mb-3">
-
-                                <label className="form-label small fw-bold">
-                                    Image
-                                </label>
-
-                                <input
-                                    type="file"
-                                    name="image"
-                                    accept="image/*"
-                                    onChange={handleChange}
-                                    className="form-control"
-                                    style={{
-                                        backgroundColor: isDarkMode ? '#1a1a2e' : '#fff',
-                                        color: theme.text,
-                                        borderColor: theme.border
-                                    }}
-                                />
-
-                                {imagePreview && (
-
+                                <div className="mb-3">
+                                    <label style={styles.label}>Rating (1-5 stars)</label>
+                                    <input
+                                        type="number"
+                                        name="stars"
+                                        min="1"
+                                        max="5"
+                                        value={formData.stars}
+                                        onChange={handleChange}
+                                        style={styles.input}
+                                        required
+                                    />
                                     <div className="mt-2">
-
-                                        <img
-                                            src={imagePreview}
-                                            alt="Preview"
-                                            style={{
-                                                width: '80px',
-                                                height: '80px',
-                                                borderRadius: '50%',
-                                                objectFit: 'cover',
-                                                border: `2px solid #9a55ff`
-                                            }}
-                                        />
-
+                                        {renderStars(formData.stars)}
                                     </div>
+                                </div>
 
-                                )}
-
+                                <div className="mb-4">
+                                    <label style={styles.label}>Review Text *</label>
+                                    <textarea
+                                        name="text"
+                                        value={formData.text}
+                                        onChange={handleChange}
+                                        rows="4"
+                                        style={{...styles.input, resize: 'vertical'}}
+                                        placeholder="Write the customer's review..."
+                                        required
+                                    />
+                                </div>
                             </div>
-
-                            <div className="mb-3">
-
-                                <label className="form-label small fw-bold">
-                                    Source
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="source"
-                                    value={formData.source}
-                                    onChange={handleChange}
-                                    placeholder="e.g. Google"
-                                    className="form-control"
-                                    style={{
-                                        backgroundColor: isDarkMode ? '#1a1a2e' : '#fff',
-                                        color: theme.text,
-                                        borderColor: theme.border
-                                    }}
-                                />
-
-                            </div>
-
-                            <div className="mb-3">
-
-                                <label className="form-label small fw-bold">
-                                    Stars (1-5)
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="stars"
-                                    min="1"
-                                    max="5"
-                                    value={formData.stars}
-                                    onChange={handleChange}
-                                    className="form-control"
-                                    style={{
-                                        backgroundColor: isDarkMode ? '#1a1a2e' : '#fff',
-                                        color: theme.text,
-                                        borderColor: theme.border
-                                    }}
-                                />
-
-                            </div>
-
-                            <div className="mb-4">
-
-                                <label className="form-label small fw-bold">
-                                    Review Text
-                                </label>
-
-                                <textarea
-                                    name="text"
-                                    value={formData.text}
-                                    onChange={handleChange}
-                                    rows="4"
-                                    className="form-control"
-                                    style={{
-                                        backgroundColor: isDarkMode ? '#1a1a2e' : '#fff',
-                                        color: theme.text,
-                                        borderColor: theme.border
-                                    }}
-                                    required
-                                ></textarea>
-
-                            </div>
-
-                            <div className="d-flex gap-2">
-
-                                <button
-                                    type="submit"
-                                    className="btn text-white w-100"
-                                    style={{ background: '#9a55ff' }}
-                                >
-                                    Save Testimonial
-                                </button>
-
+                            <div style={styles.modalFooter}>
                                 <button
                                     type="button"
-                                    className="btn btn-light w-100"
-                                    onClick={() => {
-                                        setShowModal(false);
-                                        setImagePreview(null);
-                                    }}
+                                    onClick={() => setShowModal(false)}
+                                    style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
                                 >
                                     Cancel
                                 </button>
-
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                >
+                                    {submitting ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        'Save Testimonial'
+                                    )}
+                                </button>
                             </div>
-
                         </form>
-
                     </div>
-
                 </div>
-
             )}
 
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
+                    <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
+                        <div style={styles.modalHeader}>
+                            <h5 style={{ margin: 0, fontWeight: '600' }}>Confirm Delete</h5>
+                            <button onClick={() => setDeleteConfirm(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                        </div>
+                        <div style={styles.modalBody}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+                                <p>Are you sure you want to delete testimonial from <strong>{deleteConfirm.name}</strong>?</p>
+                                <p style={{ fontSize: '13px', color: theme.textLight }}>This action cannot be undone.</p>
+                            </div>
+                        </div>
+                        <div style={styles.modalFooter}>
+                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
+                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -15,7 +15,21 @@ import king5 from '../image/section/Blog/Blog_image-6.webp';
 import king6 from '../image/section/Blog/Blog_image-7.webp';
 
 const fallbackImages = [king1, king2, king3, king4, king5, king6];
-const API_BASE_URL = 'http://localhost:8000/api';
+
+// Use environment variables for API URLs
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = import.meta.env.API_URL;
+
+// Helper function to get full image URL
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  const cleanPath = imagePath.replace(/^\/storage\/storage\//, '/storage/');
+  if (cleanPath.startsWith('/storage/')) {
+    return `${API_URL}${cleanPath}`;
+  }
+  return `${API_URL}/storage/${cleanPath}`;
+};
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -33,6 +47,16 @@ const BlogDetails = () => {
         if (response.data.status === true) {
           const blog = response.data.data;
           
+          // Parse sections if it's a string
+          let sections = blog.sections;
+          if (typeof sections === 'string') {
+            try {
+              sections = JSON.parse(sections);
+            } catch (e) {
+              sections = [];
+            }
+          }
+          
           // Format the blog data
           const formattedBlog = {
             id: blog.id,
@@ -42,14 +66,14 @@ const BlogDetails = () => {
             author: blog.author,
             category: blog.category,
             date: blog.created_at ? new Date(blog.created_at).toLocaleDateString() : '2024-01-01',
-            img: blog.image ? `http://localhost:8000/storage/${blog.image}` : fallbackImages[blog.id % fallbackImages.length],
+            img: blog.image ? getImageUrl(blog.image) : fallbackImages[blog.id % fallbackImages.length],
             readTime: blog.read_time || '5 min read',
             views: blog.views || 0,
             likes: blog.likes || 0,
             status: blog.status,
             content: {
               introduction: blog.introduction || '',
-              sections: blog.sections || [],
+              sections: sections || [],
               conclusion: blog.conclusion || ''
             }
           };

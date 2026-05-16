@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Header = ({ theme, isDarkMode, toggleDarkMode, toggleSidebar }) => {
 
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+
     const navigate = useNavigate();
 
     // ======================
@@ -10,7 +12,7 @@ const Header = ({ theme, isDarkMode, toggleDarkMode, toggleSidebar }) => {
     // ======================
     const handleLogout = async () => {
         try {
-            await fetch('http://127.0.0.1:8000/api/logout', {
+            await fetch(`${BASE_URL}/logout`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,

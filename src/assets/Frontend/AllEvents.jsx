@@ -15,8 +15,9 @@ const AllEvents = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 6;
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
-  const API_URL = 'http://127.0.0.1:8000';
+  // Use environment variables for API URLs
+  const API_BASE = import.meta.env.VITE_BASE_URL;
+  const API_URL = import.meta.env.API_URL;
 
   const theme = {
     isDarkMode,
@@ -65,11 +66,11 @@ const AllEvents = () => {
   // Filter events based on search and category
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.subtitle?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || 
-                           (selectedCategory === 'upcoming' && new Date(event.event_datetime) > new Date()) ||
-                           (selectedCategory === 'past' && new Date(event.event_datetime) < new Date());
+      event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.subtitle?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' ||
+      (selectedCategory === 'upcoming' && new Date(event.event_datetime) > new Date()) ||
+      (selectedCategory === 'past' && new Date(event.event_datetime) < new Date());
     return matchesSearch && matchesCategory;
   });
 
@@ -293,7 +294,7 @@ const AllEvents = () => {
   if (loading) {
     return (
       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-        <Header 
+        <Header
           theme={theme}
           isDarkMode={isDarkMode}
           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
@@ -315,7 +316,7 @@ const AllEvents = () => {
   if (error) {
     return (
       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-        <Header 
+        <Header
           theme={theme}
           isDarkMode={isDarkMode}
           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
@@ -333,7 +334,7 @@ const AllEvents = () => {
 
   return (
     <div style={styles.pageContainer}>
-      <Header 
+      <Header
         theme={theme}
         isDarkMode={isDarkMode}
         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
@@ -449,11 +450,11 @@ const AllEvents = () => {
                         </span>
                       </div>
                       <p className="event-card-description" style={styles.eventCardDescription}>
-                        {event.description ? 
-                          (event.description.length > 100 ? 
-                            `${event.description.substring(0, 100)}...` : 
+                        {event.description ?
+                          (event.description.length > 100 ?
+                            `${event.description.substring(0, 100)}...` :
                             event.description
-                          ) : 
+                          ) :
                           'Experience an unforgettable event with premium services and world-class hospitality.'
                         }
                       </p>

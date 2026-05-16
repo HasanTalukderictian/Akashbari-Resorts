@@ -10,6 +10,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+
   const navigate = useNavigate();
 
   // ২. লগইন ফাংশন
@@ -19,7 +21,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
+      const response = await axios.post(`${BASE_URL}/login`, {
         email: email,
         password: password
       });

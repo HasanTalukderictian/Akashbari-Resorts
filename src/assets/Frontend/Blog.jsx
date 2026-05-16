@@ -14,7 +14,8 @@ import king5 from '../image/section/Blog/Blog_image-6.webp';
 import king6 from '../image/section/Blog/Blog_image-7.webp';
 
 // API Base URL
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = import.meta.env.API_URL;
 
 // Fallback images array
 const fallbackImages = [king1, king2, king3, king4, king5, king6];
@@ -45,7 +46,7 @@ const Blog = () => {
           author: blog.author,
           date: blog.created_at ? new Date(blog.created_at).toLocaleDateString() : '2024-01-01',
           // Use API image or fallback image
-          img: blog.image ? `http://localhost:8000/storage/${blog.image}` : fallbackImages[index % fallbackImages.length],
+          img: blog.image ? `${API_URL}storage/${blog.image}` : fallbackImages[index % fallbackImages.length],
           // Store full data for details page
           introduction: blog.introduction,
           sections: blog.sections,

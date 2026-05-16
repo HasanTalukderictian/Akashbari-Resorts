@@ -11,12 +11,14 @@ const PackageDetails = () => {
 
     const [benefitsData, setBenefitsData] = useState(null);
     const [loading, setLoading] = useState(true);
+    
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     // API থেকে বেনিফিট ডাটা ফেচ করা
     useEffect(() => {
         const fetchBenefits = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/get-investment-benefits');
+                const response = await fetch(`${BASE_URL}/get-investment-benefits`);
                 const result = await response.json();
                 if (result.status) {
                     // API থেকে প্রথম অবজেক্টটি নেওয়া হচ্ছে

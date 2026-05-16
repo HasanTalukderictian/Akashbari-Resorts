@@ -13,7 +13,7 @@ const OwnerBenefit = ({ theme }) => {
     const [formData, setFormData] = useState({ id: '', title: '', desc: '' });
     const [isEditing, setIsEditing] = useState(false);
 
-    const API_BASE = "http://127.0.0.1:8000/api";
+    const API_BASE = import.meta.env.VITE_BASE_URL;
 
     const fetchBenefits = async () => {
         try {

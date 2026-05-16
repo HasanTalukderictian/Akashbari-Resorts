@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import axios from 'axios';
 
-// Import images - CORRECTED PATHS
+// Import images
 import king1 from '../assets/image/section/Blog/Blog_image-1.webp';
 import king2 from '../assets/image/section/Blog/Blog_image-2.webp';
 import king3 from '../assets/image/section/Blog/Blog_image-3.webp';
@@ -13,7 +13,8 @@ import king5 from '../assets/image/section/Blog/Blog_image-6.webp';
 import king6 from '../assets/image/section/Blog/Blog_image-7.webp';
 
 // API Base URL
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+const STORAGE_URL = import.meta.env.API_URL;
 
 const BlogSection = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -24,22 +25,41 @@ const BlogSection = ({ theme: propsTheme }) => {
     const [selectedBlog, setSelectedBlog] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(5);
+    const [itemsPerPage] = useState(6);
     const [imagePreview, setImagePreview] = useState(null);
     const [uploadedImage, setUploadedImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [blogs, setBlogs] = useState([]);
     const [editingBlog, setEditingBlog] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
-    
+
     // Theme setup
     const theme = propsTheme || {
         isDarkMode,
-        bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-        card: isDarkMode ? '#16213e' : '#ffffff',
-        text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-        border: isDarkMode ? '#2d3436' : '#ebedf2',
+        bg: isDarkMode ? '#0f0f1a' : '#f8f9fc',
+        card: isDarkMode ? '#1a1a2e' : '#ffffff',
+        text: isDarkMode ? '#e9ecef' : '#2c3e50',
+        textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
+        border: isDarkMode ? '#2d2d3d' : '#e9ecef',
+        primary: '#9a55ff',
+        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        danger: '#ef4444',
+        success: '#10b981',
+        warning: '#f59e0b',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
+    };
+
+    // Helper function for image URL
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return null;
+        if (imagePath.startsWith('http')) return imagePath;
+        if (imagePath.startsWith('/storage/')) {
+            return `${STORAGE_URL}${imagePath}`;
+        }
+        if (imagePath.startsWith('storage/')) {
+            return `${STORAGE_URL}/${imagePath}`;
+        }
+        return `${STORAGE_URL}/storage/${imagePath}`;
     };
 
     // New Blog Form State
@@ -134,12 +154,11 @@ const BlogSection = ({ theme: propsTheme }) => {
         }
     };
 
-    // Load blogs on component mount
     useEffect(() => {
         fetchBlogs();
     }, []);
 
-    // Filter blogs based on search
+    // Filter blogs
     const filteredBlogs = blogs.filter(blog =>
         blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -162,20 +181,25 @@ const BlogSection = ({ theme: propsTheme }) => {
         setSelectedBlog(null);
     };
 
-    // Handle Edit Blog
     const handleEditClick = (blog) => {
         setEditingBlog(blog);
+        let sections = [];
+        try {
+            sections = typeof blog.sections === 'string' ? JSON.parse(blog.sections) : (blog.sections || [{ title: '', content: '' }]);
+        } catch (e) {
+            sections = [{ title: '', content: '' }];
+        }
         setEditBlog({
-            title: blog.title,
-            author: blog.author,
-            category: blog.category,
-            excerpt: blog.excerpt,
-            status: blog.status,
+            title: blog.title || '',
+            author: blog.author || '',
+            category: blog.category || '',
+            excerpt: blog.excerpt || '',
+            status: blog.status || 'Draft',
             introduction: blog.introduction || '',
             conclusion: blog.conclusion || '',
-            sections: blog.sections && typeof blog.sections === 'string' ? JSON.parse(blog.sections) : (blog.sections || [{ title: '', content: '' }])
+            sections: sections
         });
-        setImagePreview(blog.image ? `http://localhost:8000/storage/${blog.image}` : null);
+        setImagePreview(getImageUrl(blog.image));
         setIsEditModalOpen(true);
     };
 
@@ -219,7 +243,6 @@ const BlogSection = ({ theme: propsTheme }) => {
         setEditBlog({ ...editBlog, sections: updatedSections });
     };
 
-    // Update blog API
     const handleUpdateBlog = async () => {
         if (!editBlog.title || !editBlog.author || !editBlog.category || !editBlog.excerpt || !editBlog.introduction) {
             showToast('Please fill in all required fields!', 'error');
@@ -227,7 +250,6 @@ const BlogSection = ({ theme: propsTheme }) => {
         }
 
         setLoading(true);
-        
         try {
             const formData = new FormData();
             formData.append('title', editBlog.title);
@@ -244,9 +266,7 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
             
             const response = await axios.post(`${API_BASE_URL}/blogs/${editingBlog.id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             
             if (response.data.status === true) {
@@ -258,22 +278,19 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error updating blog:', error);
-            showToast(error.response?.data?.message || 'Error updating blog. Please try again.', 'error');
+            showToast(error.response?.data?.message || 'Error updating blog.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    // Delete blog API
     const handleDeleteBlog = async (blogId, blogTitle) => {
-        const confirmDelete = window.confirm(`Are you sure you want to delete "${blogTitle}"? This action cannot be undone.`);
-        
+        const confirmDelete = window.confirm(`Are you sure you want to delete "${blogTitle}"?`);
         if (!confirmDelete) return;
         
         setLoading(true);
         try {
             const response = await axios.delete(`${API_BASE_URL}/blogs/${blogId}`);
-            
             if (response.data.status === true) {
                 showToast('Blog deleted successfully!', 'success');
                 fetchBlogs();
@@ -282,7 +299,7 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error deleting blog:', error);
-            showToast('Error deleting blog. Please try again.', 'error');
+            showToast('Error deleting blog.', 'error');
         } finally {
             setLoading(false);
         }
@@ -317,11 +334,9 @@ const BlogSection = ({ theme: propsTheme }) => {
                 showToast('Image size should be less than 5MB', 'error');
                 return;
             }
+            setUploadedImage(file);
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-                setUploadedImage(file);
-            };
+            reader.onloadend = () => setImagePreview(reader.result);
             reader.readAsDataURL(file);
         }
     };
@@ -349,7 +364,6 @@ const BlogSection = ({ theme: propsTheme }) => {
         setNewBlog({ ...newBlog, sections: updatedSections });
     };
 
-    // Submit blog to API
     const handleSubmitBlog = async () => {
         if (!newBlog.title || !newBlog.author || !newBlog.category || !newBlog.excerpt || !newBlog.introduction) {
             showToast('Please fill in all required fields!', 'error');
@@ -357,7 +371,6 @@ const BlogSection = ({ theme: propsTheme }) => {
         }
 
         setLoading(true);
-        
         try {
             const formData = new FormData();
             formData.append('title', newBlog.title);
@@ -374,9 +387,7 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
             
             const response = await axios.post(`${API_BASE_URL}/blogs`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             
             if (response.data.status === true) {
@@ -388,7 +399,7 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error adding blog:', error);
-            showToast(error.response?.data?.message || 'Error adding blog post. Please try again.', 'error');
+            showToast(error.response?.data?.message || 'Error adding blog post.', 'error');
         } finally {
             setLoading(false);
         }
@@ -397,7 +408,13 @@ const BlogSection = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    // Styles with improved design
+    // Statistics
+    const totalBlogs = blogs.length;
+    const publishedBlogs = blogs.filter(b => b.status === 'Published').length;
+    const draftBlogs = blogs.filter(b => b.status === 'Draft').length;
+    const totalViews = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
+
+    // Styles
     const styles = {
         container: { 
             backgroundColor: theme.bg, 
@@ -418,59 +435,58 @@ const BlogSection = ({ theme: propsTheme }) => {
         },
         contentScroll: { 
             flex: '1 0 auto', 
-            padding: '24px' 
+            padding: '30px' 
         },
-        footerWrapper: { 
-            flexShrink: 0 
-        },
-        headerSection: {
-            marginBottom: '32px'
+        pageHeader: {
+            marginBottom: '30px'
         },
         pageTitle: {
-            color: theme.text,
             fontSize: '28px',
-            fontWeight: '600',
+            fontWeight: '700',
+            background: theme.primaryGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
             marginBottom: '8px'
         },
         pageSubtitle: {
-            color: theme.text,
-            opacity: 0.7,
+            color: theme.textLight,
             fontSize: '14px'
         },
         statsContainer: {
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '20px',
-            marginBottom: '32px',
-            flexWrap: 'wrap'
+            marginBottom: '30px'
         },
         statCard: {
             backgroundColor: theme.card,
-            borderRadius: '12px',
+            borderRadius: '16px',
             padding: '20px',
-            flex: '1',
-            minWidth: '200px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             border: `1px solid ${theme.border}`,
-            transition: 'transform 0.2s, box-shadow 0.2s'
-        },
-        statCardHover: {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
         },
         statIcon: {
-            fontSize: '32px',
+            width: '45px',
+            height: '45px',
+            borderRadius: '12px',
+            background: theme.primaryGradient,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '22px',
             marginBottom: '12px'
         },
         statValue: {
-            fontSize: '28px',
+            fontSize: '24px',
             fontWeight: '700',
             color: theme.text,
             marginBottom: '4px'
         },
         statLabel: {
-            fontSize: '14px',
-            color: theme.text,
-            opacity: 0.7
+            fontSize: '13px',
+            color: theme.textLight,
+            fontWeight: '500'
         },
         toolbar: {
             display: 'flex',
@@ -481,8 +497,8 @@ const BlogSection = ({ theme: propsTheme }) => {
             gap: '16px'
         },
         searchBox: {
-            padding: '10px 16px',
-            borderRadius: '8px',
+            padding: '12px 20px',
+            borderRadius: '12px',
             border: `1px solid ${theme.border}`,
             backgroundColor: theme.card,
             color: theme.text,
@@ -492,158 +508,169 @@ const BlogSection = ({ theme: propsTheme }) => {
             transition: 'all 0.3s'
         },
         addBtn: {
-            backgroundColor: '#28a745',
+            background: theme.primaryGradient,
             color: 'white',
             border: 'none',
-            padding: '10px 24px',
-            borderRadius: '8px',
+            padding: '12px 28px',
+            borderRadius: '12px',
             cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             transition: 'all 0.3s',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
         },
-        table: {
-            width: '100%',
-            borderCollapse: 'collapse',
+        blogsGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+            gap: '24px',
+            marginBottom: '30px'
+        },
+        blogCard: {
             backgroundColor: theme.card,
-            borderRadius: '12px',
+            borderRadius: '20px',
             overflow: 'hidden',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-        },
-        th: {
-            backgroundColor: theme.isDarkMode ? '#0f3460' : '#f8f9fa',
-            padding: '16px',
-            textAlign: 'left',
-            color: theme.text,
-            fontWeight: '600',
-            fontSize: '14px',
-            borderBottom: `2px solid ${theme.border}`
-        },
-        td: {
-            padding: '16px',
-            color: theme.text,
-            borderBottom: `1px solid ${theme.border}`,
-            fontSize: '14px'
+            border: `1px solid ${theme.border}`,
+            transition: 'all 0.3s ease',
+            position: 'relative'
         },
         blogImage: {
-            width: '50px',
-            height: '50px',
-            borderRadius: '8px',
-            objectFit: 'cover'
+            width: '100%',
+            height: '200px',
+            objectFit: 'cover',
+            transition: 'transform 0.5s ease'
+        },
+        cardContent: {
+            padding: '20px'
         },
         blogTitle: {
-            fontWeight: '600',
-            marginBottom: '4px'
+            fontSize: '18px',
+            fontWeight: '700',
+            color: theme.text,
+            marginBottom: '8px',
+            lineHeight: '1.4'
         },
-        blogExcerpt: {
+        blogMeta: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '12px',
             fontSize: '12px',
-            opacity: 0.7
+            color: theme.textLight
         },
         categoryBadge: {
-            backgroundColor: theme.isDarkMode ? '#2d3436' : '#e9ecef',
+            backgroundColor: `${theme.primary}15`,
+            color: theme.primary,
             padding: '4px 12px',
             borderRadius: '20px',
-            fontSize: '12px',
+            fontSize: '11px',
+            fontWeight: '600',
             display: 'inline-block'
         },
         statusBadge: (status) => ({
             display: 'inline-block',
             padding: '4px 12px',
             borderRadius: '20px',
-            fontSize: '12px',
+            fontSize: '11px',
             fontWeight: '600',
-            backgroundColor: status === 'Published' ? '#d4edda' : '#fff3cd',
-            color: status === 'Published' ? '#155724' : '#856404'
+            backgroundColor: status === 'Published' ? `${theme.success}20` : `${theme.warning}20`,
+            color: status === 'Published' ? theme.success : theme.warning
         }),
-        actionButtons: {
+        blogExcerpt: {
+            fontSize: '13px',
+            color: theme.textLight,
+            lineHeight: '1.5',
+            marginBottom: '16px'
+        },
+        cardActions: {
             display: 'flex',
-            gap: '8px',
-            flexWrap: 'wrap'
+            gap: '10px',
+            paddingTop: '16px',
+            borderTop: `1px solid ${theme.border}`
+        },
+        actionBtn: {
+            flex: 1,
+            padding: '8px',
+            borderRadius: '10px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            fontSize: '13px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
         },
         viewBtn: {
-            backgroundColor: '#ffc107',
-            color: '#000',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: '500',
-            transition: 'all 0.3s'
+            backgroundColor: `${theme.warning}20`,
+            color: theme.warning
         },
         editBtn: {
-            backgroundColor: '#17a2b8',
-            color: 'white',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: '500',
-            transition: 'all 0.3s'
+            backgroundColor: `${theme.primary}20`,
+            color: theme.primary
         },
         deleteBtn: {
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: '500',
-            transition: 'all 0.3s'
+            backgroundColor: `${theme.danger}20`,
+            color: theme.danger
         },
         pagination: {
             display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
             gap: '8px',
-            marginTop: '32px',
-            marginBottom: '24px'
+            marginTop: '20px'
         },
         pageBtn: {
-            padding: '8px 12px',
-            borderRadius: '6px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
             border: `1px solid ${theme.border}`,
             backgroundColor: theme.card,
             color: theme.text,
             cursor: 'pointer',
             transition: 'all 0.3s',
-            minWidth: '40px'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
         },
         activePage: {
-            backgroundColor: '#ffc107',
-            color: '#000',
-            borderColor: '#ffc107'
+            background: theme.primaryGradient,
+            color: 'white',
+            border: 'none'
+        },
+        emptyState: {
+            textAlign: 'center',
+            padding: '60px',
+            color: theme.textLight
+        },
+        loadingSpinner: {
+            textAlign: 'center',
+            padding: '60px',
+            color: theme.textLight
         },
         modalOverlay: {
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)',
             display: 'flex',
-            justifyContent: 'center',
             alignItems: 'center',
-            zIndex: 1000,
-            animation: 'fadeIn 0.3s ease'
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(8px)'
         },
         modal: {
             backgroundColor: theme.card,
-            borderRadius: '16px',
-            maxWidth: '800px',
-            width: '90%',
+            borderRadius: '24px',
+            width: '800px',
+            maxWidth: '90%',
             maxHeight: '90vh',
-            overflowY: 'auto',
-            position: 'relative',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-            animation: 'slideUp 0.3s ease'
+            overflowY: 'auto'
         },
         modalHeader: {
-            padding: '20px 24px',
+            padding: '24px',
             borderBottom: `1px solid ${theme.border}`,
             display: 'flex',
             justifyContent: 'space-between',
@@ -656,75 +683,49 @@ const BlogSection = ({ theme: propsTheme }) => {
         modalBody: {
             padding: '24px'
         },
+        modalFooter: {
+            padding: '20px 24px',
+            borderTop: `1px solid ${theme.border}`,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px'
+        },
         closeBtn: {
             background: 'none',
             border: 'none',
             fontSize: '28px',
             cursor: 'pointer',
-            color: theme.text,
-            padding: '0',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            transition: 'all 0.3s'
+            color: theme.text
         },
         input: {
             width: '100%',
-            padding: '10px 12px',
-            borderRadius: '8px',
+            padding: '10px 14px',
+            borderRadius: '10px',
             border: `1px solid ${theme.border}`,
             backgroundColor: theme.bg,
             color: theme.text,
-            marginBottom: '16px',
             fontSize: '14px',
             outline: 'none',
             transition: 'all 0.3s'
         },
         textarea: {
             width: '100%',
-            padding: '10px 12px',
-            borderRadius: '8px',
+            padding: '10px 14px',
+            borderRadius: '10px',
             border: `1px solid ${theme.border}`,
             backgroundColor: theme.bg,
             color: theme.text,
-            marginBottom: '16px',
-            minHeight: '80px',
             fontSize: '14px',
             outline: 'none',
-            transition: 'all 0.3s'
+            resize: 'vertical',
+            minHeight: '80px'
         },
         label: {
             display: 'block',
             marginBottom: '8px',
-            color: theme.text,
-            fontWeight: '500',
-            fontSize: '14px'
-        },
-        submitBtn: {
-            backgroundColor: '#28a745',
-            color: 'white',
-            border: 'none',
-            padding: '10px 24px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            marginRight: '12px',
-            transition: 'all 0.3s'
-        },
-        cancelBtn: {
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '10px 24px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            transition: 'all 0.3s'
+            fontWeight: '600',
+            fontSize: '13px',
+            color: theme.text
         },
         imageUploadArea: {
             border: `2px dashed ${theme.border}`,
@@ -732,65 +733,37 @@ const BlogSection = ({ theme: propsTheme }) => {
             padding: '20px',
             textAlign: 'center',
             cursor: 'pointer',
-            marginBottom: '16px',
             transition: 'all 0.3s',
             backgroundColor: theme.bg
         },
         imagePreview: {
             maxWidth: '100%',
             maxHeight: '200px',
-            borderRadius: '8px',
-            marginBottom: '16px',
+            borderRadius: '12px',
+            marginBottom: '12px',
             objectFit: 'cover'
         },
         sectionCard: {
-            marginBottom: '20px',
+            marginBottom: '16px',
             padding: '16px',
             border: `1px solid ${theme.border}`,
             borderRadius: '12px',
             backgroundColor: theme.bg
-        },
-        loadingSpinner: {
-            textAlign: 'center',
-            padding: '50px',
-            color: theme.text
-        },
-        emptyState: {
-            textAlign: 'center',
-            padding: '60px',
-            color: theme.text
         },
         toast: {
             position: 'fixed',
             bottom: '20px',
             right: '20px',
             padding: '12px 20px',
-            borderRadius: '8px',
+            borderRadius: '10px',
             color: 'white',
             zIndex: 2000,
             animation: 'slideInRight 0.3s ease'
         }
     };
 
-    // Calculate statistics
-    const totalBlogs = blogs.length;
-    const publishedBlogs = blogs.filter(b => b.status === 'Published').length;
-    const draftBlogs = blogs.filter(b => b.status === 'Draft').length;
-    const totalViews = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
-
-    if (loading && blogs.length === 0) {
-        return (
-            <div style={styles.loadingSpinner}>
-                <div className="spinner-border text-warning" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-                <p style={{ marginTop: '16px' }}>Loading blogs...</p>
-            </div>
-        );
-    }
-
     return (
-        <div style={styles.container} className="container-fluid p-0">
+        <div style={styles.container}>
             <style>
                 {`
                     @keyframes fadeIn {
@@ -798,7 +771,7 @@ const BlogSection = ({ theme: propsTheme }) => {
                         to { opacity: 1; }
                     }
                     @keyframes slideUp {
-                        from { transform: translateY(50px); opacity: 0; }
+                        from { transform: translateY(30px); opacity: 0; }
                         to { transform: translateY(0); opacity: 1; }
                     }
                     @keyframes slideInRight {
@@ -806,17 +779,29 @@ const BlogSection = ({ theme: propsTheme }) => {
                         to { transform: translateX(0); opacity: 1; }
                     }
                     .stat-card:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        transform: translateY(-4px);
+                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                    }
+                    .blog-card:hover {
+                        transform: translateY(-6px);
+                        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+                    }
+                    .blog-card:hover img {
+                        transform: scale(1.05);
                     }
                     button:hover {
-                        transform: translateY(-1px);
+                        transform: translateY(-2px);
                     }
-                    button:active {
-                        transform: translateY(0);
+                    .search-box:focus {
+                        border-color: #9a55ff;
+                        box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1);
+                    }
+                    .blog-card {
+                        animation: slideUp 0.3s ease;
                     }
                 `}
             </style>
+
             <div className="d-flex">
                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="users" />
 
@@ -830,13 +815,13 @@ const BlogSection = ({ theme: propsTheme }) => {
 
                     <div style={styles.contentContainer}>
                         <div style={styles.contentScroll}>
-                            {/* Header Section */}
-                            <div style={styles.headerSection}>
-                                <h2 style={styles.pageTitle}>Blog Management</h2>
-                                <p style={styles.pageSubtitle}>Manage and view all blog posts</p>
+                            {/* Header */}
+                            <div style={styles.pageHeader}>
+                                <h1 style={styles.pageTitle}>Blog Management</h1>
+                                <p style={styles.pageSubtitle}>Manage and create engaging blog content</p>
                             </div>
 
-                            {/* Statistics Cards */}
+                            {/* Statistics */}
                             <div style={styles.statsContainer}>
                                 <div className="stat-card" style={styles.statCard}>
                                     <div style={styles.statIcon}>📝</div>
@@ -866,123 +851,113 @@ const BlogSection = ({ theme: propsTheme }) => {
                                     type="text"
                                     placeholder="🔍 Search by title, author, or category..."
                                     style={styles.searchBox}
+                                    className="search-box"
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
                                 />
-                                <button 
-                                    style={styles.addBtn}
-                                    onClick={handleAddNewBlog}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#218838'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#28a745'}
-                                >
-                                    + Add New Blog
+                                <button style={styles.addBtn} onClick={handleAddNewBlog}>
+                                    <i className="bi bi-plus-circle"></i> Add New Blog
                                 </button>
                             </div>
 
-                            {/* Table */}
-                            {currentBlogs.length > 0 ? (
+                            {/* Blogs Grid */}
+                            {loading && blogs.length === 0 ? (
+                                <div style={styles.loadingSpinner}>
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p style={{ marginTop: '16px' }}>Loading blogs...</p>
+                                </div>
+                            ) : currentBlogs.length > 0 ? (
                                 <>
-                                    <div style={{ overflowX: 'auto' }}>
-                                        <table style={styles.table}>
-                                            <thead>
-                                                <tr>
-                                                    <th style={styles.th}>Image</th>
-                                                    <th style={styles.th}>Title</th>
-                                                    <th style={styles.th}>Author</th>
-                                                    <th style={styles.th}>Category</th>
-                                                    <th style={styles.th}>Date</th>
-                                                    <th style={styles.th}>Status</th>
-                                                    <th style={styles.th}>Views</th>
-                                                    <th style={styles.th}>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {currentBlogs.map((blog) => (
-                                                    <tr key={blog.id}>
-                                                        <td style={styles.td}>
-                                                            <img 
-                                                                src={blog.image ? `http://localhost:8000/storage/${blog.image}` : king1} 
-                                                                alt={blog.title}
-                                                                style={styles.blogImage}
-                                                                onError={(e) => e.target.src = king1}
-                                                            />
-                                                        </td>
-                                                        <td style={styles.td}>
-                                                            <div style={styles.blogTitle}>{blog.title}</div>
-                                                            <div style={styles.blogExcerpt}>{blog.excerpt?.substring(0, 60)}...</div>
-                                                        </td>
-                                                        <td style={styles.td}>{blog.author}</td>
-                                                        <td style={styles.td}>
-                                                            <span style={styles.categoryBadge}>
-                                                                {blog.category}
-                                                            </span>
-                                                        </td>
-                                                        <td style={styles.td}>{blog.date || blog.created_at?.split('T')[0]}</td>
-                                                        <td style={styles.td}>
-                                                            <span style={styles.statusBadge(blog.status)}>
-                                                                {blog.status}
-                                                            </span>
-                                                        </td>
-                                                        <td style={styles.td}>{blog.views?.toLocaleString() || 0}</td>
-                                                        <td style={styles.td}>
-                                                            <div style={styles.actionButtons}>
-                                                                <button 
-                                                                    style={styles.viewBtn}
-                                                                    onClick={() => handleViewDetails(blog)}
-                                                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#e0a800'}
-                                                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#ffc107'}
-                                                                >
-                                                                    View
-                                                                </button>
-                                                                <button 
-                                                                    style={styles.editBtn}
-                                                                    onClick={() => handleEditClick(blog)}
-                                                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#138496'}
-                                                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#17a2b8'}
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                                <button 
-                                                                    style={styles.deleteBtn}
-                                                                    onClick={() => handleDeleteBlog(blog.id, blog.title)}
-                                                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
-                                                                    onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                    <div style={styles.blogsGrid}>
+                                        {currentBlogs.map((blog) => (
+                                            <div key={blog.id} className="blog-card" style={styles.blogCard}>
+                                                <img 
+                                                    src={getImageUrl(blog.image) || king1} 
+                                                    alt={blog.title}
+                                                    style={styles.blogImage}
+                                                    onError={(e) => e.target.src = king1}
+                                                />
+                                                <div style={styles.cardContent}>
+                                                    <h3 style={styles.blogTitle}>{blog.title}</h3>
+                                                    <div style={styles.blogMeta}>
+                                                        <span>✍️ {blog.author}</span>
+                                                        <span>📅 {blog.date || blog.created_at?.split('T')[0]}</span>
+                                                        <span>👁️ {blog.views?.toLocaleString() || 0}</span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                                        <span style={styles.categoryBadge}>{blog.category}</span>
+                                                        <span style={styles.statusBadge(blog.status)}>{blog.status}</span>
+                                                    </div>
+                                                    <p style={styles.blogExcerpt}>
+                                                        {blog.excerpt?.substring(0, 120)}...
+                                                    </p>
+                                                    <div style={styles.cardActions}>
+                                                        <button 
+                                                            style={{...styles.actionBtn, ...styles.viewBtn}}
+                                                            onClick={() => handleViewDetails(blog)}
+                                                        >
+                                                            <i className="bi bi-eye"></i> View
+                                                        </button>
+                                                        <button 
+                                                            style={{...styles.actionBtn, ...styles.editBtn}}
+                                                            onClick={() => handleEditClick(blog)}
+                                                        >
+                                                            <i className="bi bi-pencil"></i> Edit
+                                                        </button>
+                                                        <button 
+                                                            style={{...styles.actionBtn, ...styles.deleteBtn}}
+                                                            onClick={() => handleDeleteBlog(blog.id, blog.title)}
+                                                        >
+                                                            <i className="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
 
                                     {/* Pagination */}
                                     {totalPages > 1 && (
                                         <div style={styles.pagination}>
-                                            <button 
+                                            <button
                                                 style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
-                                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                                 disabled={currentPage === 1}
                                             >
                                                 ←
                                             </button>
-                                            {[...Array(totalPages)].map((_, index) => (
-                                                <button
-                                                    key={index}
-                                                    style={{
-                                                        ...styles.pageBtn,
-                                                        ...(currentPage === index + 1 && styles.activePage)
-                                                    }}
-                                                    onClick={() => setCurrentPage(index + 1)}
-                                                >
-                                                    {index + 1}
-                                                </button>
-                                            ))}
-                                            <button 
+                                            {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+                                                let pageNum;
+                                                if (totalPages <= 5) {
+                                                    pageNum = i + 1;
+                                                } else if (currentPage <= 3) {
+                                                    pageNum = i + 1;
+                                                } else if (currentPage >= totalPages - 2) {
+                                                    pageNum = totalPages - 4 + i;
+                                                } else {
+                                                    pageNum = currentPage - 2 + i;
+                                                }
+                                                return (
+                                                    <button
+                                                        key={i}
+                                                        style={{
+                                                            ...styles.pageBtn,
+                                                            ...(currentPage === pageNum && styles.activePage)
+                                                        }}
+                                                        onClick={() => setCurrentPage(pageNum)}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+                                            <button
                                                 style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
-                                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                                 disabled={currentPage === totalPages}
                                             >
                                                 →
@@ -993,35 +968,35 @@ const BlogSection = ({ theme: propsTheme }) => {
                             ) : (
                                 <div style={styles.emptyState}>
                                     <div style={{ fontSize: '64px', marginBottom: '16px' }}>📭</div>
-                                    <p>No blog posts found matching your search.</p>
-                                    <button 
-                                        style={styles.addBtn}
-                                        onClick={handleAddNewBlog}
-                                    >
-                                        + Create First Blog
-                                    </button>
+                                    <h4>No Blog Posts Found</h4>
+                                    <p style={{ marginBottom: '20px' }}>
+                                        {searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first blog post'}
+                                    </p>
+                                    {!searchTerm && (
+                                        <button style={styles.addBtn} onClick={handleAddNewBlog}>
+                                            <i className="bi bi-plus-circle"></i> Create First Blog
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
 
-                        <div style={styles.footerWrapper}>
-                            <Footer theme={theme} />
-                        </div>
+                        <Footer theme={theme} />
                     </div>
                 </div>
             </div>
 
-            {/* Toast Notification */}
+            {/* Toast */}
             {toast.show && (
                 <div style={{
                     ...styles.toast,
-                    backgroundColor: toast.type === 'success' ? '#28a745' : '#dc3545'
+                    backgroundColor: toast.type === 'success' ? theme.success : theme.danger
                 }}>
                     {toast.message}
                 </div>
             )}
 
-            {/* View Details Modal */}
+            {/* View Modal */}
             {isModalOpen && selectedBlog && (
                 <div style={styles.modalOverlay} onClick={handleCloseModal}>
                     <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -1033,14 +1008,9 @@ const BlogSection = ({ theme: propsTheme }) => {
                             {selectedBlog.image && (
                                 <div style={{ marginBottom: '20px', textAlign: 'center' }}>
                                     <img 
-                                        src={selectedBlog.image.startsWith('http') ? selectedBlog.image : `http://localhost:8000/storage/${selectedBlog.image}`}
+                                        src={getImageUrl(selectedBlog.image)} 
                                         alt={selectedBlog.title}
-                                        style={{ 
-                                            maxWidth: '100%', 
-                                            maxHeight: '300px', 
-                                            borderRadius: '12px',
-                                            objectFit: 'cover'
-                                        }}
+                                        style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '12px' }}
                                         onError={(e) => e.target.src = king1}
                                     />
                                 </div>
@@ -1057,9 +1027,7 @@ const BlogSection = ({ theme: propsTheme }) => {
                                 <span>📅 {selectedBlog.date || selectedBlog.created_at?.split('T')[0]}</span>
                                 <span>✍️ {selectedBlog.author}</span>
                                 <span>📚 {selectedBlog.category}</span>
-                                <span>⏱️ {selectedBlog.read_time || '5 min read'}</span>
                                 <span>👁️ {selectedBlog.views?.toLocaleString() || 0} views</span>
-                                <span>❤️ {selectedBlog.likes || 0} likes</span>
                             </div>
                             <div style={{ 
                                 backgroundColor: theme.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa',
@@ -1076,27 +1044,18 @@ const BlogSection = ({ theme: propsTheme }) => {
                                     <p style={{ lineHeight: '1.6' }}>{selectedBlog.introduction}</p>
                                 </div>
                             )}
-                            {selectedBlog.sections && typeof selectedBlog.sections === 'string' && (
-                                (() => {
-                                    try {
-                                        const sections = JSON.parse(selectedBlog.sections);
-                                        return sections.map((section, idx) => (
-                                            <div key={idx} style={{ marginBottom: '20px' }}>
-                                                <h4 style={{ marginBottom: '8px', color: theme.text }}>{section.title}</h4>
-                                                <p style={{ lineHeight: '1.6' }}>{section.content}</p>
-                                            </div>
-                                        ));
-                                    } catch(e) {
-                                        return null;
-                                    }
-                                })()
-                            )}
-                            {selectedBlog.sections && Array.isArray(selectedBlog.sections) && selectedBlog.sections.map((section, idx) => (
-                                <div key={idx} style={{ marginBottom: '20px' }}>
-                                    <h4 style={{ marginBottom: '8px', color: theme.text }}>{section.title}</h4>
-                                    <p style={{ lineHeight: '1.6' }}>{section.content}</p>
-                                </div>
-                            ))}
+                            {(() => {
+                                let sections = [];
+                                try {
+                                    sections = typeof selectedBlog.sections === 'string' ? JSON.parse(selectedBlog.sections) : (selectedBlog.sections || []);
+                                } catch(e) { sections = []; }
+                                return sections.map((section, idx) => (
+                                    <div key={idx} style={{ marginBottom: '20px' }}>
+                                        <h4 style={{ marginBottom: '8px', color: theme.text }}>{section.title}</h4>
+                                        <p style={{ lineHeight: '1.6' }}>{section.content}</p>
+                                    </div>
+                                ));
+                            })()}
                             {selectedBlog.conclusion && (
                                 <div style={{ 
                                     marginTop: '20px',
@@ -1113,7 +1072,7 @@ const BlogSection = ({ theme: propsTheme }) => {
                 </div>
             )}
 
-            {/* Add New Blog Modal */}
+            {/* Add Modal */}
             {isAddModalOpen && (
                 <div style={styles.modalOverlay} onClick={handleCloseAddModal}>
                     <div style={{...styles.modal, maxWidth: '900px'}} onClick={(e) => e.stopPropagation()}>
@@ -1123,17 +1082,10 @@ const BlogSection = ({ theme: propsTheme }) => {
                         </div>
                         <div style={styles.modalBody}>
                             <form onSubmit={(e) => { e.preventDefault(); handleSubmitBlog(); }}>
-                                <div className="row">
+                                <div className="row g-3">
                                     <div className="col-12">
                                         <label style={styles.label}>Featured Image</label>
-                                        <div style={styles.imageUploadArea}>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageUpload}
-                                                style={{ display: 'none' }}
-                                                id="imageUpload"
-                                            />
+                                        <div style={styles.imageUploadArea} onClick={() => document.getElementById('imageUpload').click()}>
                                             {imagePreview ? (
                                                 <div>
                                                     <img src={imagePreview} alt="Preview" style={styles.imagePreview} />
@@ -1143,15 +1095,15 @@ const BlogSection = ({ theme: propsTheme }) => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div onClick={() => document.getElementById('imageUpload').click()}>
+                                                <div>
                                                     <div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div>
                                                     <p>Click to upload an image</p>
-                                                    <p style={{ fontSize: '12px', opacity: 0.7 }}>Max size: 5MB</p>
+                                                    <p style={{ fontSize: '12px', color: theme.textLight }}>Max size: 5MB</p>
                                                 </div>
                                             )}
+                                            <input id="imageUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
                                         </div>
                                     </div>
-
                                     <div className="col-md-6">
                                         <label style={styles.label}>Title *</label>
                                         <input type="text" name="title" style={styles.input} value={newBlog.title} onChange={handleInputChange} required />
@@ -1194,24 +1146,11 @@ const BlogSection = ({ theme: propsTheme }) => {
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                                                     <h5 style={{ margin: 0, color: theme.text }}>Section {index + 1}</h5>
                                                     {index > 0 && (
-                                                        <button type="button" onClick={() => removeSection(index)} style={styles.deleteBtn}>
-                                                            Remove
-                                                        </button>
+                                                        <button type="button" onClick={() => removeSection(index)} style={styles.deleteBtn}>Remove</button>
                                                     )}
                                                 </div>
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="Section Title" 
-                                                    style={styles.input} 
-                                                    value={section.title} 
-                                                    onChange={(e) => handleSectionChange(index, 'title', e.target.value)} 
-                                                />
-                                                <textarea 
-                                                    placeholder="Section Content" 
-                                                    style={styles.textarea} 
-                                                    value={section.content} 
-                                                    onChange={(e) => handleSectionChange(index, 'content', e.target.value)} 
-                                                />
+                                                <input type="text" placeholder="Section Title" style={styles.input} value={section.title} onChange={(e) => handleSectionChange(index, 'title', e.target.value)} />
+                                                <textarea placeholder="Section Content" style={styles.textarea} value={section.content} onChange={(e) => handleSectionChange(index, 'content', e.target.value)} />
                                             </div>
                                         ))}
                                         <button type="button" onClick={addSection} style={styles.editBtn}>+ Add Section</button>
@@ -1221,9 +1160,9 @@ const BlogSection = ({ theme: propsTheme }) => {
                                         <textarea name="conclusion" style={styles.textarea} value={newBlog.conclusion} onChange={handleInputChange} />
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
-                                    <button type="button" style={styles.cancelBtn} onClick={handleCloseAddModal}>Cancel</button>
-                                    <button type="submit" style={styles.submitBtn} disabled={loading}>
+                                <div style={styles.modalFooter}>
+                                    <button type="button" onClick={handleCloseAddModal} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
+                                    <button type="submit" style={{...styles.addBtn, padding: '10px 32px'}} disabled={loading}>
                                         {loading ? 'Submitting...' : 'Submit Blog'}
                                     </button>
                                 </div>
@@ -1233,7 +1172,7 @@ const BlogSection = ({ theme: propsTheme }) => {
                 </div>
             )}
 
-            {/* Edit Blog Modal */}
+            {/* Edit Modal */}
             {isEditModalOpen && editingBlog && (
                 <div style={styles.modalOverlay} onClick={handleCloseEditModal}>
                     <div style={{...styles.modal, maxWidth: '900px'}} onClick={(e) => e.stopPropagation()}>
@@ -1243,17 +1182,10 @@ const BlogSection = ({ theme: propsTheme }) => {
                         </div>
                         <div style={styles.modalBody}>
                             <form onSubmit={(e) => { e.preventDefault(); handleUpdateBlog(); }}>
-                                <div className="row">
+                                <div className="row g-3">
                                     <div className="col-12">
                                         <label style={styles.label}>Featured Image</label>
-                                        <div style={styles.imageUploadArea}>
-                                            <input 
-                                                type="file" 
-                                                accept="image/*" 
-                                                onChange={handleImageUpload} 
-                                                style={{ display: 'none' }} 
-                                                id="editImageUpload" 
-                                            />
+                                        <div style={styles.imageUploadArea} onClick={() => document.getElementById('editImageUpload').click()}>
                                             {imagePreview ? (
                                                 <div>
                                                     <img src={imagePreview} alt="Preview" style={styles.imagePreview} />
@@ -1263,15 +1195,15 @@ const BlogSection = ({ theme: propsTheme }) => {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div onClick={() => document.getElementById('editImageUpload').click()}>
+                                                <div>
                                                     <div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div>
                                                     <p>Click to upload an image</p>
-                                                    <p style={{ fontSize: '12px', opacity: 0.7 }}>Max size: 5MB</p>
+                                                    <p style={{ fontSize: '12px', color: theme.textLight }}>Max size: 5MB</p>
                                                 </div>
                                             )}
+                                            <input id="editImageUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
                                         </div>
                                     </div>
-
                                     <div className="col-md-6">
                                         <label style={styles.label}>Title *</label>
                                         <input type="text" name="title" style={styles.input} value={editBlog.title} onChange={handleEditInputChange} required />
@@ -1314,24 +1246,11 @@ const BlogSection = ({ theme: propsTheme }) => {
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                                                     <h5 style={{ margin: 0, color: theme.text }}>Section {index + 1}</h5>
                                                     {index > 0 && (
-                                                        <button type="button" onClick={() => removeEditSection(index)} style={styles.deleteBtn}>
-                                                            Remove
-                                                        </button>
+                                                        <button type="button" onClick={() => removeEditSection(index)} style={styles.deleteBtn}>Remove</button>
                                                     )}
                                                 </div>
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="Section Title" 
-                                                    style={styles.input} 
-                                                    value={section.title} 
-                                                    onChange={(e) => handleEditSectionChange(index, 'title', e.target.value)} 
-                                                />
-                                                <textarea 
-                                                    placeholder="Section Content" 
-                                                    style={styles.textarea} 
-                                                    value={section.content} 
-                                                    onChange={(e) => handleEditSectionChange(index, 'content', e.target.value)} 
-                                                />
+                                                <input type="text" placeholder="Section Title" style={styles.input} value={section.title} onChange={(e) => handleEditSectionChange(index, 'title', e.target.value)} />
+                                                <textarea placeholder="Section Content" style={styles.textarea} value={section.content} onChange={(e) => handleEditSectionChange(index, 'content', e.target.value)} />
                                             </div>
                                         ))}
                                         <button type="button" onClick={addEditSection} style={styles.editBtn}>+ Add Section</button>
@@ -1341,9 +1260,9 @@ const BlogSection = ({ theme: propsTheme }) => {
                                         <textarea name="conclusion" style={styles.textarea} value={editBlog.conclusion} onChange={handleEditInputChange} />
                                     </div>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
-                                    <button type="button" style={styles.cancelBtn} onClick={handleCloseEditModal}>Cancel</button>
-                                    <button type="submit" style={styles.submitBtn} disabled={loading}>
+                                <div style={styles.modalFooter}>
+                                    <button type="button" onClick={handleCloseEditModal} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
+                                    <button type="submit" style={{...styles.addBtn, padding: '10px 32px'}} disabled={loading}>
                                         {loading ? 'Updating...' : 'Update Blog'}
                                     </button>
                                 </div>

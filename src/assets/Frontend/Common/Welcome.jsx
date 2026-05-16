@@ -8,19 +8,20 @@ const Welcome = () => {
   const [features, setFeatures] = useState([]);
   const [welcomeData, setWelcomeData] = useState(null); // Left side data state
   const [loading, setLoading] = useState(true);
-
+  
+  const API_BASE_URL = import.meta.env.VITE_BASE_URL;
   // Fetching data from APIs
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetching Left Side (Welcome) Data
-        const welcomeRes = await axios.get('http://127.0.0.1:8000/api/get-welcomes');
+        const welcomeRes = await axios.get(`${API_BASE_URL}/get-welcomes`);
         if (welcomeRes.data.success && welcomeRes.data.data.length > 0) {
           setWelcomeData(welcomeRes.data.data[0]);
         }
 
         // Fetching Right Side (Features) Data
-        const featuresRes = await axios.get('http://127.0.0.1:8000/api/get-about-features');
+        const featuresRes = await axios.get(`${API_BASE_URL}/get-about-features`);
         if (featuresRes.data.status === "success") {
           setFeatures(featuresRes.data.data[0].details);
         }

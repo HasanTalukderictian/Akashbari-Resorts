@@ -8,6 +8,10 @@ const Investment = ({ theme }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const itemsPerPage = 6;
     
     // ডাটা স্টেট
     const [packages, setPackages] = useState([]);
@@ -25,7 +29,7 @@ const Investment = ({ theme }) => {
     });
     const [isEditing, setIsEditing] = useState(false);
 
-    const API_BASE = "http://127.0.0.1:8000/api";
+    const API_BASE = import.meta.env.VITE_BASE_URL;
 
     // ১. ডাটা ফেচ করা
     const fetchPackages = async () => {
@@ -47,18 +51,17 @@ const Investment = ({ theme }) => {
         fetchPackages();
     }, []);
 
-    // ২. অ্যাড এবং এডিট হ্যান্ডলার (আপনার দেয়া রাউট অনুযায়ী)
+    // ২. অ্যাড এবং এডিট হ্যান্ডলার
     const handleSave = async (e) => {
         e.preventDefault();
         
-        // এডিট হলে /edit-investment/{id} আর নতুন হলে /add-investment
         const url = isEditing 
             ? `${API_BASE}/edit-investment/${formData.id}` 
             : `${API_BASE}/add-investment`;
 
         try {
             const response = await fetch(url, {
-                method: 'POST', // এডিট রাউট POST হিসেবে ডিফাইন করা আছে আপনার রিকোয়েস্টে
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
@@ -77,9 +80,8 @@ const Investment = ({ theme }) => {
         }
     };
 
-    // ৩. ডিলিট হ্যান্ডলার (আপনার দেয়া রাউট অনুযায়ী: /del-investment/{id})
+    // ৩. ডিলিট হ্যান্ডলার
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this package?")) return;
         try {
             const response = await fetch(`${API_BASE}/del-investment/${id}`, {
                 method: 'DELETE'
@@ -87,6 +89,7 @@ const Investment = ({ theme }) => {
             const result = await response.json();
             if (result.status) {
                 setPackages(prev => prev.filter(item => item.id !== id));
+                setDeleteConfirm(null);
             } else {
                 alert(result.message || "Delete failed");
             }
@@ -97,7 +100,6 @@ const Investment = ({ theme }) => {
 
     const openModal = (item = null) => {
         if (item) {
-            // ডাটাবেজ থেকে আসা boolean value (0/1) কে true/false এ কনভার্ট করা হচ্ছে
             setFormData({ 
                 ...item,
                 is_popular: item.is_popular == 1 ? true : false,
@@ -124,15 +126,376 @@ const Investment = ({ theme }) => {
 
     const closeModal = () => setShowModal(false);
 
+    // Filter and Pagination
+    const filteredPackages = packages.filter(item =>
+        item.title?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredPackages.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
+
+    // Statistics
+    const totalPackages = packages.length;
+    const popularPackages = packages.filter(item => item.is_popular == 1).length;
+    const soldOutPackages = packages.filter(item => item.is_sold_out == 1).length;
+
     const currentTheme = theme || {
-        bg: isDarkMode ? '#1a1a1a' : '#f8f9fa',
-        card: isDarkMode ? '#2d2d2d' : '#ffffff',
-        text: isDarkMode ? '#ffffff' : '#333333',
-        border: isDarkMode ? '#444' : '#dee2e6'
+        bg: isDarkMode ? '#0f0f1a' : '#f8f9fc',
+        card: isDarkMode ? '#1a1a2e' : '#ffffff',
+        text: isDarkMode ? '#e9ecef' : '#2c3e50',
+        textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
+        border: isDarkMode ? '#2d2d3d' : '#e9ecef',
+        primary: '#9a55ff',
+        accentGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        danger: '#ef4444',
+        success: '#10b981',
+        warning: '#f59e0b'
+    };
+
+    const styles = {
+        container: {
+            backgroundColor: currentTheme.bg,
+            minHeight: '100vh',
+            transition: 'all 0.3s ease'
+        },
+        mainContent: {
+            flex: 1,
+            overflowY: 'auto',
+            padding: '30px'
+        },
+        pageHeader: {
+            marginBottom: '30px'
+        },
+        pageTitle: {
+            fontSize: '28px',
+            fontWeight: '700',
+            background: currentTheme.accentGradient,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '8px'
+        },
+        pageSubtitle: {
+            color: currentTheme.textLight,
+            fontSize: '14px'
+        },
+        statCards: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '20px',
+            marginBottom: '30px'
+        },
+        statCard: {
+            backgroundColor: currentTheme.card,
+            borderRadius: '16px',
+            padding: '20px',
+            border: `1px solid ${currentTheme.border}`,
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+        },
+        statIcon: {
+            width: '50px',
+            height: '50px',
+            borderRadius: '12px',
+            background: currentTheme.accentGradient,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+            marginBottom: '16px'
+        },
+        statValue: {
+            fontSize: '28px',
+            fontWeight: '700',
+            color: currentTheme.text,
+            marginBottom: '4px'
+        },
+        statLabel: {
+            fontSize: '13px',
+            color: currentTheme.textLight,
+            fontWeight: '500'
+        },
+        toolbar: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px',
+            flexWrap: 'wrap',
+            gap: '16px'
+        },
+        searchBox: {
+            padding: '12px 20px',
+            borderRadius: '12px',
+            border: `1px solid ${currentTheme.border}`,
+            backgroundColor: currentTheme.card,
+            color: currentTheme.text,
+            width: '300px',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s'
+        },
+        addBtn: {
+            background: currentTheme.accentGradient,
+            color: 'white',
+            border: 'none',
+            padding: '12px 28px',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+        },
+        packagesGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+            gap: '24px',
+            marginBottom: '30px'
+        },
+        packageCard: {
+            backgroundColor: currentTheme.card,
+            borderRadius: '20px',
+            overflow: 'hidden',
+            border: `1px solid ${currentTheme.border}`,
+            transition: 'all 0.3s ease',
+            position: 'relative'
+        },
+        cardHeader: {
+            padding: '20px',
+            borderBottom: `1px solid ${currentTheme.border}`,
+            background: currentTheme.accentGradient,
+            color: 'white'
+        },
+        packageTitle: {
+            fontSize: '20px',
+            fontWeight: '700',
+            marginBottom: '8px'
+        },
+        packagePrice: {
+            fontSize: '28px',
+            fontWeight: '800',
+            marginBottom: '4px'
+        },
+        originalPrice: {
+            fontSize: '16px',
+            textDecoration: 'line-through',
+            opacity: '0.8',
+            marginLeft: '10px'
+        },
+        discountBadge: {
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#f59e0b',
+            color: 'white',
+            padding: '5px 12px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: '600'
+        },
+        cardBody: {
+            padding: '20px'
+        },
+        infoRow: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '12px',
+            paddingBottom: '12px',
+            borderBottom: `1px solid ${currentTheme.border}`
+        },
+        infoLabel: {
+            fontSize: '13px',
+            color: currentTheme.textLight,
+            fontWeight: '500'
+        },
+        infoValue: {
+            fontSize: '14px',
+            fontWeight: '600',
+            color: currentTheme.text
+        },
+        description: {
+            fontSize: '13px',
+            color: currentTheme.textLight,
+            lineHeight: '1.5',
+            marginTop: '12px',
+            marginBottom: '16px'
+        },
+        cardActions: {
+            display: 'flex',
+            gap: '10px',
+            marginTop: '16px',
+            paddingTop: '16px',
+            borderTop: `1px solid ${currentTheme.border}`
+        },
+        actionBtn: {
+            flex: 1,
+            padding: '8px',
+            borderRadius: '10px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            fontSize: '13px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+        },
+        editBtn: {
+            backgroundColor: `${currentTheme.primary}15`,
+            color: currentTheme.primary
+        },
+        deleteBtn: {
+            backgroundColor: `${currentTheme.danger}20`,
+            color: currentTheme.danger
+        },
+        statusBadge: {
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: '600',
+            zIndex: 1
+        },
+        pagination: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '8px',
+            marginTop: '20px'
+        },
+        pageBtn: {
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            border: `1px solid ${currentTheme.border}`,
+            backgroundColor: currentTheme.card,
+            color: currentTheme.text,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        activePage: {
+            background: currentTheme.accentGradient,
+            color: 'white',
+            border: 'none'
+        },
+        emptyState: {
+            textAlign: 'center',
+            padding: '60px',
+            color: currentTheme.textLight
+        },
+        loadingSpinner: {
+            textAlign: 'center',
+            padding: '60px',
+            color: currentTheme.textLight
+        },
+        modalOverlay: {
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(8px)'
+        },
+        modal: {
+            backgroundColor: currentTheme.card,
+            borderRadius: '24px',
+            width: '700px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+        },
+        modalHeader: {
+            padding: '24px',
+            borderBottom: `1px solid ${currentTheme.border}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: currentTheme.card,
+            zIndex: 1
+        },
+        modalBody: {
+            padding: '24px'
+        },
+        modalFooter: {
+            padding: '20px 24px',
+            borderTop: `1px solid ${currentTheme.border}`,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px'
+        },
+        input: {
+            width: '100%',
+            padding: '10px 14px',
+            borderRadius: '10px',
+            border: `1px solid ${currentTheme.border}`,
+            backgroundColor: currentTheme.bg,
+            color: currentTheme.text,
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s'
+        },
+        label: {
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '600',
+            fontSize: '13px',
+            color: currentTheme.text
+        }
+    };
+
+    // Format price with commas
+    const formatPrice = (price) => {
+        if (!price) return 'N/A';
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     return (
-        <div style={{ backgroundColor: currentTheme.bg, minHeight: '100vh', transition: '0.3s' }}>
+        <div style={styles.container}>
+            <style>
+                {`
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideUp {
+                        from { transform: translateY(30px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                    .stat-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+                    }
+                    .package-card:hover {
+                        transform: translateY(-6px);
+                        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+                    }
+                    button:hover {
+                        transform: translateY(-2px);
+                    }
+                    .search-box:focus {
+                        border-color: #667eea;
+                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                    }
+                    .package-card {
+                        animation: slideUp 0.3s ease;
+                    }
+                `}
+            </style>
+
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
                 <Sidebar theme={currentTheme} isCollapsed={isCollapsed} />
                 <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
@@ -143,130 +506,362 @@ const Investment = ({ theme }) => {
                         toggleSidebar={() => setIsCollapsed(!isCollapsed)}
                     />
 
-                    <main className="p-4 flex-grow-1" style={{ overflowY: 'auto' }}>
-                        <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 style={{ color: currentTheme.text }} className="fw-bold">Investment Packages</h4>
-                            <button className="btn btn-primary shadow-sm" onClick={() => openModal()}>
-                                <i className="bi bi-plus-lg me-2"></i> Add New Package
+                    <div style={styles.mainContent}>
+                        {/* Header Section */}
+                        <div style={styles.pageHeader}>
+                            <h1 style={styles.pageTitle}>Investment Packages</h1>
+                            <p style={styles.pageSubtitle}>Manage your premium investment opportunities</p>
+                        </div>
+
+                        {/* Statistics Cards */}
+                        <div style={styles.statCards}>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>🏘️</div>
+                                <div style={styles.statValue}>{totalPackages}</div>
+                                <div style={styles.statLabel}>Total Packages</div>
+                            </div>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>⭐</div>
+                                <div style={styles.statValue}>{popularPackages}</div>
+                                <div style={styles.statLabel}>Popular Packages</div>
+                            </div>
+                            <div className="stat-card" style={styles.statCard}>
+                                <div style={styles.statIcon}>🔴</div>
+                                <div style={styles.statValue}>{soldOutPackages}</div>
+                                <div style={styles.statLabel}>Sold Out</div>
+                            </div>
+                        </div>
+
+                        {/* Toolbar */}
+                        <div style={styles.toolbar}>
+                            <input
+                                type="text"
+                                placeholder="🔍 Search by title..."
+                                style={styles.searchBox}
+                                className="search-box"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                            <button style={styles.addBtn} onClick={() => openModal()}>
+                                <i className="bi bi-plus-circle"></i> Add New Package
                             </button>
                         </div>
 
-                        {/* Table Section - Night Mode issue Fixed by adding style to table */}
-                        <div className="card border-0 shadow-sm" style={{ backgroundColor: currentTheme.card, color: currentTheme.text, borderRadius: '15px' }}>
-                            <div className="card-body p-0">
-                                <div className="table-responsive">
-                                    <table className="table table-hover mb-0" style={{ 
-                                        color: currentTheme.text,
-                                        backgroundColor: 'transparent' // টেবিল ব্যাকগ্রাউন্ড ট্রান্সপারেন্ট করা হয়েছে
-                                    }}>
-                                        <thead style={{ borderBottom: `1px solid ${currentTheme.border}` }}>
-                                            <tr style={{ color: currentTheme.text }}>
-                                                <th className="px-4 py-3 bg-transparent" style={{ color: currentTheme.text }}>Title</th>
-                                                <th className="px-4 py-3 bg-transparent" style={{ color: currentTheme.text }}>Price</th>
-                                                <th className="px-4 py-3 bg-transparent" style={{ color: currentTheme.text }}>Land/Size</th>
-                                                <th className="px-4 py-3 bg-transparent" style={{ color: currentTheme.text }}>Status</th>
-                                                <th className="px-4 py-3 bg-transparent text-end" style={{ color: currentTheme.text }}>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {loading ? (
-                                                <tr><td colSpan="5" className="text-center py-4 bg-transparent" style={{ color: currentTheme.text }}>Loading...</td></tr>
-                                            ) : packages.map((item) => (
-                                                <tr key={item.id} style={{ borderColor: currentTheme.border }}>
-                                                    <td className="px-4 py-3 fw-semibold bg-transparent" style={{ color: currentTheme.text }}>{item.title}</td>
-                                                    <td className="px-4 py-3 bg-transparent" style={{ color: currentTheme.text }}>{item.price}</td>
-                                                    <td className="px-4 py-3 bg-transparent" style={{ color: isDarkMode ? '#aaa' : '#6c757d' }}>{item.total_size}</td>
-                                                    <td className="px-4 py-3 bg-transparent">
-                                                        {item.is_popular == 1 && <span className="badge bg-success me-1">Popular</span>}
-                                                        {item.is_sold_out == 1 && <span className="badge bg-danger">Sold Out</span>}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-end bg-transparent">
-                                                        <button className="btn btn-sm text-info me-2" onClick={() => openModal(item)}>
-                                                            <i className="bi bi-pencil-square fs-5"></i>
-                                                        </button>
-                                                        <button className="btn btn-sm text-danger" onClick={() => handleDelete(item.id)}>
-                                                            <i className="bi bi-trash3 fs-5"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                        {/* Packages Grid */}
+                        {loading ? (
+                            <div style={styles.loadingSpinner}>
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
                                 </div>
+                                <p style={{ marginTop: '16px' }}>Loading investment packages...</p>
                             </div>
-                        </div>
-                    </main>
+                        ) : currentItems.length > 0 ? (
+                            <>
+                                <div style={styles.packagesGrid}>
+                                    {currentItems.map((item) => (
+                                        <div key={item.id} className="package-card" style={styles.packageCard}>
+                                            {/* Status Badge */}
+                                            {item.is_popular == 1 && (
+                                                <div style={{...styles.statusBadge, backgroundColor: currentTheme.success}}>
+                                                    🔥 Popular
+                                                </div>
+                                            )}
+                                            {item.is_sold_out == 1 && (
+                                                <div style={{...styles.statusBadge, backgroundColor: currentTheme.danger}}>
+                                                    ❌ Sold Out
+                                                </div>
+                                            )}
+                                            
+                                            {/* Discount Badge */}
+                                            {item.discount && item.discount > 0 && (
+                                                <div style={styles.discountBadge}>
+                                                    {item.discount}% OFF
+                                                </div>
+                                            )}
+
+                                            {/* Card Header */}
+                                            <div style={styles.cardHeader}>
+                                                <h3 style={styles.packageTitle}>{item.title}</h3>
+                                                <div>
+                                                    <span style={styles.packagePrice}>${formatPrice(item.price)}</span>
+                                                    {item.discount && item.discount > 0 && (
+                                                        <span style={styles.originalPrice}>
+                                                            ${formatPrice(Math.floor(item.price * (1 + item.discount / 100)))}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Card Body */}
+                                            <div style={styles.cardBody}>
+                                                <div style={styles.infoRow}>
+                                                    <span style={styles.infoLabel}>Land Size</span>
+                                                    <span style={styles.infoValue}>{item.land || 'N/A'} sqft</span>
+                                                </div>
+                                                <div style={styles.infoRow}>
+                                                    <span style={styles.infoLabel}>Building Size</span>
+                                                    <span style={styles.infoValue}>{item.building || 'N/A'} sqft</span>
+                                                </div>
+                                                <div style={styles.infoRow}>
+                                                    <span style={styles.infoLabel}>Total Size</span>
+                                                    <span style={styles.infoValue}>{item.total_size || 'N/A'} sqft</span>
+                                                </div>
+                                                {item.description && (
+                                                    <div style={styles.description}>
+                                                        <strong>Description:</strong><br />
+                                                        {item.description}
+                                                    </div>
+                                                )}
+
+                                                {/* Action Buttons */}
+                                                <div style={styles.cardActions}>
+                                                    <button 
+                                                        style={{...styles.actionBtn, ...styles.editBtn}}
+                                                        onClick={() => openModal(item)}
+                                                    >
+                                                        <i className="bi bi-pencil"></i> Edit
+                                                    </button>
+                                                    <button 
+                                                        style={{...styles.actionBtn, ...styles.deleteBtn}}
+                                                        onClick={() => setDeleteConfirm(item)}
+                                                    >
+                                                        <i className="bi bi-trash"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div style={styles.pagination}>
+                                        <button
+                                            style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                        >
+                                            ←
+                                        </button>
+                                        {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+                                            let pageNum;
+                                            if (totalPages <= 5) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage <= 3) {
+                                                pageNum = i + 1;
+                                            } else if (currentPage >= totalPages - 2) {
+                                                pageNum = totalPages - 4 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+                                            return (
+                                                <button
+                                                    key={i}
+                                                    style={{
+                                                        ...styles.pageBtn,
+                                                        ...(currentPage === pageNum && styles.activePage)
+                                                    }}
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
+                                        <button
+                                            style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                            disabled={currentPage === totalPages}
+                                        >
+                                            →
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div style={styles.emptyState}>
+                                <div style={{ fontSize: '64px', marginBottom: '16px' }}>🏘️</div>
+                                <h4>No Investment Packages Found</h4>
+                                <p style={{ color: currentTheme.textLight, marginBottom: '20px' }}>
+                                    {searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first investment package'}
+                                </p>
+                                {!searchTerm && (
+                                    <button style={styles.addBtn} onClick={() => openModal()}>
+                                        <i className="bi bi-plus-circle"></i> Add New Package
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     <Footer theme={currentTheme} />
                 </div>
             </div>
 
-            {/* Modal */}
+            {/* Add/Edit Modal */}
             {showModal && (
-                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <form className="modal-content border-0 shadow-lg" onSubmit={handleSave} style={{ backgroundColor: currentTheme.card, color: currentTheme.text }}>
-                            <div className="modal-header border-0 px-4 pt-4">
-                                <h5 className="fw-bold">{isEditing ? "Edit" : "Add"} Investment Package</h5>
-                                <button type="button" className={`btn-close ${isDarkMode ? 'btn-close-white' : ''}`} onClick={closeModal}></button>
+                <div style={styles.modalOverlay} onClick={closeModal}>
+                    <div style={styles.modal} onClick={e => e.stopPropagation()}>
+                        <form onSubmit={handleSave}>
+                            <div style={styles.modalHeader}>
+                                <h5 style={{ margin: 0, fontWeight: '600' }}>
+                                    {isEditing ? "✏️ Edit" : "✨ Add"} Investment Package
+                                </h5>
+                                <button 
+                                    type="button"
+                                    onClick={closeModal}
+                                    style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: currentTheme.text }}
+                                >
+                                    ×
+                                </button>
                             </div>
-                            <div className="modal-body px-4">
+                            <div style={styles.modalBody}>
                                 <div className="row g-3">
                                     <div className="col-md-12">
-                                        <label className="form-label fw-semibold">Package Title *</label>
-                                        <input type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.title} required
-                                            onChange={(e) => setFormData({...formData, title: e.target.value})} placeholder="e.g. Premium Garden" />
+                                        <label style={styles.label}>Package Title *</label>
+                                        <input 
+                                            type="text" 
+                                            style={styles.input}
+                                            value={formData.title}
+                                            onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                            placeholder="e.g., Premium Garden Villa"
+                                            required
+                                        />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-semibold">Price</label>
-                                        <input type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.price}
-                                            onChange={(e) => setFormData({...formData, price: e.target.value})} placeholder="e.g. 500000" />
+                                        <label style={styles.label}>Price *</label>
+                                        <input 
+                                            type="text" 
+                                            style={styles.input}
+                                            value={formData.price}
+                                            onChange={(e) => setFormData({...formData, price: e.target.value})}
+                                            placeholder="e.g., 500000"
+                                            required
+                                        />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-semibold">Discount</label>
-                                        <input type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.discount}
-                                            onChange={(e) => setFormData({...formData, discount: e.target.value})} />
+                                        <label style={styles.label}>Discount (%)</label>
+                                        <input 
+                                            type="text" 
+                                            style={styles.input}
+                                            value={formData.discount}
+                                            onChange={(e) => setFormData({...formData, discount: e.target.value})}
+                                            placeholder="e.g., 10"
+                                        />
                                     </div>
                                     <div className="col-md-4">
-                                        <label className="form-label fw-semibold">Land</label>
-                                        <input type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.land}
-                                            onChange={(e) => setFormData({...formData, land: e.target.value})} />
+                                        <label style={styles.label}>Land Size (sqft)</label>
+                                        <input 
+                                            type="text" 
+                                            style={styles.input}
+                                            value={formData.land}
+                                            onChange={(e) => setFormData({...formData, land: e.target.value})}
+                                            placeholder="Land size"
+                                        />
                                     </div>
                                     <div className="col-md-4">
-                                        <label className="form-label fw-semibold">Building</label>
-                                        <input type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.building}
-                                            onChange={(e) => setFormData({...formData, building: e.target.value})} />
+                                        <label style={styles.label}>Building Size (sqft)</label>
+                                        <input 
+                                            type="text" 
+                                            style={styles.input}
+                                            value={formData.building}
+                                            onChange={(e) => setFormData({...formData, building: e.target.value})}
+                                            placeholder="Building size"
+                                        />
                                     </div>
                                     <div className="col-md-4">
-                                        <label className="form-label fw-semibold">Total Size</label>
-                                        <input type="text" className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} value={formData.total_size}
-                                            onChange={(e) => setFormData({...formData, total_size: e.target.value})} />
+                                        <label style={styles.label}>Total Size (sqft)</label>
+                                        <input 
+                                            type="text" 
+                                            style={styles.input}
+                                            value={formData.total_size}
+                                            onChange={(e) => setFormData({...formData, total_size: e.target.value})}
+                                            placeholder="Total size"
+                                        />
                                     </div>
                                     <div className="col-12">
-                                        <label className="form-label fw-semibold">Description</label>
-                                        <textarea className={`form-control ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`} rows="3" value={formData.description}
-                                            onChange={(e) => setFormData({...formData, description: e.target.value})}></textarea>
+                                        <label style={styles.label}>Description</label>
+                                        <textarea 
+                                            rows="3"
+                                            style={{...styles.input, resize: 'vertical'}}
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                            placeholder="Describe the investment package..."
+                                        />
                                     </div>
-                                    <div className="col-md-6 d-flex align-items-center">
+                                    <div className="col-md-6">
                                         <div className="form-check form-switch">
-                                            <input className="form-check-input" type="checkbox" checked={formData.is_popular}
-                                                onChange={(e) => setFormData({...formData, is_popular: e.target.checked})} />
-                                            <label className="form-check-label fw-semibold">Mark as Popular</label>
+                                            <input 
+                                                className="form-check-input" 
+                                                type="checkbox" 
+                                                id="is_popular"
+                                                checked={formData.is_popular}
+                                                onChange={(e) => setFormData({...formData, is_popular: e.target.checked})}
+                                                style={{ cursor: 'pointer' }}
+                                            />
+                                            <label className="form-check-label" htmlFor="is_popular" style={{ color: currentTheme.text }}>
+                                                ⭐ Mark as Popular
+                                            </label>
                                         </div>
                                     </div>
-                                    <div className="col-md-6 d-flex align-items-center">
+                                    <div className="col-md-6">
                                         <div className="form-check form-switch">
-                                            <input className="form-check-input" type="checkbox" checked={formData.is_sold_out}
-                                                onChange={(e) => setFormData({...formData, is_sold_out: e.target.checked})} />
-                                            <label className="form-check-label fw-semibold text-danger">Mark as Sold Out</label>
+                                            <input 
+                                                className="form-check-input" 
+                                                type="checkbox" 
+                                                id="is_sold_out"
+                                                checked={formData.is_sold_out}
+                                                onChange={(e) => setFormData({...formData, is_sold_out: e.target.checked})}
+                                                style={{ cursor: 'pointer' }}
+                                            />
+                                            <label className="form-check-label" htmlFor="is_sold_out" style={{ color: currentTheme.danger }}>
+                                                🔴 Mark as Sold Out
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="modal-footer border-0 px-4 pb-4">
-                                <button type="button" className={`btn ${isDarkMode ? 'btn-outline-light' : 'btn-light'} px-4`} onClick={closeModal}>Cancel</button>
-                                <button type="submit" className="btn btn-primary px-5 shadow-sm">Save Package</button>
+                            <div style={styles.modalFooter}>
+                                <button 
+                                    type="button"
+                                    onClick={closeModal}
+                                    style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit"
+                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                >
+                                    {isEditing ? 'Update Package' : 'Save Package'}
+                                </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
+                    <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
+                        <div style={styles.modalHeader}>
+                            <h5 style={{ margin: 0, fontWeight: '600' }}>Confirm Delete</h5>
+                            <button onClick={() => setDeleteConfirm(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                        </div>
+                        <div style={styles.modalBody}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+                                <p>Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?</p>
+                                <p style={{ fontSize: '13px', color: currentTheme.textLight }}>This action cannot be undone.</p>
+                            </div>
+                        </div>
+                        <div style={styles.modalFooter}>
+                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}>Cancel</button>
+                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                        </div>
                     </div>
                 </div>
             )}

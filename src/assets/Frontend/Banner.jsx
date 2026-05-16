@@ -1,55 +1,3 @@
-// import { useEffect, useState } from "react";
-// import "../css/Banner.css";
-
-// import img1 from "../image/image1.jpg";
-// import img2 from "../image/image2.jpg";
-// import img3 from "../image/image3.jpg";
-
-// const images = [img1, img2, img3];
-
-// const Banner = ({ onDiscoverClick }) => { // 👈 props নাও
-//   const [current, setCurrent] = useState(0);
-
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       setCurrent((prev) => (prev + 1) % images.length);
-//     }, 4000);
-
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <div className="banner">
-
-//       {images.map((img, index) => (
-//         <div
-//           key={index}
-//           className={`banner-slide ${index === current ? "active" : ""}`}
-//           style={{ backgroundImage: `url(${img})` }}
-//         />
-//       ))}
-
-//       <div className="banner-overlay"></div>
-
-//       <div className="banner-content">
-//         <p className="subtitle">AkashBari Resort</p>
-//         <h1>A True Paradise On Earth</h1>
-
-//         {/* 👇 click event add */}
-//         <button 
-//           className="discover-btn"
-//           onClick={onDiscoverClick}
-//         >
-//           DISCOVER MORE
-//         </button>
-//       </div>
-
-//     </div>
-//   );
-// };
-
-// export default Banner;
-
 import { useEffect, useState } from "react";
 import "../css/Banner.css";
 
@@ -58,17 +6,39 @@ const Banner = ({ onDiscoverClick }) => {
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // লারাভেলের স্টোরেজ ইউআরএল বেস
-  const storageBaseUrl = "http://127.0.0.1:8000/storage/";
+  // Use environment variables for URLs
+  const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const STORAGE_URL = import.meta.env.API_URL;
+  const storageBaseUrl = `${STORAGE_URL}/storage/`;
+
+  // Helper function to get full image URL
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/storage/')) {
+      return `${STORAGE_URL}${imagePath}`;
+    }
+    if (imagePath.startsWith('storage/')) {
+      return `${STORAGE_URL}/${imagePath}`;
+    }
+    return `${storageBaseUrl}${imagePath.replace(/^\/?storage\//, '')}`;
+  };
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/v1/banners/active'); // আপনার একটিভ ব্যানার এন্ডপয়েন্ট
+        const res = await fetch(`${API_BASE_URL}/v1/banners/active`);
         const result = await res.json();
 
         if (result.status === "success") {
-          setBannerData(result.data); // result.data হচ্ছে আপনার সেই অবজেক্ট
+          const data = result.data;
+          // Process images to get full URLs
+          if (data && data.images) {
+            const processedImages = data.images.map(img => getFullImageUrl(img));
+            setBannerData({ ...data, images: processedImages });
+          } else {
+            setBannerData(data);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch banners", err);
@@ -81,7 +51,7 @@ const Banner = ({ onDiscoverClick }) => {
 
   // স্লাইডার ইন্টারভাল (ইমেজ অ্যারের ওপর ভিত্তি করে)
   useEffect(() => {
-    if (bannerData && bannerData.images.length > 0) {
+    if (bannerData && bannerData.images && bannerData.images.length > 0) {
       const interval = setInterval(() => {
         setCurrent((prev) => (prev + 1) % bannerData.images.length);
       }, 5000);
@@ -100,7 +70,6 @@ const Banner = ({ onDiscoverClick }) => {
           key={index}
           className={`banner-slide ${index === current ? "active" : ""}`}
           style={{
-            
             backgroundImage: `url(${imgUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'

@@ -28,10 +28,8 @@ const Events = () => {
         main_img: null
     });
 
-    // Image preview states
     const [thumbPreview, setThumbPreview] = useState(null);
     const [mainPreview, setMainPreview] = useState(null);
-
     const [featureInput, setFeatureInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetchLoading, setFetchLoading] = useState(true);
@@ -54,23 +52,20 @@ const Events = () => {
         warning: '#f59e0b',
         tableHeader: isDarkMode ? '#25253a' : '#f8f9fc'
     };
+    
+    const API_BASE = import.meta.env.VITE_BASE_URL;
+    const API_URL = import.meta.env.VITE_BASE_URL;
 
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
-    const API_URL = 'http://127.0.0.1:8000';
-
-    // Show toast notification
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
         setTimeout(() => setToast({ show: false, message: '', type: '' }), 3000);
     };
 
-    // Get Auth Token from localStorage
     const getAuthToken = () => {
         const token = localStorage.getItem("token");
         return token;
     };
 
-    // Helper function to get full image URL
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
@@ -81,13 +76,11 @@ const Events = () => {
         return `${API_URL}/storage/${cleanPath}`;
     };
 
-    // Create axios instance
     const axiosInstance = axios.create({
         baseURL: API_BASE,
         headers: { 'Accept': 'application/json' }
     });
 
-    // Add token to every request
     axiosInstance.interceptors.request.use((config) => {
         const token = getAuthToken();
         if (token) {
@@ -99,7 +92,6 @@ const Events = () => {
         return config;
     });
 
-    // Fetch Events
     const fetchEvents = async () => {
         setFetchLoading(true);
         try {
@@ -129,7 +121,6 @@ const Events = () => {
         fetchEvents();
     }, []);
 
-    // Filter and pagination
     const filteredEvents = events.filter(event =>
         event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -177,7 +168,6 @@ const Events = () => {
         setFormData({ ...formData, features: updatedFeatures });
     };
 
-    // Add or Update Event
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -241,7 +231,6 @@ const Events = () => {
         }
     };
 
-    // Delete Event
     const confirmDelete = (event) => {
         setDeletingEvent(event);
         setShowDeleteModal(true);
@@ -260,7 +249,6 @@ const Events = () => {
         }
     };
 
-    // Edit Event
     const handleEdit = (event) => {
         const token = getAuthToken();
         if (!token) {
@@ -317,16 +305,8 @@ const Events = () => {
         });
     };
 
-    const getStatusColor = (datetime) => {
-        if (!datetime) return theme.secondary;
-        const eventDate = new Date(datetime);
-        const now = new Date();
-        return eventDate > now ? theme.success : theme.warning;
-    };
-
     const isLoggedIn = !!getAuthToken();
 
-    // Styles
     const styles = {
         container: {
             backgroundColor: theme.bg,
@@ -429,14 +409,19 @@ const Events = () => {
             overflow: 'hidden',
             border: `1px solid ${theme.border}`,
             transition: 'all 0.3s ease',
-            cursor: 'pointer',
             position: 'relative'
+        },
+        imageWrapper: {
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
         },
         eventImage: {
             width: '100%',
             height: '200px',
             objectFit: 'cover',
-            transition: 'transform 0.5s ease'
+            transition: 'transform 0.5s ease',
+            display: 'block'
         },
         cardOverlay: {
             position: 'absolute',
@@ -448,9 +433,25 @@ const Events = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '16px',
+            gap: '20px',
             opacity: 0,
-            transition: 'all 0.3s ease'
+            transition: 'opacity 0.3s ease',
+            zIndex: 10
+        },
+        actionBtn: {
+            width: '50px',
+            height: '50px',
+            borderRadius: '12px',
+            border: 'none',
+            fontSize: '24px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            color: '#333',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
         },
         cardContent: {
             padding: '20px'
@@ -516,8 +517,7 @@ const Events = () => {
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 2000,
-            backdropFilter: 'blur(8px)',
-            animation: 'fadeIn 0.3s ease'
+            backdropFilter: 'blur(8px)'
         },
         modal: {
             backgroundColor: theme.card,
@@ -525,8 +525,7 @@ const Events = () => {
             width: '800px',
             maxWidth: '90%',
             maxHeight: '90vh',
-            overflowY: 'auto',
-            animation: 'slideUp 0.3s ease'
+            overflowY: 'auto'
         },
         modalHeader: {
             padding: '20px 24px',
@@ -550,8 +549,7 @@ const Events = () => {
             backgroundColor: theme.bg,
             color: theme.text,
             fontSize: '14px',
-            outline: 'none',
-            transition: 'all 0.3s'
+            outline: 'none'
         },
         textarea: {
             width: '100%',
@@ -589,7 +587,6 @@ const Events = () => {
             borderRadius: '12px',
             color: 'white',
             zIndex: 2000,
-            animation: 'slideInRight 0.3s ease',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
@@ -607,7 +604,6 @@ const Events = () => {
         }
     };
 
-    // Calculate statistics
     const totalEvents = events.length;
     const upcomingEvents = events.filter(e => new Date(e.event_datetime) > new Date()).length;
     const pastEvents = events.filter(e => new Date(e.event_datetime) <= new Date()).length;
@@ -663,17 +659,18 @@ const Events = () => {
                         transform: translateY(-8px);
                         box-shadow: 0 12px 30px rgba(0,0,0,0.2);
                     }
-                    .event-card:hover .card-overlay {
-                        opacity: 1;
+                    .image-wrapper:hover .card-overlay {
+                        opacity: 1 !important;
                     }
-                    .event-card:hover img {
+                    .image-wrapper:hover img {
                         transform: scale(1.1);
+                    }
+                    .action-btn:hover {
+                        transform: scale(1.1) !important;
+                        box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
                     }
                     button:hover {
                         transform: translateY(-2px);
-                    }
-                    button:active {
-                        transform: translateY(0);
                     }
                     .search-box:focus {
                         border-color: #9a55ff;
@@ -694,13 +691,11 @@ const Events = () => {
                     />
 
                     <div style={styles.scrollContent}>
-                        {/* Header Section */}
                         <div style={{ marginBottom: '30px' }}>
                             <h1 style={styles.pageTitle}>Event Management</h1>
                             <p style={{ color: theme.textLight }}>Manage and organize your events</p>
                         </div>
 
-                        {/* Statistics Cards */}
                         <div style={styles.statsContainer}>
                             <div className="stat-card" style={styles.statCard}>
                                 <div style={styles.statIcon}>📅</div>
@@ -719,7 +714,6 @@ const Events = () => {
                             </div>
                         </div>
 
-                        {/* Toolbar */}
                         <div style={styles.toolbar}>
                             <input
                                 type="text"
@@ -738,14 +732,11 @@ const Events = () => {
                                     resetForm();
                                     setShowModal(true);
                                 }}
-                                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                             >
                                 + Add Event
                             </button>
                         </div>
 
-                        {/* Events Grid */}
                         {fetchLoading ? (
                             <div style={styles.loadingSpinner}>
                                 <div className="spinner-border text-primary" role="status">
@@ -757,12 +748,8 @@ const Events = () => {
                             <>
                                 <div style={styles.eventGrid}>
                                     {currentItems.map((event) => (
-                                        <div 
-                                            key={event.id} 
-                                            className="event-card"
-                                            style={styles.eventCard}
-                                        >
-                                            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                                        <div key={event.id} className="event-card" style={styles.eventCard}>
+                                            <div className="image-wrapper" style={styles.imageWrapper}>
                                                 <img 
                                                     src={getImageUrl(event.thumbImg) || 'https://via.placeholder.com/400x200?text=Event+Image'} 
                                                     alt={event.title}
@@ -774,16 +761,26 @@ const Events = () => {
                                                 />
                                                 <div className="card-overlay" style={styles.cardOverlay}>
                                                     <button 
-                                                        className="btn btn-light btn-sm rounded-circle"
-                                                        onClick={() => handleEdit(event)}
-                                                        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                                        className="action-btn"
+                                                        style={styles.actionBtn}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEdit(event);
+                                                        }}
+                                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                                                     >
                                                         ✏️
                                                     </button>
                                                     <button 
-                                                        className="btn btn-light btn-sm rounded-circle"
-                                                        onClick={() => confirmDelete(event)}
-                                                        style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                                        className="action-btn"
+                                                        style={styles.actionBtn}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            confirmDelete(event);
+                                                        }}
+                                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                                                     >
                                                         🗑️
                                                     </button>
@@ -817,7 +814,6 @@ const Events = () => {
                                     ))}
                                 </div>
 
-                                {/* Pagination */}
                                 {totalPages > 1 && (
                                     <div style={styles.pagination}>
                                         <button
@@ -1015,7 +1011,6 @@ const Events = () => {
                                         </div>
                                     </div>
 
-                                    {/* Thumbnail Image */}
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label fw-semibold mb-2">Thumbnail Image {!editingEvent && '*'}</label>
                                         <div 
@@ -1052,7 +1047,6 @@ const Events = () => {
                                         />
                                     </div>
 
-                                    {/* Main Image */}
                                     <div className="col-md-6 mb-3">
                                         <label className="form-label fw-semibold mb-2">Main Image {!editingEvent && '*'}</label>
                                         <div 
@@ -1162,7 +1156,6 @@ const Events = () => {
                 </div>
             )}
 
-            {/* Toast Notification */}
             {toast.show && (
                 <div style={{
                     ...styles.toast,

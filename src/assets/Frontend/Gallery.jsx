@@ -10,11 +10,13 @@ const Gallery = () => {
     const [images, setImages] = useState([]); // API theke asha data ekhane thakbe
     const [loading, setLoading] = useState(true);
 
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+
     // 👉 Fetch Gallery Data from API
     useEffect(() => {
         const fetchGallery = async () => {
             try {
-                const response = await axios.get("http://localhost:8000/api/gallery");
+                const response = await axios.get(`${BASE_URL}/gallery`);
                 setImages(response.data); // Database theke asha array set hobe
                 setLoading(false);
             } catch (error) {

@@ -8,10 +8,12 @@ const Video = () => {
     const [videoData, setVideoData] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+
     useEffect(() => {
         const fetchVideoData = async () => {
             try {
-                const res = await axios.get('http://127.0.0.1:8000/api/get-videos');
+                const res = await axios.get(`${BASE_URL}/get-videos`);
                 if (res.data.success && res.data.data.length > 0) {
                     // এপিআই থেকে প্রথম ভিডিও ডাটাটি নেওয়া হচ্ছে
                     setVideoData(res.data.data[0]);

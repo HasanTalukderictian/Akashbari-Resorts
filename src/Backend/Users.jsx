@@ -25,10 +25,12 @@ const Users = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
+     const BASE_URL = import.meta.env.VITE_BASE_URL;
+
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://127.0.0.1:8000/api/users', {
+            const res = await fetch(`${BASE_URL}/users`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const data = await res.json();
@@ -44,7 +46,7 @@ const Users = ({ theme: propsTheme }) => {
 
     const handleSubmit = async () => {
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/users', {
+            const res = await fetch(`${BASE_URL}/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +65,7 @@ const Users = ({ theme: propsTheme }) => {
     const handleDelete = async (id) => {
         if (!window.confirm('Delete this user?')) return;
         try {
-            await fetch(`http://127.0.0.1:8000/api/users/${id}`, {
+            await fetch(`${BASE_URL}/users/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });

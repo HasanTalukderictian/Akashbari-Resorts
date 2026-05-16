@@ -12,6 +12,8 @@ const VideoSection = () => {
     const [banners, setBanners] = useState([]);
     const [showModal, setShowModal] = useState(false);
 
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+
     const [formData, setFormData] = useState({
         title: '',
         videoUrl: '',
@@ -29,7 +31,7 @@ const VideoSection = () => {
     // ✅ Fetch Videos
     const fetchVideos = async () => {
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/get-videos');
+            const res = await axios.get(`${BASE_URL}/get-videos`);
             // Backend res.data.success অথবা সরাসরি ডাটা চেক করা
             if (res.data) {
                 setBanners(Array.isArray(res.data) ? res.data : res.data.data || []);
@@ -51,7 +53,7 @@ const VideoSection = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://127.0.0.1:8000/api/add-videos', {
+            const res = await axios.post(`${BASE_URL}/add-videos`, {
                 title: formData.title,
                 description: formData.description,
                 video_url: formData.videoUrl 
@@ -72,7 +74,7 @@ const VideoSection = () => {
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this video?")) return;
         try {
-            await axios.delete(`http://127.0.0.1:8000/api/del-videos/${id}`);
+            await axios.delete(`${BASE_URL}/del-videos/${id}`);
             setBanners(banners.filter(x => x.id !== id));
         } catch (err) {
             console.error("Delete error:", err);

@@ -12,8 +12,9 @@ const EventsDetails = () => {
   const [error, setError] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
-  const API_URL = 'http://127.0.0.1:8000';
+  // Use environment variables for API URLs
+  const API_BASE = import.meta.env.VITE_BASE_URL;
+  const API_URL = import.meta.env.API_URL;
 
   const theme = {
     isDarkMode,
