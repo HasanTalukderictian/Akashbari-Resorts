@@ -22,6 +22,7 @@ const Header = ({ theme, isDarkMode, toggleDarkMode, toggleSidebar }) => {
 
             // clear token
             localStorage.removeItem('token');
+            localStorage.removeItem('Role');
 
             // redirect login
             navigate('/login');

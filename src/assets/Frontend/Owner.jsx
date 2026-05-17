@@ -98,15 +98,6 @@ const Owner = () => {
         }
     };
 
-    // Debug log to check image URLs
-    console.log("Property slider images:", property?.slider_images);
-    if (property?.slider_images) {
-        property.slider_images.forEach(img => {
-            console.log("Original image path:", img);
-            console.log("Full image URL:", getImageUrl(img));
-        });
-    }
-
     // Styles
     const styles = {
         container: {
@@ -124,7 +115,7 @@ const Owner = () => {
             position: 'relative',
             overflow: 'hidden',
             backgroundColor: '#1a1a2e',
-            minHeight: '400px'
+            minHeight: '350px'
         },
         slideImage: {
             width: '100%',
@@ -141,31 +132,35 @@ const Owner = () => {
         },
         brandText: {
             color: '#d4af37',
-            fontSize: '2rem',
+            fontSize: '1.8rem',
             fontWeight: 'bold'
         },
         featureItem: {
             display: 'flex',
             alignItems: 'center',
-            marginBottom: '12px',
-            padding: '8px',
+            marginBottom: '8px',
+            padding: '6px',
             borderRadius: '10px',
             transition: 'all 0.3s ease'
         },
-        whatsappBtn: {
-            background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+        actionBtn: {
             borderRadius: '50px',
             border: 'none',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)'
+            padding: '10px 20px',
+            width: 'auto',
+            minWidth: '220px',
+            color: 'white',
+            fontWeight: 'bold',
+            display: 'inline-flex'
         },
-        callCard: {
-            background: 'linear-gradient(145deg, #ffffff, #f8f9fa)',
-            border: '1px solid #e9ecef',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            borderRadius: '60px',
-            padding: '8px'
+        whatsappBtn: {
+            background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+            boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)',
+        },
+        callBtn: {
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
         },
         benefitCard: {
             borderRadius: '20px',
@@ -175,14 +170,14 @@ const Owner = () => {
             boxShadow: '0 5px 20px rgba(0,0,0,0.05)'
         },
         benefitIcon: {
-            width: '70px',
-            height: '70px',
+            width: '60px',
+            height: '60px',
             backgroundColor: '#f3e5f5',
             borderRadius: '20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 20px',
+            margin: '0 auto 15px',
             transition: 'all 0.3s ease'
         }
     };
@@ -234,12 +229,12 @@ const Owner = () => {
     return (
         <div style={styles.container}>
             {/* Hero Section */}
-            <div className="container py-5">
+            <div className="container py-3 py-md-4">
                 <div className="row g-0 shadow-lg d-lg-flex align-items-lg-stretch" style={styles.mainCard}>
                     
                     {/* Left Side - Image Slider */}
                     <div className="col-lg-6 d-flex flex-column" style={styles.sliderContainer}>
-                        <div className="w-100 flex-grow-1 position-relative" style={{ minHeight: '350px' }}>
+                        <div className="w-100 flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
                             {property.slider_images && property.slider_images.map((img, index) => (
                                 <div
                                     key={index}
@@ -274,7 +269,7 @@ const Owner = () => {
                         
                         {/* Slider Dots */}
                         {property.slider_images && property.slider_images.length > 1 && (
-                            <div className="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2" style={{ zIndex: 2 }}>
+                            <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2" style={{ zIndex: 2 }}>
                                 {property.slider_images.map((_, index) => (
                                     <div
                                         key={index}
@@ -294,28 +289,28 @@ const Owner = () => {
 
                     {/* Right Side - Content */}
                     <div className="col-lg-6 d-flex flex-column justify-content-center" style={{ backgroundColor: '#ffffff' }}>
-                        <div className="p-4 p-md-5">
-                            <div className="mb-3">
-                                <span className="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                        <div className="p-3 p-md-4">
+                            <div className="mb-2">
+                                <span className="badge bg-warning text-dark px-3 py-2 rounded-pill" style={{ fontSize: '12px' }}>
                                     🏆 Premium Investment
                                 </span>
                             </div>
                             
-                            <h2 className="display-5 fw-bold mb-3" style={{ color: '#2c3e50' }}>
+                            <h2 className="display-6 fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '2rem' }}>
                                 {property.title}
                             </h2>
                             
-                            <h3 style={styles.brandText} className="mb-4">
+                            <h3 style={styles.brandText} className="mb-3">
                                 {property.brand_name}
                             </h3>
                             
-                            <p className="lead text-muted mb-4" style={{ fontSize: '1rem', lineHeight: '1.6' }}>
+                            <p className="text-muted mb-3" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
                                 {property.description}
                             </p>
 
                             {/* Features */}
-                            <div className="mb-4">
-                                <h6 className="fw-bold mb-3" style={{ color: '#2c3e50' }}>
+                            <div className="mb-3">
+                                <h6 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '0.9rem' }}>
                                     ✨ Key Features
                                 </h6>
                                 {property.features && property.features.map((text, i) => (
@@ -324,65 +319,55 @@ const Owner = () => {
                                         style={styles.featureItem}
                                         className="hover-feature"
                                     >
-                                        <i className="bi bi-check-circle-fill me-3" style={{ color: '#10b981', fontSize: '18px' }}></i>
-                                        <span style={{ color: '#4a5568' }}>{text}</span>
+                                        <i className="bi bi-check-circle-fill me-2" style={{ color: '#10b981', fontSize: '14px' }}></i>
+                                        <span style={{ color: '#4a5568', fontSize: '0.9rem' }}>{text}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* WhatsApp Button */}
-                            <button
-                                onClick={handleWhatsAppClick}
-                                className="btn btn-lg text-white w-100 mb-3 py-3 fw-bold"
-                                style={styles.whatsappBtn}
-                                onMouseEnter={(e) => {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                    e.target.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.4)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.transform = 'translateY(0)';
-                                    e.target.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.3)';
-                                }}
-                            >
-                                <i className="bi bi-whatsapp me-2 fs-5"></i>
-                                Chat on WhatsApp
-                            </button>
+                            {/* Both Buttons with Same Width */}
+                            <div className="d-flex flex-column align-items-center gap-3">
+                                {/* WhatsApp Button */}
+                                <button
+                                    onClick={handleWhatsAppClick}
+                                    className="btn text-white py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
+                                    style={{
+                                        ...styles.actionBtn,
+                                        ...styles.whatsappBtn
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.4)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.3)';
+                                    }}
+                                >
+                                    <i className="bi bi-whatsapp fs-5"></i>
+                                    <span>Chat on WhatsApp</span>
+                                </button>
 
-                            {/* Call Button */}
-                            <div
-                                style={styles.callCard}
-                                onClick={handleCallClick}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.05)';
-                                }}
-                            >
-                                <div className="d-flex align-items-center p-2">
-                                    <div
-                                        className="d-flex align-items-center justify-content-center rounded-circle me-3"
-                                        style={{
-                                            width: '50px',
-                                            height: '50px',
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            color: '#fff'
-                                        }}
-                                    >
-                                        <i className="bi bi-telephone-fill fs-5"></i>
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <small className="text-muted d-block" style={{ fontSize: '11px', letterSpacing: '1px' }}>
-                                            CALL NOW
-                                        </small>
-                                        <span className="fw-bold fs-5" style={{ color: '#2c3e50' }}>
-                                            {property.whatsapp_number || 'Number Not Available'}
-                                        </span>
-                                    </div>
-                                    <i className="bi bi-arrow-right-circle fs-4" style={{ color: '#667eea' }}></i>
-                                </div>
+                                {/* Call Button */}
+                                <button
+                                    onClick={handleCallClick}
+                                    className="btn text-white py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
+                                    style={{
+                                        ...styles.actionBtn,
+                                        ...styles.callBtn
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
+                                    }}
+                                >
+                                    <i className="bi bi-telephone-fill fs-5"></i>
+                                    <span>Call Now: {property.whatsapp_number || 'Number Not Available'}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -391,25 +376,25 @@ const Owner = () => {
 
             {/* Benefits Section */}
             {benefits.length > 0 && (
-                <div className="container py-5">
-                    <div className="text-center mb-5">
-                        <span className="badge bg-primary bg-opacity-10 text-primary px-4 py-2 rounded-pill mb-3">
+                <div className="container py-3 py-md-4">
+                    <div className="text-center mb-4">
+                        <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill mb-2" style={{ fontSize: '11px' }}>
                             Why Choose Us
                         </span>
-                        <h2 className="display-5 fw-bold mb-3" style={{ color: '#2c3e50' }}>
+                        <h2 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '1.8rem' }}>
                             Why Invest with Us?
                         </h2>
-                        <div className="mx-auto" style={{ width: '80px', height: '4px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }}></div>
-                        <p className="text-muted mt-3" style={{ maxWidth: '600px', margin: '0 auto' }}>
+                        <div className="mx-auto" style={{ width: '60px', height: '3px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }}></div>
+                        <p className="text-muted mt-2" style={{ maxWidth: '600px', margin: '0 auto', fontSize: '0.9rem' }}>
                             Discover the advantages of choosing us for your investment journey
                         </p>
                     </div>
 
-                    <div className="row g-4">
+                    <div className="row g-3">
                         {benefits.map((item, index) => (
                             <div className="col-md-6 col-lg-4" key={index}>
                                 <div
-                                    className="card h-100 p-4 text-center"
+                                    className="card h-100 p-3 text-center"
                                     style={styles.benefitCard}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.transform = 'translateY(-10px)';
@@ -421,12 +406,12 @@ const Owner = () => {
                                     }}
                                 >
                                     <div style={styles.benefitIcon}>
-                                        <i className="bi bi-gem" style={{ fontSize: '2rem', color: '#b66dff' }}></i>
+                                        <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: '#b66dff' }}></i>
                                     </div>
-                                    <h4 className="fw-bold mb-3" style={{ color: '#2c3e50' }}>
+                                    <h4 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '1.2rem' }}>
                                         {item.title}
                                     </h4>
-                                    <p className="text-muted mb-0" style={{ lineHeight: '1.6' }}>
+                                    <p className="text-muted mb-0" style={{ lineHeight: '1.5', fontSize: '0.85rem' }}>
                                         {item.desc || item.description || 'Premium investment opportunity with guaranteed returns'}
                                     </p>
                                 </div>
@@ -437,23 +422,23 @@ const Owner = () => {
             )}
 
             {/* Call to Action Section */}
-            <div className="container py-5">
+            <div className="container py-3 py-md-4">
                 <div className="row justify-content-center">
                     <div className="col-lg-8">
-                        <div className="text-center p-5 rounded-4" style={{
+                        <div className="text-center p-4 rounded-4" style={{
                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                             borderRadius: '30px'
                         }}>
-                            <h3 className="text-white fw-bold mb-3">Ready to Invest?</h3>
-                            <p className="text-white opacity-75 mb-4">
+                            <h3 className="text-white fw-bold mb-2" style={{ fontSize: '1.5rem' }}>Ready to Invest?</h3>
+                            <p className="text-white opacity-75 mb-3" style={{ fontSize: '0.9rem' }}>
                                 Take the first step towards a profitable investment opportunity
                             </p>
                             <button
                                 onClick={handleWhatsAppClick}
-                                className="btn btn-light btn-lg px-5 py-3 fw-bold"
-                                style={{ borderRadius: '50px', color: '#667eea' }}
-                                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                                className="btn btn-light px-4 py-2 fw-bold"
+                                style={{ borderRadius: '50px', color: '#667eea', fontSize: '0.9rem' }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                             >
                                 <i className="bi bi-whatsapp me-2"></i>
                                 Contact Us Now

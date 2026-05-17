@@ -4,17 +4,14 @@ import axios from 'axios';
 import '../assets/css/Backend/Login.css';
 
 const Login = () => {
-  // ১. স্টেট ডিক্লেয়ারেশন
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const BASE_URL = import.meta.env.VITE_BASE_URL;
-
   const navigate = useNavigate();
 
-  // ২. লগইন ফাংশন
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -27,14 +24,15 @@ const Login = () => {
       });
 
       if (response.data.status === 'success') {
-        // টোকেন সেভ করা
+        // টোকেন এবং রোল সেভ করা
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('Role', response.role);
+        localStorage.setItem('Role', response.data.role || 'admin'); // role সঠিকভাবে সেভ করা
         // ড্যাশবোর্ডে পাঠানো
         navigate('/dashboard');
+      } else {
+        setError(response.data.message || 'Login failed');
       }
     } catch (err) {
-      // ভুল ইমেইল/পাসওয়ার্ডের এরর মেসেজ দেখানো
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -44,9 +42,8 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-glass-card">
-        <h2 className="login-title">Login</h2>
+        <h2 className="login-title">Admin Login</h2>
         
-        {/* এরর মেসেজ দেখানোর জন্য */}
         {error && <p style={{ color: 'red', textAlign: 'center', fontSize: '14px' }}>{error}</p>}
         
         <form className="login-form" onSubmit={handleLogin}>
@@ -54,7 +51,7 @@ const Login = () => {
             <label>Email</label>
             <input 
               type="email" 
-              placeholder="" 
+              placeholder="admin@example.com" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
@@ -65,7 +62,7 @@ const Login = () => {
             <label>Password</label>
             <input 
               type="password" 
-              placeholder="" 
+              placeholder="Enter password" 
               className='border'
               value={password}
               onChange={(e) => setPassword(e.target.value)}

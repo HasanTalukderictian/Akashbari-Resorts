@@ -22,7 +22,7 @@ const Notice = () => {
         const apiNotices = response.data.data.map(notice => ({
           id: notice.id,
           text: notice.text,
-          icon: notice.icon || "📢",
+          icon: notice.icon,
           color: notice.color || "#ff6b6b",
           status: notice.status
         }));

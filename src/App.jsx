@@ -29,13 +29,15 @@ import GallerySection from './Backend/GallerySection'
 import BlogSection from './Backend/BlogSection'
 import Affliates from './assets/Frontend/Affliates'
 import NoticeSection from './Backend/NoticeSection'
+import PrivateRoute from './assets/Frontend/PrivateRoute'
+import NotFound from './assets/Frontend/Common/NotFound'
 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
+        {/* ফ্রন্টএন্ড রুটসমূহ - পাবলিক */}
         <Route path='/home' element={<Homepage />} />
         <Route path='/' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
@@ -45,28 +47,109 @@ function App() {
         <Route path="/blog-details/:id" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/package-details/:id" element={<PackageDetails />} />
-        <Route path="/dashboard" element={<Dashbord />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/content" element={<Content />} />
-        <Route path="/welcome" element={<Welcome />} />
-        <Route path="/video" element={<VideoSection />} />
-        <Route path="/owner-section" element={<OwnerSection />} />
-        <Route path="/owner-benefit" element={<OwnerBenefit />} />
-        <Route path="/admin-investment" element={<Investment />} />
-        <Route path="/admin-investmentbenefit" element={<InvestmentBenefit />} />
-        <Route path="/admin-events" element={<Events />} />
-        <Route path="/admin-luxury" element={<LuxurySection />} />
-        <Route path="/admin-testo" element={<Testominal />} />
-        <Route path="/admin-gallery" element={<GallerySection />} />
-        <Route path="/admin-client" element={<HappyClientsection />} />
-         <Route path="/admin-notice" element={<NoticeSection />} />
-        <Route path="/admin-client" element={<HappyClientsection />} />
-        <Route path="/admin-blog" element={<BlogSection />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/event/:id" element={<EventsDetails />} />
-
-
+         <Route path="*" element={<NotFound />} />
+        
+        {/* লগইন রুট - পাবলিক */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* অ্যাডমিন রুটসমূহ - প্রাইভেট (লগইন প্রয়োজন) */}
+        <Route path="/dashboard" element={
+          <PrivateRoute>
+            <Dashbord />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/users" element={
+          <PrivateRoute>
+            <Users />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/content" element={
+          <PrivateRoute>
+            <Content />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/welcome" element={
+          <PrivateRoute>
+            <Welcome />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/video" element={
+          <PrivateRoute>
+            <VideoSection />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/owner-section" element={
+          <PrivateRoute>
+            <OwnerSection />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/owner-benefit" element={
+          <PrivateRoute>
+            <OwnerBenefit />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-investment" element={
+          <PrivateRoute>
+            <Investment />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-investmentbenefit" element={
+          <PrivateRoute>
+            <InvestmentBenefit />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-events" element={
+          <PrivateRoute>
+            <Events />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-luxury" element={
+          <PrivateRoute>
+            <LuxurySection />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-testo" element={
+          <PrivateRoute>
+            <Testominal />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-gallery" element={
+          <PrivateRoute>
+            <GallerySection />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-client" element={
+          <PrivateRoute>
+            <HappyClientsection />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-notice" element={
+          <PrivateRoute>
+            <NoticeSection />
+          </PrivateRoute>
+        } />
+        
+        <Route path="/admin-blog" element={
+          <PrivateRoute>
+            <BlogSection />
+          </PrivateRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
