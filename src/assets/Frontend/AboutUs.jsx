@@ -119,10 +119,55 @@ const placesSectionData = {
     ]
 };
 
+const visionSectionData = {
+    sectionId: "vision-section",
+    badge: "OUR VISION",
+    title: "Shaping the Future of",
+    gradientText: "Luxury Hospitality",
+    description: "At Akashbari Hotel & Resort, we envision a future where luxury and sustainability coexist harmoniously. Our vision is to create a sanctuary that not only provides exceptional comfort but also inspires a deeper connection with nature and community.",
+    icon: "👁️",
+    visionPoints: [
+        {
+            id: 1,
+            icon: "🌿",
+            title: "Sustainable Excellence",
+            description: "Pioneering eco-friendly luxury that minimizes environmental impact while maximizing guest comfort and satisfaction.",
+            color: "#10b981"
+        },
+        {
+            id: 2,
+            icon: "🤝",
+            title: "Community First",
+            description: "Empowering local communities through employment, cultural preservation, and responsible tourism initiatives.",
+            color: "#3b82f6"
+        },
+        {
+            id: 3,
+            icon: "✨",
+            title: "Innovation & Growth",
+            description: "Continuously evolving our services and facilities to exceed global hospitality standards and guest expectations.",
+            color: "#9a55ff"
+        },
+        {
+            id: 4,
+            icon: "❤️",
+            title: "Guest Centricity",
+            description: "Creating unforgettable memories through personalized experiences and genuine warm hospitality.",
+            color: "#ef4444"
+        }
+    ],
+    stats: [
+        { value: "500+", label: "Happy Guests Daily", icon: "😊" },
+        { value: "98%", label: "Guest Satisfaction", icon: "⭐" },
+        { value: "15+", label: "Years of Excellence", icon: "🏆" },
+        { value: "50+", label: "Awards Won", icon: "🎖️" }
+    ]
+};
+
 const teamSectionData = {
     sectionId: "team-section",
     header: {
-        icon: "👥",
+        icon: "",
         tag: "MEET OUR EXPERTS",
         title: "The Passionate",
         gradientText: "People Behind",
@@ -137,30 +182,24 @@ const teamSectionData = {
         { id: 5, name: "Liam Parker", role: "Hospitality Coordinator", img: team5, bio: "Making every guest feel at home", social: { twitter: "#", linkedin: "#", email: "liam@hotelux.com" }, contactBadge: "📧 Book a Meeting" },
         { id: 6, name: "Olivia Reed", role: "Front Desk Supervisor", img: team6, bio: "Your first friendly face at Akashbari", social: { instagram: "#", linkedin: "#", email: "olivia@hotelux.com" }, contactBadge: "📧 Book a Meeting" }
     ],
-    cta: {
-        icon: "🌟",
-        title: "Join Our Amazing Team",
-        description: "We're always looking for passionate people to join our family",
-        buttonText: "View Open Positions",
-        buttonLink: "/careers"
-    }
+
 };
 
 const AboutUs = () => {
     const [selectedImage, setSelectedImage] = useState(aboutSectionData.gallery.images[0].img);
     const [activeId, setActiveId] = useState(aboutSectionData.gallery.defaultImageId);
-    
+
     const galleryImages = aboutSectionData.gallery.images;
     const contentData = aboutSectionData.content;
     const statsData = contentData.stats;
     const featuresData = contentData.features;
-    
+
     const placesContent = placesSectionData.content;
     const placesList = placesSectionData.places;
-    
+
     const teamHeader = teamSectionData.header;
     const teamMembers = teamSectionData.teamMembers;
-    const teamCTA = teamSectionData.cta;
+
 
     return (
         <>
@@ -186,7 +225,7 @@ const AboutUs = () => {
             <section id={akashbariSectionData.sectionId} className="akashbari-intro-section py-5" style={{ backgroundColor: '#fcfcfc' }}>
                 <div className="container">
                     <div className="row align-items-center g-5">
-                        
+
                         {/* Left Side - Text Details */}
                         <div className="col-lg-6">
                             <div className="modern-content">
@@ -194,7 +233,7 @@ const AboutUs = () => {
                                     <span className="badge-dot"></span>
                                     {akashbariSectionData.badge}
                                 </div>
-                                
+
                                 <h2 className="modern-title mb-4">
                                     {akashbariSectionData.titleMain}
                                     <span className="text-gradient"> {akashbariSectionData.titleGradient}</span>
@@ -230,11 +269,11 @@ const AboutUs = () => {
                         <div className="col-lg-6">
                             <div className="modern-gallery-wrapper">
                                 <div className="main-image-container position-relative overflow-hidden rounded-4 shadow-lg">
-                                    <img 
-                                        src={king3} 
-                                        alt="Akashbari Resort View" 
-                                        className="img-fluid w-100" 
-                                        style={{ minHeight: '420px', objectFit: 'cover' }} 
+                                    <img
+                                        src={king3}
+                                        alt="Akashbari Resort View"
+                                        className="img-fluid w-100"
+                                        style={{ minHeight: '420px', objectFit: 'cover' }}
                                     />
                                 </div>
                             </div>
@@ -245,10 +284,145 @@ const AboutUs = () => {
             </section>
 
             {/* Section 2: Welcome Section with Gallery */}
-           
 
-            
-           
+            <section id={visionSectionData.sectionId} className="vision-section py-5" style={{ backgroundColor: '#ffffff' }}>
+                <div className="container">
+                    {/* Section Header */}
+                    <div className="text-center mb-5">
+                        <div className="section-badge d-inline-flex align-items-center gap-2 mb-3" style={{
+                            backgroundColor: '#f0f0ff',
+                            padding: '8px 20px',
+                            borderRadius: '50px',
+                            color: '#9a55ff',
+                            fontSize: '14px',
+                            fontWeight: '600'
+                        }}>
+                            <span style={{ fontSize: '18px' }}>{visionSectionData.icon}</span>
+                            {visionSectionData.badge}
+                        </div>
+                        <h2 className="modern-title mb-3">
+                            {visionSectionData.title}
+                            <span className="text-gradient"> {visionSectionData.gradientText}</span>
+                        </h2>
+                        <p className="vision-description text-muted mx-auto" style={{ maxWidth: '700px', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                            {visionSectionData.description}
+                        </p>
+                    </div>
+
+                    {/* Vision Points Grid */}
+                    <div className="row g-4 mb-5">
+                        {visionSectionData.visionPoints.map((point) => (
+                            <div className="col-md-6 col-lg-3" key={point.id}>
+                                <div className="vision-card h-100 text-center p-4 rounded-4" style={{
+                                    backgroundColor: '#fcfcfc',
+                                    border: '1px solid #e9ecef',
+                                    transition: 'all 0.3s ease',
+                                    cursor: 'pointer'
+                                }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-8px)';
+                                        e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                    }}>
+                                    <div className="vision-icon-wrapper mb-3" style={{
+                                        width: '70px',
+                                        height: '70px',
+                                        margin: '0 auto',
+                                        background: `linear-gradient(135deg, ${point.color}15 0%, ${point.color}05 100%)`,
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <span style={{ fontSize: '32px' }}>{point.icon}</span>
+                                    </div>
+                                    <h4 className="vision-point-title mb-3" style={{ fontSize: '1.2rem', fontWeight: '700', color: '#2c3e50' }}>
+                                        {point.title}
+                                    </h4>
+                                    <p className="vision-point-description text-muted" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
+                                        {point.description}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Vision Stats Row */}
+                    <div className="vision-stats-wrapper mt-4 p-4 rounded-4" style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        borderRadius: '20px'
+                    }}>
+                        <div className="row text-center">
+                            {visionSectionData.stats.map((stat, index) => (
+                                <div className="col-md-3 col-6 mb-3 mb-md-0" key={index}>
+                                    <div className="stat-item">
+                                        <div className="stat-icon mb-2">
+                                            <span style={{ fontSize: '32px' }}>{stat.icon}</span>
+                                        </div>
+                                        <h3 className="stat-value text-white mb-1" style={{ fontSize: '2rem', fontWeight: '700' }}>
+                                            {stat.value}
+                                        </h3>
+                                        <p className="stat-label text-white-50 mb-0" style={{ fontSize: '0.9rem' }}>
+                                            {stat.label}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Vision Quote/Footer */}
+                    <div className="vision-quote text-center mt-5 pt-3">
+                        <div className="quote-icon mb-3">
+                            <span style={{ fontSize: '40px', opacity: '0.5' }}>❝</span>
+                        </div>
+                        <p className="quote-text" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#6c757d', maxWidth: '800px', margin: '0 auto' }}>
+                            "To be the most loved and trusted hospitality brand that transforms every stay into a cherished memory,
+                            while nurturing the environment and communities we serve."
+                        </p>
+                        <div className="quote-author mt-3">
+                            <p className="mb-0" style={{ fontWeight: '600', color: '#2c3e50' }}>- Akashbari Management</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <style>{`
+    .vision-card:hover .vision-icon-wrapper {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .vision-stats-wrapper {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .vision-card {
+        animation: fadeInUp 0.5s ease-out;
+        animation-fill-mode: backwards;
+    }
+    
+    .vision-card:nth-child(1) { animation-delay: 0.1s; }
+    .vision-card:nth-child(2) { animation-delay: 0.2s; }
+    .vision-card:nth-child(3) { animation-delay: 0.3s; }
+    .vision-card:nth-child(4) { animation-delay: 0.4s; }
+`}</style>
+
+
             {/* Section 5: Team Section */}
             <section className="team-section-modern py-5">
                 <div className="container">
@@ -295,21 +469,11 @@ const AboutUs = () => {
                         ))}
                     </div>
 
-                    <div className="team-cta">
-                        <div className="cta-content">
-                            <span className="cta-icon">{teamCTA.icon}</span>
-                            <h4>{teamCTA.title}</h4>
-                            <p>{teamCTA.description}</p>
-                            <button className="join-team-btn" onClick={() => window.location.href = teamCTA.buttonLink}>
-                                {teamCTA.buttonText}
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+
                 </div>
             </section>
+
+
 
             <Footer />
         </>
