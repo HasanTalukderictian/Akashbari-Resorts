@@ -6,7 +6,7 @@ import axios from 'axios';
 import '../css/blog.css';
 import '../css/blogdetails.css';
 
-// Import fallback images
+// Import fallback images (only for error cases)
 import king1 from '../image/section/Blog/Blog_image-1.webp';
 import king2 from '../image/section/Blog/Blog_image-2.webp';
 import king3 from '../image/section/Blog/Blog_image-3.webp';
@@ -18,17 +18,35 @@ const fallbackImages = [king1, king2, king3, king4, king5, king6];
 
 // Use environment variables for API URLs
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.API_URL;
+const API_URL = import.meta.env.API_URL || 'http://localhost:8000';
 
-// Helper function to get full image URL
+// Helper function to get full image URL - FIXED for Laravel storage
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
+  
+  // If already a full URL, return as is
   if (imagePath.startsWith('http')) return imagePath;
-  const cleanPath = imagePath.replace(/^\/storage\/storage\//, '/storage/');
-  if (cleanPath.startsWith('/storage/')) {
-    return `${API_URL}${cleanPath}`;
+  
+  // Extract just the filename from the path
+  let filename = imagePath;
+  if (imagePath.includes('/')) {
+    filename = imagePath.split('/').pop();
   }
-  return `${API_URL}/storage/${cleanPath}`;
+  
+  // Clean the filename
+  filename = filename.replace(/^\/+/, '');
+  
+  // Remove any query parameters
+  if (filename.includes('?')) {
+    filename = filename.split('?')[0];
+  }
+  
+  // Construct the full URL for Laravel storage
+  const baseUrl = API_URL.replace(/\/$/, '');
+  const imageUrl = `${baseUrl}/storage/blogs/${filename}`;
+  
+  console.log('Generated image URL:', imageUrl); // Debug log
+  return imageUrl;
 };
 
 const BlogDetails = () => {
@@ -37,6 +55,7 @@ const BlogDetails = () => {
   const [blogPost, setBlogPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchBlogDetails = async () => {
@@ -65,7 +84,11 @@ const BlogDetails = () => {
             excerpt: blog.excerpt,
             author: blog.author,
             category: blog.category,
-            date: blog.created_at ? new Date(blog.created_at).toLocaleDateString() : '2024-01-01',
+            date: blog.created_at ? new Date(blog.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : '2024-01-01',
             img: blog.image ? getImageUrl(blog.image) : fallbackImages[blog.id % fallbackImages.length],
             readTime: blog.read_time || '5 min read',
             views: blog.views || 0,
@@ -78,6 +101,7 @@ const BlogDetails = () => {
             }
           };
           
+          console.log('Formatted blog post:', formattedBlog);
           setBlogPost(formattedBlog);
         } else {
           setError('Blog post not found');
@@ -95,15 +119,30 @@ const BlogDetails = () => {
     }
   }, [id]);
 
+  // Handle image error - use fallback
+  const handleImageError = () => {
+    if (!imageError) {
+      setImageError(true);
+    }
+  };
+
+  // Get final image URL with fallback
+  const getFinalImageUrl = () => {
+    if (imageError || !blogPost?.img) {
+      return fallbackImages[0];
+    }
+    return blogPost.img;
+  };
+
   if (loading) {
     return (
       <>
         <Header />
-        <div className="text-center py-5">
-          <div className="spinner-border text-warning" role="status">
+        <div className="text-center py-5" style={{ minHeight: '60vh' }}>
+          <div className="spinner-border text-warning" role="status" style={{ width: '3rem', height: '3rem' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="mt-3">Loading blog post...</p>
+          <p className="mt-3 text-muted">Loading blog post...</p>
         </div>
         <Footer />
       </>
@@ -114,12 +153,16 @@ const BlogDetails = () => {
     return (
       <>
         <Header />
-        <div className="text-center py-5">
+        <div className="text-center py-5" style={{ minHeight: '60vh' }}>
+          <div className="error-icon mb-4">
+            <span style={{ fontSize: '64px' }}>📄</span>
+          </div>
           <h2 className="text-danger mb-4">{error || 'No Blog Data Found!'}</h2>
-          <p className="mb-4">The blog post you're looking for doesn't exist or has been moved.</p>
+          <p className="text-muted mb-4">The blog post you're looking for doesn't exist or has been moved.</p>
           <button 
-            className="btn btn-warning px-4 py-2"
+            className="btn btn-warning px-4 py-2 rounded-pill"
             onClick={() => navigate('/blog')}
+            style={{ fontWeight: '600' }}
           >
             ← Back to Blog
           </button>
@@ -134,18 +177,29 @@ const BlogDetails = () => {
       <Header />
       
       {/* Banner Section */}
-      <section className="blog-banner text-center d-flex flex-column justify-content-center" style={{ minHeight: '400px' }}>
+      <section className="blog-banner text-center d-flex flex-column justify-content-center" style={{ 
+        minHeight: '400px',
+        background: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(${getFinalImageUrl()})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
         <div className="container">
-          <h1 className="blog-title serif mb-2 text-white">Blog Details</h1>
-          <h5 className="serif display-6 mb-3 text-white">{blogPost.title}</h5>
-          <div className="blog-meta text-white">
-            <span className="mx-2">📅 {blogPost.date}</span>
-            <span className="mx-2">|</span>
-            <span className="mx-2">✍️ By {blogPost.author}</span>
-            <span className="mx-2">|</span>
-            <span className="mx-2">⏱️ {blogPost.readTime}</span>
-            <span className="mx-2">|</span>
-            <span className="mx-2">📚 {blogPost.category}</span>
+          <div className="breadcrumb-wrapper mb-3">
+            <span className="text-white-50">Home</span>
+            <span className="text-warning mx-2">›</span>
+            <span className="text-white-50">Blog</span>
+            <span className="text-warning mx-2">›</span>
+            <span className="text-white">Details</span>
+          </div>
+          <h1 className="blog-title serif mb-3 text-white" style={{ fontSize: '2.5rem', fontWeight: '700' }}>
+            {blogPost.title}
+          </h1>
+          <div className="blog-meta text-white-50 d-flex justify-content-center gap-4 flex-wrap">
+            <span>📅 {blogPost.date}</span>
+            <span>✍️ By {blogPost.author}</span>
+            <span>⏱️ {blogPost.readTime}</span>
+            <span>📚 {blogPost.category}</span>
           </div>
         </div>
       </section>
@@ -157,30 +211,50 @@ const BlogDetails = () => {
             {/* Left Column - Main Content */}
             <div className="col-lg-8">
               {/* Introduction */}
-              <div className="mb-4">
-                <p className="lead text-muted fst-italic">
-                  "{blogPost.content?.introduction || "No introduction available"}"
-                </p>
-              </div>
+              {blogPost.content?.introduction && (
+                <div className="introduction-block mb-4 p-4 rounded-4" style={{
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: '4px solid #ffc107'
+                }}>
+                  <p className="lead text-muted fst-italic mb-0" style={{ fontSize: '1.1rem' }}>
+                    "{blogPost.content.introduction}"
+                  </p>
+                </div>
+              )}
               
               {/* Featured Image */}
-              <div className="detail-img-wrapper mb-5">
+              <div className="detail-img-wrapper mb-5 position-relative overflow-hidden rounded-4 shadow-lg">
                 <img 
-                  src={blogPost.img} 
+                  src={getFinalImageUrl()} 
                   alt={blogPost.title} 
-                  className="img-fluid w-100 rounded"
-                  style={{ maxHeight: '500px', objectFit: 'cover' }}
-                  onError={(e) => e.target.src = fallbackImages[0]}
+                  className="img-fluid w-100"
+                  style={{ 
+                    maxHeight: '500px', 
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease'
+                  }}
+                  onError={handleImageError}
                 />
+                <div className="position-absolute bottom-0 start-0 bg-dark text-white px-3 py-1 m-3 rounded-pill" style={{ fontSize: '12px' }}>
+                  {blogPost.category}
+                </div>
               </div>
 
               {/* Content Sections */}
               {blogPost.content?.sections && blogPost.content.sections.length > 0 && (
                 <>
                   {blogPost.content.sections.map((section, idx) => (
-                    <div key={idx} className="mb-5">
-                      <h3 className="serif h4 mb-3 pb-2 border-bottom">{section.title}</h3>
-                      <p className="text-muted lh-lg">{section.content}</p>
+                    <div key={idx} className="section-block mb-5">
+                      <h3 className="serif h4 mb-3 pb-2" style={{ 
+                        color: '#2c3e50',
+                        borderLeft: '3px solid #ffc107',
+                        paddingLeft: '15px'
+                      }}>
+                        {section.title}
+                      </h3>
+                      <p className="text-muted lh-lg" style={{ fontSize: '1.05rem', lineHeight: '1.8' }}>
+                        {section.content}
+                      </p>
                     </div>
                   ))}
                 </>
@@ -188,17 +262,26 @@ const BlogDetails = () => {
 
               {/* Conclusion */}
               {blogPost.content?.conclusion && (
-                <div className="mt-5 p-4 bg-light rounded">
+                <div className="conclusion-block mt-5 p-4 rounded-4" style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white'
+                }}>
                   <h4 className="serif mb-3">✨ Conclusion</h4>
-                  <p className="text-muted mb-0 fs-5">{blogPost.content.conclusion}</p>
+                  <p className="mb-0 fs-5" style={{ lineHeight: '1.6' }}>{blogPost.content.conclusion}</p>
                 </div>
               )}
 
-              {/* Stats */}
-              <div className="mt-4 pt-3 border-top">
+              {/* Stats & Share */}
+              <div className="mt-4 pt-3 d-flex justify-content-between align-items-center border-top">
                 <div className="d-flex gap-4">
                   <span className="text-muted">👁️ {blogPost.views.toLocaleString()} views</span>
                   <span className="text-muted">❤️ {blogPost.likes} likes</span>
+                </div>
+                <div className="share-buttons">
+                  <span className="text-muted me-2">Share:</span>
+                  <a href="#" className="text-decoration-none me-2">📘</a>
+                  <a href="#" className="text-decoration-none me-2">🐦</a>
+                  <a href="#" className="text-decoration-none">📌</a>
                 </div>
               </div>
             </div>
@@ -206,59 +289,78 @@ const BlogDetails = () => {
             {/* Right Column - Sidebar */}
             <div className="col-lg-4">
               {/* About Author Card */}
-              <div className="sidebar-card mb-4 p-4 bg-light rounded shadow-sm">
-                <h5 className="serif mb-3">✍️ About the Author</h5>
+              <div className="sidebar-card mb-4 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#ffffff', border: '1px solid #e9ecef' }}>
+                <h5 className="serif mb-3" style={{ color: '#2c3e50' }}>✍️ About the Author</h5>
                 <div className="d-flex align-items-center mb-3">
-                  <div className="bg-warning rounded-circle me-3 d-flex align-items-center justify-content-center" style={{ width: '50px', height: '50px', fontSize: '24px' }}>
+                  <div className="rounded-circle me-3 d-flex align-items-center justify-content-center" style={{
+                    width: '50px',
+                    height: '50px',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    fontSize: '24px',
+                    color: 'white'
+                  }}>
                     {blogPost.author?.charAt(0) || 'A'}
                   </div>
                   <div>
-                    <strong className="d-block">{blogPost.author}</strong>
-                    <small className="text-muted">Content Writer</small>
+                    <strong className="d-block" style={{ color: '#2c3e50' }}>{blogPost.author}</strong>
+                    <small className="text-muted">Content Writer & Hospitality Expert</small>
                   </div>
                 </div>
                 <p className="text-muted small mb-0">
-                  Passionate about sharing insights on luxury travel, hospitality, and unique experiences.
+                  Passionate about sharing insights on luxury travel, hospitality, and creating unforgettable experiences for guests worldwide.
                 </p>
               </div>
 
               {/* Blog Info Card */}
-              <div className="sidebar-card mb-4 p-4 bg-white rounded shadow-sm">
-                <h5 className="serif mb-4">ℹ️ Blog Info</h5>
+              <div className="sidebar-card mb-4 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#ffffff', border: '1px solid #e9ecef' }}>
+                <h5 className="serif mb-4" style={{ color: '#2c3e50' }}>ℹ️ Blog Info</h5>
                 <ul className="list-unstyled">
-                  <li className="mb-2">
-                    <strong>Status:</strong>{' '}
-                    <span className={`badge ${blogPost.status === 'Published' ? 'bg-success' : 'bg-warning'}`}>
+                  <li className="mb-3 d-flex justify-content-between">
+                    <strong className="text-muted">Status:</strong>
+                    <span className={`badge ${blogPost.status === 'Published' ? 'bg-success' : 'bg-warning'} px-3 py-2 rounded-pill`}>
                       {blogPost.status}
                     </span>
                   </li>
-                  <li className="mb-2">
-                    <strong>Category:</strong> {blogPost.category}
+                  <li className="mb-3 d-flex justify-content-between">
+                    <strong className="text-muted">Category:</strong>
+                    <span className="text-dark">{blogPost.category}</span>
                   </li>
-                  <li className="mb-2">
-                    <strong>Published:</strong> {blogPost.date}
+                  <li className="mb-3 d-flex justify-content-between">
+                    <strong className="text-muted">Published:</strong>
+                    <span className="text-dark">{blogPost.date}</span>
                   </li>
-                  <li className="mb-2">
-                    <strong>Reading Time:</strong> {blogPost.readTime}
+                  <li className="mb-3 d-flex justify-content-between">
+                    <strong className="text-muted">Reading Time:</strong>
+                    <span className="text-dark">{blogPost.readTime}</span>
+                  </li>
+                  <li className="d-flex justify-content-between">
+                    <strong className="text-muted">Total Views:</strong>
+                    <span className="text-dark">{blogPost.views.toLocaleString()}</span>
                   </li>
                 </ul>
               </div>
 
               {/* Book Now CTA */}
-              <div className="book-now-card text-white position-relative rounded overflow-hidden shadow-lg">
+              <div className="book-now-card position-relative rounded-4 overflow-hidden shadow-lg mb-4" style={{ minHeight: '250px' }}>
                 <div className="position-absolute top-0 start-0 w-100 h-100">
                   <img 
-                    src={blogPost.img} 
+                    src={getFinalImageUrl()} 
                     alt="Book your stay" 
                     className="img-fluid w-100 h-100"
                     style={{ objectFit: 'cover' }}
+                    onError={handleImageError}
                   />
-                  <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-75"></div>
+                  <div className="position-absolute top-0 start-0 w-100 h-100" style={{
+                    background: 'linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%)'
+                  }}></div>
                 </div>
-                <div className="book-content p-4 position-relative" style={{ zIndex: 1 }}>
-                  <h4 className="serif mb-3">🏨 Book Your Stay</h4>
-                  <p className="small mb-4">Check availability and choose the perfect room for your needs.</p>
-                  <button className="btn btn-warning w-100 fw-bold py-2">
+                <div className="book-content p-4 position-relative text-white" style={{ zIndex: 1 }}>
+                  <div className="mb-3">
+                    <span style={{ fontSize: '40px' }}>🏨</span>
+                  </div>
+                  <h4 className="serif mb-3" style={{ fontWeight: '700' }}>Book Your Stay</h4>
+                  <p className="small mb-4 text-white-50">Check availability and choose the perfect room for your needs.</p>
+                  <button className="btn btn-warning w-100 fw-bold py-2 rounded-pill" style={{ fontWeight: '600' }}>
                     Book Now <span className="ms-2">→</span>
                   </button>
                 </div>
@@ -266,8 +368,9 @@ const BlogDetails = () => {
 
               {/* Back Button */}
               <button 
-                className="btn btn-outline-secondary w-100 mt-3 py-2"
+                className="btn btn-outline-secondary w-100 mt-2 py-2 rounded-pill"
                 onClick={() => navigate('/blog')}
+                style={{ fontWeight: '500' }}
               >
                 ← Back to All Blogs
               </button>
