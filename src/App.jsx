@@ -31,6 +31,7 @@ import Affliates from './assets/Frontend/Affliates'
 import NoticeSection from './Backend/NoticeSection'
 import PrivateRoute from './assets/Frontend/PrivateRoute'
 import NotFound from './assets/Frontend/Common/NotFound'
+import Packagestatistics from './Backend/Packagestatistics'
 
 
 function App() {
@@ -130,6 +131,13 @@ function App() {
         <Route path="/admin-gallery" element={
           <PrivateRoute>
             <GallerySection />
+          </PrivateRoute>
+        } />
+
+
+         <Route path="/admin-stat" element={
+          <PrivateRoute>
+            <Packagestatistics />
           </PrivateRoute>
         } />
         
