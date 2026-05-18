@@ -12,7 +12,8 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     { id: 'gallery', label: 'Gallery', icon: 'bi bi-images', path: '/admin-gallery' },
     { id: 'blog', label: 'Blog Page', icon: 'bi bi-gear', path: '/admin-blog' },
     { id: 'notice', label: 'Notice', icon: 'bi bi-person-circle', path: '/admin-notice' },
-    { id: 'statistics', label: 'Price statistics', icon: 'bi bi-person-circle', path: '/admin-stat' }
+    { id: 'statistics', label: 'Price statistics', icon: 'bi bi-person-circle', path: '/admin-stat' },
+    { id: 'affilites', label: 'Affilites', icon: 'bi bi-person-circle', path: '/admin-affilites' }
 ];
 
 const landingSubItems = [

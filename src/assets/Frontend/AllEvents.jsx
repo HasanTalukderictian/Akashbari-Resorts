@@ -25,7 +25,9 @@ const AllEvents = () => {
     card: isDarkMode ? '#16213e' : '#ffffff',
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    heroBg: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    heroBg: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #ff8c32 0%, #ff8c32 100%)',
+    primaryColor: '#ff8c32',
+    primaryHover: '#e67e22',
   };
 
   // Helper function to get full image URL
@@ -131,7 +133,7 @@ const AllEvents = () => {
       top: '50%',
       transform: 'translateY(-50%)',
       zIndex: 10,
-      color: '#9a55ff',
+      color: '#ff8c32',
     },
     searchInput: {
       paddingLeft: '40px',
@@ -216,6 +218,9 @@ const AllEvents = () => {
       borderRadius: '25px',
       padding: '10px 25px',
       fontWeight: '600',
+      backgroundColor: '#ff8c32',
+      border: 'none',
+      color: 'white',
     },
     eventCardBody: {
       padding: '20px',
@@ -231,7 +236,7 @@ const AllEvents = () => {
     },
     eventCardSubtitle: {
       fontSize: '14px',
-      color: '#e74c3c',
+      color: '#ff8c32',
       marginBottom: '12px',
     },
     eventMeta: {
@@ -301,7 +306,7 @@ const AllEvents = () => {
         />
         <div className="container py-5">
           <div className="text-center py-5">
-            <div className="spinner-border text-primary" style={styles.spinner} role="status">
+            <div className="spinner-border" style={{ ...styles.spinner, color: '#ff8c32' }} role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="mt-3" style={styles.loadingText}>Loading amazing events...</p>
@@ -375,7 +380,24 @@ const AllEvents = () => {
               <button
                 className={`btn ${selectedCategory === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setSelectedCategory('all')}
-                style={styles.filterBtn}
+                style={{
+                  ...styles.filterBtn,
+                  backgroundColor: selectedCategory === 'all' ? '#ff8c32' : 'transparent',
+                  borderColor: '#ff8c32',
+                  color: selectedCategory === 'all' ? 'white' : '#ff8c32',
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedCategory !== 'all') {
+                    e.currentTarget.style.backgroundColor = '#ff8c32';
+                    e.currentTarget.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedCategory !== 'all') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#ff8c32';
+                  }
+                }}
               >
                 <i className="bi bi-grid-3x3-gap-fill me-2"></i>
                 All Events
@@ -383,7 +405,24 @@ const AllEvents = () => {
               <button
                 className={`btn ${selectedCategory === 'upcoming' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setSelectedCategory('upcoming')}
-                style={styles.filterBtn}
+                style={{
+                  ...styles.filterBtn,
+                  backgroundColor: selectedCategory === 'upcoming' ? '#ff8c32' : 'transparent',
+                  borderColor: '#ff8c32',
+                  color: selectedCategory === 'upcoming' ? 'white' : '#ff8c32',
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedCategory !== 'upcoming') {
+                    e.currentTarget.style.backgroundColor = '#ff8c32';
+                    e.currentTarget.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedCategory !== 'upcoming') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#ff8c32';
+                  }
+                }}
               >
                 <i className="bi bi-calendar-event-fill me-2"></i>
                 Upcoming
@@ -391,7 +430,24 @@ const AllEvents = () => {
               <button
                 className={`btn ${selectedCategory === 'past' ? 'btn-primary' : 'btn-outline-primary'}`}
                 onClick={() => setSelectedCategory('past')}
-                style={styles.filterBtn}
+                style={{
+                  ...styles.filterBtn,
+                  backgroundColor: selectedCategory === 'past' ? '#ff8c32' : 'transparent',
+                  borderColor: '#ff8c32',
+                  color: selectedCategory === 'past' ? 'white' : '#ff8c32',
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedCategory !== 'past') {
+                    e.currentTarget.style.backgroundColor = '#ff8c32';
+                    e.currentTarget.style.color = 'white';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedCategory !== 'past') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#ff8c32';
+                  }
+                }}
               >
                 <i className="bi bi-calendar-check-fill me-2"></i>
                 Past Events
@@ -433,7 +489,7 @@ const AllEvents = () => {
                         </span>
                       </div>
                       <div className="event-overlay" style={styles.eventOverlay}>
-                        <button className="btn btn-light btn-sm" style={styles.viewDetailsBtn}>
+                        <button className="btn btn-sm" style={styles.viewDetailsBtn}>
                           View Details <i className="bi bi-arrow-right"></i>
                         </button>
                       </div>
@@ -461,7 +517,7 @@ const AllEvents = () => {
                       <div className="event-features" style={styles.eventFeatures}>
                         {event.features && event.features.slice(0, 2).map((feature, idx) => (
                           <span key={idx} className="feature-tag" style={styles.featureTag}>
-                            <i className="bi bi-check-circle-fill me-1"></i> {feature.substring(0, 30)}
+                            <i className="bi bi-check-circle-fill me-1" style={{ color: '#ff8c32' }}></i> {feature.substring(0, 30)}
                           </span>
                         ))}
                       </div>
@@ -469,7 +525,7 @@ const AllEvents = () => {
                         <span className="text-muted small">
                           <i className="bi bi-chat me-1"></i> {event.comments || 0} comments
                         </span>
-                        <span className="text-primary small">
+                        <span className="small" style={{ color: '#ff8c32' }}>
                           Read More <i className="bi bi-arrow-right-short"></i>
                         </span>
                       </div>
@@ -485,19 +541,31 @@ const AllEvents = () => {
                 <nav>
                   <ul className="pagination justify-content-center">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
+                      <button 
+                        className="page-link" 
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        style={{ color: '#ff8c32' }}
+                      >
                         <i className="bi bi-chevron-left"></i> Previous
                       </button>
                     </li>
                     {[...Array(totalPages)].map((_, index) => (
                       <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                        <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
+                        <button 
+                          className="page-link" 
+                                          onClick={() => setCurrentPage(index + 1)}
+                          style={currentPage === index + 1 ? { backgroundColor: '#ff8c32', borderColor: '#ff8c32', color: 'white' } : { color: '#ff8c32' }}
+                        >
                           {index + 1}
                         </button>
                       </li>
                     ))}
                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                      <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
+                      <button 
+                        className="page-link" 
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        style={{ color: '#ff8c32' }}
+                      >
                         Next <i className="bi bi-chevron-right"></i>
                       </button>
                     </li>
@@ -544,6 +612,13 @@ const AllEvents = () => {
         
         .page-link:hover {
           transform: translateY(-2px);
+          background-color: #ff8c32;
+          color: white !important;
+        }
+        
+        .page-item.active .page-link {
+          background-color: #ff8c32 !important;
+          border-color: #ff8c32 !important;
         }
         
         @media (max-width: 768px) {

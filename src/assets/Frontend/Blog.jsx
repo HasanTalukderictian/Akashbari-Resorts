@@ -271,7 +271,7 @@ const Blog = () => {
                       </p>
                     </div>
                     <button className="read-more-btn-gold mt-3 w-100 py-2 rounded-pill border-0 fw-semibold" style={{
-                      background: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+                      background: 'linear-gradient(135deg, #ff8c32 0%, #ff8c32 100%)',
                       color: 'white',
                       transition: 'all 0.3s ease'
                     }}>

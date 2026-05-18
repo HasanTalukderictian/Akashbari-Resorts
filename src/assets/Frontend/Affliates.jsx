@@ -1,34 +1,123 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Header from './Common/Header';
 import Footer from './Common/Footer';
-import logo1 from '../../assets/image/section/Blog/ddd.jpg';
-import logo2 from '../../assets/image/section/Blog/hhh.jpg';
-import logo3 from '../../assets/image/section/Blog/kkk.jpg';
-import logo4 from '../../assets/image/section/Blog/logo (1).webp';
 
 const Affiliates = () => {
-  const partners = [
-    {
-      name: "Akashbari Holidays",
-      description: "Akashbari Holidays is your gateway to unforgettable adventures around the world. Whether you dream of a getaway to North America, an immersion in the cultural riches of Europe, or a luxurious adventure in French Polynesia, we offer exceptional trips that transcend simple vacations to become truly unforgettable experiences.",
-      logo: logo4,
-    },
-    {
-      name: "Akashbari Global Service",
-      description: "Akashbari Global Services known as AGS is one of the best education consultancy services in Bangladesh. Best services for Study Abroad & Visa Consultancy and student support from university application to immigration.",
-      logo: logo1,
-    },
-    {
-      name: "Rupkatha Adventure Tours",
-      description: "Rupkatha Adventure Tours is a top-tier travel agency specializing in Holidays Packages, International Hotels, Air Tickets, and Visa processing with a focus on customer satisfaction.",
-      logo: logo2,
-    },
-    {
-      name: "Rupkatha Edu World",
-      description: "A Bangladesh-based education consultancy that turns global dreams into achievable journeys through thoughtful counseling, seamless admissions, and scholarship guidance.",
-      logo: logo3,
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // API Configuration
+  const API_BASE_URL =  'http://localhost:8000/api';
+  const API_URL =  'http://localhost:8000';
+
+  // Helper function to get full image URL
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    // Remove leading slash if exists and prepend API_URL
+    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${API_URL}${cleanPath}`;
+  };
+
+  // Fetch affiliates from API
+  const fetchAffiliates = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/affiliates`);
+      console.log('API Response:', response.data);
+      
+      if (response.data.success && response.data.data) {
+        // Transform the data to match the component's expected format
+        const transformedData = response.data.data.map(affiliate => ({
+          id: affiliate.id,
+          name: affiliate.title,
+          description: affiliate.description,
+          logo: getFullImageUrl(affiliate.image),
+          website: affiliate.website,
+          status: affiliate.status,
+          createdAt: affiliate.created_at,
+          sortOrder: affiliate.sort_order,
+          clickCount: affiliate.click_count
+        }));
+        setPartners(transformedData);
+      } else {
+        setPartners([]);
+        setError('No affiliates found');
+      }
+    } catch (err) {
+      console.error('Error fetching affiliates:', err);
+      setError('Failed to load affiliates. Please try again later.');
+      setPartners([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchAffiliates();
+  }, []);
+
+  // Handle view details click
+  const handleViewDetails = (website) => {
+    if (website) {
+      window.open(website, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main style={styles.container}>
+          <div style={styles.loadingContainer}>
+            <div className="spinner-border text-success" role="status" style={styles.spinner}>
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p style={styles.loadingText}>Loading our sister concerns...</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <main style={styles.container}>
+          <div style={styles.errorContainer}>
+            <i className="bi bi-exclamation-triangle-fill" style={styles.errorIcon}></i>
+            <h3 style={styles.errorTitle}>Oops! Something went wrong</h3>
+            <p style={styles.errorMessage}>{error}</p>
+            <button onClick={fetchAffiliates} style={styles.retryButton}>
+              Try Again
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (partners.length === 0) {
+    return (
+      <>
+        <Header />
+        <main style={styles.container}>
+          <div style={styles.emptyContainer}>
+            <i className="bi bi-building" style={styles.emptyIcon}></i>
+            <h3 style={styles.emptyTitle}>No Sister Concerns Found</h3>
+            <p style={styles.emptyMessage}>Please check back later for updates.</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -52,21 +141,28 @@ const Affiliates = () => {
             const isReverse = index % 2 !== 0;
 
             return (
-              <div key={index} style={{
+              <div key={item.id} style={{
                 ...styles.row,
                 flexDirection: isReverse ? 'row-reverse' : 'row'
               }}>
                 {/* Image Box */}
                 <div style={styles.imageBox}>
                   <div style={styles.imageWrapper}>
-                    <img src={item.logo} alt={item.name} style={styles.logo} />
+                    <img 
+                      src={item.logo} 
+                      alt={item.name} 
+                      style={styles.logo}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                      }}
+                    />
                   </div>
                 </div>
 
                 {/* Text Box */}
                 <div style={{
                   ...styles.textBox,
-                  // Fix: Remove border on the side that touches the image
                   borderLeft: isReverse ? '1px solid #e0e0e0' : 'none',
                   borderRight: isReverse ? 'none' : '1px solid #e0e0e0',
                 }}>
@@ -74,8 +170,9 @@ const Affiliates = () => {
                   <p style={styles.cardText}>{item.description}</p>
                   <button 
                     style={styles.button}
-                    onMouseOver={(e) => e.target.style.backgroundColor = '#5e853d'}
-                    onMouseOut={(e) => e.target.style.backgroundColor = '#76a34d'}
+                    onClick={() => handleViewDetails(item.website)}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#5e853d'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#76a34d'}
                   >
                     VIEW DETAILS ↗
                   </button>
@@ -97,7 +194,6 @@ const styles = {
     margin: '0 auto',
     padding: '80px 20px',
     fontFamily: "'Playfair Display', serif",
-    // Mobile padding adjustment
     '@media (maxWidth: 768px)': {
       padding: '40px 16px',
     },
@@ -203,6 +299,7 @@ const styles = {
   imageWrapper: {
     width: '70%',
     transition: 'transform 0.5s ease',
+    cursor: 'pointer',
     '@media (maxWidth: 768px)': {
       width: '50%',
     },
@@ -242,6 +339,7 @@ const styles = {
     width: '100%',
     height: 'auto',
     objectFit: 'contain',
+    transition: 'transform 0.5s ease',
   },
   cardTitle: {
     fontSize: '32px',
@@ -293,7 +391,71 @@ const styles = {
       padding: '8px 16px',
       fontSize: '11px',
     },
-  }
+  },
+  loadingContainer: {
+    textAlign: 'center',
+    padding: '80px 20px',
+  },
+  spinner: {
+    width: '3rem',
+    height: '3rem',
+  },
+  loadingText: {
+    marginTop: '20px',
+    color: '#666',
+    fontSize: '16px',
+  },
+  errorContainer: {
+    textAlign: 'center',
+    padding: '80px 20px',
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 5px 20px rgba(0,0,0,0.05)',
+  },
+  errorIcon: {
+    fontSize: '48px',
+    color: '#dc3545',
+    marginBottom: '20px',
+  },
+  errorTitle: {
+    fontSize: '24px',
+    color: '#333',
+    marginBottom: '10px',
+  },
+  errorMessage: {
+    fontSize: '16px',
+    color: '#666',
+    marginBottom: '20px',
+  },
+  retryButton: {
+    backgroundColor: '#76a34d',
+    color: 'white',
+    border: 'none',
+    padding: '10px 24px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
+  },
+  emptyContainer: {
+    textAlign: 'center',
+    padding: '80px 20px',
+  },
+  emptyIcon: {
+    fontSize: '48px',
+    color: '#76a34d',
+    marginBottom: '20px',
+  },
+  emptyTitle: {
+    fontSize: '24px',
+    color: '#333',
+    marginBottom: '10px',
+  },
+  emptyMessage: {
+    fontSize: '16px',
+    color: '#666',
+  },
 };
 
 // Add responsive styles using CSS-in-JS with media queries

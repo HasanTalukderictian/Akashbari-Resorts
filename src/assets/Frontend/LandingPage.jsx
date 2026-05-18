@@ -15,6 +15,7 @@ import Luxury from "./Luxury";
 import HappyClient from "./HappyClient";
 import Notice from "./Notice";
 import Member from "./Member";
+import ProjectView from "./ProjectView";
 
 const LandingPage = () => {
 
@@ -59,11 +60,12 @@ const LandingPage = () => {
       <Luxury />
 
       <Facility />
-
+      
+      <ProjectView/>
 
       <Event />
-      
-      <Member/>
+
+      {/* <Member/> */}
 
       <Testominal />
 

@@ -23,7 +23,7 @@ const EventsDetails = () => {
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     textMuted: isDarkMode ? '#adb5bd' : '#6c757d',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    heroBg: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    heroBg: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #ff8c32 0%, #ff8c32 100%)',
   };
 
   // Helper function to get full image URL
@@ -144,7 +144,7 @@ const EventsDetails = () => {
     },
     infoIcon: {
       fontSize: '24px',
-      color: '#9a55ff',
+      color: '#ff8c32',
       marginRight: '15px',
     },
     infoLabel: {
@@ -173,7 +173,7 @@ const EventsDetails = () => {
       left: 0,
       width: '60px',
       height: '3px',
-      background: '#9a55ff',
+      background: '#ff8c32',
       borderRadius: '2px',
     },
     description: {
@@ -212,7 +212,7 @@ const EventsDetails = () => {
       transition: 'all 0.3s ease',
     },
     backButton: {
-      backgroundColor: '#9a55ff',
+      backgroundColor: '#ff8c32',
       color: 'white',
       border: 'none',
       padding: '12px 30px',
@@ -445,12 +445,12 @@ const EventsDetails = () => {
             {/* Booking Card */}
             <div style={styles.infoCard}>
               <div className="text-center">
-                <i className="bi bi-ticket-perforated" style={{ fontSize: '48px', color: '#9a55ff', marginBottom: '15px', display: 'block' }}></i>
+                <i className="bi bi-ticket-perforated" style={{ fontSize: '48px', color: '#ff8c32', marginBottom: '15px', display: 'block' }}></i>
                 <h5 style={{ color: theme.text, marginBottom: '15px' }}>Want to Join?</h5>
                 <p style={{ color: theme.textMuted, fontSize: '14px', marginBottom: '20px' }}>
                   Limited seats available. Book your spot now!
                 </p>
-                <button className="btn w-100" style={{ backgroundColor: '#9a55ff', color: 'white', padding: '12px', borderRadius: '25px', fontWeight: '600' }}>
+                <button className="btn w-100" style={{ backgroundColor: '#ff8c32', color: 'white', padding: '12px', borderRadius: '25px', fontWeight: '600' }}>
                   <i className="bi bi-calendar-check me-2"></i>
                   Register Now
                 </button>
