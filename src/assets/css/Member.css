@@ -1,0 +1,293 @@
+/* Member.css - ইমেজ অনুযায়ী কন্টেইনার সাইজ */
+
+.carousel-container {
+    width: 100%;
+    max-width: 900px;
+    /* 900px এ সেট করা হয়েছে - ইমেজের মতো */
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+
+/* যদি পুরো স্ক্রিনে দেখাতে চান তাহলে এইটা ব্যবহার করুন */
+
+
+/* .carousel-container {
+    width: 95%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+} */
+
+
+/* Header Styles */
+
+.carousel-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.sub-title {
+    font-size: 1.1rem;
+    color: #666;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+
+/* Carousel Wrapper */
+
+.carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-content {
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.slides-container {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.image-container {
+    width: 100%;
+    height: 450px;
+    /* ইমেজের মতো适中 সাইজ */
+    overflow: hidden;
+    position: relative;
+}
+
+.member-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.member-image:hover {
+    transform: scale(1.03);
+}
+
+
+/* Member Info Overlay */
+
+.member-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.member-name {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.member-title {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+.member-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+
+/* Navigation Buttons */
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.prev-btn {
+    left: 15px;
+}
+
+.next-btn {
+    right: 15px;
+}
+
+
+/* Dots Container */
+
+.dots-container {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    gap: 8px;
+    background-color: white;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background-color: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.dot:hover {
+    background-color: #999;
+    transform: scale(1.2);
+}
+
+.dot.active {
+    background-color: #333;
+    width: 24px;
+    border-radius: 4px;
+}
+
+
+/* Loading and Error States */
+
+.loading,
+.error,
+.no-data {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.error {
+    color: #dc3545;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .carousel-container {
+        padding: 15px;
+    }
+    .main-title {
+        font-size: 1.8rem;
+    }
+    .sub-title {
+        font-size: 0.95rem;
+    }
+    .image-container {
+        height: 350px;
+    }
+    .member-name {
+        font-size: 1.2rem;
+    }
+    .member-title {
+        font-size: 0.9rem;
+    }
+    .member-description {
+        font-size: 0.8rem;
+        max-width: 90%;
+    }
+    .carousel-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-container {
+        height: 280px;
+    }
+    .member-info {
+        padding: 12px;
+    }
+    .member-name {
+        font-size: 1rem;
+    }
+    .carousel-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}
+
+
+/* বড় স্ক্রিনের জন্য */
+
+@media (min-width: 1400px) {
+    .carousel-container {
+        max-width: 1100px;
+    }
+    .image-container {
+        height: 500px;
+    }
+}
+
+
+/* Animations */
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

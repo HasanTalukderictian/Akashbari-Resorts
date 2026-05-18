@@ -14,6 +14,7 @@ import Packagegrap from "./Packagegrap";
 import Luxury from "./Luxury";
 import HappyClient from "./HappyClient";
 import Notice from "./Notice";
+import Member from "./Member";
 
 const LandingPage = () => {
 
@@ -59,7 +60,10 @@ const LandingPage = () => {
 
       <Facility />
 
+
       <Event />
+      
+      <Member/>
 
       <Testominal />
 
