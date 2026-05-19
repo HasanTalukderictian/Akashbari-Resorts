@@ -34,6 +34,7 @@ import NotFound from './assets/Frontend/Common/NotFound'
 import Packagestatistics from './Backend/Packagestatistics'
 import Affilitaes from './Backend/Affilitaes'
 import Club from './assets/Frontend/Club'
+import Teamate from './Backend/Teamate'
 
 
 function App() {
@@ -159,6 +160,12 @@ function App() {
         <Route path="/admin-notice" element={
           <PrivateRoute>
             <NoticeSection />
+          </PrivateRoute>
+        } />
+
+         <Route path="/admin-team" element={
+          <PrivateRoute>
+            <Teamate />
           </PrivateRoute>
         } />
         

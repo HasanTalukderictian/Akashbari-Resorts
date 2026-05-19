@@ -12,8 +12,8 @@ const Investment = ({ theme }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const itemsPerPage = 6;
-    
-    // ডাটা স্টেট
+
+    // Data state
     const [packages, setPackages] = useState([]);
     const [formData, setFormData] = useState({
         id: '',
@@ -24,14 +24,16 @@ const Investment = ({ theme }) => {
         building: '',
         total_size: '',
         description: '',
+        images: [],
+        imagePreview: [],
         is_popular: false,
         is_sold_out: false
     });
     const [isEditing, setIsEditing] = useState(false);
 
-    const API_BASE = import.meta.env.VITE_BASE_URL;
+    const API_BASE = import.meta.env.VITE_BASE_URL || 'http://localhost:5000/api';
 
-    // ১. ডাটা ফেচ করা
+    // 1. Fetch data
     const fetchPackages = async () => {
         try {
             setLoading(true);
@@ -39,6 +41,8 @@ const Investment = ({ theme }) => {
             const result = await response.json();
             if (result.status) {
                 setPackages(result.data || []);
+            } else {
+                console.error("Failed to fetch:", result.message);
             }
         } catch (error) {
             console.error("Fetch error:", error);
@@ -51,62 +55,157 @@ const Investment = ({ theme }) => {
         fetchPackages();
     }, []);
 
-    // ২. অ্যাড এবং এডিট হ্যান্ডলার
+    // Handle image change
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        
+        // Clean up old preview URLs to prevent memory leaks
+        if (formData.imagePreview.length > 0) {
+            formData.imagePreview.forEach(url => {
+                if (url && url.startsWith('blob:')) {
+                    URL.revokeObjectURL(url);
+                }
+            });
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            images: files,
+            imagePreview: files.map(file => URL.createObjectURL(file))
+        }));
+    };
+
+    // 2. Add and Edit handler - FIXED
     const handleSave = async (e) => {
         e.preventDefault();
         
-        const url = isEditing 
-            ? `${API_BASE}/edit-investment/${formData.id}` 
+        // Validation
+        if (!formData.title.trim()) {
+            alert("Please enter package title");
+            return;
+        }
+        if (!formData.price) {
+            alert("Please enter package price");
+            return;
+        }
+
+        const url = isEditing
+            ? `${API_BASE}/edit-investment/${formData.id}`
             : `${API_BASE}/add-investment`;
 
         try {
+            const sendData = new FormData();
+
+            // Append all fields
+            sendData.append('title', formData.title.trim());
+            sendData.append('price', formData.price);
+            sendData.append('discount', formData.discount || '0');
+            sendData.append('land', formData.land || '0');
+            sendData.append('building', formData.building || '0');
+            sendData.append('total_size', formData.total_size || '0');
+            sendData.append('description', formData.description || '');
+            sendData.append('is_popular', formData.is_popular ? '1' : '0');
+            sendData.append('is_sold_out', formData.is_sold_out ? '1' : '0');
+
+            // Handle images - only append new images when adding or when new images are selected
+            if (formData.images && formData.images.length > 0) {
+                formData.images.forEach((image, index) => {
+                    sendData.append('images[]', image);
+                });
+            }
+
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: sendData
             });
 
             const result = await response.json();
 
             if (result.status) {
-                await fetchPackages(); 
+                await fetchPackages(); // Refresh the list
                 closeModal();
+                alert(isEditing ? "Package updated successfully!" : "Package added successfully!");
             } else {
                 alert(result.message || "Validation Error");
             }
+
         } catch (error) {
             console.error("Save error:", error);
-            alert("Server error, check console.");
+            alert("Server Error. Please try again.");
         }
     };
 
-    // ৩. ডিলিট হ্যান্ডলার
+    // 3. Delete handler
     const handleDelete = async (id) => {
         try {
             const response = await fetch(`${API_BASE}/del-investment/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
             const result = await response.json();
             if (result.status) {
                 setPackages(prev => prev.filter(item => item.id !== id));
                 setDeleteConfirm(null);
+                alert("Package deleted successfully!");
             } else {
                 alert(result.message || "Delete failed");
             }
         } catch (error) {
             console.error("Delete error:", error);
+            alert("Failed to delete package");
         }
     };
 
+    // Open modal for add/edit - FIXED: Properly set price and discount values
     const openModal = (item = null) => {
+        console.log("Opening modal with item:", item); // Debug log
+        
         if (item) {
-            setFormData({ 
-                ...item,
-                is_popular: item.is_popular == 1 ? true : false,
-                is_sold_out: item.is_sold_out == 1 ? true : false
-            });
+            // Handle image previews for existing items
+            let imagePreviewArray = [];
+            if (item.images && Array.isArray(item.images)) {
+                imagePreviewArray = item.images;
+            } else if (item.images && typeof item.images === 'string') {
+                try {
+                    const parsed = JSON.parse(item.images);
+                    imagePreviewArray = Array.isArray(parsed) ? parsed : [item.images];
+                } catch {
+                    imagePreviewArray = [item.images];
+                }
+            }
+
+            // CRITICAL FIX: Ensure price and discount are properly set as strings
+            const newFormData = {
+                id: item.id || '',
+                title: item.title || '',
+                price: item.price ? item.price.toString() : '', // Convert to string
+                discount: item.discount ? item.discount.toString() : '', // Convert to string
+                land: item.land || '',
+                building: item.building || '',
+                total_size: item.total_size || '',
+                description: item.description || '',
+                images: [],
+                imagePreview: imagePreviewArray,
+                is_popular: item.is_popular == 1 || item.is_popular === true,
+                is_sold_out: item.is_sold_out == 1 || item.is_sold_out === true
+            };
+            
+            console.log("Setting form data for edit:", newFormData); // Debug log
+            
+            setFormData(newFormData);
             setIsEditing(true);
         } else {
+            // Clean up preview URLs when closing
+            if (formData.imagePreview.length > 0) {
+                formData.imagePreview.forEach(url => {
+                    if (url && url.startsWith('blob:')) {
+                        URL.revokeObjectURL(url);
+                    }
+                });
+            }
+            
             setFormData({
                 id: '',
                 title: '',
@@ -116,6 +215,8 @@ const Investment = ({ theme }) => {
                 building: '',
                 total_size: '',
                 description: '',
+                images: [],
+                imagePreview: [],
                 is_popular: false,
                 is_sold_out: false
             });
@@ -124,7 +225,34 @@ const Investment = ({ theme }) => {
         setShowModal(true);
     };
 
-    const closeModal = () => setShowModal(false);
+    // Close modal and cleanup
+    const closeModal = () => {
+        // Clean up blob URLs
+        if (formData.imagePreview.length > 0) {
+            formData.imagePreview.forEach(url => {
+                if (url && url.startsWith('blob:')) {
+                    URL.revokeObjectURL(url);
+                }
+            });
+        }
+        
+        setShowModal(false);
+        setFormData({
+            id: '',
+            title: '',
+            price: '',
+            discount: '',
+            land: '',
+            building: '',
+            total_size: '',
+            description: '',
+            images: [],
+            imagePreview: [],
+            is_popular: false,
+            is_sold_out: false
+        });
+        setIsEditing(false);
+    };
 
     // Filter and Pagination
     const filteredPackages = packages.filter(item =>
@@ -499,7 +627,7 @@ const Investment = ({ theme }) => {
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
                 <Sidebar theme={currentTheme} isCollapsed={isCollapsed} />
                 <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
-                    <Header 
+                    <Header
                         theme={currentTheme}
                         isDarkMode={isDarkMode}
                         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
@@ -565,20 +693,51 @@ const Investment = ({ theme }) => {
                                         <div key={item.id} className="package-card" style={styles.packageCard}>
                                             {/* Status Badge */}
                                             {item.is_popular == 1 && (
-                                                <div style={{...styles.statusBadge, backgroundColor: currentTheme.success}}>
+                                                <div style={{ ...styles.statusBadge, backgroundColor: currentTheme.success }}>
                                                     🔥 Popular
                                                 </div>
                                             )}
                                             {item.is_sold_out == 1 && (
-                                                <div style={{...styles.statusBadge, backgroundColor: currentTheme.danger}}>
+                                                <div style={{ ...styles.statusBadge, backgroundColor: currentTheme.danger }}>
                                                     ❌ Sold Out
                                                 </div>
                                             )}
-                                            
+
                                             {/* Discount Badge */}
                                             {item.discount && item.discount > 0 && (
                                                 <div style={styles.discountBadge}>
                                                     {item.discount}% OFF
+                                                </div>
+                                            )}
+
+                                            {/* Package Images */}
+                                            {item.images && item.images.length > 0 && (
+                                                <div
+                                                    style={{
+                                                        display: 'grid',
+                                                        gridTemplateColumns: item.images.length > 1
+                                                            ? 'repeat(2, 1fr)'
+                                                            : '1fr',
+                                                        gap: '2px',
+                                                        height: '220px',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                >
+                                                    {item.images.slice(0, 4).map((img, index) => (
+                                                        <img
+                                                            key={index}
+                                                            src={img}
+                                                            alt="package"
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '220px',
+                                                                objectFit: 'cover'
+                                                            }}
+                                                            onError={(e) => {
+                                                                e.target.src = 'https://via.placeholder.com/400x220?text=No+Image';
+                                                            }}
+                                                        />
+                                                    ))}
                                                 </div>
                                             )}
 
@@ -589,7 +748,7 @@ const Investment = ({ theme }) => {
                                                     <span style={styles.packagePrice}>${formatPrice(item.price)}</span>
                                                     {item.discount && item.discount > 0 && (
                                                         <span style={styles.originalPrice}>
-                                                            ${formatPrice(Math.floor(item.price * (1 + item.discount / 100)))}
+                                                            ${formatPrice(Math.floor(Number(item.price) * (1 + Number(item.discount) / 100)))}
                                                         </span>
                                                     )}
                                                 </div>
@@ -618,14 +777,14 @@ const Investment = ({ theme }) => {
 
                                                 {/* Action Buttons */}
                                                 <div style={styles.cardActions}>
-                                                    <button 
-                                                        style={{...styles.actionBtn, ...styles.editBtn}}
+                                                    <button
+                                                        style={{ ...styles.actionBtn, ...styles.editBtn }}
                                                         onClick={() => openModal(item)}
                                                     >
                                                         <i className="bi bi-pencil"></i> Edit
                                                     </button>
-                                                    <button 
-                                                        style={{...styles.actionBtn, ...styles.deleteBtn}}
+                                                    <button
+                                                        style={{ ...styles.actionBtn, ...styles.deleteBtn }}
                                                         onClick={() => setDeleteConfirm(item)}
                                                     >
                                                         <i className="bi bi-trash"></i> Delete
@@ -640,7 +799,7 @@ const Investment = ({ theme }) => {
                                 {totalPages > 1 && (
                                     <div style={styles.pagination}>
                                         <button
-                                            style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            style={{ ...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' }) }}
                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                             disabled={currentPage === 1}
                                         >
@@ -671,7 +830,7 @@ const Investment = ({ theme }) => {
                                             );
                                         })}
                                         <button
-                                            style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
+                                            style={{ ...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' }) }}
                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                             disabled={currentPage === totalPages}
                                         >
@@ -700,7 +859,7 @@ const Investment = ({ theme }) => {
                 </div>
             </div>
 
-            {/* Add/Edit Modal */}
+            {/* Add/Edit Modal - FIXED: Input fields properly bind to formData */}
             {showModal && (
                 <div style={styles.modalOverlay} onClick={closeModal}>
                     <div style={styles.modal} onClick={e => e.stopPropagation()}>
@@ -709,7 +868,7 @@ const Investment = ({ theme }) => {
                                 <h5 style={{ margin: 0, fontWeight: '600' }}>
                                     {isEditing ? "✏️ Edit" : "✨ Add"} Investment Package
                                 </h5>
-                                <button 
+                                <button
                                     type="button"
                                     onClick={closeModal}
                                     style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: currentTheme.text }}
@@ -721,84 +880,129 @@ const Investment = ({ theme }) => {
                                 <div className="row g-3">
                                     <div className="col-md-12">
                                         <label style={styles.label}>Package Title *</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             style={styles.input}
                                             value={formData.title}
-                                            onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                             placeholder="e.g., Premium Garden Villa"
                                             required
                                         />
                                     </div>
                                     <div className="col-md-6">
                                         <label style={styles.label}>Price *</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="number"
                                             style={styles.input}
                                             value={formData.price}
-                                            onChange={(e) => setFormData({...formData, price: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                             placeholder="e.g., 500000"
                                             required
                                         />
                                     </div>
                                     <div className="col-md-6">
                                         <label style={styles.label}>Discount (%)</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="number"
                                             style={styles.input}
                                             value={formData.discount}
-                                            onChange={(e) => setFormData({...formData, discount: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                                             placeholder="e.g., 10"
                                         />
                                     </div>
                                     <div className="col-md-4">
                                         <label style={styles.label}>Land Size (sqft)</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             style={styles.input}
                                             value={formData.land}
-                                            onChange={(e) => setFormData({...formData, land: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, land: e.target.value })}
                                             placeholder="Land size"
                                         />
                                     </div>
                                     <div className="col-md-4">
                                         <label style={styles.label}>Building Size (sqft)</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             style={styles.input}
                                             value={formData.building}
-                                            onChange={(e) => setFormData({...formData, building: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, building: e.target.value })}
                                             placeholder="Building size"
                                         />
                                     </div>
                                     <div className="col-md-4">
                                         <label style={styles.label}>Total Size (sqft)</label>
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             style={styles.input}
                                             value={formData.total_size}
-                                            onChange={(e) => setFormData({...formData, total_size: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, total_size: e.target.value })}
                                             placeholder="Total size"
                                         />
                                     </div>
                                     <div className="col-12">
                                         <label style={styles.label}>Description</label>
-                                        <textarea 
+                                        <textarea
                                             rows="3"
-                                            style={{...styles.input, resize: 'vertical'}}
+                                            style={{ ...styles.input, resize: 'vertical' }}
                                             value={formData.description}
-                                            onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                             placeholder="Describe the investment package..."
                                         />
                                     </div>
+
+                                    <div className="col-12">
+                                        <label style={styles.label}>Upload Images</label>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            style={styles.input}
+                                            onChange={handleImageChange}
+                                        />
+                                        <small style={{ color: currentTheme.textLight, display: 'block', marginTop: '5px' }}>
+                                            You can select multiple images (Max 10MB each)
+                                        </small>
+
+                                        {/* Preview Images */}
+                                        {formData.imagePreview && formData.imagePreview.length > 0 && (
+                                            <div
+                                                style={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+                                                    gap: '10px',
+                                                    marginTop: '15px'
+                                                }}
+                                            >
+                                                {formData.imagePreview.map((img, index) => (
+                                                    <div key={index} style={{ position: 'relative' }}>
+                                                        <img
+                                                            src={img}
+                                                            alt="preview"
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100px',
+                                                                objectFit: 'cover',
+                                                                borderRadius: '10px',
+                                                                border: `1px solid ${currentTheme.border}`
+                                                            }}
+                                                            onError={(e) => {
+                                                                e.target.src = 'https://via.placeholder.com/100x100?text=Error';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="col-md-6">
                                         <div className="form-check form-switch">
-                                            <input 
-                                                className="form-check-input" 
-                                                type="checkbox" 
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
                                                 id="is_popular"
                                                 checked={formData.is_popular}
-                                                onChange={(e) => setFormData({...formData, is_popular: e.target.checked})}
+                                                onChange={(e) => setFormData({ ...formData, is_popular: e.target.checked })}
                                                 style={{ cursor: 'pointer' }}
                                             />
                                             <label className="form-check-label" htmlFor="is_popular" style={{ color: currentTheme.text }}>
@@ -808,12 +1012,12 @@ const Investment = ({ theme }) => {
                                     </div>
                                     <div className="col-md-6">
                                         <div className="form-check form-switch">
-                                            <input 
-                                                className="form-check-input" 
-                                                type="checkbox" 
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
                                                 id="is_sold_out"
                                                 checked={formData.is_sold_out}
-                                                onChange={(e) => setFormData({...formData, is_sold_out: e.target.checked})}
+                                                onChange={(e) => setFormData({ ...formData, is_sold_out: e.target.checked })}
                                                 style={{ cursor: 'pointer' }}
                                             />
                                             <label className="form-check-label" htmlFor="is_sold_out" style={{ color: currentTheme.danger }}>
@@ -824,16 +1028,16 @@ const Investment = ({ theme }) => {
                                 </div>
                             </div>
                             <div style={styles.modalFooter}>
-                                <button 
+                                <button
                                     type="button"
                                     onClick={closeModal}
-                                    style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}
+                                    style={{ ...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px' }}
                                 >
                                     Cancel
                                 </button>
-                                <button 
+                                <button
                                     type="submit"
-                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                    style={{ ...styles.addBtn, padding: '10px 32px' }}
                                 >
                                     {isEditing ? 'Update Package' : 'Save Package'}
                                 </button>
@@ -846,7 +1050,7 @@ const Investment = ({ theme }) => {
             {/* Delete Confirmation Modal */}
             {deleteConfirm && (
                 <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
-                    <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
+                    <div style={{ ...styles.modal, width: '400px' }} onClick={e => e.stopPropagation()}>
                         <div style={styles.modalHeader}>
                             <h5 style={{ margin: 0, fontWeight: '600' }}>Confirm Delete</h5>
                             <button onClick={() => setDeleteConfirm(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
@@ -859,8 +1063,8 @@ const Investment = ({ theme }) => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                            <button onClick={() => setDeleteConfirm(null)} style={{ ...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px' }}>Cancel</button>
+                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{ ...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px' }}>Delete Permanently</button>
                         </div>
                     </div>
                 </div>
