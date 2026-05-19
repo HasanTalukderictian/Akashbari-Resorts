@@ -33,6 +33,7 @@ import PrivateRoute from './assets/Frontend/PrivateRoute'
 import NotFound from './assets/Frontend/Common/NotFound'
 import Packagestatistics from './Backend/Packagestatistics'
 import Affilitaes from './Backend/Affilitaes'
+import Club from './assets/Frontend/Club'
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/affliates' element={<Affliates />} />
         <Route path='/blog' element={<Blog />} />
+        <Route path='/club' element={<Club />} />
         <Route path="/blog-details/:id" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/package-details/:id" element={<PackageDetails />} />

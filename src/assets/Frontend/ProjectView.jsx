@@ -21,8 +21,8 @@ const ProjectView = () => {
   return (
     <div className="container my-5">
       {/* টাইটেলটি row এর বাইরে রাখলে লেআউট নিখুঁত থাকবে */}
-      <h3 className='text-center  fw-bold'>On going Hotel and Resorts</h3>
-      <p className='text-center'>Under Developmemnt view</p>
+      <h3 className='text-center  fw-bold'>Our Acheivement</h3>
+      <p className='text-center'>Some of our Customers</p>
 
       {/* 1st Div/Row: Left 50% Big, Right 50% Two Small */}
       <div className="row g-3" style={{ height: '500px' }}>

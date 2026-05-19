@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
+import { Link } from 'react-router-dom'; // রাউটিং এর জন্য Link ইম্পোর্ট করা হয়েছে
 import '../../css/welcome.css'; 
 import logo from '../../image/Akashbari  resort logo png-01.png';
 
@@ -10,6 +11,7 @@ const Welcome = () => {
   const [loading, setLoading] = useState(true);
   
   const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+
   // Fetching data from APIs
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +48,6 @@ const Welcome = () => {
               {/* Left Side: Text Div */}
               <div>
                 <h3 className="welcome-title text-uppercase mb-0">
-                   {/* splitting "Welcome To Akashbari Resort" if needed, or just showing title */}
                    {welcomeData ? welcomeData.title.split(' ').slice(0, 2).join(' ') : "Welcome To"}
                 </h3>
                 <h3 className="welcome-subtitle text-uppercase mb-0">
@@ -66,7 +67,6 @@ const Welcome = () => {
             <div className="yellow-divider mb-4"></div>
 
             <div className="welcome-text">
-              {/* API theke asha description render hocche */}
               {welcomeData ? (
                 welcomeData.description.split('\r\n\r\n').map((para, index) => (
                   <p key={index}>{para}</p>
@@ -74,6 +74,32 @@ const Welcome = () => {
               ) : (
                 <p>Loading description...</p>
               )}
+            </div>
+
+            {/* বাটনটি এখানে ফিক্স করা হয়েছে */}
+            <div className="mt-4">
+              <Link 
+                to="/club" 
+                className="btn text-uppercase px-4 py-2 text-decoration-none"
+                style={{ 
+                  backgroundColor: '#b8860b', 
+                  color: '#ffffff',
+                  fontWeight: '500',
+                  letterSpacing: '1px',
+                  borderRadius: '4px',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ffffff';
+                  e.currentTarget.style.color = '#b8860b';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#b8860b';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+              >
+                Club
+              </Link>
             </div>
           </div>
 
@@ -87,7 +113,7 @@ const Welcome = () => {
               ) : (
                 <ul className="list-unstyled features-list">
                   {features.map((item, index) => (
-                    <li key={index}>
+                    <li key={index} style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       {item}
                     </li>
                   ))}

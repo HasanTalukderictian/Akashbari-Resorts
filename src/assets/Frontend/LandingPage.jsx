@@ -63,7 +63,7 @@ const LandingPage = () => {
       
       <ProjectView/>
 
-      <Event />
+      {/* <Event /> */}
 
       {/* <Member/> */}
 
