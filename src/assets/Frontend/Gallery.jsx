@@ -7,17 +7,25 @@ import Footer from "./Common/Footer";
 
 const Gallery = () => {
     const [currentIndex, setCurrentIndex] = useState(null);
-    const [images, setImages] = useState([]); // API theke asha data ekhane thakbe
+    const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+    // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'instant' // 'smooth' বা 'instant'
+        });
+    }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
 
     // 👉 Fetch Gallery Data from API
     useEffect(() => {
         const fetchGallery = async () => {
             try {
                 const response = await axios.get(`${BASE_URL}/gallery`);
-                setImages(response.data); // Database theke asha array set hobe
+                setImages(response.data);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching gallery:", error);
@@ -69,14 +77,12 @@ const Gallery = () => {
                                         className="gallery-item"
                                         onClick={() => setCurrentIndex(index)}
                                     >
-                                        {/* API theke asha image_url use kora hoyeche */}
                                         <img 
                                             src={item.image_url} 
                                             alt={item.title} 
                                             className="img-fluid" 
                                             loading="lazy"
                                         />
-
                                         <div className="overlay">
                                             <FaSearchPlus color="#fff" size={30} />
                                         </div>
@@ -88,7 +94,7 @@ const Gallery = () => {
                 </div>
             </div>
 
-            {/* ✅ Lightbox with arrows */}
+            {/* Lightbox with arrows */}
             {currentIndex !== null && (
                 <div
                     onClick={() => setCurrentIndex(null)}
@@ -105,7 +111,6 @@ const Gallery = () => {
                         zIndex: 9999,
                     }}
                 >
-                    {/* ❌ Close click prevent */}
                     <div className="position-relative" style={{ maxWidth: "90%", maxHeight: "90%" }}>
                         <img
                             src={images[currentIndex].image_url}
@@ -123,7 +128,7 @@ const Gallery = () => {
                         </p>
                     </div>
 
-                    {/* ⬅️ Left Arrow */}
+                    {/* Left Arrow */}
                     <button
                         onClick={prevImage}
                         style={arrowStyle("left")}
@@ -131,7 +136,7 @@ const Gallery = () => {
                         <FaChevronLeft />
                     </button>
 
-                    {/* ➡️ Right Arrow */}
+                    {/* Right Arrow */}
                     <button
                         onClick={nextImage}
                         style={arrowStyle("right")}
@@ -149,7 +154,8 @@ const Gallery = () => {
                             border: "none",
                             color: "white",
                             fontSize: "30px",
-                            cursor: "pointer"
+                            cursor: "pointer",
+                            zIndex: 10000
                         }}
                         onClick={() => setCurrentIndex(null)}
                     >
@@ -163,7 +169,7 @@ const Gallery = () => {
     );
 };
 
-// 👉 Arrow style function
+// Arrow style function
 const arrowStyle = (side) => ({
     position: "fixed",
     top: "50%",
@@ -181,7 +187,8 @@ const arrowStyle = (side) => ({
     justifyContent: "center",
     width: "60px",
     height: "60px",
-    transition: "0.3s"
+    transition: "0.3s",
+    zIndex: 10000
 });
 
 export default Gallery;

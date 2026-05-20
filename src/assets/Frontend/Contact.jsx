@@ -17,6 +17,14 @@ const Contact = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null);
 
+    // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+    React.useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'instant' // 'smooth' অথবা 'instant'
+        });
+    }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+
     const contactInfo = [
         {
             id: 1,

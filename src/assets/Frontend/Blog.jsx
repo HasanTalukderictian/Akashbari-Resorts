@@ -5,20 +5,9 @@ import '../css/blog.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// Import fallback images (only for error cases)
-import king1 from '../image/section/Blog/Blog_image-1.webp';
-import king2 from '../image/section/Blog/Blog_image-2.webp';
-import king3 from '../image/section/Blog/Blog_image-3.webp';
-import king4 from '../image/section/Blog/Blog_image-5.webp';
-import king5 from '../image/section/Blog/Blog_image-6.webp';
-import king6 from '../image/section/Blog/Blog_image-7.webp';
-
 // API Base URL
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.API_URL || 'http://localhost:8000';
-
-// Fallback images array (only for when API image fails)
-const fallbackImages = [king1, king2, king3, king4, king5, king6];
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
 
 // Helper function to get full image URL - FIXED for Laravel storage
 const getImageUrl = (imagePath) => {
@@ -27,27 +16,21 @@ const getImageUrl = (imagePath) => {
   // If already a full URL, return as is
   if (imagePath.startsWith('http')) return imagePath;
   
-  // Extract just the filename from the path
-  let filename = imagePath;
-  if (imagePath.includes('/')) {
-    filename = imagePath.split('/').pop();
-  }
-  
-  // Clean the filename
-  filename = filename.replace(/^\/+/, '');
-  
-  // Remove any query parameters
-  if (filename.includes('?')) {
-    filename = filename.split('?')[0];
+  // Clean the path - remove any leading slashes
+  let cleanPath = imagePath;
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1);
   }
   
   // Construct the full URL for Laravel storage
   const baseUrl = API_URL.replace(/\/$/, '');
-  const imageUrl = `${baseUrl}/storage/blogs/${filename}`;
+  const imageUrl = `${baseUrl}/storage/${cleanPath}`;
   
-  console.log('Generated image URL:', imageUrl); // Debug log
   return imageUrl;
 };
+
+// Placeholder image when no image is available
+const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image+Available';
 
 const Blog = () => {  
   const navigate = useNavigate();
@@ -56,21 +39,30 @@ const Blog = () => {
   const [error, setError] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
 
-  // Handle image error - use fallback
+  // পেজ লোড হলে টপে স্ক্রল করার জন্য
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, []);
+
+  // Handle image error - use placeholder
   const handleImageError = (blogId) => {
     if (!imageErrors[blogId]) {
       setImageErrors(prev => ({ ...prev, [blogId]: true }));
-      console.log(`Image failed to load for blog ID: ${blogId}`);
     }
   };
 
   // Get final image URL with fallback
   const getFinalImageUrl = (blog) => {
     if (imageErrors[blog.id]) {
-      return fallbackImages[blog.id % fallbackImages.length];
+      return PLACEHOLDER_IMAGE;
     }
-    const url = blog.imageUrl;
-    return url || fallbackImages[blog.id % fallbackImages.length];
+    if (blog.imageUrl) {
+      return blog.imageUrl;
+    }
+    return PLACEHOLDER_IMAGE;
   };
 
   // Fetch blogs from API
@@ -84,10 +76,9 @@ const Blog = () => {
         const blogs = response.data.data;
         
         // Transform API data to match component structure
-        const formattedBlogs = blogs.map((blog, index) => {
+        const formattedBlogs = blogs.map((blog) => {
           // Generate image URL from API
-          const imageUrl = getImageUrl(blog.image);
-          console.log(`Blog ${blog.id} - Original path: ${blog.image}, Generated URL: ${imageUrl}`);
+          const imageUrl = blog.image ? getImageUrl(blog.image) : null;
           
           return {
             id: blog.id,
@@ -101,14 +92,14 @@ const Blog = () => {
               month: 'long',
               day: 'numeric'
             }) : '2024-01-01',
-            imageUrl: imageUrl, // Store generated URL
-            image: blog.image, // Store original path for debugging
+            imageUrl: imageUrl,
+            originalImage: blog.image,
             introduction: blog.introduction,
             sections: blog.sections,
             conclusion: blog.conclusion,
-            read_time: blog.read_time,
-            views: blog.views,
-            likes: blog.likes,
+            read_time: blog.read_time || '5 min read',
+            views: blog.views || 0,
+            likes: blog.likes || 0,
             status: blog.status
           };
         });
@@ -306,7 +297,7 @@ const Blog = () => {
         
         .read-more-btn-gold:hover {
           transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(154, 85, 255, 0.3);
+          box-shadow: 0 5px 15px rgba(255, 140, 50, 0.3);
         }
         
         @keyframes fadeInUp {
@@ -331,6 +322,25 @@ const Blog = () => {
         .blog-card:nth-child(4) { animation-delay: 0.4s; }
         .blog-card:nth-child(5) { animation-delay: 0.5s; }
         .blog-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          .blog-card-title {
+            font-size: 1.1rem !important;
+          }
+          .blog-info {
+            padding: 1rem !important;
+          }
+          .blog-img-wrapper img {
+            height: 200px !important;
+          }
+        }
+        
+        @media (max-width: 576px) {
+          .blog-img-wrapper img {
+            height: 180px !important;
+          }
+        }
       `}</style>
     </>
   );

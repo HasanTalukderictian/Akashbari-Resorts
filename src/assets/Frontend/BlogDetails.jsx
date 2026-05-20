@@ -18,34 +18,30 @@ const fallbackImages = [king1, king2, king3, king4, king5, king6];
 
 // Use environment variables for API URLs
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
 
-// Helper function to get full image URL - FIXED for Laravel storage
+// Helper function to get full image URL - COMPLETELY FIXED
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   
   // If already a full URL, return as is
   if (imagePath.startsWith('http')) return imagePath;
   
-  // Extract just the filename from the path
-  let filename = imagePath;
-  if (imagePath.includes('/')) {
-    filename = imagePath.split('/').pop();
-  }
-  
-  // Clean the filename
-  filename = filename.replace(/^\/+/, '');
-  
-  // Remove any query parameters
-  if (filename.includes('?')) {
-    filename = filename.split('?')[0];
+  // Clean the path - remove any leading slashes
+  let cleanPath = imagePath;
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1);
   }
   
   // Construct the full URL for Laravel storage
   const baseUrl = API_URL.replace(/\/$/, '');
-  const imageUrl = `${baseUrl}/storage/blogs/${filename}`;
   
-  console.log('Generated image URL:', imageUrl); // Debug log
+  // For Laravel storage, the correct URL structure is: {API_URL}/storage/{path}
+  const imageUrl = `${baseUrl}/storage/${cleanPath}`;
+  
+  console.log('Original path:', imagePath);
+  console.log('Generated image URL:', imageUrl);
+  
   return imageUrl;
 };
 
@@ -57,11 +53,22 @@ const BlogDetails = () => {
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(false);
 
+  // পেজ লোড হলে টপে স্ক্রল করার জন্য
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  }, [id]);
+
   useEffect(() => {
     const fetchBlogDetails = async () => {
       setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(`${API_BASE_URL}/blogs/${id}`);
+        
+        console.log('API Response:', response.data);
         
         if (response.data.status === true) {
           const blog = response.data.data;
@@ -76,6 +83,10 @@ const BlogDetails = () => {
             }
           }
           
+          // Generate image URL
+          const imageUrl = getImageUrl(blog.image);
+          console.log('Generated image URL for blog:', imageUrl);
+          
           // Format the blog data
           const formattedBlog = {
             id: blog.id,
@@ -89,7 +100,7 @@ const BlogDetails = () => {
               month: 'long',
               day: 'numeric'
             }) : '2024-01-01',
-            img: blog.image ? getImageUrl(blog.image) : fallbackImages[blog.id % fallbackImages.length],
+            img: imageUrl || fallbackImages[blog.id % fallbackImages.length],
             readTime: blog.read_time || '5 min read',
             views: blog.views || 0,
             likes: blog.likes || 0,
@@ -121,6 +132,7 @@ const BlogDetails = () => {
 
   // Handle image error - use fallback
   const handleImageError = () => {
+    console.log('Image failed to load, using fallback');
     if (!imageError) {
       setImageError(true);
     }

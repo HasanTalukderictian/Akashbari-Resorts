@@ -9,7 +9,6 @@ const PackageDetails = () => {
     const location = useLocation();
     const pkg = location.state?.packageData;
     
-    // লোকাল স্টোরেজ থেকে ডাটা নেওয়ার জন্য স্টেট
     const [packageData, setPackageData] = useState(null);
     const [benefitsData, setBenefitsData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -17,17 +16,15 @@ const PackageDetails = () => {
     
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    // প্যাকেজ ডাটা লোড করা (URL থেকে আইডি ব্যবহার করে)
+    // প্যাকেজ ডাটা লোড করা
     useEffect(() => {
         const loadPackageData = async () => {
-            // প্রথমে location state থেকে চেক করা
             if (pkg && pkg.id == id) {
                 setPackageData(pkg);
                 setLoading(false);
                 return;
             }
             
-            // লোকাল স্টোরেজ থেকে চেক করা
             const savedPackages = localStorage.getItem('investmentPackages');
             if (savedPackages) {
                 const packages = JSON.parse(savedPackages);
@@ -39,12 +36,10 @@ const PackageDetails = () => {
                 }
             }
             
-            // API থেকে ডাটা ফেচ করা
             try {
                 const response = await fetch(`${BASE_URL}/get-investment`);
                 const result = await response.json();
                 if (result.status && result.data) {
-                    // ডাটা লোকাল স্টোরেজে সেভ করা
                     localStorage.setItem('investmentPackages', JSON.stringify(result.data));
                     const foundPackage = result.data.find(p => p.id == id);
                     if (foundPackage) {
@@ -65,6 +60,14 @@ const PackageDetails = () => {
             loadPackageData();
         }
     }, [id, pkg]);
+
+    // ✅ AUTO SCROLL TO TOP FIX - পেজ লোড হলে টপে স্ক্রল করা
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'instant' // 'smooth' অথবা 'instant'
+        });
+    }, [id]); // পেজ পরিবর্তন হলে স্ক্রল করবে
 
     // Auto-slide functionality
     useEffect(() => {
@@ -95,7 +98,6 @@ const PackageDetails = () => {
         fetchBenefits();
     }, []);
 
-    // Manual navigation functions
     const nextImage = () => {
         if (packageData?.images) {
             setCurrentImageIndex((prevIndex) => 
@@ -112,7 +114,6 @@ const PackageDetails = () => {
         }
     };
 
-    // লোডিং স্টেট
     if (loading) {
         return (
             <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -130,7 +131,6 @@ const PackageDetails = () => {
         );
     }
 
-    // প্যাকেজ না পাওয়া গেলে
     if (!packageData) {
         return (
             <div style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -154,9 +154,8 @@ const PackageDetails = () => {
         <div style={{ backgroundColor: '#f8f9fa' }}>
             <Header />
 
-            {/* Image Slider Section with Centered Title - NO MARGIN */}
+            {/* Image Slider Section */}
             <div className="position-relative" style={{ height: '60vh', overflow: 'hidden', marginTop: '0', paddingTop: '0' }}>
-                {/* Slider Images */}
                 <div className="position-relative h-100 w-100">
                     {packageData.images && packageData.images.length > 0 ? (
                         packageData.images.map((image, index) => (
@@ -184,13 +183,11 @@ const PackageDetails = () => {
                         />
                     )}
                     
-                    {/* Dark Overlay for better text visibility */}
                     <div className="position-absolute w-100 h-100" style={{
                         background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))',
                         zIndex: 2
                     }} />
                     
-                    {/* Centered Package Name */}
                     <div className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 3 }}>
                         <div className="text-center text-white px-4">
                             <h6 className="text-uppercase mb-3" style={{ letterSpacing: '3px', fontWeight: '300', marginTop: '0' }}>
@@ -221,7 +218,6 @@ const PackageDetails = () => {
                         </div>
                     </div>
                     
-                    {/* Navigation Arrows - মোবাইলের জন্য অ্যাডজাস্টেড */}
                     {packageData.images && packageData.images.length > 1 && (
                         <>
                             <button
@@ -261,7 +257,6 @@ const PackageDetails = () => {
                         </>
                     )}
                     
-                    {/* Dots Indicator */}
                     {packageData.images && packageData.images.length > 1 && (
                         <div className="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2" style={{ zIndex: 4 }}>
                             {packageData.images.map((_, index) => (
@@ -373,7 +368,7 @@ const PackageDetails = () => {
                     </div>
                 </div>
 
-                {/* Benefits Section - Dynamic from API */}
+                {/* Benefits Section */}
                 {!loading && benefitsData && benefitsData.benefits && benefitsData.benefits.length > 0 && (
                     <div className="mt-4 mt-md-5 pt-3 pt-md-5">
                         <div className="text-center mb-4 mb-md-5">
@@ -448,7 +443,6 @@ const PackageDetails = () => {
                     padding: 0;
                 }
                 
-                /* মোবাইলের জন্য টাচ অপটিমাইজেশন */
                 @media (max-width: 768px) {
                     button {
                         cursor: pointer !important;

@@ -23,6 +23,14 @@ const AboutUs = () => {
 
     const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
+    // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'instant' // 'smooth' অথবা 'instant'
+        });
+    }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+
     const galleryImages = [
         { id: 1, img: king1, title: "King Room", alt: "Luxury king room with modern amenities" },
         { id: 2, img: king2, title: "Suits Room", alt: "Elegant suite with separate living area" },

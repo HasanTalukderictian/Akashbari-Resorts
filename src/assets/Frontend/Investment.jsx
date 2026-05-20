@@ -76,7 +76,7 @@ const Investment = () => {
                             >
                                 {pkg.is_popular == 1 && (
                                     <div className="popular-badge">
-                                        <span>★ MOST POPULAR ★</span>
+                                       
                                     </div>
                                 )}
 
@@ -114,11 +114,11 @@ const Investment = () => {
             {/* Dynamic Benefits Container */}
             {benefitsData && (
                 <div className="benefits-container container mt-5 p-5 bg-white">
-                    <div className="text-center mb-4">
+                    {/* <div className="text-center mb-4">
                         <span className="benefits-badge">WHY INVEST WITH US</span>
                         <h2 className="benefits-main-title">{benefitsData.title}</h2>
                         <p className="benefits-sub-text">{benefitsData.subtitle}</p>
-                    </div>
+                    </div> */}
 
                     <div className="row g-3">
                         {benefitsData.benefits && benefitsData.benefits.map((benefit, index) => (
@@ -132,7 +132,7 @@ const Investment = () => {
                     </div>
 
                     <div className="footer-promo text-center mt-5">
-                        <div className="promo-divider mb-4"></div>
+                        {/* <div className="promo-divider mb-4"></div> */}
                         <h4 className="promo-question">Ready to Secure Your Future?</h4>
                         <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
                     </div>

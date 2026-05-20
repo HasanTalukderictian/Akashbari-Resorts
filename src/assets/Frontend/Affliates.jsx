@@ -9,6 +9,14 @@ const Affiliates = () => {
   const [error, setError] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
 
+  // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant' // 'smooth' অথবা 'instant'
+    });
+  }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+
   // API Configuration
   const API_BASE_URL = import.meta.env.VITE_BASE_URL;
   const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
