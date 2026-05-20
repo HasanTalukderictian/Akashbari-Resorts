@@ -10,32 +10,33 @@ const Owner = () => {
 
     // Use environment variables for API URLs with fallbacks
     const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-    const STORAGE_URL = import.meta.env.API_URL || 'http://localhost:8000';
+    const STORAGE_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
 
-    // Helper function to get image URL - FIXED
+    // Helper function to get image URL - FIXED for both local and production
     const getImageUrl = (imagePath) => {
-        if (!imagePath) return null;
+        if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
         
         // If already a full URL, return as is
         if (imagePath.startsWith('http')) return imagePath;
         
-        // Remove any leading slashes or storage prefix
+        // Handle different path formats
         let cleanPath = imagePath;
         
-        // Remove /storage/ from beginning if present
+        // Remove any storage prefix if present
         if (cleanPath.startsWith('/storage/')) {
             cleanPath = cleanPath.replace('/storage/', '');
-        }
-        // Remove storage/ from beginning if present
-        else if (cleanPath.startsWith('storage/')) {
+        } else if (cleanPath.startsWith('storage/')) {
             cleanPath = cleanPath.replace('storage/', '');
         }
         
-        // Ensure no double slashes
+        // Remove leading slashes
         cleanPath = cleanPath.replace(/^\/+/, '');
         
+        // Ensure the base URL doesn't have trailing slash
+        const baseUrl = STORAGE_URL.replace(/\/$/, '');
+        
         // Construct the full URL
-        return `${STORAGE_URL}/storage/${cleanPath}`;
+        return `${baseUrl}/storage/${cleanPath}`;
     };
 
     useEffect(() => {
@@ -50,7 +51,12 @@ const Owner = () => {
                     const data = response.data.data;
 
                     if (data.offers && data.offers.data && data.offers.data.length > 0) {
-                        setProperty(data.offers.data[0]);
+                        const propertyData = data.offers.data[0];
+                        // Process slider images to ensure they have correct URLs
+                        if (propertyData.slider_images && propertyData.slider_images.length > 0) {
+                            propertyData.slider_images = propertyData.slider_images.map(img => getImageUrl(img));
+                        }
+                        setProperty(propertyData);
                     }
 
                     if (data.benefits && data.benefits.length > 0) {
@@ -184,7 +190,7 @@ const Owner = () => {
 
     if (loading) {
         return (
-            <div style={styles.container} className="d-flex align-items-center justify-content-center">
+            <div style={styles.container} className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
                 <div className="text-center">
                     <div className="spinner-border text-warning" role="status" style={{ width: '3rem', height: '3rem' }}>
                         <span className="visually-hidden">Loading...</span>
@@ -197,7 +203,7 @@ const Owner = () => {
 
     if (error) {
         return (
-            <div style={styles.container} className="d-flex align-items-center justify-content-center">
+            <div style={styles.container} className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
                 <div className="text-center">
                     <div style={{ fontSize: '64px', marginBottom: '20px' }}>⚠️</div>
                     <h4 className="text-danger">Error Loading Content</h4>
@@ -216,7 +222,7 @@ const Owner = () => {
 
     if (!property) {
         return (
-            <div style={styles.container} className="d-flex align-items-center justify-content-center">
+            <div style={styles.container} className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
                 <div className="text-center">
                     <div style={{ fontSize: '64px', marginBottom: '20px' }}>🏢</div>
                     <h4>No Property Data Found</h4>
@@ -234,7 +240,7 @@ const Owner = () => {
                     
                     {/* Left Side - Image Slider */}
                     <div className="col-lg-6 d-flex flex-column" style={styles.sliderContainer}>
-                        <div className="w-100 flex-grow-1 position-relative" style={{ minHeight: '300px' }}>
+                        <div className="w-100 flex-grow-1 position-relative" style={{ minHeight: '400px' }}>
                             {property.slider_images && property.slider_images.map((img, index) => (
                                 <div
                                     key={index}
@@ -250,7 +256,7 @@ const Owner = () => {
                                     }}
                                 >
                                     <img
-                                        src={getImageUrl(img)}
+                                        src={img}
                                         className="w-100 h-100"
                                         alt={`Property view ${index + 1}`}
                                         style={{
@@ -258,7 +264,7 @@ const Owner = () => {
                                             objectPosition: 'center'
                                         }}
                                         onError={(e) => {
-                                            console.error('Image failed to load:', getImageUrl(img));
+                                            console.error('Image failed to load:', img);
                                             e.target.onerror = null;
                                             e.target.src = 'https://via.placeholder.com/800x600?text=Property+Image';
                                         }}
@@ -461,6 +467,14 @@ const Owner = () => {
                     }
                     .card {
                         animation: fadeIn 0.5s ease-out;
+                    }
+                    @media (max-width: 768px) {
+                        .display-6 {
+                            font-size: 1.5rem !important;
+                        }
+                        .brandText {
+                            font-size: 1.2rem !important;
+                        }
                     }
                 `}
             </style>

@@ -7,18 +7,44 @@ const Affiliates = () => {
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
 
   // API Configuration
-  const API_BASE_URL =  'http://localhost:8000/api';
-  const API_URL =  'http://localhost:8000';
+  const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
 
-  // Helper function to get full image URL
+  // Helper function to get full image URL - FIXED
   const getFullImageUrl = (imagePath) => {
     if (!imagePath) return null;
+    
+    // If already a full URL, return as is
     if (imagePath.startsWith('http')) return imagePath;
-    // Remove leading slash if exists and prepend API_URL
-    const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
-    return `${API_URL}${cleanPath}`;
+    
+    // Clean the path
+    let cleanPath = imagePath;
+    
+    // Remove /storage/ from beginning if present
+    if (cleanPath.startsWith('/storage/')) {
+      cleanPath = cleanPath.replace('/storage/', '');
+    }
+    // Remove storage/ from beginning if present
+    else if (cleanPath.startsWith('storage/')) {
+      cleanPath = cleanPath.replace('storage/', '');
+    }
+    
+    // Remove leading slashes
+    cleanPath = cleanPath.replace(/^\/+/, '');
+    
+    // Ensure base URL doesn't have trailing slash
+    const baseUrl = API_URL.replace(/\/$/, '');
+    
+    // Construct the full URL
+    return `${baseUrl}/storage/${cleanPath}`;
+  };
+
+  // Handle image error
+  const handleImageError = (id) => {
+    setImageErrors(prev => ({ ...prev, [id]: true }));
   };
 
   // Fetch affiliates from API
@@ -35,7 +61,8 @@ const Affiliates = () => {
           id: affiliate.id,
           name: affiliate.title,
           description: affiliate.description,
-          logo: getFullImageUrl(affiliate.image),
+          image: affiliate.image, // Keep original image path
+          logo: getFullImageUrl(affiliate.image), // Processed URL
           website: affiliate.website,
           status: affiliate.status,
           createdAt: affiliate.created_at,
@@ -148,15 +175,19 @@ const Affiliates = () => {
                 {/* Image Box */}
                 <div style={styles.imageBox}>
                   <div style={styles.imageWrapper}>
-                    <img 
-                      src={item.logo} 
-                      alt={item.name} 
-                      style={styles.logo}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
-                      }}
-                    />
+                    {!imageErrors[item.id] ? (
+                      <img 
+                        src={item.logo} 
+                        alt={item.name} 
+                        style={styles.logo}
+                        onError={() => handleImageError(item.id)}
+                      />
+                    ) : (
+                      <div style={styles.placeholderImage}>
+                        <i className="bi bi-building" style={styles.placeholderIcon}></i>
+                        <p style={styles.placeholderText}>{item.name}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -340,6 +371,27 @@ const styles = {
     height: 'auto',
     objectFit: 'contain',
     transition: 'transform 0.5s ease',
+  },
+  placeholderImage: {
+    width: '100%',
+    height: '200px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: '12px',
+    textAlign: 'center',
+  },
+  placeholderIcon: {
+    fontSize: '48px',
+    color: '#76a34d',
+    marginBottom: '10px',
+  },
+  placeholderText: {
+    fontSize: '14px',
+    color: '#666',
+    marginTop: '10px',
   },
   cardTitle: {
     fontSize: '32px',

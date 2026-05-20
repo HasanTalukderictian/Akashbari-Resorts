@@ -8,6 +8,26 @@ import Sidebar from './Sidebar';
 export const API_BASE = import.meta.env.VITE_BASE_URL;
 export const STORAGE_BASE = import.meta.env.API_URL;
 
+// Get authentication headers
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Role': localStorage.getItem('Role') || 'admin'
+    };
+};
+
+// Check authentication
+const checkAuth = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert("Please login to access this page");
+        setTimeout(() => window.location.href = '/login', 2000);
+        return false;
+    }
+    return true;
+};
+
 // হেল্পার ফাংশন ইমেজ URL জেনারেট করার জন্য
 const getImageUrl = (item) => {
     if (!item) return null;
@@ -92,6 +112,8 @@ const CustomModal = ({ theme, onClose, fetchItems, editingItem, readOnly }) => {
     };
 
     const handleSubmit = async () => {
+        if (!checkAuth()) return;
+        
         try {
             setLoading(true);
             const data = new FormData();
@@ -111,18 +133,27 @@ const CustomModal = ({ theme, onClose, fetchItems, editingItem, readOnly }) => {
                 }
             });
 
+            const headers = getAuthHeaders();
+            
             if (editingItem) {
                 data.append('_method', 'PUT');
-                await axios.post(`${API_BASE}/luxury-items/${editingItem.id}`, data);
+                await axios.post(`${API_BASE}/luxury-items/${editingItem.id}`, data, { headers });
             } else {
-                await axios.post(`${API_BASE}/luxury-items`, data);
+                await axios.post(`${API_BASE}/luxury-items`, data, { headers });
             }
 
             fetchItems();
             onClose();
         } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Something went wrong!');
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert(error.response?.data?.message || 'Something went wrong!');
+            }
         } finally {
             setLoading(false);
         }
@@ -349,6 +380,7 @@ const LuxurySection = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 6;
 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -368,9 +400,22 @@ const LuxurySection = () => {
     };
 
     const fetchItems = async () => {
+        if (!checkAuth()) return;
+        
         try {
             setLoading(true);
-            const res = await axios.get(`${API_BASE}/luxury-items`);
+            setAuthError(null);
+            const headers = getAuthHeaders();
+            const res = await axios.get(`${API_BASE}/luxury-items`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const fetchedItems = res.data.data.data || [];
             
             const itemsWithImageUrl = fetchedItems.map(item => ({
@@ -380,7 +425,15 @@ const LuxurySection = () => {
             
             setItems(itemsWithImageUrl);
         } catch (e) { 
-            console.error(e); 
+            console.error(e);
+            if (e.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                setAuthError("Failed to fetch luxury items. Please try again.");
+            }
         } finally { 
             setLoading(false); 
         }
@@ -395,13 +448,23 @@ const LuxurySection = () => {
     };
 
     const deleteItem = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
-            await axios.delete(`${API_BASE}/luxury-items/${id}`);
+            const headers = getAuthHeaders();
+            await axios.delete(`${API_BASE}/luxury-items/${id}`, { headers });
             fetchItems();
             setDeleteConfirm(null);
         } catch (error) {
             console.error(error);
-            alert('Failed to delete item');
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert('Failed to delete item');
+            }
         }
     };
 
@@ -452,6 +515,14 @@ const LuxurySection = () => {
         pageSubtitle: {
             color: theme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -693,6 +764,14 @@ const LuxurySection = () => {
                             <h1 style={styles.pageTitle}>Luxury Collection</h1>
                             <p style={styles.pageSubtitle}>Manage your premium luxury items and features</p>
                         </div>
+
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
 
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>

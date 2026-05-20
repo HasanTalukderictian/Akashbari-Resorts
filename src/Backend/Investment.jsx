@@ -11,6 +11,7 @@ const Investment = ({ theme }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 6;
 
     // Data state
@@ -31,21 +32,61 @@ const Investment = ({ theme }) => {
     });
     const [isEditing, setIsEditing] = useState(false);
 
-    const API_BASE = import.meta.env.VITE_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/api';
 
-    // 1. Fetch data
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
+    // 1. Fetch data with authentication
     const fetchPackages = async () => {
+        if (!checkAuth()) return;
+        
         try {
             setLoading(true);
-            const response = await fetch(`${API_BASE}/get-investment`);
+            setAuthError(null);
+            
+            const headers = getAuthHeaders();
+            const response = await fetch(`${API_BASE}/get-investment`, {
+                method: 'GET',
+                headers: headers
+            });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await response.json();
             if (result.status) {
                 setPackages(result.data || []);
             } else {
                 console.error("Failed to fetch:", result.message);
+                setPackages([]);
             }
         } catch (error) {
             console.error("Fetch error:", error);
+            setAuthError("Failed to fetch investment packages. Please try again.");
+            setPackages([]);
         } finally {
             setLoading(false);
         }
@@ -75,9 +116,11 @@ const Investment = ({ theme }) => {
         }));
     };
 
-    // 2. Add and Edit handler - FIXED
+    // 2. Add and Edit handler with authentication
     const handleSave = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
         
         // Validation
         if (!formData.title.trim()) {
@@ -94,6 +137,7 @@ const Investment = ({ theme }) => {
             : `${API_BASE}/add-investment`;
 
         try {
+            setLoading(true);
             const sendData = new FormData();
 
             // Append all fields
@@ -114,10 +158,22 @@ const Investment = ({ theme }) => {
                 });
             }
 
+            const headers = getAuthHeaders();
             const response = await fetch(url, {
                 method: 'POST',
+                headers: {
+                    'Authorization': headers.Authorization
+                },
                 body: sendData
             });
+
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
 
             const result = await response.json();
 
@@ -126,27 +182,41 @@ const Investment = ({ theme }) => {
                 closeModal();
                 alert(isEditing ? "Package updated successfully!" : "Package added successfully!");
             } else {
-                alert(result.message || "Validation Error");
+                alert(result.message || result.error || "Validation Error");
             }
 
         } catch (error) {
             console.error("Save error:", error);
             alert("Server Error. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    // 3. Delete handler
+    // 3. Delete handler with authentication
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
+            setLoading(true);
+            const headers = getAuthHeaders();
+            
             const response = await fetch(`${API_BASE}/del-investment/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: headers
             });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await response.json();
             if (result.status) {
-                setPackages(prev => prev.filter(item => item.id !== id));
+                await fetchPackages();
                 setDeleteConfirm(null);
                 alert("Package deleted successfully!");
             } else {
@@ -155,13 +225,13 @@ const Investment = ({ theme }) => {
         } catch (error) {
             console.error("Delete error:", error);
             alert("Failed to delete package");
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Open modal for add/edit - FIXED: Properly set price and discount values
+    // Open modal for add/edit
     const openModal = (item = null) => {
-        console.log("Opening modal with item:", item); // Debug log
-        
         if (item) {
             // Handle image previews for existing items
             let imagePreviewArray = [];
@@ -176,12 +246,11 @@ const Investment = ({ theme }) => {
                 }
             }
 
-            // CRITICAL FIX: Ensure price and discount are properly set as strings
-            const newFormData = {
+            setFormData({
                 id: item.id || '',
                 title: item.title || '',
-                price: item.price ? item.price.toString() : '', // Convert to string
-                discount: item.discount ? item.discount.toString() : '', // Convert to string
+                price: item.price ? item.price.toString() : '',
+                discount: item.discount ? item.discount.toString() : '',
                 land: item.land || '',
                 building: item.building || '',
                 total_size: item.total_size || '',
@@ -190,11 +259,7 @@ const Investment = ({ theme }) => {
                 imagePreview: imagePreviewArray,
                 is_popular: item.is_popular == 1 || item.is_popular === true,
                 is_sold_out: item.is_sold_out == 1 || item.is_sold_out === true
-            };
-            
-            console.log("Setting form data for edit:", newFormData); // Debug log
-            
-            setFormData(newFormData);
+            });
             setIsEditing(true);
         } else {
             // Clean up preview URLs when closing
@@ -270,13 +335,14 @@ const Investment = ({ theme }) => {
     const soldOutPackages = packages.filter(item => item.is_sold_out == 1).length;
 
     const currentTheme = theme || {
+        isDarkMode,
         bg: isDarkMode ? '#0f0f1a' : '#f8f9fc',
         card: isDarkMode ? '#1a1a2e' : '#ffffff',
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
         primary: '#9a55ff',
-        accentGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        primaryGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b'
@@ -299,7 +365,7 @@ const Investment = ({ theme }) => {
         pageTitle: {
             fontSize: '28px',
             fontWeight: '700',
-            background: currentTheme.accentGradient,
+            background: currentTheme.primaryGradient,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             marginBottom: '8px'
@@ -307,6 +373,14 @@ const Investment = ({ theme }) => {
         pageSubtitle: {
             color: currentTheme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -326,7 +400,7 @@ const Investment = ({ theme }) => {
             width: '50px',
             height: '50px',
             borderRadius: '12px',
-            background: currentTheme.accentGradient,
+            background: currentTheme.primaryGradient,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -364,7 +438,7 @@ const Investment = ({ theme }) => {
             transition: 'all 0.3s'
         },
         addBtn: {
-            background: currentTheme.accentGradient,
+            background: currentTheme.primaryGradient,
             color: 'white',
             border: 'none',
             padding: '12px 28px',
@@ -395,7 +469,7 @@ const Investment = ({ theme }) => {
         cardHeader: {
             padding: '20px',
             borderBottom: `1px solid ${currentTheme.border}`,
-            background: currentTheme.accentGradient,
+            background: currentTheme.primaryGradient,
             color: 'white'
         },
         packageTitle: {
@@ -512,7 +586,7 @@ const Investment = ({ theme }) => {
             justifyContent: 'center'
         },
         activePage: {
-            background: currentTheme.accentGradient,
+            background: currentTheme.primaryGradient,
             color: 'white',
             border: 'none'
         },
@@ -582,6 +656,10 @@ const Investment = ({ theme }) => {
             fontWeight: '600',
             fontSize: '13px',
             color: currentTheme.text
+        },
+        buttonDisabled: {
+            opacity: 0.7,
+            cursor: 'not-allowed'
         }
     };
 
@@ -641,6 +719,14 @@ const Investment = ({ theme }) => {
                             <p style={styles.pageSubtitle}>Manage your premium investment opportunities</p>
                         </div>
 
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
+
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>
                             <div className="stat-card" style={styles.statCard}>
@@ -673,13 +759,17 @@ const Investment = ({ theme }) => {
                                     setCurrentPage(1);
                                 }}
                             />
-                            <button style={styles.addBtn} onClick={() => openModal()}>
+                            <button 
+                                style={styles.addBtn} 
+                                onClick={() => openModal()}
+                                disabled={loading}
+                            >
                                 <i className="bi bi-plus-circle"></i> Add New Package
                             </button>
                         </div>
 
                         {/* Packages Grid */}
-                        {loading ? (
+                        {loading && packages.length === 0 ? (
                             <div style={styles.loadingSpinner}>
                                 <div className="spinner-border text-primary" role="status">
                                     <span className="visually-hidden">Loading...</span>
@@ -780,12 +870,14 @@ const Investment = ({ theme }) => {
                                                     <button
                                                         style={{ ...styles.actionBtn, ...styles.editBtn }}
                                                         onClick={() => openModal(item)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-pencil"></i> Edit
                                                     </button>
                                                     <button
                                                         style={{ ...styles.actionBtn, ...styles.deleteBtn }}
                                                         onClick={() => setDeleteConfirm(item)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-trash"></i> Delete
                                                     </button>
@@ -859,7 +951,7 @@ const Investment = ({ theme }) => {
                 </div>
             </div>
 
-            {/* Add/Edit Modal - FIXED: Input fields properly bind to formData */}
+            {/* Add/Edit Modal */}
             {showModal && (
                 <div style={styles.modalOverlay} onClick={closeModal}>
                     <div style={styles.modal} onClick={e => e.stopPropagation()}>
@@ -887,6 +979,7 @@ const Investment = ({ theme }) => {
                                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                             placeholder="e.g., Premium Garden Villa"
                                             required
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-6">
@@ -898,6 +991,7 @@ const Investment = ({ theme }) => {
                                             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                                             placeholder="e.g., 500000"
                                             required
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-6">
@@ -908,6 +1002,7 @@ const Investment = ({ theme }) => {
                                             value={formData.discount}
                                             onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                                             placeholder="e.g., 10"
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-4">
@@ -918,6 +1013,7 @@ const Investment = ({ theme }) => {
                                             value={formData.land}
                                             onChange={(e) => setFormData({ ...formData, land: e.target.value })}
                                             placeholder="Land size"
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-4">
@@ -928,6 +1024,7 @@ const Investment = ({ theme }) => {
                                             value={formData.building}
                                             onChange={(e) => setFormData({ ...formData, building: e.target.value })}
                                             placeholder="Building size"
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-4">
@@ -938,6 +1035,7 @@ const Investment = ({ theme }) => {
                                             value={formData.total_size}
                                             onChange={(e) => setFormData({ ...formData, total_size: e.target.value })}
                                             placeholder="Total size"
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="col-12">
@@ -948,6 +1046,7 @@ const Investment = ({ theme }) => {
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                             placeholder="Describe the investment package..."
+                                            disabled={loading}
                                         />
                                     </div>
 
@@ -959,6 +1058,7 @@ const Investment = ({ theme }) => {
                                             accept="image/*"
                                             style={styles.input}
                                             onChange={handleImageChange}
+                                            disabled={loading}
                                         />
                                         <small style={{ color: currentTheme.textLight, display: 'block', marginTop: '5px' }}>
                                             You can select multiple images (Max 10MB each)
@@ -1004,6 +1104,7 @@ const Investment = ({ theme }) => {
                                                 checked={formData.is_popular}
                                                 onChange={(e) => setFormData({ ...formData, is_popular: e.target.checked })}
                                                 style={{ cursor: 'pointer' }}
+                                                disabled={loading}
                                             />
                                             <label className="form-check-label" htmlFor="is_popular" style={{ color: currentTheme.text }}>
                                                 ⭐ Mark as Popular
@@ -1019,6 +1120,7 @@ const Investment = ({ theme }) => {
                                                 checked={formData.is_sold_out}
                                                 onChange={(e) => setFormData({ ...formData, is_sold_out: e.target.checked })}
                                                 style={{ cursor: 'pointer' }}
+                                                disabled={loading}
                                             />
                                             <label className="form-check-label" htmlFor="is_sold_out" style={{ color: currentTheme.danger }}>
                                                 🔴 Mark as Sold Out
@@ -1032,14 +1134,23 @@ const Investment = ({ theme }) => {
                                     type="button"
                                     onClick={closeModal}
                                     style={{ ...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px' }}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    style={{ ...styles.addBtn, padding: '10px 32px' }}
+                                    style={{ ...styles.addBtn, padding: '10px 32px', ...(loading && styles.buttonDisabled) }}
+                                    disabled={loading}
                                 >
-                                    {isEditing ? 'Update Package' : 'Save Package'}
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            {isEditing ? 'Updating...' : 'Saving...'}
+                                        </>
+                                    ) : (
+                                        isEditing ? 'Update Package' : 'Save Package'
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -1063,8 +1174,20 @@ const Investment = ({ theme }) => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{ ...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px' }}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{ ...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px' }}>Delete Permanently</button>
+                            <button 
+                                onClick={() => setDeleteConfirm(null)} 
+                                style={{ ...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px' }}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(deleteConfirm.id)} 
+                                style={{ ...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px', ...(loading && styles.buttonDisabled) }}
+                                disabled={loading}
+                            >
+                                {loading ? 'Deleting...' : 'Delete Permanently'}
+                            </button>
                         </div>
                     </div>
                 </div>

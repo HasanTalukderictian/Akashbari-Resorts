@@ -15,9 +15,10 @@ const VideoSection = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 6;
 
-    const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/api';
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     const [formData, setFormData] = useState({
         title: '',
@@ -37,6 +38,27 @@ const VideoSection = () => {
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b'
+    };
+
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin',
+            'Content-Type': 'application/json'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
     };
 
     // Show toast notification
@@ -62,17 +84,38 @@ const VideoSection = () => {
         return url;
     };
 
-    // ✅ Fetch Videos
+    // ✅ Fetch Videos with Authentication
     const fetchVideos = async () => {
+        if (!checkAuth()) return;
+        
         setLoading(true);
+        setAuthError(null);
+        
         try {
-            const res = await axios.get(`${BASE_URL}/get-videos`);
+            const headers = getAuthHeaders();
+            const res = await axios.get(`${BASE_URL}/get-videos`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             if (res.data) {
                 setBanners(Array.isArray(res.data) ? res.data : res.data.data || []);
             }
         } catch (err) {
             console.error("Fetch error:", err);
-            showToast('Failed to fetch videos', 'error');
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                showToast('Failed to fetch videos', 'error');
+            }
         } finally {
             setLoading(false);
         }
@@ -86,16 +129,28 @@ const VideoSection = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // ✅ Add Video
+    // ✅ Add Video with Authentication
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
+        
         setLoading(true);
         try {
+            const headers = getAuthHeaders();
             const res = await axios.post(`${BASE_URL}/add-videos`, {
                 title: formData.title,
                 description: formData.description,
                 video_url: formData.videoUrl 
-            });
+            }, { headers });
+
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
 
             if (res.data) {
                 showToast('Video added successfully!', 'success');
@@ -105,22 +160,39 @@ const VideoSection = () => {
             }
         } catch (err) {
             console.error("Submit error:", err.response?.data || err.message);
-            showToast(err.response?.data?.message || "Something went wrong!", 'error');
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                showToast(err.response?.data?.message || "Something went wrong!", 'error');
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    // ✅ Delete Video
+    // ✅ Delete Video with Authentication
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
-            await axios.delete(`${BASE_URL}/del-videos/${id}`);
+            const headers = getAuthHeaders();
+            await axios.delete(`${BASE_URL}/del-videos/${id}`, { headers });
             showToast('Video deleted successfully!', 'success');
             fetchVideos();
             setDeleteConfirm(null);
         } catch (err) {
             console.error("Delete error:", err);
-            showToast("Failed to delete video.", 'error');
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                showToast("Failed to delete video.", 'error');
+            }
         }
     };
 
@@ -163,6 +235,14 @@ const VideoSection = () => {
         pageSubtitle: {
             color: theme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -415,6 +495,10 @@ const VideoSection = () => {
             color: 'white',
             zIndex: 2000,
             animation: 'slideInRight 0.3s ease'
+        },
+        disabledBtn: {
+            opacity: 0.6,
+            cursor: 'not-allowed'
         }
     };
 
@@ -473,6 +557,14 @@ const VideoSection = () => {
                             <p style={styles.pageSubtitle}>Manage your video content and galleries</p>
                         </div>
 
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
+
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>
                             <div className="stat-card" style={styles.statCard}>
@@ -505,13 +597,17 @@ const VideoSection = () => {
                                     setCurrentPage(1);
                                 }}
                             />
-                            <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+                            <button 
+                                style={styles.addBtn} 
+                                onClick={() => setShowModal(true)}
+                                disabled={loading}
+                            >
                                 <i className="bi bi-plus-circle"></i> Add New Video
                             </button>
                         </div>
 
                         {/* Videos Grid */}
-                        {loading ? (
+                        {loading && banners.length === 0 ? (
                             <div style={styles.loadingSpinner}>
                                 <div className="spinner-border text-primary" role="status">
                                     <span className="visually-hidden">Loading...</span>
@@ -541,6 +637,7 @@ const VideoSection = () => {
                                                     <button 
                                                         style={{...styles.actionBtn, ...styles.deleteBtn}}
                                                         onClick={() => setDeleteConfirm(video)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-trash"></i> Delete
                                                     </button>
@@ -651,6 +748,7 @@ const VideoSection = () => {
                                         style={styles.input}
                                         placeholder="Enter video title"
                                         required
+                                        disabled={loading}
                                     />
                                 </div>
 
@@ -663,6 +761,7 @@ const VideoSection = () => {
                                         style={styles.textarea}
                                         placeholder="Enter video description"
                                         required
+                                        disabled={loading}
                                     />
                                 </div>
 
@@ -676,6 +775,7 @@ const VideoSection = () => {
                                         style={styles.input}
                                         placeholder="https://youtube.com/watch?v=..."
                                         required
+                                        disabled={loading}
                                     />
                                     <small style={{ color: theme.textLight, fontSize: '11px', display: 'block', marginTop: '5px' }}>
                                         Supports YouTube, Vimeo, and other video platforms
@@ -687,13 +787,14 @@ const VideoSection = () => {
                                     type="button" 
                                     onClick={() => setShowModal(false)}
                                     style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit" 
                                     disabled={loading}
-                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                    style={{...styles.addBtn, padding: '10px 32px', ...(loading && styles.disabledBtn)}}
                                 >
                                     {loading ? (
                                         <>
@@ -726,8 +827,20 @@ const VideoSection = () => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                            <button 
+                                onClick={() => setDeleteConfirm(null)} 
+                                style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(deleteConfirm.id)} 
+                                style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}
+                                disabled={loading}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>

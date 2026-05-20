@@ -11,6 +11,7 @@ const OwnerBenefit = ({ theme }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 6;
     
     const [benefits, setBenefits] = useState([]);
@@ -19,10 +20,48 @@ const OwnerBenefit = ({ theme }) => {
 
     const API_BASE = import.meta.env.VITE_BASE_URL;
 
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
     const fetchBenefits = async () => {
+        if (!checkAuth()) return;
+        
         try {
             setLoading(true);
-            const response = await fetch(`${API_BASE}/get-property-benifit`);
+            setAuthError(null);
+            
+            const headers = getAuthHeaders();
+            const response = await fetch(`${API_BASE}/get-property-benifit`, {
+                method: 'GET',
+                headers: headers
+            });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await response.json();
             
             if (result.status && result.data && Array.isArray(result.data.data)) {
@@ -33,6 +72,7 @@ const OwnerBenefit = ({ theme }) => {
         } catch (error) {
             console.error("Fetch error:", error);
             setBenefits([]);
+            setAuthError("Failed to fetch benefits. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -44,19 +84,33 @@ const OwnerBenefit = ({ theme }) => {
 
     const handleSave = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
+        
         const url = isEditing 
             ? `${API_BASE}/edit-property-benifit/${formData.id}` 
             : `${API_BASE}/add-property-benifit`;
 
         try {
+            setLoading(true);
+            const headers = getAuthHeaders();
+            
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({
                     title: formData.title,
                     desc: formData.desc
                 }),
             });
+
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
 
             const result = await response.json();
 
@@ -64,26 +118,48 @@ const OwnerBenefit = ({ theme }) => {
                 await fetchBenefits(); 
                 closeModal();
             } else {
-                alert(result.message || "Error saving data");
+                alert(result.message || result.error || "Error saving data");
             }
         } catch (error) {
             console.error("Save error:", error);
+            alert(error.message || "Network error. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
+            setLoading(true);
+            const headers = getAuthHeaders();
+            
             const response = await fetch(`${API_BASE}/delete-property-benifit/${id}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
+                headers: headers
             });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await response.json();
             if (result.status) {
-                setBenefits(prev => prev.filter(item => item.id !== id));
+                await fetchBenefits();
                 setDeleteConfirm(null);
+            } else {
+                alert(result.message || "Error deleting benefit");
             }
         } catch (error) {
             console.error("Delete error:", error);
+            alert("Failed to delete benefit. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -98,7 +174,11 @@ const OwnerBenefit = ({ theme }) => {
         setShowModal(true);
     };
 
-    const closeModal = () => setShowModal(false);
+    const closeModal = () => {
+        setShowModal(false);
+        setFormData({ id: '', title: '', desc: '' });
+        setIsEditing(false);
+    };
 
     // Filter and Pagination
     const filteredBenefits = benefits.filter(item =>
@@ -153,6 +233,14 @@ const OwnerBenefit = ({ theme }) => {
         pageSubtitle: {
             color: currentTheme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -391,6 +479,10 @@ const OwnerBenefit = ({ theme }) => {
             fontWeight: '600',
             fontSize: '13px',
             color: currentTheme.text
+        },
+        buttonDisabled: {
+            opacity: 0.7,
+            cursor: 'not-allowed'
         }
     };
 
@@ -449,6 +541,14 @@ const OwnerBenefit = ({ theme }) => {
                             <p style={styles.pageSubtitle}>Manage property owner benefits and incentives</p>
                         </div>
 
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
+
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>
                             <div className="stat-card" style={styles.statCard}>
@@ -481,13 +581,17 @@ const OwnerBenefit = ({ theme }) => {
                                     setCurrentPage(1);
                                 }}
                             />
-                            <button style={styles.addBtn} onClick={() => openModal()}>
+                            <button 
+                                style={styles.addBtn} 
+                                onClick={() => openModal()}
+                                disabled={loading}
+                            >
                                 <i className="bi bi-plus-circle"></i> Add New Benefit
                             </button>
                         </div>
 
                         {/* Benefits Grid */}
-                        {loading ? (
+                        {loading && benefits.length === 0 ? (
                             <div style={styles.loadingSpinner}>
                                 <div className="spinner-border text-primary" role="status">
                                     <span className="visually-hidden">Loading...</span>
@@ -513,12 +617,14 @@ const OwnerBenefit = ({ theme }) => {
                                                     <button 
                                                         style={{...styles.actionBtn, ...styles.editBtn}}
                                                         onClick={() => openModal(item)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-pencil"></i> Edit
                                                     </button>
                                                     <button 
                                                         style={{...styles.actionBtn, ...styles.deleteBtn}}
                                                         onClick={() => setDeleteConfirm(item)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-trash"></i> Delete
                                                     </button>
@@ -618,6 +724,7 @@ const OwnerBenefit = ({ theme }) => {
                                         required
                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
                                         placeholder="Enter benefit title"
+                                        disabled={loading}
                                     />
                                 </div>
                                 <div className="mb-3">
@@ -628,6 +735,7 @@ const OwnerBenefit = ({ theme }) => {
                                         required
                                         onChange={(e) => setFormData({...formData, desc: e.target.value})}
                                         placeholder="Enter benefit description"
+                                        disabled={loading}
                                     />
                                 </div>
                             </div>
@@ -636,14 +744,23 @@ const OwnerBenefit = ({ theme }) => {
                                     type="button" 
                                     onClick={closeModal}
                                     style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit" 
-                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                    style={{...styles.addBtn, padding: '10px 32px', ...(loading && styles.buttonDisabled)}}
+                                    disabled={loading}
                                 >
-                                    {isEditing ? 'Update Benefit' : 'Save Benefit'}
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            {isEditing ? 'Updating...' : 'Saving...'}
+                                        </>
+                                    ) : (
+                                        isEditing ? 'Update Benefit' : 'Save Benefit'
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -667,8 +784,20 @@ const OwnerBenefit = ({ theme }) => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                            <button 
+                                onClick={() => setDeleteConfirm(null)} 
+                                style={{...styles.actionBtn, backgroundColor: currentTheme.border, color: currentTheme.text, padding: '10px 24px'}}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(deleteConfirm.id)} 
+                                style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px', ...(loading && styles.buttonDisabled)}}
+                                disabled={loading}
+                            >
+                                {loading ? 'Deleting...' : 'Delete'}
+                            </button>
                         </div>
                     </div>
                 </div>

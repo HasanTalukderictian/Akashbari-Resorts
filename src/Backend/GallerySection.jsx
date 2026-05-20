@@ -19,6 +19,7 @@ const GallerySection = ({ theme: propsTheme }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 8;
     
     const [formData, setFormData] = useState({
@@ -43,6 +44,36 @@ const GallerySection = ({ theme: propsTheme }) => {
         tableHeader: isDarkMode ? '#25253a' : '#f8f9fa'
     };
 
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Get multipart headers for file upload
+    const getMultipartHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin',
+            'Content-Type': 'multipart/form-data'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
     // Helper function to get image URL
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -56,14 +87,36 @@ const GallerySection = ({ theme: propsTheme }) => {
         return `${STORAGE_URL}/storage/${imagePath}`;
     };
 
-    // --- API Logic ---
+    // --- API Logic with Authentication ---
     const fetchGallery = async () => {
+        if (!checkAuth()) return;
+        
         setLoading(true);
+        setAuthError(null);
+        
         try {
-            const res = await axios.get(`${API_BASE_URL}/gallery`);
+            const headers = getAuthHeaders();
+            const res = await axios.get(`${API_BASE_URL}/gallery`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             setGalleryItems(res.data);
         } catch (err) {
             console.error("Data Load Error:", err);
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                setAuthError("Failed to fetch gallery images. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
@@ -86,13 +139,17 @@ const GallerySection = ({ theme: propsTheme }) => {
     // Statistics
     const totalItems = galleryItems.length;
 
-    // --- Handlers ---
+    // --- Handlers with Authentication ---
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
                 alert('Image size should be less than 5MB');
                 return;
+            }
+            // Clean up old preview URL
+            if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(formData.imagePreview);
             }
             setFormData({
                 ...formData,
@@ -104,6 +161,9 @@ const GallerySection = ({ theme: propsTheme }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
+        
         setLoading(true);
 
         const data = new FormData();
@@ -114,36 +174,71 @@ const GallerySection = ({ theme: propsTheme }) => {
         }
 
         try {
+            const headers = getMultipartHeaders();
             const url = editingItem 
                 ? `${API_BASE_URL}/gallery/${editingItem.id}` 
                 : `${API_BASE_URL}/gallery`;
 
             if (editingItem) {
-                data.append('_method', 'PUT');
+                data.append('_method', 'POST');
             }
 
-            await axios.post(url, data, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const response = await axios.post(url, data, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
 
             fetchGallery();
             closeModal();
+            alert(editingItem ? "Image updated successfully!" : "Image uploaded successfully!");
         } catch (err) {
             console.error("Full Error Object:", err.response);
-            alert("Upload failed: " + (err.response?.data?.message || "Something went wrong!"));
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert("Upload failed: " + (err.response?.data?.message || "Something went wrong!"));
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
-            await axios.delete(`${API_BASE_URL}/gallery/${id}`);
+            const headers = getAuthHeaders();
+            const response = await axios.delete(`${API_BASE_URL}/gallery/${id}`, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             fetchGallery();
             setDeleteConfirm(null);
+            alert("Image deleted successfully!");
         } catch (err) {
             console.error("Delete Error:", err);
-            alert("Failed to delete image");
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert("Failed to delete image");
+            }
         }
     };
 
@@ -158,6 +253,10 @@ const GallerySection = ({ theme: propsTheme }) => {
     };
 
     const closeModal = () => {
+        // Clean up blob URL
+        if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(formData.imagePreview);
+        }
         setShowModal(false);
         setEditingItem(null);
         setFormData({ title: '', image: null, imagePreview: '' });
@@ -196,6 +295,14 @@ const GallerySection = ({ theme: propsTheme }) => {
         pageSubtitle: {
             color: theme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -431,6 +538,10 @@ const GallerySection = ({ theme: propsTheme }) => {
             borderRadius: '12px',
             marginTop: '12px',
             border: `2px solid ${theme.primary}`
+        },
+        buttonDisabled: {
+            opacity: 0.7,
+            cursor: 'not-allowed'
         }
     };
 
@@ -488,6 +599,14 @@ const GallerySection = ({ theme: propsTheme }) => {
                             <p style={styles.pageSubtitle}>Manage your image gallery assets</p>
                         </div>
 
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
+
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>
                             <div className="stat-card" style={styles.statCard}>
@@ -520,7 +639,11 @@ const GallerySection = ({ theme: propsTheme }) => {
                                     setCurrentPage(1);
                                 }}
                             />
-                            <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+                            <button 
+                                style={styles.addBtn} 
+                                onClick={() => setShowModal(true)}
+                                disabled={loading}
+                            >
                                 <i className="bi bi-plus-circle"></i> Add New Image
                             </button>
                         </div>
@@ -557,12 +680,14 @@ const GallerySection = ({ theme: propsTheme }) => {
                                                     <button 
                                                         style={{...styles.actionBtn, ...styles.editBtn}}
                                                         onClick={() => openEditModal(item)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-pencil"></i> Edit
                                                     </button>
                                                     <button 
                                                         style={{...styles.actionBtn, ...styles.deleteBtn}}
                                                         onClick={() => setDeleteConfirm(item)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-trash"></i> Delete
                                                     </button>
@@ -662,6 +787,7 @@ const GallerySection = ({ theme: propsTheme }) => {
                                         onChange={e => setFormData({...formData, title: e.target.value})}
                                         placeholder="Enter image title"
                                         required
+                                        disabled={loading}
                                     />
                                 </div>
                                 <div className="mb-3">
@@ -672,6 +798,7 @@ const GallerySection = ({ theme: propsTheme }) => {
                                         accept="image/*"
                                         onChange={handleImageChange}
                                         required={!editingItem}
+                                        disabled={loading}
                                     />
                                     <small style={{ color: theme.textLight, fontSize: '11px' }}>
                                         Max size: 5MB (JPG, PNG, WebP)
@@ -694,13 +821,14 @@ const GallerySection = ({ theme: propsTheme }) => {
                                     type="button" 
                                     onClick={closeModal}
                                     style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit" 
                                     disabled={loading}
-                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                    style={{...styles.addBtn, padding: '10px 32px', ...(loading && styles.buttonDisabled)}}
                                 >
                                     {loading ? (
                                         <>
@@ -733,8 +861,20 @@ const GallerySection = ({ theme: propsTheme }) => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                            <button 
+                                onClick={() => setDeleteConfirm(null)} 
+                                style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(deleteConfirm.id)} 
+                                style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}
+                                disabled={loading}
+                            >
+                                {loading ? 'Deleting...' : 'Delete'}
+                            </button>
                         </div>
                     </div>
                 </div>

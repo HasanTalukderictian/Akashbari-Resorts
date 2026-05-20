@@ -16,6 +16,7 @@ const Teamate = ({ theme: propsTheme }) => {
     const itemsPerPage = 5;
     const [loading, setLoading] = useState(false);
     const [teamMembers, setTeamMembers] = useState([]);
+    const [authError, setAuthError] = useState(null);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -40,15 +41,55 @@ const Teamate = ({ theme: propsTheme }) => {
         warning: '#f59e0b'
     };
 
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Get multipart headers for file upload
+    const getMultipartHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin',
+            'Content-Type': 'multipart/form-data'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
     // =========================
-    // FETCH TEAM MEMBERS
+    // FETCH TEAM MEMBERS WITH AUTH
     // =========================
     const fetchTeamMembers = async () => {
+        if (!checkAuth()) return;
+        
         try {
             setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/team-members`);
+            setAuthError(null);
+            const headers = getAuthHeaders();
+            const response = await axios.get(`${API_BASE_URL}/team-members`, { headers });
             
-            console.log('API Response:', response.data);
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
             
             if (response.data.status === true) {
                 setTeamMembers(response.data.data || []);
@@ -57,11 +98,13 @@ const Teamate = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Fetch error:', error);
-            if (error.response) {
-                console.log('Error response:', error.response.data);
-                alert(`Error: ${error.response.data.message || 'Failed to fetch team members'}`);
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
             } else {
-                alert('Network error. Please check your connection.');
+                setAuthError("Failed to fetch team members. Please try again.");
             }
             setTeamMembers([]);
         } finally {
@@ -79,6 +122,10 @@ const Teamate = ({ theme: propsTheme }) => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB');
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 setFormData({
@@ -136,10 +183,12 @@ const Teamate = ({ theme: propsTheme }) => {
     };
 
     // =========================
-    // SAVE TEAM MEMBER (FIXED FOR YOUR ROUTES)
+    // SAVE TEAM MEMBER WITH AUTH
     // =========================
     const handleSave = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
 
         if (!formData.name || !formData.designation) {
             alert('Please fill all required fields');
@@ -159,18 +208,24 @@ const Teamate = ({ theme: propsTheme }) => {
             }
 
             let response;
+            const headers = getMultipartHeaders();
 
             // UPDATE - using your edit-team-member route
             if (editingItem) {
+                payload.append('_method', 'POST');
                 response = await axios.post(
                     `${API_BASE_URL}/edit-team-member/${editingItem.id}`,
                     payload,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }
+                    { headers }
                 );
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('Role');
+                    alert("Session expired. Please login again.");
+                    setTimeout(() => window.location.href = '/login', 2000);
+                    return;
+                }
                 
                 if (response.data.status === true) {
                     alert('Team member updated successfully');
@@ -185,12 +240,16 @@ const Teamate = ({ theme: propsTheme }) => {
                 response = await axios.post(
                     `${API_BASE_URL}/add-team-member`,
                     payload,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }
+                    { headers }
                 );
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('Role');
+                    alert("Session expired. Please login again.");
+                    setTimeout(() => window.location.href = '/login', 2000);
+                    return;
+                }
                 
                 if (response.data.status === true) {
                     alert('Team member created successfully');
@@ -203,11 +262,13 @@ const Teamate = ({ theme: propsTheme }) => {
         } catch (error) {
             console.error('Save error:', error);
             
-            if (error.response) {
-                console.log('Error response:', error.response.data);
-                
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else if (error.response) {
                 if (error.response.status === 422) {
-                    // Validation errors
                     const errors = error.response.data.errors;
                     if (errors) {
                         Object.keys(errors).forEach((key) => {
@@ -232,15 +293,26 @@ const Teamate = ({ theme: propsTheme }) => {
     };
 
     // =========================
-    // DELETE MEMBER
+    // DELETE MEMBER WITH AUTH
     // =========================
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         const confirmDelete = window.confirm('Are you sure you want to delete this member?');
         if (!confirmDelete) return;
 
         try {
             setLoading(true);
-            const response = await axios.delete(`${API_BASE_URL}/delete-team-member/${id}`);
+            const headers = getAuthHeaders();
+            const response = await axios.delete(`${API_BASE_URL}/delete-team-member/${id}`, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
             
             if (response.data.status === true) {
                 alert('Team member deleted successfully');
@@ -250,11 +322,13 @@ const Teamate = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Delete error:', error);
-            
-            if (error.response) {
-                alert(error.response.data?.message || 'Delete failed');
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
             } else {
-                alert('Network error. Please try again.');
+                alert(error.response?.data?.message || 'Delete failed');
             }
         } finally {
             setLoading(false);
@@ -308,6 +382,14 @@ const Teamate = ({ theme: propsTheme }) => {
         },
         footerWrapper: {
             flexShrink: 0
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         tableWrapper: {
             backgroundColor: theme.card,
@@ -461,6 +543,10 @@ const Teamate = ({ theme: propsTheme }) => {
             textAlign: 'center',
             padding: '40px',
             color: theme.text
+        },
+        disabledBtn: {
+            opacity: 0.6,
+            cursor: 'not-allowed'
         }
     };
 
@@ -493,13 +579,25 @@ const Teamate = ({ theme: propsTheme }) => {
                                                 setCurrentPage(1);
                                             }}
                                         />
-                                        <button style={styles.addButton} onClick={() => openModal()}>
+                                        <button 
+                                            style={styles.addButton} 
+                                            onClick={() => openModal()}
+                                            disabled={loading}
+                                        >
                                             ➕ Add Member
                                         </button>
                                     </div>
                                 </div>
 
-                                {loading ? (
+                                {/* Auth Error Display */}
+                                {authError && (
+                                    <div style={styles.alert}>
+                                        <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                        {authError}
+                                    </div>
+                                )}
+
+                                {loading && teamMembers.length === 0 ? (
                                     <div style={styles.loadingSpinner}>
                                         <div className="spinner-border text-primary" role="status">
                                             <span className="visually-hidden">Loading...</span>
@@ -539,10 +637,18 @@ const Teamate = ({ theme: propsTheme }) => {
                                                             <td style={styles.td}>{member.subtitle}</td>
                                                             <td style={styles.td}>
                                                                 <div style={styles.actionButtons}>
-                                                                    <button style={styles.editBtn} onClick={() => openModal(member)}>
+                                                                    <button 
+                                                                        style={styles.editBtn} 
+                                                                        onClick={() => openModal(member)}
+                                                                        disabled={loading}
+                                                                    >
                                                                         ✏️ Edit
                                                                     </button>
-                                                                    <button style={styles.deleteBtn} onClick={() => handleDelete(member.id)}>
+                                                                    <button 
+                                                                        style={styles.deleteBtn} 
+                                                                        onClick={() => handleDelete(member.id)}
+                                                                        disabled={loading}
+                                                                    >
                                                                         🗑️ Delete
                                                                     </button>
                                                                 </div>
@@ -554,7 +660,11 @@ const Teamate = ({ theme: propsTheme }) => {
                                                         <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: theme.text }}>
                                                             📭 No team members found
                                                             <br />
-                                                            <button style={{ ...styles.addButton, marginTop: '10px' }} onClick={() => openModal()}>
+                                                            <button 
+                                                                style={{ ...styles.addButton, marginTop: '10px' }} 
+                                                                onClick={() => openModal()}
+                                                                disabled={loading}
+                                                            >
                                                                 Add your first team member
                                                             </button>
                                                         </td>
@@ -569,9 +679,9 @@ const Teamate = ({ theme: propsTheme }) => {
                                 {totalPages > 1 && (
                                     <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
                                         <button
-                                            style={styles.editBtn}
+                                            style={{...styles.editBtn, ...(currentPage === 1 && styles.disabledBtn)}}
                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                            disabled={currentPage === 1}
+                                            disabled={currentPage === 1 || loading}
                                         >
                                             ← Previous
                                         </button>
@@ -579,9 +689,9 @@ const Teamate = ({ theme: propsTheme }) => {
                                             Page {currentPage} of {totalPages}
                                         </span>
                                         <button
-                                            style={styles.editBtn}
+                                            style={{...styles.editBtn, ...(currentPage === totalPages && styles.disabledBtn)}}
                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                            disabled={currentPage === totalPages}
+                                            disabled={currentPage === totalPages || loading}
                                         >
                                             Next →
                                         </button>
@@ -631,6 +741,7 @@ const Teamate = ({ theme: propsTheme }) => {
                                     accept="image/*"
                                     onChange={handleImageChange}
                                     style={styles.input}
+                                    disabled={loading}
                                 />
                                 
                                 <input
@@ -640,6 +751,7 @@ const Teamate = ({ theme: propsTheme }) => {
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     style={styles.input}
                                     required
+                                    disabled={loading}
                                 />
                                 
                                 <input
@@ -649,6 +761,7 @@ const Teamate = ({ theme: propsTheme }) => {
                                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
                                     style={styles.input}
                                     required
+                                    disabled={loading}
                                 />
                                 
                                 <textarea
@@ -657,6 +770,7 @@ const Teamate = ({ theme: propsTheme }) => {
                                     value={formData.subtitle}
                                     onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
                                     style={styles.input}
+                                    disabled={loading}
                                 />
                             </div>
 
@@ -672,11 +786,23 @@ const Teamate = ({ theme: propsTheme }) => {
                                         backgroundColor: '#6c757d',
                                         color: 'white'
                                     }}
+                                    disabled={loading}
                                 >
                                     Cancel
                                 </button>
-                                <button type="submit" style={styles.addButton}>
-                                    {editingItem ? 'Update' : 'Save'}
+                                <button 
+                                    type="submit" 
+                                    style={{...styles.addButton, ...(loading && styles.disabledBtn)}}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            {editingItem ? 'Updating...' : 'Saving...'}
+                                        </>
+                                    ) : (
+                                        editingItem ? 'Update' : 'Save'
+                                    )}
                                 </button>
                             </div>
                         </form>

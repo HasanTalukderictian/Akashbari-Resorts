@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
@@ -7,11 +7,12 @@ const Users = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    
+
     const initialFormState = { name: '', email: '', role: 'User', password: '' };
     const [formData, setFormData] = useState(initialFormState);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [authError, setAuthError] = useState(null);
 
     const theme = propsTheme || {
         isDarkMode,
@@ -25,52 +26,114 @@ const Users = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-     const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    const fetchUsers = async () => {
+    // Helper to dynamically pull the latest token headers
+    // Users.js এর ভেতরের এই ফাংশনটি রিপ্লেস করুন
+  const getAuthHeaders = useCallback((extraHeaders = {}) => {
+    // সরাসরি এই মুহূর্তে লোকালস্টোরেজ থেকে লেটেস্ট টোকেনটি রিড করা হচ্ছে
+    let token = window.localStorage.getItem('token'); 
+    
+    console.log("Current Token from LocalStorage:", token); // এটি কনসোলে চেক করুন
+
+    if (!token) {
+        console.warn("Warning: No token found in localStorage!");
+        return {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            ...extraHeaders
+        };
+    }
+
+    // যদি কোনো কারণে টোকেনটি অবজেক্ট বা স্ট্রিং আকারে কোটেশনের ভেতরে থাকে, তা ক্লিন করা
+    token = token.replace(/['"]+/g, ''); 
+
+    if (token.startsWith('Bearer ')) {
+        token = token.replace('Bearer ', '');
+    }
+
+    return {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.trim()}`,
+        ...extraHeaders
+    };
+}, []);
+    // Centralized authentication error check
+    const handleApiResponse = useCallback((res) => {
+        if (res.status === 401 || res.status === 403) {
+            setAuthError("Your session has expired. Please log in again.");
+            // Optional: localStorage.removeItem('token'); window.location.href = '/login';
+            return false;
+        }
+        return true;
+    }, []);
+
+    const fetchUsers = useCallback(async () => {
         try {
             setLoading(true);
+            setAuthError(null);
+
             const res = await fetch(`${BASE_URL}/users`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: getAuthHeaders()
             });
+
+            if (!handleApiResponse(res)) return;
+
             const data = await res.json();
-            setUsers(data.data || data);
+
+            // Handle Laravel pagination response
+            // Laravel returns { current_page, data, first_page_url, from, last_page, etc. }
+            setUsers(data.data || data); // data.data contains the actual users array
+
         } catch (err) {
-            console.error(err);
+            console.error("Failed to fetch users:", err);
+            setAuthError("Failed to fetch users. Please try again.");
         } finally {
             setLoading(false);
         }
-    };
+    }, [BASE_URL, getAuthHeaders, handleApiResponse]);
 
-    useEffect(() => { fetchUsers(); }, []);
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
 
     const handleSubmit = async () => {
         try {
             const res = await fetch(`${BASE_URL}/users`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(formData)
             });
+
+            if (!handleApiResponse(res)) return;
+
             if (res.ok) {
                 setShowModal(false);
                 setFormData(initialFormState);
                 fetchUsers();
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error("Failed to add user:", err);
+        }
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm('Delete this user?')) return;
         try {
-            await fetch(`${BASE_URL}/users/${id}`, {
+            const res = await fetch(`${BASE_URL}/users/${id}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                headers: getAuthHeaders()
             });
-            fetchUsers();
-        } catch (err) { console.error(err); }
+
+            if (!handleApiResponse(res)) return;
+
+            if (res.ok) {
+                fetchUsers();
+            }
+        } catch (err) {
+            console.error("Failed to delete user:", err);
+        }
     };
 
     const styles = {
@@ -107,7 +170,11 @@ const Users = ({ theme: propsTheme }) => {
             fontSize: '11px', padding: '4px 10px', borderRadius: '20px',
             background: status === 'Active' ? 'rgba(7, 205, 174, 0.1)' : 'rgba(254, 112, 150, 0.1)',
             color: status === 'Active' ? '#07cdae' : '#fe7096', fontWeight: '600'
-        })
+        }),
+        alert: {
+            padding: '12px 20px', backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096', borderRadius: '8px', marginBottom: '20px', fontWeight: '500'
+        }
     };
 
     return (
@@ -140,7 +207,15 @@ const Users = ({ theme: propsTheme }) => {
                     <div style={styles.contentContainer}>
                         <div style={styles.contentScroll}>
                             <div className="animate__animated animate__fadeIn">
-                                <h4 className="mb-4 fw-bold" style={{color: theme.text}}>User Management</h4>
+                                <h4 className="mb-4 fw-bold" style={{ color: theme.text }}>User Management</h4>
+
+                                {authError && (
+                                    <div style={styles.alert}>
+                                        <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                        {authError}
+                                    </div>
+                                )}
+
                                 <div className="card shadow-sm border-0" style={styles.card}>
                                     <div className="card-body p-4">
                                         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -150,7 +225,6 @@ const Users = ({ theme: propsTheme }) => {
                                             </button>
                                         </div>
                                         <div className="table-responsive">
-                                            {/* ✅ Table Fixed for Night Mode */}
                                             <table className={`table table-hover ${isDarkMode ? 'table-dark' : ''}`} style={{ color: theme.text }}>
                                                 <thead>
                                                     <tr style={{ borderBottom: `1px solid ${theme.border}` }}>
@@ -164,9 +238,11 @@ const Users = ({ theme: propsTheme }) => {
                                                 <tbody>
                                                     {loading ? (
                                                         <tr><td colSpan="5" className="text-center py-4" style={{ color: theme.text }}>Loading...</td></tr>
+                                                    ) : users.length === 0 ? (
+                                                        <tr><td colSpan="5" className="text-center py-4" style={{ color: theme.text }}>No users found.</td></tr>
                                                     ) : (
                                                         users.map((user) => (
-                                                            <tr key={user.id} style={{ borderColor: theme.border }}>
+                                                            <tr key={user.id || user.email} style={{ borderColor: theme.border }}>
                                                                 <td style={{ color: theme.text }}>{user.name}</td>
                                                                 <td style={{ color: theme.text }}>{user.email}</td>
                                                                 <td style={{ color: theme.text }}>{user.role}</td>

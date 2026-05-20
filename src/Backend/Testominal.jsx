@@ -6,7 +6,8 @@ import Sidebar from './Sidebar';
 
 const Testominal = () => {
     
-     const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    
     // UI States
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -15,6 +16,7 @@ const Testominal = () => {
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 6;
 
     // Data States
@@ -45,14 +47,66 @@ const Testominal = () => {
         warning: '#f59e0b'
     };
 
-    // Fetch Testimonials
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Get multipart headers for file upload
+    const getMultipartHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin',
+            'Content-Type': 'multipart/form-data'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
+    // Fetch Testimonials with authentication
     const fetchTestimonials = async () => {
+        if (!checkAuth()) return;
+        
         setLoading(true);
+        setAuthError(null);
+        
         try {
-            const res = await axios.get(`${BASE_URL}/get-testimonials`);
+            const headers = getAuthHeaders();
+            const res = await axios.get(`${BASE_URL}/get-testimonials`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             setTestimonials(res.data.data || []);
         } catch (err) {
             console.error("Fetch Error:", err);
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                setAuthError("Failed to fetch testimonials. Please try again.");
+            }
             setTestimonials([]);
         } finally {
             setLoading(false);
@@ -79,9 +133,12 @@ const Testominal = () => {
         }
     };
 
-    // Submit Form
+    // Submit Form with authentication
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
+        
         setSubmitting(true);
         
         const data = new FormData();
@@ -94,13 +151,22 @@ const Testominal = () => {
         data.append('text', formData.text);
 
         try {
+            const headers = getMultipartHeaders();
             const res = await axios.post(
                 `${BASE_URL}/add-testimonial`,
                 data,
-                { headers: { 'Content-Type': 'multipart/form-data' } }
+                { headers }
             );
 
-            if (res.status === 201) {
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+
+            if (res.status === 201 || res.data.status) {
                 setShowModal(false);
                 setFormData({
                     name: '',
@@ -111,24 +177,45 @@ const Testominal = () => {
                 });
                 setImagePreview(null);
                 fetchTestimonials();
+                alert("Testimonial added successfully!");
+            } else {
+                alert(res.data.message || "Failed to save testimonial");
             }
         } catch (err) {
             console.error("Submit Error:", err.response?.data || err);
-            alert("Failed to save testimonial");
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert("Failed to save testimonial");
+            }
         } finally {
             setSubmitting(false);
         }
     };
 
-    // Delete Testimonial
+    // Delete Testimonial with authentication
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
-            await axios.delete(`${BASE_URL}/del-testimonial/${id}`);
+            const headers = getAuthHeaders();
+            await axios.delete(`${BASE_URL}/del-testimonial/${id}`, { headers });
             fetchTestimonials();
             setDeleteConfirm(null);
+            alert("Testimonial deleted successfully!");
         } catch (err) {
             console.error("Delete Error:", err);
-            alert("Failed to delete testimonial");
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert("Failed to delete testimonial");
+            }
         }
     };
 
@@ -183,6 +270,14 @@ const Testominal = () => {
         pageSubtitle: {
             color: theme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -425,6 +520,10 @@ const Testominal = () => {
             fontWeight: '600',
             fontSize: '13px',
             color: theme.text
+        },
+        buttonDisabled: {
+            opacity: 0.7,
+            cursor: 'not-allowed'
         }
     };
 
@@ -483,6 +582,14 @@ const Testominal = () => {
                             <p style={styles.pageSubtitle}>Manage customer feedback and reviews</p>
                         </div>
 
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
+
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>
                             <div className="stat-card" style={styles.statCard}>
@@ -515,7 +622,11 @@ const Testominal = () => {
                                     setCurrentPage(1);
                                 }}
                             />
-                            <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+                            <button 
+                                style={styles.addBtn} 
+                                onClick={() => setShowModal(true)}
+                                disabled={loading}
+                            >
                                 <i className="bi bi-plus-circle"></i> Add Testimonial
                             </button>
                         </div>
@@ -665,6 +776,7 @@ const Testominal = () => {
                                         style={styles.input}
                                         placeholder="Enter customer name"
                                         required
+                                        disabled={submitting}
                                     />
                                 </div>
 
@@ -676,6 +788,7 @@ const Testominal = () => {
                                         accept="image/*"
                                         onChange={handleChange}
                                         style={styles.input}
+                                        disabled={submitting}
                                     />
                                     {imagePreview && (
                                         <div className="mt-3 text-center">
@@ -703,6 +816,7 @@ const Testominal = () => {
                                         onChange={handleChange}
                                         style={styles.input}
                                         placeholder="e.g., Google, Facebook, TripAdvisor"
+                                        disabled={submitting}
                                     />
                                 </div>
 
@@ -717,6 +831,7 @@ const Testominal = () => {
                                         onChange={handleChange}
                                         style={styles.input}
                                         required
+                                        disabled={submitting}
                                     />
                                     <div className="mt-2">
                                         {renderStars(formData.stars)}
@@ -733,6 +848,7 @@ const Testominal = () => {
                                         style={{...styles.input, resize: 'vertical'}}
                                         placeholder="Write the customer's review..."
                                         required
+                                        disabled={submitting}
                                     />
                                 </div>
                             </div>
@@ -741,13 +857,14 @@ const Testominal = () => {
                                     type="button"
                                     onClick={() => setShowModal(false)}
                                     style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+                                    disabled={submitting}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    style={{...styles.addBtn, padding: '10px 32px'}}
+                                    style={{...styles.addBtn, padding: '10px 32px', ...(submitting && styles.buttonDisabled)}}
                                 >
                                     {submitting ? (
                                         <>
@@ -780,8 +897,19 @@ const Testominal = () => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                            <button 
+                                onClick={() => setDeleteConfirm(null)} 
+                                style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+                                disabled={submitting}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(deleteConfirm.id)} 
+                                style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>

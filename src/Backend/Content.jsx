@@ -5,7 +5,7 @@ import Footer from './Footer';
 
 // API Base URL from environment variables
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const STORAGE_URL = import.meta.env.API_URL;
+const STORAGE_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
 
 const Content = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -13,6 +13,7 @@ const Content = ({ theme: propsTheme }) => {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [authError, setAuthError] = useState(null);
 
     // --- API Data States ---
     const [featureTitles, setFeatureTitles] = useState([]); 
@@ -47,43 +48,118 @@ const Content = ({ theme: propsTheme }) => {
         warning: '#f59e0b'
     };
 
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin',
+            'Content-Type': 'application/json'
+        };
+    };
+
+    // Get multipart headers for file upload
+    const getMultipartHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
     // Helper function to get image URL
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         if (imagePath.startsWith('http')) return imagePath;
-        if (imagePath.startsWith('/storage/')) {
-            return `${STORAGE_URL}${imagePath}`;
+        
+        let cleanPath = imagePath;
+        if (cleanPath.startsWith('/storage/')) {
+            cleanPath = cleanPath.replace('/storage/', '');
+        } else if (cleanPath.startsWith('storage/')) {
+            cleanPath = cleanPath.replace('storage/', '');
         }
-        if (imagePath.startsWith('storage/')) {
-            return `${STORAGE_URL}/${imagePath}`;
-        }
-        return `${STORAGE_URL}/storage/${imagePath}`;
+        cleanPath = cleanPath.replace(/^\/+/, '');
+        
+        const baseUrl = STORAGE_URL.replace(/\/$/, '');
+        return `${baseUrl}/storage/${cleanPath}`;
     };
 
-    // --- API Functions with dynamic BASE_URL ---
+    // --- API Functions with Authentication ---
     const fetchBanners = async () => {
+        if (!checkAuth()) return;
+        
         try {
             setLoading(true);
-            const res = await fetch(`${API_BASE_URL}/v1/banners/active`);
+            setAuthError(null);
+            const headers = getAuthHeaders();
+            const res = await fetch(`${API_BASE_URL}/v1/banners/active`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await res.json();
             if (result.status === 'success') {
                 setBanners(Array.isArray(result.data) ? result.data : [result.data]);
             }
-        } catch (err) { console.error(err); }
-        finally { setLoading(false); }
+        } catch (err) { 
+            console.error(err);
+            setAuthError("Failed to fetch banners. Please try again.");
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const fetchFeatureTitles = async () => {
+        if (!checkAuth()) return;
+        
         try {
-            const res = await fetch(`${API_BASE_URL}/get-features`);
+            const headers = getAuthHeaders();
+            const res = await fetch(`${API_BASE_URL}/get-features`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await res.json();
             if (result.status === 'success') setFeatureTitles(result.data);
         } catch (err) { console.error(err); }
     };
 
     const fetchGroupedFeatures = async () => {
+        if (!checkAuth()) return;
+        
         try {
-            const res = await fetch(`${API_BASE_URL}/get-about-features`); 
+            const headers = getAuthHeaders();
+            const res = await fetch(`${API_BASE_URL}/get-about-features`, { headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await res.json();
             if (result.status === 'success') setGroupedFeatures(result.data);
         } catch (err) { console.error(err); }
@@ -96,13 +172,25 @@ const Content = ({ theme: propsTheme }) => {
     }, []);
 
     const handleAddAboutTitle = async () => {
+        if (!checkAuth()) return;
         if (!formData.aboutTitle) return alert("Title is required");
+        
         try {
+            const headers = getAuthHeaders();
             const res = await fetch(`${API_BASE_URL}/add-features`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ title: formData.aboutTitle })
             });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             const result = await res.json();
             if (result.status === 'success') {
                 alert("Header Title Saved!");
@@ -113,6 +201,8 @@ const Content = ({ theme: propsTheme }) => {
     };
 
     const handleSubmit = async () => {
+        if (!checkAuth()) return;
+        
         setLoading(true);
         try {
             if (sectionType === 'hero') {
@@ -123,18 +213,39 @@ const Content = ({ theme: propsTheme }) => {
                 selectedImages.forEach((image) => data.append('images[]', image));
 
                 const url = editId ? `${API_BASE_URL}/v1/update-banners/${editId}` : `${API_BASE_URL}/v1/add-banners`;
-                const res = await fetch(url, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
+                const headers = getMultipartHeaders();
+                
+                const res = await fetch(url, { method: 'POST', body: data, headers });
+                
+                if (res.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('Role');
+                    alert("Session expired. Please login again.");
+                    setTimeout(() => window.location.href = '/login', 2000);
+                    return;
+                }
+                
                 const result = await res.json();
                 if (result.status === 'success') {
                     alert("Hero Banner Saved!");
                     setShowModal(false); resetForm(); fetchBanners();
                 }
             } else {
+                const headers = getAuthHeaders();
                 const res = await fetch(`${API_BASE_URL}/save-about-features`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({ aboutFeatures: aboutFeatures })
                 });
+                
+                if (res.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('Role');
+                    alert("Session expired. Please login again.");
+                    setTimeout(() => window.location.href = '/login', 2000);
+                    return;
+                }
+                
                 const result = await res.json();
                 if (result.status === 'success') {
                     alert("Features Saved!");
@@ -146,8 +257,20 @@ const Content = ({ theme: propsTheme }) => {
     };
 
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
-            const res = await fetch(`${API_BASE_URL}/v1/del-banners/${id}`, { method: 'DELETE' });
+            const headers = getAuthHeaders();
+            const res = await fetch(`${API_BASE_URL}/v1/del-banners/${id}`, { method: 'DELETE', headers });
+            
+            if (res.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                alert("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             if (res.ok) {
                 fetchBanners();
                 setDeleteConfirm(null);
@@ -176,6 +299,12 @@ const Content = ({ theme: propsTheme }) => {
         setEditId(null);
         setFormData({ title: '', subtitle: '', slug: '', aboutTitle: '' });
         setAboutFeatures([{ category: '', feature: '' }]);
+        // Clean up blob URLs
+        previews.forEach(url => {
+            if (url && url.startsWith('blob:')) {
+                URL.revokeObjectURL(url);
+            }
+        });
         setPreviews([]);
         setSelectedImages([]);
     };
@@ -244,6 +373,14 @@ const Content = ({ theme: propsTheme }) => {
         pageSubtitle: {
             color: theme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         toolbar: {
             display: 'flex',
@@ -460,6 +597,10 @@ const Content = ({ theme: propsTheme }) => {
             textAlign: 'center',
             padding: '60px',
             color: theme.textLight
+        },
+        disabledBtn: {
+            opacity: 0.6,
+            cursor: 'not-allowed'
         }
     };
 
@@ -511,6 +652,14 @@ const Content = ({ theme: propsTheme }) => {
                             <p style={styles.pageSubtitle}>Manage banners, hero sections, and about features</p>
                         </div>
 
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
+
                         {/* Toolbar */}
                         <div style={styles.toolbar}>
                             <input
@@ -521,7 +670,11 @@ const Content = ({ theme: propsTheme }) => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            <button style={styles.addBtn} onClick={() => { resetForm(); setShowModal(true); }}>
+                            <button 
+                                style={styles.addBtn} 
+                                onClick={() => { resetForm(); setShowModal(true); }}
+                                disabled={loading}
+                            >
                                 <i className="bi bi-plus-circle"></i> Add New Content
                             </button>
                         </div>
@@ -546,7 +699,7 @@ const Content = ({ theme: propsTheme }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {loading ? (
+                                        {loading && banners.length === 0 ? (
                                             <tr>
                                                 <td colSpan="5" style={{ ...styles.td, textAlign: 'center' }}>
                                                     <div className="spinner-border text-primary" role="status">
@@ -587,12 +740,14 @@ const Content = ({ theme: propsTheme }) => {
                                                         <button 
                                                             style={{...styles.actionBtn, ...styles.editBtn}}
                                                             onClick={() => handleEdit(b)}
+                                                            disabled={loading}
                                                         >
                                                             <i className="bi bi-pencil"></i>
                                                         </button>
                                                         <button 
                                                             style={{...styles.actionBtn, ...styles.deleteBtn}}
                                                             onClick={() => setDeleteConfirm(b)}
+                                                            disabled={loading}
                                                         >
                                                             <i className="bi bi-trash"></i>
                                                         </button>
@@ -699,6 +854,7 @@ const Content = ({ theme: propsTheme }) => {
                                                 id={`section-${type}`}
                                                 checked={sectionType === type} 
                                                 onChange={() => setSectionType(type)} 
+                                                disabled={loading}
                                             />
                                             <label className="form-check-label fw-bold text-capitalize" htmlFor={`section-${type}`}>
                                                 {type} Section
@@ -718,6 +874,7 @@ const Content = ({ theme: propsTheme }) => {
                                             onChange={e => setFormData({ ...formData, title: e.target.value })}
                                             placeholder="Enter hero title"
                                             required
+                                            disabled={loading}
                                         />
                                     </div>
                                     <div className="row mb-3">
@@ -728,6 +885,7 @@ const Content = ({ theme: propsTheme }) => {
                                                 value={formData.subtitle} 
                                                 onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
                                                 placeholder="Enter subtitle"
+                                                disabled={loading}
                                             />
                                         </div>
                                         <div className="col-md-6">
@@ -737,6 +895,7 @@ const Content = ({ theme: propsTheme }) => {
                                                 value={formData.slug} 
                                                 onChange={e => setFormData({ ...formData, slug: e.target.value })}
                                                 placeholder="e.g., home, about"
+                                                disabled={loading}
                                             />
                                         </div>
                                     </div>
@@ -745,11 +904,11 @@ const Content = ({ theme: propsTheme }) => {
                                         <div 
                                             style={styles.uploadZone}
                                             className="upload-zone"
-                                            onClick={() => document.getElementById('fileInput').click()}
+                                            onClick={() => !loading && document.getElementById('fileInput').click()}
                                         >
                                             <i className="bi bi-cloud-arrow-up" style={{ fontSize: '32px', color: theme.primary }}></i>
                                             <p className="mb-0 small" style={{ color: theme.textLight }}>Click to upload or drag and drop</p>
-                                            <input id="fileInput" type="file" multiple hidden accept="image/*" onChange={handleImageChange} />
+                                            <input id="fileInput" type="file" multiple hidden accept="image/*" onChange={handleImageChange} disabled={loading} />
                                         </div>
                                         {previews.length > 0 && (
                                             <div style={styles.imagePreviewContainer}>
@@ -771,11 +930,13 @@ const Content = ({ theme: propsTheme }) => {
                                                 placeholder="Main Title" 
                                                 value={formData.aboutTitle} 
                                                 onChange={e => setFormData({ ...formData, aboutTitle: e.target.value })} 
+                                                disabled={loading}
                                             />
                                             <button 
                                                 onClick={handleAddAboutTitle} 
                                                 className="btn" 
                                                 style={{ background: theme.primaryGradient, color: 'white', border: 'none', padding: '0 20px', borderRadius: '10px' }}
+                                                disabled={loading}
                                             >
                                                 Add
                                             </button>
@@ -788,6 +949,7 @@ const Content = ({ theme: propsTheme }) => {
                                                 className="btn btn-sm rounded-circle" 
                                                 onClick={addFeatureRow}
                                                 style={{ background: theme.primaryGradient, color: 'white', width: '32px', height: '32px' }}
+                                                disabled={loading}
                                             >
                                                 <i className="bi bi-plus-lg"></i>
                                             </button>
@@ -800,6 +962,7 @@ const Content = ({ theme: propsTheme }) => {
                                                         style={styles.input}
                                                         value={feat.category} 
                                                         onChange={(e) => handleFeatureChange(index, 'category', e.target.value)}
+                                                        disabled={loading}
                                                     >
                                                         <option value="">Select Category</option>
                                                         {featureTitles.map((item) => (
@@ -814,6 +977,7 @@ const Content = ({ theme: propsTheme }) => {
                                                         placeholder="Feature..." 
                                                         value={feat.feature} 
                                                         onChange={(e) => handleFeatureChange(index, 'feature', e.target.value)} 
+                                                        disabled={loading}
                                                     />
                                                 </div>
                                                 {aboutFeatures.length > 1 && (
@@ -821,6 +985,7 @@ const Content = ({ theme: propsTheme }) => {
                                                         type="button"
                                                         style={styles.featureRemoveBtn}
                                                         onClick={() => removeFeatureRow(index)}
+                                                        disabled={loading}
                                                     >
                                                         <i className="bi bi-trash"></i>
                                                     </button>
@@ -836,6 +1001,7 @@ const Content = ({ theme: propsTheme }) => {
                                 className="btn btn-secondary" 
                                 onClick={() => { setShowModal(false); resetForm(); }}
                                 style={{ padding: '10px 24px', borderRadius: '10px' }}
+                                disabled={loading}
                             >
                                 Cancel
                             </button>
@@ -843,7 +1009,7 @@ const Content = ({ theme: propsTheme }) => {
                                 className="btn" 
                                 onClick={handleSubmit} 
                                 disabled={loading}
-                                style={{ background: theme.primaryGradient, color: 'white', border: 'none', padding: '10px 32px', borderRadius: '10px' }}
+                                style={{ background: theme.primaryGradient, color: 'white', border: 'none', padding: '10px 32px', borderRadius: '10px', ...(loading && styles.disabledBtn) }}
                             >
                                 {loading ? (
                                     <>
@@ -875,8 +1041,20 @@ const Content = ({ theme: propsTheme }) => {
                             </div>
                         </div>
                         <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{ padding: '10px 24px', borderRadius: '10px', backgroundColor: theme.border, border: 'none' }}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{ padding: '10px 24px', borderRadius: '10px', backgroundColor: theme.danger, color: 'white', border: 'none' }}>Delete</button>
+                            <button 
+                                onClick={() => setDeleteConfirm(null)} 
+                                style={{ padding: '10px 24px', borderRadius: '10px', backgroundColor: theme.border, border: 'none' }}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(deleteConfirm.id)} 
+                                style={{ padding: '10px 24px', borderRadius: '10px', backgroundColor: theme.danger, color: 'white', border: 'none' }}
+                                disabled={loading}
+                            >
+                                {loading ? 'Deleting...' : 'Delete'}
+                            </button>
                         </div>
                     </div>
                 </div>

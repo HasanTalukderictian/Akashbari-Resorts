@@ -27,6 +27,7 @@ const Login = () => {
         // টোকেন এবং রোল সেভ করা
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('Role', response.data.role || 'admin'); // role সঠিকভাবে সেভ করা
+        console.log(response.data.token);
         // ড্যাশবোর্ডে পাঠানো
         navigate('/dashboard');
       } else {

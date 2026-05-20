@@ -13,6 +13,7 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [authError, setAuthError] = useState(null);
     const itemsPerPage = 6;
     
     const [isEditing, setIsEditing] = useState(false);
@@ -49,7 +50,42 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
         warning: '#f59e0b'
     };
 
-    // Helper function to get image URL - FIXED
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('Role') || 'admin';
+        
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': role,
+            'Content-Type': 'application/json'
+        };
+    };
+
+    // Get multipart form headers (for file uploads)
+    const getMultipartHeaders = () => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('Role') || 'admin';
+        
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': role,
+            'Content-Type': 'multipart/form-data'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
+    };
+
+    // Helper function to get image URL
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         
@@ -76,20 +112,38 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
     };
 
     const fetchProperties = async () => {
+        if (!checkAuth()) return;
+        
         setLoading(true);
+        setAuthError(null);
+        
         try {
-            const res = await axios.get(`${BASE_URL}/get-property-offers`);
+            const headers = getAuthHeaders();
+            const res = await axios.get(`${BASE_URL}/get-property-offers`, { headers });
+            
             if (res.data.status && res.data.data.data) {
                 setProperties(res.data.data.data);
+            } else {
+                setProperties([]);
             }
         } catch (err) { 
-            console.error("Fetch Error:", err); 
+            console.error("Fetch Error:", err);
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                setAuthError("Failed to fetch properties. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => { fetchProperties(); }, []);
+    useEffect(() => { 
+        fetchProperties(); 
+    }, []);
 
     const handleEditClick = (item) => {
         setIsEditing(true);
@@ -102,7 +156,7 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
             features: item.features && item.features.length > 0 ? item.features : [''],
         });
         
-        // Set existing images for preview - FIXED: process images correctly
+        // Set existing images for preview
         if (item.slider_images && item.slider_images.length > 0) {
             const imageUrls = item.slider_images.map(img => getImageUrl(img));
             setExistingImages(imageUrls);
@@ -152,6 +206,9 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
 
     const handleSave = async (e) => {
         e.preventDefault();
+        
+        if (!checkAuth()) return;
+        
         setLoading(true);
         
         const data = new FormData();
@@ -169,29 +226,48 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
         }
 
         try {
+            const headers = getMultipartHeaders();
             const url = isEditing 
                 ? `${BASE_URL}/edit-property-offers/${editId}`
                 : `${BASE_URL}/add-property-offers`;
 
-            await axios.post(url, data, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            await axios.post(url, data, { headers });
             
             fetchProperties();
             closeModal();
         } catch (err) { 
-            alert(err.response?.data?.message || "Something went wrong!");
-        } finally { setLoading(false); }
+            console.error("Save Error:", err);
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert(err.response?.data?.message || "Something went wrong!");
+            }
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const handleDelete = async (id) => {
+        if (!checkAuth()) return;
+        
         try {
-            await axios.delete(`${BASE_URL}/del-property-offers/${id}`);
+            const headers = getAuthHeaders();
+            await axios.delete(`${BASE_URL}/del-property-offers/${id}`, { headers });
             fetchProperties();
             setDeleteConfirm(null);
         } catch (err) { 
             console.error(err);
-            alert("Failed to delete property");
+            if (err.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                alert("Failed to delete property");
+            }
         }
     };
 
@@ -234,6 +310,14 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
         pageSubtitle: {
             color: theme.textLight,
             fontSize: '14px'
+        },
+        alert: {
+            padding: '12px 20px',
+            backgroundColor: 'rgba(254, 112, 150, 0.15)',
+            color: '#fe7096',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            fontWeight: '500'
         },
         statCards: {
             display: 'grid',
@@ -559,6 +643,14 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                             <h1 style={styles.pageTitle}>Property Inventory</h1>
                             <p style={styles.pageSubtitle}>Manage your property listings and offers</p>
                         </div>
+
+                        {/* Auth Error Display */}
+                        {authError && (
+                            <div style={styles.alert}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {authError}
+                            </div>
+                        )}
 
                         {/* Statistics Cards */}
                         <div style={styles.statCards}>

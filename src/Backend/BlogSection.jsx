@@ -33,6 +33,7 @@ const BlogSection = ({ theme: propsTheme }) => {
     const [editingBlog, setEditingBlog] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
     const [imageErrors, setImageErrors] = useState({});
+    const [authError, setAuthError] = useState(null);
 
     const theme = propsTheme || {
         isDarkMode,
@@ -47,6 +48,36 @@ const BlogSection = ({ theme: propsTheme }) => {
         success: '#10b981',
         warning: '#f59e0b',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
+    };
+
+    // Get authentication headers
+    const getAuthHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin'
+        };
+    };
+
+    // Get multipart headers for file upload
+    const getMultipartHeaders = () => {
+        const token = localStorage.getItem('token');
+        return {
+            'Authorization': `Bearer ${token}`,
+            'Role': localStorage.getItem('Role') || 'admin',
+            'Content-Type': 'multipart/form-data'
+        };
+    };
+
+    // Check authentication
+    const checkAuth = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setAuthError("Please login to access this page");
+            setTimeout(() => window.location.href = '/login', 2000);
+            return false;
+        }
+        return true;
     };
 
     const getImageUrl = (imagePath) => {
@@ -104,9 +135,23 @@ const BlogSection = ({ theme: propsTheme }) => {
     };
 
     const fetchBlogs = async () => {
+        if (!checkAuth()) return;
+        
         setLoading(true);
+        setAuthError(null);
+        
         try {
-            const response = await axios.get(`${API_BASE_URL}/blogs`);
+            const headers = getAuthHeaders();
+            const response = await axios.get(`${API_BASE_URL}/blogs`, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             if (response.data.status === true) {
                 setBlogs(response.data.data);
             } else {
@@ -114,8 +159,15 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error fetching blogs:', error);
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                setAuthError("Session expired. Please login again.");
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                setAuthError("Failed to load blogs. Please try again.");
+            }
             setBlogs([]);
-            showToast('Failed to load blogs', 'error');
         } finally {
             setLoading(false);
         }
@@ -209,6 +261,8 @@ const BlogSection = ({ theme: propsTheme }) => {
     };
 
     const handleUpdateBlog = async () => {
+        if (!checkAuth()) return;
+        
         if (!editBlog.title || !editBlog.author || !editBlog.category || !editBlog.excerpt || !editBlog.introduction) {
             showToast('Please fill in all required fields!', 'error');
             return;
@@ -225,15 +279,22 @@ const BlogSection = ({ theme: propsTheme }) => {
             formData.append('introduction', editBlog.introduction);
             formData.append('conclusion', editBlog.conclusion || '');
             formData.append('sections', JSON.stringify(editBlog.sections));
-            formData.append('_method', 'PUT');
+            formData.append('_method', 'POSt');
             
             if (uploadedImage) {
                 formData.append('image', uploadedImage);
             }
             
-            const response = await axios.post(`${API_BASE_URL}/blogs/${editingBlog.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const headers = getMultipartHeaders();
+            const response = await axios.post(`${API_BASE_URL}/blogs/${editingBlog.id}`, formData, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
             
             if (response.data.status === true) {
                 showToast('Blog updated successfully!', 'success');
@@ -244,18 +305,36 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error updating blog:', error);
-            showToast(error.response?.data?.message || 'Error updating blog.', 'error');
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                showToast(error.response?.data?.message || 'Error updating blog.', 'error');
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteBlog = async (blogId, blogTitle) => {
+        if (!checkAuth()) return;
         if (!window.confirm(`Are you sure you want to delete "${blogTitle}"?`)) return;
         
         setLoading(true);
         try {
-            const response = await axios.delete(`${API_BASE_URL}/blogs/${blogId}`);
+            const headers = getAuthHeaders();
+            const response = await axios.delete(`${API_BASE_URL}/blogs/${blogId}`, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
+            
             if (response.data.status === true) {
                 showToast('Blog deleted successfully!', 'success');
                 fetchBlogs();
@@ -264,7 +343,14 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error deleting blog:', error);
-            showToast('Error deleting blog.', 'error');
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                showToast('Error deleting blog.', 'error');
+            }
         } finally {
             setLoading(false);
         }
@@ -340,6 +426,8 @@ const BlogSection = ({ theme: propsTheme }) => {
     };
 
     const handleSubmitBlog = async () => {
+        if (!checkAuth()) return;
+        
         if (!newBlog.title || !newBlog.author || !newBlog.category || !newBlog.excerpt || !newBlog.introduction) {
             showToast('Please fill in all required fields!', 'error');
             return;
@@ -361,9 +449,16 @@ const BlogSection = ({ theme: propsTheme }) => {
                 formData.append('image', uploadedImage);
             }
             
-            const response = await axios.post(`${API_BASE_URL}/blogs`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const headers = getMultipartHeaders();
+            const response = await axios.post(`${API_BASE_URL}/blogs`, formData, { headers });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
+            }
             
             if (response.data.status === true) {
                 showToast('Blog post added successfully!', 'success');
@@ -374,7 +469,14 @@ const BlogSection = ({ theme: propsTheme }) => {
             }
         } catch (error) {
             console.error('Error adding blog:', error);
-            showToast(error.response?.data?.message || 'Error adding blog post.', 'error');
+            if (error.response?.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('Role');
+                showToast("Session expired. Please login again.", 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+            } else {
+                showToast(error.response?.data?.message || 'Error adding blog post.', 'error');
+            }
         } finally {
             setLoading(false);
         }
@@ -396,6 +498,7 @@ const BlogSection = ({ theme: propsTheme }) => {
         pageHeader: { marginBottom: '30px' },
         pageTitle: { fontSize: '28px', fontWeight: '700', background: theme.primaryGradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '8px' },
         pageSubtitle: { color: theme.textLight, fontSize: '14px' },
+        alert: { padding: '12px 20px', backgroundColor: 'rgba(254, 112, 150, 0.15)', color: '#fe7096', borderRadius: '8px', marginBottom: '20px', fontWeight: '500' },
         statsContainer: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' },
         statCard: { backgroundColor: theme.card, borderRadius: '16px', padding: '20px', border: `1px solid ${theme.border}`, transition: 'all 0.3s ease', cursor: 'pointer' },
         statIcon: { width: '45px', height: '45px', borderRadius: '12px', background: theme.primaryGradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '12px' },
@@ -462,6 +565,14 @@ const BlogSection = ({ theme: propsTheme }) => {
                                 <p style={styles.pageSubtitle}>Manage and create engaging blog content</p>
                             </div>
 
+                            {/* Auth Error Display */}
+                            {authError && (
+                                <div style={styles.alert}>
+                                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                    {authError}
+                                </div>
+                            )}
+
                             <div style={styles.statsContainer}>
                                 <div className="stat-card" style={styles.statCard}><div style={styles.statIcon}>📝</div><div style={styles.statValue}>{totalBlogs}</div><div style={styles.statLabel}>Total Blogs</div></div>
                                 <div className="stat-card" style={styles.statCard}><div style={styles.statIcon}>✅</div><div style={styles.statValue}>{publishedBlogs}</div><div style={styles.statLabel}>Published</div></div>
@@ -471,7 +582,7 @@ const BlogSection = ({ theme: propsTheme }) => {
 
                             <div style={styles.toolbar}>
                                 <input type="text" placeholder="🔍 Search by title, author, or category..." style={styles.searchBox} className="search-box" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} />
-                                <button style={styles.addBtn} onClick={handleAddNewBlog}><i className="bi bi-plus-circle"></i> Add New Blog</button>
+                                <button style={styles.addBtn} onClick={handleAddNewBlog} disabled={loading}><i className="bi bi-plus-circle"></i> Add New Blog</button>
                             </div>
 
                             {loading && blogs.length === 0 ? (
@@ -488,9 +599,9 @@ const BlogSection = ({ theme: propsTheme }) => {
                                                     <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}><span style={styles.categoryBadge}>{blog.category}</span><span style={styles.statusBadge(blog.status)}>{blog.status}</span></div>
                                                     <p style={styles.blogExcerpt}>{blog.excerpt?.substring(0, 120)}...</p>
                                                     <div style={styles.cardActions}>
-                                                        <button style={{...styles.actionBtn, ...styles.viewBtn}} onClick={() => handleViewDetails(blog)}><i className="bi bi-eye"></i> View</button>
-                                                        <button style={{...styles.actionBtn, ...styles.editBtn}} onClick={() => handleEditClick(blog)}><i className="bi bi-pencil"></i> Edit</button>
-                                                        <button style={{...styles.actionBtn, ...styles.deleteBtn}} onClick={() => handleDeleteBlog(blog.id, blog.title)}><i className="bi bi-trash"></i> Delete</button>
+                                                        <button style={{...styles.actionBtn, ...styles.viewBtn}} onClick={() => handleViewDetails(blog)} disabled={loading}><i className="bi bi-eye"></i> View</button>
+                                                        <button style={{...styles.actionBtn, ...styles.editBtn}} onClick={() => handleEditClick(blog)} disabled={loading}><i className="bi bi-pencil"></i> Edit</button>
+                                                        <button style={{...styles.actionBtn, ...styles.deleteBtn}} onClick={() => handleDeleteBlog(blog.id, blog.title)} disabled={loading}><i className="bi bi-trash"></i> Delete</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -546,18 +657,18 @@ const BlogSection = ({ theme: propsTheme }) => {
                                 <div className="row g-3">
                                     <div className="col-12"><label style={styles.label}>Featured Image</label><div style={styles.imageUploadArea} onClick={() => document.getElementById('imageUpload').click()}>
                                         {imagePreview ? (<div><img src={imagePreview} alt="Preview" style={styles.imagePreview} /><div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}><button type="button" style={styles.deleteBtn} onClick={() => { setImagePreview(null); setUploadedImage(null); }}>Remove</button><button type="button" style={styles.editBtn} onClick={() => document.getElementById('imageUpload').click()}>Change</button></div></div>) : (<div><div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div><p>Click to upload an image</p><p style={{ fontSize: '12px', color: theme.textLight }}>Max size: 5MB</p></div>)}
-                                        <input id="imageUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+                                        <input id="imageUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={loading} />
                                     </div></div>
-                                    <div className="col-md-6"><label style={styles.label}>Title *</label><input type="text" name="title" style={styles.input} value={newBlog.title} onChange={handleInputChange} required /></div>
-                                    <div className="col-md-6"><label style={styles.label}>Author *</label><input type="text" name="author" style={styles.input} value={newBlog.author} onChange={handleInputChange} required /></div>
-                                    <div className="col-md-6"><label style={styles.label}>Category *</label><select name="category" style={styles.input} value={newBlog.category} onChange={handleInputChange} required><option value="">Select Category</option><option value="Suite Tips">Suite Tips</option><option value="Weekend Getaway">Weekend Getaway</option><option value="Suite Review">Suite Review</option><option value="Business Travel">Business Travel</option><option value="Spa & Wellness">Spa & Wellness</option><option value="Room Guide">Room Guide</option></select></div>
-                                    <div className="col-md-6"><label style={styles.label}>Status *</label><select name="status" style={styles.input} value={newBlog.status} onChange={handleInputChange}><option value="Draft">Draft</option><option value="Published">Published</option></select></div>
-                                    <div className="col-12"><label style={styles.label}>Excerpt *</label><textarea name="excerpt" style={styles.textarea} value={newBlog.excerpt} onChange={handleInputChange} required /></div>
-                                    <div className="col-12"><label style={styles.label}>Introduction *</label><textarea name="introduction" style={styles.textarea} value={newBlog.introduction} onChange={handleInputChange} required /></div>
-                                    <div className="col-12"><label style={styles.label}>Sections</label>{newBlog.sections.map((section, index) => (<div key={index} style={styles.sectionCard}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}><h5 style={{ margin: 0, color: theme.text }}>Section {index + 1}</h5>{index > 0 && (<button type="button" onClick={() => removeSection(index)} style={styles.deleteBtn}>Remove</button>)}</div><input type="text" placeholder="Section Title" style={styles.input} value={section.title} onChange={(e) => handleSectionChange(index, 'title', e.target.value)} /><textarea placeholder="Section Content" style={styles.textarea} value={section.content} onChange={(e) => handleSectionChange(index, 'content', e.target.value)} /></div>))}<button type="button" onClick={addSection} style={styles.editBtn}>+ Add Section</button></div>
-                                    <div className="col-12"><label style={styles.label}>Conclusion</label><textarea name="conclusion" style={styles.textarea} value={newBlog.conclusion} onChange={handleInputChange} /></div>
+                                    <div className="col-md-6"><label style={styles.label}>Title *</label><input type="text" name="title" style={styles.input} value={newBlog.title} onChange={handleInputChange} required disabled={loading} /></div>
+                                    <div className="col-md-6"><label style={styles.label}>Author *</label><input type="text" name="author" style={styles.input} value={newBlog.author} onChange={handleInputChange} required disabled={loading} /></div>
+                                    <div className="col-md-6"><label style={styles.label}>Category *</label><select name="category" style={styles.input} value={newBlog.category} onChange={handleInputChange} required disabled={loading}><option value="">Select Category</option><option value="Suite Tips">Suite Tips</option><option value="Weekend Getaway">Weekend Getaway</option><option value="Suite Review">Suite Review</option><option value="Business Travel">Business Travel</option><option value="Spa & Wellness">Spa & Wellness</option><option value="Room Guide">Room Guide</option></select></div>
+                                    <div className="col-md-6"><label style={styles.label}>Status *</label><select name="status" style={styles.input} value={newBlog.status} onChange={handleInputChange} disabled={loading}><option value="Draft">Draft</option><option value="Published">Published</option></select></div>
+                                    <div className="col-12"><label style={styles.label}>Excerpt *</label><textarea name="excerpt" style={styles.textarea} value={newBlog.excerpt} onChange={handleInputChange} required disabled={loading} /></div>
+                                    <div className="col-12"><label style={styles.label}>Introduction *</label><textarea name="introduction" style={styles.textarea} value={newBlog.introduction} onChange={handleInputChange} required disabled={loading} /></div>
+                                    <div className="col-12"><label style={styles.label}>Sections</label>{newBlog.sections.map((section, index) => (<div key={index} style={styles.sectionCard}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}><h5 style={{ margin: 0, color: theme.text }}>Section {index + 1}</h5>{index > 0 && (<button type="button" onClick={() => removeSection(index)} style={styles.deleteBtn} disabled={loading}>Remove</button>)}</div><input type="text" placeholder="Section Title" style={styles.input} value={section.title} onChange={(e) => handleSectionChange(index, 'title', e.target.value)} disabled={loading} /><textarea placeholder="Section Content" style={styles.textarea} value={section.content} onChange={(e) => handleSectionChange(index, 'content', e.target.value)} disabled={loading} /></div>))}<button type="button" onClick={addSection} style={styles.editBtn} disabled={loading}>+ Add Section</button></div>
+                                    <div className="col-12"><label style={styles.label}>Conclusion</label><textarea name="conclusion" style={styles.textarea} value={newBlog.conclusion} onChange={handleInputChange} disabled={loading} /></div>
                                 </div>
-                                <div style={styles.modalFooter}><button type="button" onClick={handleCloseAddModal} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button><button type="submit" style={{...styles.addBtn, padding: '10px 32px'}} disabled={loading}>{loading ? 'Submitting...' : 'Submit Blog'}</button></div>
+                                <div style={styles.modalFooter}><button type="button" onClick={handleCloseAddModal} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}} disabled={loading}>Cancel</button><button type="submit" style={{...styles.addBtn, padding: '10px 32px'}} disabled={loading}>{loading ? 'Submitting...' : 'Submit Blog'}</button></div>
                             </form>
                         </div>
                     </div>
@@ -574,18 +685,18 @@ const BlogSection = ({ theme: propsTheme }) => {
                                 <div className="row g-3">
                                     <div className="col-12"><label style={styles.label}>Featured Image</label><div style={styles.imageUploadArea} onClick={() => document.getElementById('editImageUpload').click()}>
                                         {imagePreview ? (<div><img src={imagePreview} alt="Preview" style={styles.imagePreview} /><div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}><button type="button" style={styles.deleteBtn} onClick={() => { setImagePreview(null); setUploadedImage(null); }}>Remove</button><button type="button" style={styles.editBtn} onClick={() => document.getElementById('editImageUpload').click()}>Change</button></div></div>) : (<div><div style={{ fontSize: '48px', marginBottom: '10px' }}>📷</div><p>Click to upload an image</p><p style={{ fontSize: '12px', color: theme.textLight }}>Max size: 5MB</p></div>)}
-                                        <input id="editImageUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+                                        <input id="editImageUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={loading} />
                                     </div></div>
-                                    <div className="col-md-6"><label style={styles.label}>Title *</label><input type="text" name="title" style={styles.input} value={editBlog.title} onChange={handleEditInputChange} required /></div>
-                                    <div className="col-md-6"><label style={styles.label}>Author *</label><input type="text" name="author" style={styles.input} value={editBlog.author} onChange={handleEditInputChange} required /></div>
-                                    <div className="col-md-6"><label style={styles.label}>Category *</label><select name="category" style={styles.input} value={editBlog.category} onChange={handleEditInputChange} required><option value="">Select Category</option><option value="Suite Tips">Suite Tips</option><option value="Weekend Getaway">Weekend Getaway</option><option value="Suite Review">Suite Review</option><option value="Business Travel">Business Travel</option><option value="Spa & Wellness">Spa & Wellness</option><option value="Room Guide">Room Guide</option></select></div>
-                                    <div className="col-md-6"><label style={styles.label}>Status *</label><select name="status" style={styles.input} value={editBlog.status} onChange={handleEditInputChange}><option value="Draft">Draft</option><option value="Published">Published</option></select></div>
-                                    <div className="col-12"><label style={styles.label}>Excerpt *</label><textarea name="excerpt" style={styles.textarea} value={editBlog.excerpt} onChange={handleEditInputChange} required /></div>
-                                    <div className="col-12"><label style={styles.label}>Introduction *</label><textarea name="introduction" style={styles.textarea} value={editBlog.introduction} onChange={handleEditInputChange} required /></div>
-                                    <div className="col-12"><label style={styles.label}>Sections</label>{editBlog.sections.map((section, index) => (<div key={index} style={styles.sectionCard}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}><h5 style={{ margin: 0, color: theme.text }}>Section {index + 1}</h5>{index > 0 && (<button type="button" onClick={() => removeEditSection(index)} style={styles.deleteBtn}>Remove</button>)}</div><input type="text" placeholder="Section Title" style={styles.input} value={section.title} onChange={(e) => handleEditSectionChange(index, 'title', e.target.value)} /><textarea placeholder="Section Content" style={styles.textarea} value={section.content} onChange={(e) => handleEditSectionChange(index, 'content', e.target.value)} /></div>))}<button type="button" onClick={addEditSection} style={styles.editBtn}>+ Add Section</button></div>
-                                    <div className="col-12"><label style={styles.label}>Conclusion</label><textarea name="conclusion" style={styles.textarea} value={editBlog.conclusion} onChange={handleEditInputChange} /></div>
+                                    <div className="col-md-6"><label style={styles.label}>Title *</label><input type="text" name="title" style={styles.input} value={editBlog.title} onChange={handleEditInputChange} required disabled={loading} /></div>
+                                    <div className="col-md-6"><label style={styles.label}>Author *</label><input type="text" name="author" style={styles.input} value={editBlog.author} onChange={handleEditInputChange} required disabled={loading} /></div>
+                                    <div className="col-md-6"><label style={styles.label}>Category *</label><select name="category" style={styles.input} value={editBlog.category} onChange={handleEditInputChange} required disabled={loading}><option value="">Select Category</option><option value="Suite Tips">Suite Tips</option><option value="Weekend Getaway">Weekend Getaway</option><option value="Suite Review">Suite Review</option><option value="Business Travel">Business Travel</option><option value="Spa & Wellness">Spa & Wellness</option><option value="Room Guide">Room Guide</option></select></div>
+                                    <div className="col-md-6"><label style={styles.label}>Status *</label><select name="status" style={styles.input} value={editBlog.status} onChange={handleEditInputChange} disabled={loading}><option value="Draft">Draft</option><option value="Published">Published</option></select></div>
+                                    <div className="col-12"><label style={styles.label}>Excerpt *</label><textarea name="excerpt" style={styles.textarea} value={editBlog.excerpt} onChange={handleEditInputChange} required disabled={loading} /></div>
+                                    <div className="col-12"><label style={styles.label}>Introduction *</label><textarea name="introduction" style={styles.textarea} value={editBlog.introduction} onChange={handleEditInputChange} required disabled={loading} /></div>
+                                    <div className="col-12"><label style={styles.label}>Sections</label>{editBlog.sections.map((section, index) => (<div key={index} style={styles.sectionCard}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}><h5 style={{ margin: 0, color: theme.text }}>Section {index + 1}</h5>{index > 0 && (<button type="button" onClick={() => removeEditSection(index)} style={styles.deleteBtn} disabled={loading}>Remove</button>)}</div><input type="text" placeholder="Section Title" style={styles.input} value={section.title} onChange={(e) => handleEditSectionChange(index, 'title', e.target.value)} disabled={loading} /><textarea placeholder="Section Content" style={styles.textarea} value={section.content} onChange={(e) => handleEditSectionChange(index, 'content', e.target.value)} disabled={loading} /></div>))}<button type="button" onClick={addEditSection} style={styles.editBtn} disabled={loading}>+ Add Section</button></div>
+                                    <div className="col-12"><label style={styles.label}>Conclusion</label><textarea name="conclusion" style={styles.textarea} value={editBlog.conclusion} onChange={handleEditInputChange} disabled={loading} /></div>
                                 </div>
-                                <div style={styles.modalFooter}><button type="button" onClick={handleCloseEditModal} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button><button type="submit" style={{...styles.addBtn, padding: '10px 32px'}} disabled={loading}>{loading ? 'Updating...' : 'Update Blog'}</button></div>
+                                <div style={styles.modalFooter}><button type="button" onClick={handleCloseEditModal} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}} disabled={loading}>Cancel</button><button type="submit" style={{...styles.addBtn, padding: '10px 32px'}} disabled={loading}>{loading ? 'Updating...' : 'Update Blog'}</button></div>
                             </form>
                         </div>
                     </div>
