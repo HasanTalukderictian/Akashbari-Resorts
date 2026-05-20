@@ -5,7 +5,8 @@ import Footer from './Footer';
 import Sidebar from './Sidebar';
 
 const Testominal = () => {
-
+    
+     const BASE_URL = import.meta.env.VITE_BASE_URL;
     // UI States
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -48,7 +49,7 @@ const Testominal = () => {
     const fetchTestimonials = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/get-testimonials');
+            const res = await axios.get(`${BASE_URL}/get-testimonials`);
             setTestimonials(res.data.data || []);
         } catch (err) {
             console.error("Fetch Error:", err);
@@ -94,7 +95,7 @@ const Testominal = () => {
 
         try {
             const res = await axios.post(
-                'http://127.0.0.1:8000/api/add-testimonial',
+                `${BASE_URL}/add-testimonial`,
                 data,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             );
@@ -122,7 +123,7 @@ const Testominal = () => {
     // Delete Testimonial
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/api/del-testimonial/${id}`);
+            await axios.delete(`${BASE_URL}/del-testimonial/${id}`);
             fetchTestimonials();
             setDeleteConfirm(null);
         } catch (err) {

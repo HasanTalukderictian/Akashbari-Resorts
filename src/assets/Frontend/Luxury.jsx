@@ -6,6 +6,8 @@ const Luxury = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+   const APP_URL = import.meta.env.API_URL;
+
   // API Base URL
   const API_BASE = import.meta.env.VITE_BASE_URL;
 
@@ -157,7 +159,7 @@ const Luxury = () => {
               {/* Image Container with Zoom Logic */}
               <div className="zoom-container" style={{ height: '250px', position: 'relative' }}>
                 <img
-                  src={item.image_url || `http://127.0.0.1:8000/${item.image}`}
+                  src={item.image_url || `${APP_URL}/${item.image}`}
                   className="zoom-image"
                   alt={item.title}
                   onError={(e) => {

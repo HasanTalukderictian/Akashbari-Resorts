@@ -65,14 +65,7 @@ const Header = ({ theme, isDarkMode, toggleDarkMode, toggleSidebar }) => {
                         <i className={`bi bi-${isDarkMode ? 'sun-fill' : 'moon-stars-fill'}`}></i>
                     </div>
 
-                    {/* Notification */}
-                    <div className="position-relative" style={{ cursor: 'pointer', color: theme.text }}>
-                        <i className="bi bi-bell fs-5"></i>
-                        <span
-                            className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
-                            style={{ fontSize: '5px' }}
-                        ></span>
-                    </div>
+                   
 
                     {/* User avatar */}
                     <img
