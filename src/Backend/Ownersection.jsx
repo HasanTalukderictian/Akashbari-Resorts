@@ -28,13 +28,14 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
     };
 
     // Use environment variables with fallbacks
-    const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/api';
-    const API_URL = import.meta.env.API_URL || 'http://localhost:8000';
+    const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://backend.akashbariresort.com/api';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://backend.akashbariresort.com';
 
     const [formData, setFormData] = useState(initialFormState);
     const [selectedImages, setSelectedImages] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
+    const [imageErrors, setImageErrors] = useState({});
 
     const theme = {
         isDarkMode,
@@ -85,30 +86,51 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
         return true;
     };
 
-    // Helper function to get image URL
+    // Helper function to get image URL - FIXED
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
         
         // If already a full URL, return as is
         if (imagePath.startsWith('http')) return imagePath;
         
-        // Clean the path - remove any storage prefix and extra slashes
+        // Clean the path - remove 'property/' prefix if present
         let cleanPath = imagePath;
-        
-        // Remove /storage/ from beginning if present
-        if (cleanPath.startsWith('/storage/')) {
-            cleanPath = cleanPath.replace('/storage/', '');
+        if (cleanPath.startsWith('property/')) {
+            cleanPath = cleanPath.replace('property/', '');
         }
-        // Remove storage/ from beginning if present
-        else if (cleanPath.startsWith('storage/')) {
-            cleanPath = cleanPath.replace('storage/', '');
+        if (cleanPath.startsWith('/property/')) {
+            cleanPath = cleanPath.replace('/property/', '');
         }
         
         // Remove any leading slashes
         cleanPath = cleanPath.replace(/^\/+/, '');
         
-        // Construct the full URL
-        return `${API_URL}/storage/${cleanPath}`;
+        // Remove query parameters if any
+        if (cleanPath.includes('?')) {
+            cleanPath = cleanPath.split('?')[0];
+        }
+        
+        const baseUrl = API_URL.replace(/\/$/, '');
+        return `${baseUrl}/storage/property/${cleanPath}`;
+    };
+
+    const handleImageError = (propertyId, imageIndex = null) => {
+        const key = imageIndex !== null ? `${propertyId}-${imageIndex}` : propertyId;
+        if (!imageErrors[key]) {
+            setImageErrors(prev => ({ ...prev, [key]: true }));
+        }
+    };
+
+    const getFinalImageUrl = (property, imagePath, index = 0) => {
+        const key = index !== null ? `${property.id}-${index}` : property.id;
+        if (imageErrors[key]) {
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+        }
+        const url = getImageUrl(imagePath);
+        if (!url) {
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+        }
+        return url;
     };
 
     const fetchProperties = async () => {
@@ -703,14 +725,10 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                                     {currentItems.map((item) => (
                                         <div key={item.id} className="property-card" style={styles.propertyCard}>
                                             <img 
-                                                src={item.slider_images?.[0] ? getImageUrl(item.slider_images[0]) : 'https://via.placeholder.com/400x200?text=Property+Image'} 
+                                                src={item.slider_images?.[0] ? getFinalImageUrl(item, item.slider_images[0], 0) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E"} 
                                                 alt={item.title}
                                                 style={styles.cardImage}
-                                                onError={(e) => {
-                                                    console.error('Image failed to load:', e.target.src);
-                                                    e.target.onerror = null;
-                                                    e.target.src = 'https://via.placeholder.com/400x200?text=No+Image';
-                                                }}
+                                                onError={() => handleImageError(item.id, 0)}
                                             />
                                             <div style={styles.cardContent}>
                                                 <h3 style={styles.propertyTitle}>{item.title}</h3>

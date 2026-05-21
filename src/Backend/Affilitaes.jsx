@@ -22,8 +22,8 @@ const Affilitaes = ({ theme: propsTheme }) => {
     const [editingId, setEditingId] = useState(null);
 
     // API Configuration
-    const API_BASE_URL = 'http://localhost:8000/api';
-    const API_URL = 'http://localhost:8000';
+    const API_BASE_URL = 'https://backend.akashbariresort.com/api';
+    const API_URL = 'https://backend.akashbariresort.com';
 
     const theme = propsTheme || {
         isDarkMode,

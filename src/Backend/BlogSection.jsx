@@ -4,17 +4,9 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import axios from 'axios';
 
-// Import images
-import king1 from '../assets/image/section/Blog/Blog_image-1.webp';
-import king2 from '../assets/image/section/Blog/Blog_image-2.webp';
-import king3 from '../assets/image/section/Blog/Blog_image-3.webp';
-import king4 from '../assets/image/section/Blog/Blog_image-5.webp';
-import king5 from '../assets/image/section/Blog/Blog_image-6.webp';
-import king6 from '../assets/image/section/Blog/Blog_image-7.webp';
-
 // API Base URL
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://backend.akashbariresort.com';
 
 const BlogSection = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -80,19 +72,32 @@ const BlogSection = ({ theme: propsTheme }) => {
         return true;
     };
 
+    // Fixed: Get image URL properly
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
+        
+        // If already a full URL, return as is
         if (imagePath.startsWith('http')) return imagePath;
-        let filename = imagePath;
-        if (imagePath.includes('/')) {
-            filename = imagePath.split('/').pop();
+        
+        // Clean the path - remove 'blogs/' prefix if present
+        let cleanPath = imagePath;
+        if (cleanPath.startsWith('blogs/')) {
+            cleanPath = cleanPath.replace('blogs/', '');
         }
-        filename = filename.replace(/^\/+/, '');
-        if (filename.includes('?')) {
-            filename = filename.split('?')[0];
+        if (cleanPath.startsWith('/blogs/')) {
+            cleanPath = cleanPath.replace('/blogs/', '');
         }
+        
+        // Remove any leading slashes
+        cleanPath = cleanPath.replace(/^\/+/, '');
+        
+        // Remove query parameters if any
+        if (cleanPath.includes('?')) {
+            cleanPath = cleanPath.split('?')[0];
+        }
+        
         const baseUrl = BACKEND_URL.replace(/\/$/, '');
-        return `${baseUrl}/storage/blogs/${filename}`;
+        return `${baseUrl}/storage/blogs/${cleanPath}`;
     };
 
     const handleImageError = (blogId) => {
@@ -102,9 +107,15 @@ const BlogSection = ({ theme: propsTheme }) => {
     };
 
     const getFinalImageUrl = (blog) => {
-        if (imageErrors[blog.id]) return king1;
+        if (imageErrors[blog.id]) {
+            // Return a default placeholder image as data URL
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+        }
         const url = getImageUrl(blog.image);
-        return url || king1;
+        if (!url) {
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+        }
+        return url;
     };
 
     const [newBlog, setNewBlog] = useState({
@@ -279,7 +290,7 @@ const BlogSection = ({ theme: propsTheme }) => {
             formData.append('introduction', editBlog.introduction);
             formData.append('conclusion', editBlog.conclusion || '');
             formData.append('sections', JSON.stringify(editBlog.sections));
-            formData.append('_method', 'POSt');
+            formData.append('_method', 'PUT');
             
             if (uploadedImage) {
                 formData.append('image', uploadedImage);
@@ -595,7 +606,7 @@ const BlogSection = ({ theme: propsTheme }) => {
                                                 <img src={getFinalImageUrl(blog)} alt={blog.title} style={styles.blogImage} onError={() => handleImageError(blog.id)} />
                                                 <div style={styles.cardContent}>
                                                     <h3 style={styles.blogTitle}>{blog.title}</h3>
-                                                    <div style={styles.blogMeta}><span>✍️ {blog.author}</span><span>📅 {blog.date || blog.created_at?.split('T')[0]}</span><span>👁️ {blog.views?.toLocaleString() || 0}</span></div>
+                                                    <div style={styles.blogMeta}><span>✍️ {blog.author}</span><span>📅 {blog.created_at?.split('T')[0]}</span><span>👁️ {blog.views?.toLocaleString() || 0}</span></div>
                                                     <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}><span style={styles.categoryBadge}>{blog.category}</span><span style={styles.statusBadge(blog.status)}>{blog.status}</span></div>
                                                     <p style={styles.blogExcerpt}>{blog.excerpt?.substring(0, 120)}...</p>
                                                     <div style={styles.cardActions}>
@@ -637,7 +648,7 @@ const BlogSection = ({ theme: propsTheme }) => {
                         <div style={styles.modalBody}>
                             {selectedBlog.image && (<div style={{ marginBottom: '20px', textAlign: 'center' }}><img src={getFinalImageUrl(selectedBlog)} alt={selectedBlog.title} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '12px' }} onError={() => handleImageError(selectedBlog.id)} /></div>)}
                             <h2 style={{ color: theme.text, marginBottom: '16px' }}>{selectedBlog.title}</h2>
-                            <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', paddingBottom: '16px', borderBottom: `1px solid ${theme.border}`, flexWrap: 'wrap' }}><span>📅 {selectedBlog.date || selectedBlog.created_at?.split('T')[0]}</span><span>✍️ {selectedBlog.author}</span><span>📚 {selectedBlog.category}</span><span>👁️ {selectedBlog.views?.toLocaleString() || 0} views</span></div>
+                            <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', paddingBottom: '16px', borderBottom: `1px solid ${theme.border}`, flexWrap: 'wrap' }}><span>📅 {selectedBlog.created_at?.split('T')[0]}</span><span>✍️ {selectedBlog.author}</span><span>📚 {selectedBlog.category}</span><span>👁️ {selectedBlog.views?.toLocaleString() || 0} views</span></div>
                             <div style={{ backgroundColor: theme.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa', padding: '16px', borderRadius: '12px', marginBottom: '20px', fontStyle: 'italic' }}><p style={{ margin: 0 }}>{selectedBlog.excerpt}</p></div>
                             {selectedBlog.introduction && (<div style={{ marginBottom: '20px' }}><h4 style={{ marginBottom: '8px', color: theme.text }}>Introduction</h4><p style={{ lineHeight: '1.6' }}>{selectedBlog.introduction}</p></div>)}
                             {(() => { let sections = []; try { sections = typeof selectedBlog.sections === 'string' ? JSON.parse(selectedBlog.sections) : (selectedBlog.sections || []); } catch(e) { sections = []; } return sections.map((section, idx) => (<div key={idx} style={{ marginBottom: '20px' }}><h4 style={{ marginBottom: '8px', color: theme.text }}>{section.title}</h4><p style={{ lineHeight: '1.6' }}>{section.content}</p></div>)); })()}
