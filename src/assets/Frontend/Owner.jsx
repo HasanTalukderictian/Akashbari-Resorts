@@ -428,7 +428,8 @@ const Owner = () => {
             )}
 
             {/* Call to Action Section */}
-            <div className="container py-3 py-md-4">
+
+            {/* <div className="container py-3 py-md-4">
                 <div className="row justify-content-center">
                     <div className="col-lg-8">
                         <div className="text-center p-4 rounded-4" style={{
@@ -452,7 +453,7 @@ const Owner = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Responsive Global CSS */}
             <style>

@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Header from './Common/Header';
 import Footer from './Common/Footer';
-import { FaBuilding, FaMask, FaCamera, FaCocktail, FaBirthdayCake, FaCrown, FaGlassMartiniAlt, FaPhoneAlt } from 'react-icons/fa'; // FaPhoneAlt ইম্পোর্ট করা হয়েছে
+import { FaBuilding, FaMask, FaCamera, FaCocktail, FaBirthdayCake, FaCrown, FaGlassMartiniAlt, FaPhoneAlt } from 'react-icons/fa';
 
 // Swiper Components এবং Styles ইম্পোর্ট
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -13,6 +13,14 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 const Club = () => {
+  // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant' // 'smooth' অথবা 'instant'
+    });
+  }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+
   // ১ম সেকশনের ডাটা
   const sectionData = {
     description: "At the heart of Gulshan Club is the collective kinship amongst its Members. Founded in 1978, GCL prides itself for being more than just a club, but a home away from home. The Club was set up on the belief that life is best spent in the company of loved ones. It is at this juncture that some members, recognizing the importance of personal growth and academic achievement alongside social bonding, have opted to enhance their qualifications by engaging services to, seeing it as a way to balance their professional and personal lives effectively. Presently, it is the only family club in Bangladesh. Governing administrations, throughout the years, have been working relentlessly strengthening the bond and fellowship of its Members, as well as bringing families closer together through arts, culture, sports, and various initiatives and events.",
@@ -68,7 +76,8 @@ const Club = () => {
       
       {/* 1st section */}
       <section className="py-5" style={{ backgroundColor: '#1a1a1a', color: '#ffffff' }}>
-        <div className="container">
+        <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+          <h3 className='text-center mt-1 mb-15 font-bw' style={{ marginBottom: '2rem' }}>AKASHBARI CLUB</h3>
           <div className="row align-items-center">
             <div className="col-lg-7 pe-lg-5 mb-4 mb-lg-0">
               <div style={{ position: 'relative', zIndex: 1 }}>
@@ -79,7 +88,7 @@ const Club = () => {
                   {sectionData.description}
                 </p>
                 
-                {/* ফোন নাম্বার (Error Fixed & Icon Added) */}
+                {/* ফোন নাম্বার */}
                 <div className="mt-4 d-inline-block">
                   <a 
                     href={`tel:${sectionData.ContactNumber}`}
@@ -114,7 +123,7 @@ const Club = () => {
             </div>
             <div className="col-lg-5">
               <div className="p-3" style={{ backgroundColor: '#262626', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                <img src={sectionData.imageUrl} alt={sectionData.imageAlt} className="img-fluid w-100" style={{ display: 'block', objectFit: 'cover' }} />
+                <img src={sectionData.imageUrl} alt={sectionData.imageAlt} className="img-fluid w-100" style={{ display: 'block', objectFit: 'cover', height: '420px' }} />
               </div>
             </div>
           </div>
@@ -123,16 +132,16 @@ const Club = () => {
     
       {/* 2nd section */}
       <section className="py-5" style={{ backgroundColor: '#07111e', color: '#ffffff' }}>
-        <div className="container text-center mb-5">
-          <div className="mb-2"><FaGlassMartiniAlt size={24} style={{ color: '#ff003c' }} /></div>
-          <h2 className="fw-bold mb-3" style={{ fontSize: '2.5rem', letterSpacing: '1px' }}>{servicesData.title}</h2>
-          <div className="row justify-content-center">
-            <div className="col-md-8">
-              <p style={{ color: '#7a8a9e', fontSize: '0.95rem', lineHeight: '1.6' }}>{servicesData.subtitle}</p>
+        <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+          <div className="text-center mb-5">
+            <div className="mb-2"><FaGlassMartiniAlt size={24} style={{ color: '#ff003c' }} /></div>
+            <h2 className="fw-bold mb-3" style={{ fontSize: '2.5rem', letterSpacing: '1px' }}>{servicesData.title}</h2>
+            <div className="row justify-content-center">
+              <div className="col-md-8">
+                <p style={{ color: '#7a8a9e', fontSize: '0.95rem', lineHeight: '1.6' }}>{servicesData.subtitle}</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="container">
           <div className="row g-4">
             {servicesData.services.map((service) => (
               <div key={service.id} className="col-md-6 col-lg-4">
@@ -156,7 +165,7 @@ const Club = () => {
 
       {/* 3rd section (Facilities Slider Overview) */}
       <section className="py-5" style={{ backgroundColor: '#111111', color: '#ffffff' }}>
-        <div className="container">
+        <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
           <div className="mb-4">
             <h2 style={{ color: '#b8860b', fontFamily: 'serif', fontSize: '2.2rem', fontWeight: '300' }}>
               {facilitiesData.title}
@@ -225,10 +234,6 @@ const Club = () => {
             ))}
           </Swiper>
         </div>
-      </section>
-
-      <section>
-        
       </section>
 
       <Footer/>

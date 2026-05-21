@@ -2,9 +2,19 @@ import { FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn, FaMapMarkerAlt, FaPh
 import "../../css/Footer.css";
 import logo from '../../image/Akashbari  resort logo png-01.png'
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  // Timer function to update current year
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentYear(new Date().getFullYear());
+    }, 1000); // Updates every second (though year only changes once per year)
+    
+    return () => clearInterval(timer); // Cleanup timer on component unmount
+  }, []);
 
   return (
     <footer className="footer">
@@ -36,7 +46,7 @@ const Footer = () => {
         </div>
 
         {/* Right Section - Services */}
-        <div className="footer-col services">
+        <div className="footer-col quick-links">
           <h3>SERVICES</h3>
           <ul>
             <li>Rooms</li>
@@ -91,6 +101,21 @@ const Footer = () => {
           <Link to="/contact">Contact</Link>
         </div>
       </div>
+
+      {/* Add these styles to make p tag text size same as li tags */}
+      <style jsx>{`
+        .footer .contact-info p {
+          font-size: 14px; /* Adjust this value to match your li tag font size */
+          line-height: 1.6;
+        }
+        
+        /* If your li tags have different font size, you can uncomment and adjust below */
+        /*
+        .footer .quick-links ul li {
+          font-size: 14px;
+        }
+        */
+      `}</style>
     </footer>
   );
 };

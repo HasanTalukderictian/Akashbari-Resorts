@@ -13,40 +13,32 @@ const Affiliates = () => {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'instant' // 'smooth' অথবা 'instant'
+      behavior: 'instant'
     });
-  }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+  }, []);
 
   // API Configuration
   const API_BASE_URL = import.meta.env.VITE_BASE_URL;
   const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
 
-  // Helper function to get full image URL - FIXED
+  // Helper function to get full image URL
   const getFullImageUrl = (imagePath) => {
     if (!imagePath) return null;
     
-    // If already a full URL, return as is
     if (imagePath.startsWith('http')) return imagePath;
     
-    // Clean the path
     let cleanPath = imagePath;
     
-    // Remove /storage/ from beginning if present
     if (cleanPath.startsWith('/storage/')) {
       cleanPath = cleanPath.replace('/storage/', '');
     }
-    // Remove storage/ from beginning if present
     else if (cleanPath.startsWith('storage/')) {
       cleanPath = cleanPath.replace('storage/', '');
     }
     
-    // Remove leading slashes
     cleanPath = cleanPath.replace(/^\/+/, '');
-    
-    // Ensure base URL doesn't have trailing slash
     const baseUrl = API_URL.replace(/\/$/, '');
     
-    // Construct the full URL
     return `${baseUrl}/storage/${cleanPath}`;
   };
 
@@ -64,13 +56,12 @@ const Affiliates = () => {
       console.log('API Response:', response.data);
       
       if (response.data.success && response.data.data) {
-        // Transform the data to match the component's expected format
         const transformedData = response.data.data.map(affiliate => ({
           id: affiliate.id,
           name: affiliate.title,
           description: affiliate.description,
-          image: affiliate.image, // Keep original image path
-          logo: getFullImageUrl(affiliate.image), // Processed URL
+          image: affiliate.image,
+          logo: getFullImageUrl(affiliate.image),
           website: affiliate.website,
           status: affiliate.status,
           createdAt: affiliate.created_at,
@@ -172,7 +163,6 @@ const Affiliates = () => {
         {/* Partners Grid */}
         <section style={styles.grid}>
           {partners.map((item, index) => {
-            // Automatically alternate: even index = Normal, odd index = Reverse
             const isReverse = index % 2 !== 0;
 
             return (
@@ -230,19 +220,14 @@ const Affiliates = () => {
 const styles = {
   container: {
     maxWidth: '1200px',
+    width: '100%',
     margin: '0 auto',
     padding: '80px 20px',
     fontFamily: "'Playfair Display', serif",
-    '@media (maxWidth: 768px)': {
-      padding: '40px 16px',
-    },
   },
   headerSection: {
     textAlign: 'center',
     marginBottom: '80px',
-    '@media (maxWidth: 768px)': {
-      marginBottom: '40px',
-    },
   },
   badge: {
     backgroundColor: '#76a34d',
@@ -254,23 +239,12 @@ const styles = {
     borderRadius: '50px',
     boxShadow: '0 4px 10px rgba(118, 163, 77, 0.3)',
     display: 'inline-block',
-    '@media (maxWidth: 768px)': {
-      fontSize: '11px',
-      padding: '4px 14px',
-    },
   },
   title: {
     fontSize: '56px',
     margin: '25px 0 15px',
     color: '#1a1a1a',
     fontWeight: '800',
-    '@media (maxWidth: 768px)': {
-      fontSize: '32px',
-      margin: '15px 0 10px',
-    },
-    '@media (maxWidth: 480px)': {
-      fontSize: '28px',
-    },
   },
   subtitle: {
     color: '#555',
@@ -278,11 +252,6 @@ const styles = {
     margin: '0 auto',
     lineHeight: '1.8',
     fontSize: '18px',
-    '@media (maxWidth: 768px)': {
-      fontSize: '15px',
-      lineHeight: '1.6',
-      padding: '0 10px',
-    },
   },
   underline: {
     width: '80px',
@@ -290,27 +259,17 @@ const styles = {
     backgroundColor: '#76a34d',
     margin: '30px auto 0',
     borderRadius: '2px',
-    '@media (maxWidth: 768px)': {
-      width: '60px',
-      margin: '20px auto 0',
-    },
   },
   grid: {
     display: 'flex',
     flexDirection: 'column',
     gap: '60px',
-    '@media (maxWidth: 768px)': {
-      gap: '30px',
-    },
   },
   row: {
     display: 'flex',
     alignItems: 'center',
     gap: '0px',
     flexWrap: 'wrap',
-    '@media (maxWidth: 992px)': {
-      flexDirection: 'column !important',
-    },
   },
   imageBox: {
     flex: '1',
@@ -323,28 +282,11 @@ const styles = {
     backgroundColor: '#fff',
     overflow: 'hidden',
     boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
-    '@media (maxWidth: 992px)': {
-      minWidth: '100%',
-      height: '280px',
-      borderBottom: 'none',
-    },
-    '@media (maxWidth: 768px)': {
-      height: '220px',
-    },
-    '@media (maxWidth: 480px)': {
-      height: '180px',
-    },
   },
   imageWrapper: {
     width: '70%',
     transition: 'transform 0.5s ease',
     cursor: 'pointer',
-    '@media (maxWidth: 768px)': {
-      width: '50%',
-    },
-    '@media (maxWidth: 480px)': {
-      width: '60%',
-    },
   },
   textBox: {
     flex: '1',
@@ -359,20 +301,6 @@ const styles = {
     justifyContent: 'center',
     backgroundColor: '#fdfdfd',
     boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
-    '@media (maxWidth: 992px)': {
-      minWidth: '100%',
-      height: 'auto',
-      padding: '40px 30px',
-      borderLeft: '1px solid #e0e0e0 !important',
-      borderRight: '1px solid #e0e0e0 !important',
-      borderTop: 'none',
-    },
-    '@media (maxWidth: 768px)': {
-      padding: '30px 20px',
-    },
-    '@media (maxWidth: 480px)': {
-      padding: '25px 15px',
-    },
   },
   logo: {
     width: '100%',
@@ -406,28 +334,12 @@ const styles = {
     marginBottom: '20px',
     color: '#1a1a1a',
     lineHeight: '1.2',
-    '@media (maxWidth: 768px)': {
-      fontSize: '24px',
-      marginBottom: '15px',
-    },
-    '@media (maxWidth: 480px)': {
-      fontSize: '20px',
-      marginBottom: '12px',
-    },
   },
   cardText: {
     fontSize: '16px',
     color: '#666',
     lineHeight: '1.7',
     marginBottom: '30px',
-    '@media (maxWidth: 768px)': {
-      fontSize: '14px',
-      lineHeight: '1.6',
-      marginBottom: '20px',
-    },
-    '@media (maxWidth: 480px)': {
-      fontSize: '13px',
-    },
   },
   button: {
     backgroundColor: '#76a34d',
@@ -441,16 +353,6 @@ const styles = {
     transition: 'all 0.3s ease',
     fontSize: '14px',
     letterSpacing: '1px',
-    '@media (maxWidth: 768px)': {
-      padding: '10px 20px',
-      fontSize: '12px',
-      width: '100%',
-      textAlign: 'center',
-    },
-    '@media (maxWidth: 480px)': {
-      padding: '8px 16px',
-      fontSize: '11px',
-    },
   },
   loadingContainer: {
     textAlign: 'center',
@@ -518,7 +420,7 @@ const styles = {
   },
 };
 
-// Add responsive styles using CSS-in-JS with media queries
+// Add responsive styles
 const responsiveStyles = `
   @media (max-width: 992px) {
     .affiliates-row {

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../css/video.css'; 
@@ -47,33 +45,36 @@ const Video = () => {
     }
 
     return (
-        <section className="video-section py-5">
-            <div className="container text-center">
+        <section className="video-section py-5" style={{ backgroundColor: 'rgb(248, 249, 252)' }}>
+            <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
                 {/* Top Header Section */}
-                <div className="row justify-content-center mb-5 animate__animated animate__fadeIn">
-                    <div className="col-lg-8">
-                        <div className="mx-auto mb-3"></div>
-                        {/* ডাইনামিক টাইটেল */}
-                        <p className="gateway-text mb-2">{videoData.title}</p>
-                        {/* ডাইনামিক ডেসক্রিপশন */}
-                        <h5 className="video-subtext text-muted">
-                            {videoData.description.length > 200 
-                                ? `${videoData.description.substring(0, 200)}...` 
-                                : videoData.description}
-                        </h5>
+                <div className="text-center mb-5">
+                    <div className="row justify-content-center">
+                        <div className="col-lg-8">
+                            <div className="mx-auto mb-3"></div>
+                            {/* ডাইনামিক টাইটেল */}
+                            <p className="gateway-text mb-2" style={{ fontSize: '1.2rem', fontWeight: '500', color: '#333' }}>{videoData.title}</p>
+                            {/* ডাইনামিক ডেসক্রিপশন */}
+                            <h5 className="video-subtext text-muted" style={{ fontSize: '1rem', lineHeight: '1.6', color: '#666' }}>
+                                {videoData.description.length > 200 
+                                    ? `${videoData.description.substring(0, 200)}...` 
+                                    : videoData.description}
+                            </h5>
+                        </div>
                     </div>
                 </div>
 
-                {/* Video Section */}
-                <div className="row justify-content-center animate__animated animate__zoomIn">
-                    <div className="col-lg-10">
-                        <div className="video-wrapper shadow-lg" style={{ borderRadius: '15px', overflow: 'hidden' }}>
-                            <div className="ratio ratio-16x9">
+                {/* Video Section - Full Width */}
+                <div className="row justify-content-center">
+                    <div className="col-12">
+                        <div className="video-wrapper shadow-lg" style={{ borderRadius: '15px', overflow: 'hidden', width: '100%' }}>
+                            <div className="ratio ratio-16x9" style={{ width: '100%' }}>
                                 <iframe 
                                     src={getEmbedUrl(videoData.video_url || videoData.videoUrl)} 
                                     title={videoData.title} 
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowFullScreen
+                                    style={{ width: '100%', height: '100%', border: 'none' }}
                                 ></iframe>
                             </div>
                         </div>

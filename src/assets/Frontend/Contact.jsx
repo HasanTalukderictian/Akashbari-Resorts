@@ -42,8 +42,8 @@ const Contact = () => {
         },
         {
             id: 3,
-            title: "Visit Us",
-            detail: "Akashbari Resort",
+            title: "Location",
+            detail: "Akashbari Hotel & Resort",
             detail2: "Sreepur, Gazipur, Bangladesh",
             icon: "bi bi-geo-alt",
             action: "https://www.google.com/maps/place/24%C2%B007'12.2%22N+90%C2%B030'27.8%22E/@24.1200554,90.5051585,17z"
@@ -54,7 +54,6 @@ const Contact = () => {
     const latitude = 24.1200554;
     const longitude = 90.5077334;
     const googleMapEmbedUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3650.5!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjTCsDA3JzEyLjIiTiA5MMKwMzAnMjcuOCJF!5e0!3m2!1sen!2sbd!4v1234567890!5m2!1sen!2sbd`;
-    const googleMapsDirectionsUrl = `https://www.google.com/maps/dir//${latitude},${longitude}`;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -235,13 +234,13 @@ const Contact = () => {
 
                     <div className="row g-4">
                         {/* Map Column */}
-                        <div className="col-lg-8">
-                            <div className="map-wrapper rounded-4 overflow-hidden shadow-lg">
+                        <div className="col-lg-8 d-flex">
+                            <div className="map-wrapper rounded-4 overflow-hidden shadow-lg w-100">
                                 <iframe
                                     src={googleMapEmbedUrl}
                                     width="100%"
-                                    height="450"
-                                    style={{ border: 0 }}
+                                    height="100%"
+                                    style={{ border: 0, minHeight: '450px' }}
                                     allowFullScreen=""
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
@@ -251,8 +250,8 @@ const Contact = () => {
                         </div>
 
                         {/* Location Details Column */}
-                        <div className="col-lg-4">
-                            <div className="location-details h-100 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#fff' }}>
+                        <div className="col-lg-4 d-flex">
+                            <div className="location-details w-100 p-4 rounded-4 shadow-sm d-flex flex-column" style={{ backgroundColor: '#fff' }}>
                                 <h4 className="serif mb-3 text-gold">📍 Address Details</h4>
                                 <div className="location-info mb-4">
                                     <p className="mb-2">
@@ -279,8 +278,7 @@ const Contact = () => {
                                     </p>
                                 </div>
                                 
-                                <div className="direction-buttons mt-4">
-                                    
+                                <div className="direction-buttons mt-auto">
                                     <a 
                                         href={`https://www.google.com/maps?q=${latitude},${longitude}`}
                                         target="_blank"
@@ -291,29 +289,6 @@ const Contact = () => {
                                         <i className="bi bi-navigation me-2"></i>
                                         Open in Google Maps App
                                     </a>
-                                </div>
-
-                                {/* Nearby Attractions */}
-                                <div className="nearby-places mt-4 pt-3 border-top">
-                                    <h5 className="serif mb-3">Nearby Attractions</h5>
-                                    <ul className="list-unstyled">
-                                        <li className="mb-2">
-                                            <i className="bi bi-tree-fill text-gold me-2"></i>
-                                            Bhawal National Park
-                                        </li>
-                                        <li className="mb-2">
-                                            <i className="bi bi-building text-gold me-2"></i>
-                                            Rajendrapur Cantonment
-                                        </li>
-                                        <li className="mb-2">
-                                            <i className="bi bi-water text-gold me-2"></i>
-                                            Bangabandhu Safari Park
-                                        </li>
-                                        <li className="mb-2">
-                                            <i className="bi bi-flower1 text-gold me-2"></i>
-                                            Nuhash Polli
-                                        </li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -350,6 +325,54 @@ const Contact = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Nearby Attractions as Beautiful Cards */}
+                    <div className="nearby-attractions-wrapper mt-5 pt-4">
+                        <div className="text-center mb-4">
+                            <h3 className="serif display-6 fs-2">
+                                <span className="text-italic">Nearby Attractions</span>
+                            </h3>
+                            <p className="text-muted">Explore the beauty around Akashbari Resort</p>
+                        </div>
+                        <div className="row g-4">
+                            <div className="col-md-3 col-sm-6">
+                                <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
+                                    <div className="attraction-icon mb-3">
+                                        <i className="bi bi-tree-fill fs-1 text-gold"></i>
+                                    </div>
+                                    <h5 className="serif mb-2">Bhawal National Park</h5>
+                                    <p className="text-muted small mb-0">Lush green forest, rich biodiversity & peaceful trails</p>
+                                </div>
+                            </div>
+                            <div className="col-md-3 col-sm-6">
+                                <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
+                                    <div className="attraction-icon mb-3">
+                                        <i className="bi bi-building fs-1 text-gold"></i>
+                                    </div>
+                                    <h5 className="serif mb-2">Rajendrapur Cantonment</h5>
+                                    <p className="text-muted small mb-0">Historical military area with scenic surroundings</p>
+                                </div>
+                            </div>
+                            <div className="col-md-3 col-sm-6">
+                                <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
+                                    <div className="attraction-icon mb-3">
+                                        <i className="bi bi-water fs-1 text-gold"></i>
+                                    </div>
+                                    <h5 className="serif mb-2">Bangabandhu Safari Park</h5>
+                                    <p className="text-muted small mb-0">Exciting wildlife safari, exotic animals & family fun</p>
+                                </div>
+                            </div>
+                            <div className="col-md-3 col-sm-6">
+                                <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
+                                    <div className="attraction-icon mb-3">
+                                        <i className="bi bi-flower1 fs-1 text-gold"></i>
+                                    </div>
+                                    <h5 className="serif mb-2">Nuhash Polli</h5>
+                                    <p className="text-muted small mb-0">Artistic village with sculptures & cultural vibes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -379,9 +402,13 @@ const Contact = () => {
                     transform: translateY(-8px);
                     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
                 }
+                .attraction-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+                }
                 @media (max-width: 768px) {
                     .map-wrapper iframe {
-                        height: 350px;
+                        min-height: 350px;
                     }
                 }
             `}</style>

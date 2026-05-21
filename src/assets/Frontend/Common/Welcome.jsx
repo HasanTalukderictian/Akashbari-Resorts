@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
-import { Link } from 'react-router-dom'; // রাউটিং এর জন্য Link ইম্পোর্ট করা হয়েছে
+import { Link } from 'react-router-dom'; // রাউটিং এর জন্য Link ইম্পোর্ট করা হয়েছে
 import '../../css/welcome.css'; 
 import logo from '../../image/Akashbari  resort logo png-01.png';
 
@@ -76,31 +76,86 @@ const Welcome = () => {
               )}
             </div>
 
-            {/* বাটনটি এখানে ফিক্স করা হয়েছে */}
-            <div className="mt-4">
-              <Link 
-                to="/club" 
-                className="btn text-uppercase px-4 py-2 text-decoration-none"
-                style={{ 
-                  backgroundColor: '#b8860b', 
-                  color: '#ffffff',
-                  fontWeight: '500',
-                  letterSpacing: '1px',
-                  borderRadius: '4px',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#ffffff';
-                  e.currentTarget.style.color = '#b8860b';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#b8860b';
-                  e.currentTarget.style.color = '#ffffff';
+            {/* বাটন এবং কল বক্স সেকশন */}
+            <div className="mt-4 d-flex flex-column gap-4">
+              <div>
+                <Link 
+                  to="/club" 
+                  className="btn text-uppercase px-4 py-2 text-decoration-none"
+                  style={{ 
+                    backgroundColor: '#b8860b', 
+                    color: '#ffffff',
+                    fontWeight: '500',
+                    letterSpacing: '1px',
+                    borderRadius: '4px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ffffff';
+                    e.currentTarget.style.color = '#b8860b';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#b8860b';
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                >
+                  Visit Club
+                </Link>
+              </div>
+
+              {/* ছবি অনুযায়ী কল বক্স (ডিজাইন একদম ম্যাচিং) */}
+              <div 
+                style={{
+                  border: '2px solid #1a1a1a',
+                  padding: '15px 25px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '20px',
+                  maxWidth: '480px',
+                  backgroundColor: '#f9f9f9'
                 }}
               >
-                Club
-              </Link>
+                {/* গোল আইকন বক্স */}
+                <div 
+                  style={{
+                    backgroundColor: '#639c4e',
+                    borderRadius: '50%',
+                    width: '45px',
+                    height: '45px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  {/* SVG Call Icon */}
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    strokeWidth="2" 
+                    stroke="#ffffff" 
+                    style={{ width: '22px', height: '22px' }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.75Z" />
+                  </svg>
+                </div>
+
+                {/* টেক্সট এবং নাম্বার */}
+                <span 
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#1a1a1a',
+                    letterSpacing: '1.5px',
+                    fontFamily: 'sans-serif'
+                  }}
+                >
+                  CALL NOW: +8801701294455
+                </span>
+              </div>
             </div>
+
           </div>
 
           {/* Right Features Side - Dynamic Part - Icons Removed */}
