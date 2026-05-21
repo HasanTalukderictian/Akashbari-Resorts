@@ -1,16 +1,60 @@
-# React + Vite
+# 🌴 Hotel & Resort Management Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and responsive Hotel & Resort Management Website built with React + Vite.  
+This project includes a beautiful landing page and a powerful admin dashboard for managing website content dynamically.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Live Preview
 
-## React Compiler
+### 🌐 Landing Page
+![Landing Page](https://i.ibb.co.com/r2Y04hJF/screencapture-localhost-5173-2026-05-17-13-39-41.png)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ⚙️ Admin Dashboard
+![Admin Panel](https://i.ibb.co.com/6p1SZxX/screencapture-localhost-5173-admin-events-2026-05-17-13-38-42.png)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# ✨ Features
+
+## 🏠 User Side
+- Modern Responsive Landing Page
+- Smooth Navigation
+- Beautiful UI Design
+- Dynamic Content Rendering
+- Image Carousel / Slider
+- Pagination System
+- Mobile Friendly Design
+
+## 🛠️ Admin Panel
+- Professional Admin Dashboard
+- Event Management System
+- Dynamic Data Handling
+- CRUD Operations
+- Responsive Admin Interface
+- Secure API Communication
+
+---
+
+# ⚡ Technologies Used
+
+## Frontend
+- React JS
+- Vite
+- Bootstrap 5
+- React Hooks
+- Axios
+- React Router DOM
+- React Pagination
+- React Carousel
+
+---
+
+# 📦 Packages Used
+
+```bash
+npm install axios
+npm install bootstrap
+npm install react-router-dom
+npm install react-responsive-carousel
+npm install react-paginate
