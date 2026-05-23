@@ -48,7 +48,7 @@ function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/sister' element={<Affliates />} />
-           <Route path='/partner' element={<Partner />} />
+        <Route path='/partner' element={<Partner />} />
         <Route path='/blog' element={<Blog />} />
         <Route path='/club' element={<Club />} />
         <Route path="/blog-details/:id" element={<BlogDetails />} />
@@ -56,84 +56,84 @@ function App() {
         <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/event/:id" element={<EventsDetails />} />
-         <Route path="*" element={<NotFound />} />
-        
+        <Route path="*" element={<NotFound />} />
+
         {/* লগইন রুট - পাবলিক */}
         <Route path="/login" element={<Login />} />
-        
+
         {/* অ্যাডমিন রুটসমূহ - প্রাইভেট (লগইন প্রয়োজন) */}
         <Route path="/dashboard" element={
           <PrivateRoute>
             <Dashbord />
           </PrivateRoute>
         } />
-        
+
         <Route path="/users" element={
           <PrivateRoute>
             <Users />
           </PrivateRoute>
         } />
-        
+
         <Route path="/content" element={
           <PrivateRoute>
             <Content />
           </PrivateRoute>
         } />
-        
+
         <Route path="/welcome" element={
           <PrivateRoute>
             <Welcome />
           </PrivateRoute>
         } />
-        
+
         <Route path="/video" element={
           <PrivateRoute>
             <VideoSection />
           </PrivateRoute>
         } />
-        
+
         <Route path="/owner-section" element={
           <PrivateRoute>
             <OwnerSection />
           </PrivateRoute>
         } />
-        
+
         <Route path="/owner-benefit" element={
           <PrivateRoute>
             <OwnerBenefit />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-investment" element={
           <PrivateRoute>
             <Investment />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-investmentbenefit" element={
           <PrivateRoute>
             <InvestmentBenefit />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-events" element={
           <PrivateRoute>
             <Events />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-luxury" element={
           <PrivateRoute>
             <LuxurySection />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-testo" element={
           <PrivateRoute>
             <Testominal />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-gallery" element={
           <PrivateRoute>
             <GallerySection />
@@ -141,36 +141,36 @@ function App() {
         } />
 
 
-         <Route path="/admin-stat" element={
+        <Route path="/admin-stat" element={
           <PrivateRoute>
             <Packagestatistics />
           </PrivateRoute>
         } />
 
-         <Route path="/admin-affilites" element={
+        <Route path="/admin-affilites" element={
           <PrivateRoute>
             <Affilitaes />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-client" element={
           <PrivateRoute>
             <HappyClientsection />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-notice" element={
           <PrivateRoute>
             <NoticeSection />
           </PrivateRoute>
         } />
 
-         <Route path="/admin-team" element={
+        <Route path="/admin-team" element={
           <PrivateRoute>
             <Teamate />
           </PrivateRoute>
         } />
-        
+
         <Route path="/admin-blog" element={
           <PrivateRoute>
             <BlogSection />
