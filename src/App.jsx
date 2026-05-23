@@ -35,6 +35,7 @@ import Packagestatistics from './Backend/Packagestatistics'
 import Affilitaes from './Backend/Affilitaes'
 import Club from './assets/Frontend/Club'
 import Teamate from './Backend/Teamate'
+import Partner from './assets/Frontend/Partner'
 
 
 function App() {
@@ -46,7 +47,8 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
-        <Route path='/affliates' element={<Affliates />} />
+        <Route path='/sister' element={<Affliates />} />
+           <Route path='/partner' element={<Partner />} />
         <Route path='/blog' element={<Blog />} />
         <Route path='/club' element={<Club />} />
         <Route path="/blog-details/:id" element={<BlogDetails />} />

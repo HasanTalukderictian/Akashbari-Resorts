@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Navbar, Nav, Container } from "react-bootstrap";
+import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 
 import "../../css/Header.css";
 import Logo from "../../image/Akashbari  resort logo png-01.png";
@@ -94,9 +94,16 @@ const Header = ({ scrollToOwner }) => {
               <Nav.Link onClick={() => navigate("/blog")}>
                 BLOG
               </Nav.Link>
-               <Nav.Link onClick={() => navigate("/affliates")}>
-                AFFLIATES
-              </Nav.Link>
+
+              {/* AFFILIATES Dropdown Menu */}
+              <NavDropdown title="AFFILIATES" id="affiliates-dropdown">
+                <NavDropdown.Item onClick={() => navigate("/partner")}>
+                  PARTNER
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={() => navigate("/sister")}>
+                  SISTER CONCERS
+                </NavDropdown.Item>
+              </NavDropdown>
 
               <button
                 className="contact-btn"

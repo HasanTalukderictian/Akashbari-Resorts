@@ -6,6 +6,7 @@
     z-index: 999;
     background: #f8f8f8;
     border-bottom: 2px solid #000;
+    width: 100%;
 }
 
 
@@ -55,20 +56,114 @@
     background: #6b9e3e;
 }
 
-.sticky-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: white;
-    width: 100%;
-    /* Background full width thakbe */
-    /* border-radius dorkar thakle sudhu bhetorer content-e dite paren, header-e na */
-}
 
-
-/* Menu link gulo ke ektu gap deyar jonno */
+/* Menu link gap */
 
 .menu .nav-link {
     margin: 0 15px;
     font-weight: 500;
+}
+
+
+/* ========== DROPDOWN CUSTOM STYLES ========== */
+
+
+/* Dropdown menu container - no border radius, no gap */
+
+.dropdown-menu {
+    border-radius: 0 !important;
+    margin-top: 0 !important;
+    border: 1px solid #ddd !important;
+    background-color: #f8f8f8 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    padding: 0 !important;
+}
+
+
+/* Dropdown items - no border radius */
+
+.dropdown-item {
+    border-radius: 0 !important;
+    padding: 10px 25px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #000 !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+}
+
+
+/* Dropdown item hover - black background */
+
+.dropdown-item:hover {
+    background-color: black !important;
+    color: white !important;
+}
+
+
+/* Remove default Bootstrap gray background on active/click */
+
+.dropdown-item:active {
+    background-color: black !important;
+    color: white !important;
+}
+
+
+/* Remove focus outline and gray background */
+
+.dropdown-item:focus {
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+
+/* Dropdown toggle link styling */
+
+.navbar-nav .nav-link.dropdown-toggle {
+    margin: 0 12px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #000 !important;
+    letter-spacing: 0.5px !important;
+}
+
+
+/* Dropdown toggle hover effect */
+
+.navbar-nav .nav-link.dropdown-toggle:hover {
+    color: #2b8145 !important;
+}
+
+
+/* Remove any gap issues */
+
+.navbar-nav .dropdown-menu {
+    margin: 0 !important;
+}
+
+
+/* Dropdown toggle arrow styling */
+
+.dropdown-toggle::after {
+    vertical-align: middle !important;
+    margin-left: 5px !important;
+}
+
+
+/* Main menu items - remove gray background on click/active */
+
+.menu .nav-link:active,
+.menu .nav-link:focus {
+    background-color: transparent !important;
+    color: #000 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+
+/* Ensure no border radius on dropdown menu */
+
+.navbar-nav .dropdown-menu {
+    border-radius: 0 !important;
 }
