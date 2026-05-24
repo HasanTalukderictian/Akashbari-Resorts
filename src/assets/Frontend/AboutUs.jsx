@@ -6,7 +6,7 @@ import '../css/about.css';
 // Import images
 import king1 from '../image/King-room1.jpg';
 import king2 from '../image/King-room2.jpg';
-import king3 from '../image/King-room13.jpg';
+import king3 from '../image/section/Blog/hotle.jpeg';
 import king4 from '../image/King-room4.jpg';
 import king5 from '../image/king5.jpg';
 import img4 from '../image/facility4.jpg';

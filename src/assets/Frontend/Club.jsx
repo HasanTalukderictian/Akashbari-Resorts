@@ -30,8 +30,8 @@ const Club = () => {
 
   // ১ম সেকশনের ডাটা
   const sectionData = {
-    description: "At the heart of Gulshan Club is the collective kinship amongst its Members. Founded in 1978, GCL prides itself for being more than just a club, but a home away from home. The Club was set up on the belief that life is best spent in the company of loved ones. It is at this juncture that some members, recognizing the importance of personal growth and academic achievement alongside social bonding, have opted to enhance their qualifications by engaging services to, seeing it as a way to balance their professional and personal lives effectively. Presently, it is the only family club in Bangladesh. Governing administrations, throughout the years, have been working relentlessly strengthening the bond and fellowship of its Members, as well as bringing families closer together through arts, culture, sports, and various initiatives and events.",
-    imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800&q=80",
+    description: "At the heart of Akashbari  Club is the collective kinship amongst its Members. Founded in 2027, GCL prides itself for being more than just a club, but a home away from home. The Club was set up on the belief that life is best spent in the company of loved ones. It is at this juncture that some members, recognizing the importance of personal growth and academic achievement alongside social bonding, have opted to enhance their qualifications by engaging services to, seeing it as a way to balance their professional and personal lives effectively. Presently, it is the only family club in Bangladesh. Governing administrations, throughout the years, have been working relentlessly strengthening the bond and fellowship of its Members, as well as bringing families closer together through arts, culture, sports, and various initiatives and events.",
+    imageUrl: "https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg",
     imageAlt: "Gulshan Club Building",
     ContactNumber: "01768712230"
   };

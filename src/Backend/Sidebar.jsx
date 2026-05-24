@@ -15,6 +15,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     { id: 'statistics', label: 'Price statistics', icon: 'bi bi-graph-up', path: '/admin-stat' },
     { id: 'affilites', label: 'Affiliates', icon: 'bi bi-share-fill', path: '/admin-affilites' },
      { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
+      { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
     { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
     
 ];
@@ -27,7 +28,7 @@ const landingSubItems = [
     { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-gem', path: '/owner-benefit' },
     { id: 'investment', label: 'Investment Package', icon: 'bi bi-piggy-bank', path: '/admin-investment' },
     { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
-    { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
+   
     { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
     { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
     { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' }
