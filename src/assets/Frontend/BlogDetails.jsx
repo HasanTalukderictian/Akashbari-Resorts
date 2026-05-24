@@ -18,7 +18,12 @@ const fallbackImages = [king1, king2, king3, king4, king5, king6];
 
 // Use environment variables for API URLs
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.API_URL ||
+  (import.meta.env.DEV
+    ? 'http://localhost:8000'
+    : 'https://backend.akashbariresort.com');
 
 // Helper function to get full image URL - COMPLETELY FIXED
 const getImageUrl = (imagePath) => {

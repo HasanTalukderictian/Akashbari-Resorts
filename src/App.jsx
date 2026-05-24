@@ -36,6 +36,8 @@ import Affilitaes from './Backend/Affilitaes'
 import Club from './assets/Frontend/Club'
 import Teamate from './Backend/Teamate'
 import Partner from './assets/Frontend/Partner'
+import OngoingView from './assets/Frontend/OngoingView'
+import AdminSister from './Backend/AdminSister'
 
 
 function App() {
@@ -150,6 +152,12 @@ function App() {
         <Route path="/admin-affilites" element={
           <PrivateRoute>
             <Affilitaes />
+          </PrivateRoute>
+        } />
+
+         <Route path="/admin-sister" element={
+          <PrivateRoute>
+            <AdminSister/>
           </PrivateRoute>
         } />
 

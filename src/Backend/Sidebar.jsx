@@ -14,7 +14,9 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     { id: 'notice', label: 'Notice', icon: 'bi bi-megaphone-fill', path: '/admin-notice' },
     { id: 'statistics', label: 'Price statistics', icon: 'bi bi-graph-up', path: '/admin-stat' },
     { id: 'affilites', label: 'Affiliates', icon: 'bi bi-share-fill', path: '/admin-affilites' },
+     { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
     { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
+    
 ];
 
 const landingSubItems = [

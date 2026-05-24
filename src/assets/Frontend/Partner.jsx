@@ -1,37 +1,92 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Header from './Common/Header';
 import Footer from './Common/Footer';
 
 const Partner = () => {
+  const [partners, setPartners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
 
-  // Page load scroll to top
+  // API Configuration
+  const API_BASE_URL = 'http://localhost:8000/api';
+  const API_URL = 'http://localhost:8000/';
+
+  // Helper function to get full image URL
+  const getFullImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/storage/')) return `${API_URL.slice(0, -1)}${imagePath}`;
+    if (imagePath.startsWith('storage/')) return `${API_URL}${imagePath}`;
+    if (imagePath.startsWith('partners/')) return `${API_URL}storage/${imagePath}`;
+    return `${API_URL}storage/${imagePath}`;
+  };
+
+  // Fetch partners from API
+  const fetchPartners = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/partners`);
+      console.log('API Response:', response.data);
+      
+      if (response.data.success && response.data.data) {
+        // Extract the data array from the nested data property
+        let partnersData = response.data.data;
+        
+        // Check if data has nested data property (pagination)
+        if (partnersData.data && Array.isArray(partnersData.data)) {
+          partnersData = partnersData.data;
+        } else if (Array.isArray(partnersData)) {
+          partnersData = partnersData;
+        } else {
+          partnersData = [];
+        }
+        
+        // Transform the data for the component
+        const transformedData = partnersData.map(partner => {
+          // Get image URL from either image_url or image field
+          let imageUrl = null;
+          if (partner.image_url) {
+            imageUrl = getFullImageUrl(partner.image_url);
+          } else if (partner.image) {
+            imageUrl = getFullImageUrl(partner.image);
+          }
+          
+          return {
+            id: partner.id,
+            name: partner.title,
+            description: partner.description,
+            logo: imageUrl,
+            website: partner.website,
+            buttonText: "VISIT WEBSITE ↗",
+            status: partner.status,
+            created_at: partner.created_at
+          };
+        });
+        
+        setPartners(transformedData);
+        console.log('Transformed partners:', transformedData);
+      } else {
+        setPartners([]);
+      }
+    } catch (error) {
+      console.error('Error fetching partners:', error);
+      setError('Failed to load partners. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchPartners();
+    // Page load scroll to top
     window.scrollTo({
       top: 0,
       behavior: 'instant'
     });
   }, []);
-
-  // Static Partners Data (No API needed)
-  const partners = [
-    {
-      id: 1,
-      name: "Cholo Jai Limited",
-      description: "Cholo Jai is an online-based travel start-up dedicated to ensuring a smooth and hassle-free travel experience for all travelers. By combining friendly customer support with modern technology, the company provides complete travel assistance, including expert travel advice, competitively priced tour packages, and air ticketing services. Its call center is operated by skilled and travel-experienced professionals who deliver personalized support around the clock. Reflecting Bangladesh's language and culture, Cholo Jai offers Bangla content on its website and remains committed to providing reliable travel solutions both online and offline as a trusted travel partner.",
-      logo: "https://i.ibb.co.com/SwtBWxCF/xx-2.webp",
-    //   website: "https://www.cholojaibd.com",
-      buttonText: "VISIT WEBSITE ↗"
-    },
-    {
-      id: 2,
-      name: "Pan Pacific Tours",
-      description: "Pan Pacific Tours is a next-generation travel agency dedicated to simplifying global travel. Since our launch in 2024, we have been committed to connecting travelers with unforgettable experiences, whether it's flights, hotels, holiday packages, or Umrah services. With trusted global partners and 24/7 support, we're here to make travel seamless for everyone.",
-      logo: "https://i.ibb.co.com/tpNjY45Q/yy.webp",
-    //   website: "https://www.panpacifictours.com",
-      buttonText: "VISIT WEBSITE ↗"
-    }
-  ];
 
   // Handle image error
   const handleImageError = (id) => {
@@ -44,6 +99,39 @@ const Partner = () => {
       window.open(website, '_blank', 'noopener,noreferrer');
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div style={styles.loadingContainer}>
+          <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p style={{ marginTop: '20px', color: '#666' }}>Loading partners...</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div style={styles.errorContainer}>
+          <i className="bi bi-exclamation-triangle" style={{ fontSize: '48px', color: '#dc3545' }}></i>
+          <p style={{ marginTop: '20px', color: '#666' }}>{error}</p>
+          <button onClick={fetchPartners} style={styles.retryButton}>
+            Try Again
+          </button>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -63,67 +151,74 @@ const Partner = () => {
 
         {/* Partners Grid */}
         <section style={styles.grid}>
-          {partners.map((item, index) => {
-            const isReverse = index % 2 !== 0;
+          {partners.length === 0 ? (
+            <div style={styles.noDataContainer}>
+              <i className="bi bi-inbox" style={{ fontSize: '48px', color: '#76a34d' }}></i>
+              <p style={{ marginTop: '20px', color: '#666' }}>No partners found.</p>
+            </div>
+          ) : (
+            partners.map((item, index) => {
+              const isReverse = index % 2 !== 0;
 
-            return (
-              <div 
-                key={item.id} 
-                className="partner-row"
-                style={{
-                  ...styles.row,
-                  flexDirection: isReverse ? 'row-reverse' : 'row'
-                }}
-              >
-                {/* Image Box */}
-                <div className="partner-image-box" style={styles.imageBox}>
-                  <div className="partner-image-wrapper" style={styles.imageWrapper}>
-                    {!imageErrors[item.id] ? (
-                      <img 
-                        src={item.logo} 
-                        alt={item.name} 
-                        style={styles.logo}
-                        onError={() => handleImageError(item.id)}
-                      />
-                    ) : (
-                      <div style={styles.placeholderImage}>
-                        <i className="bi bi-building" style={styles.placeholderIcon}></i>
-                        <p style={styles.placeholderText}>{item.name}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Text Box */}
+              return (
                 <div 
-                  className="partner-text-box"
+                  key={item.id} 
+                  className="partner-row"
                   style={{
-                    ...styles.textBox,
-                    borderLeft: isReverse ? '1px solid #e0e0e0' : 'none',
-                    borderRight: isReverse ? 'none' : '1px solid #e0e0e0',
+                    ...styles.row,
+                    flexDirection: isReverse ? 'row-reverse' : 'row'
                   }}
                 >
-                  <h2 style={styles.cardTitle}>{item.name}</h2>
-                  <p style={styles.cardText}>{item.description}</p>
-                  <button 
-                    className="partner-button"
-                    style={styles.button}
-                    onClick={() => handleViewDetails(item.website)}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#5e853d';
-                      e.target.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = '#76a34d';
-                      e.target.style.transform = 'translateY(0)';
+                  {/* Image Box */}
+                  <div className="partner-image-box" style={styles.imageBox}>
+                    <div className="partner-image-wrapper" style={styles.imageWrapper}>
+                      {!imageErrors[item.id] && item.logo ? (
+                        <img 
+                          src={item.logo} 
+                          alt={item.name} 
+                          style={styles.logo}
+                          onError={() => handleImageError(item.id)}
+                        />
+                      ) : (
+                        <div style={styles.placeholderImage}>
+                          <i className="bi bi-building" style={styles.placeholderIcon}></i>
+                          <p style={styles.placeholderText}>{item.name}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Text Box */}
+                  <div 
+                    className="partner-text-box"
+                    style={{
+                      ...styles.textBox,
+                      borderLeft: isReverse ? '1px solid #e0e0e0' : 'none',
+                      borderRight: isReverse ? 'none' : '1px solid #e0e0e0',
                     }}
                   >
-                    {item.buttonText}
-                  </button>
+                    <h2 style={styles.cardTitle}>{item.name}</h2>
+                    <p style={styles.cardText}>{item.description}</p>
+                    <button 
+                      className="partner-button"
+                      style={styles.button}
+                      onClick={() => handleViewDetails(item.website)}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = '#5e853d';
+                        e.target.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = '#76a34d';
+                        e.target.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      {item.buttonText}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </section>
       </main>
 
@@ -131,6 +226,21 @@ const Partner = () => {
 
       {/* Add responsive styles */}
       <style jsx="true">{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .partner-row {
+          animation: fadeIn 0.6s ease-out;
+        }
+        
         @media (max-width: 992px) {
           .partner-row {
             flex-direction: column !important;
@@ -341,6 +451,40 @@ const styles = {
     transition: 'all 0.3s ease',
     fontSize: '14px',
     letterSpacing: '1px',
+  },
+  loadingContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '60vh',
+    textAlign: 'center',
+  },
+  errorContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '60vh',
+    textAlign: 'center',
+  },
+  retryButton: {
+    marginTop: '20px',
+    padding: '10px 24px',
+    backgroundColor: '#76a34d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
+  },
+  noDataContainer: {
+    textAlign: 'center',
+    padding: '60px 20px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '12px',
   },
 };
 

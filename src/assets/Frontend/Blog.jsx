@@ -7,7 +7,13 @@ import axios from 'axios';
 
 // API Base URL
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL = import.meta.env.VITE_API_URL || import.meta.env.API_URL || 'https://backend.akashbariresort.com';
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.API_URL ||
+  (import.meta.env.DEV
+    ? 'http://localhost:8000'
+    : 'https://backend.akashbariresort.com');
 
 // Helper function to get full image URL - FIXED for Laravel storage
 const getImageUrl = (imagePath) => {
