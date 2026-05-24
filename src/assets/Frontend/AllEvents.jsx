@@ -25,7 +25,10 @@ const AllEvents = () => {
     card: isDarkMode ? '#16213e' : '#ffffff',
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    heroBg: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #ff8c32 0%, #ff8c32 100%)',
+    // সুন্দর রিসোর্ট ব্যাকগ্রাউন্ড ইমেজ এবং টেক্সট ক্লিয়ার দেখার জন্য ওভারলে সেট করা হয়েছে
+    heroBg: isDarkMode 
+      ? 'linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1920&auto=format&fit=crop")' 
+      : 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1920&auto=format&fit=crop")',
     primaryColor: '#ff8c32',
     primaryHover: '#e67e22',
   };
@@ -96,7 +99,9 @@ const AllEvents = () => {
     },
     heroSection: {
       background: theme.heroBg,
-      padding: '80px 0',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      padding: '100px 0', // ইমেজটি ফুটিয়ে তোলার জন্য প্যাডিং কিছুটা বাড়ানো হয়েছে
       color: 'white',
       position: 'relative',
       overflow: 'hidden',
@@ -107,10 +112,11 @@ const AllEvents = () => {
       zIndex: 2,
     },
     heroTitle: {
-      textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+      textShadow: '2px 4px 10px rgba(0,0,0,0.5)', // টেক্সট যাতে ইমেজের ওপর স্পষ্ট ভাসে
     },
     heroSubtitle: {
       opacity: 0.95,
+      textShadow: '1px 2px 5px rgba(0,0,0,0.5)',
     },
     spinner: {
       width: '3rem',
@@ -147,7 +153,7 @@ const AllEvents = () => {
     filterButtons: {
       display: 'flex',
       gap: '10px',
-      justifyContent: 'flex-end',
+      justifycontent: 'flex-end',
     },
     filterBtn: {
       borderRadius: '25px',
@@ -553,7 +559,7 @@ const AllEvents = () => {
                       <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
                         <button 
                           className="page-link" 
-                                          onClick={() => setCurrentPage(index + 1)}
+                          onClick={() => setCurrentPage(index + 1)}
                           style={currentPage === index + 1 ? { backgroundColor: '#ff8c32', borderColor: '#ff8c32', color: 'white' } : { color: '#ff8c32' }}
                         >
                           {index + 1}

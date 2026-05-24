@@ -1,8 +1,12 @@
+/* Investment.css - Complete File */
+
 .investment-section {
     background-color: #ff8c32;
     /* Orange Background */
     min-height: 100vh;
     font-family: 'Times New Roman', serif;
+    position: relative;
+    overflow-x: hidden;
 }
 
 .badge-opportunity {
@@ -37,57 +41,105 @@
 .investment-card {
     background-color: white;
     border: 2px solid black;
-    height: 500px;
+    height: auto;
+    min-height: 550px;
+    max-height: 600px;
     position: relative;
     transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    overflow: visible !important;
+    /* Important for badge */
 }
 
 .popular-border {
-    border: 4px solid #639c4e !important;
+    border: 3px solid #639c4e !important;
 }
 
-.popular-badge {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #4a6d36;
-    color: white;
-    padding: 5px 15px;
-    font-size: 12px;
-    z-index: 10;
+.sold-out-card {
+    opacity: 0.8;
+    background: #f8f9fa;
+    position: relative;
+}
+
+.clickable-card {
+    cursor: pointer;
+}
+
+.card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    margin-top: 15px;
+    /* Space for popular badge */
+}
+
+
+/* Custom scrollbar for card content */
+
+.card-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.card-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.card-content::-webkit-scrollbar-thumb {
+    background: #ff8c32;
+    border-radius: 2px;
 }
 
 .pkg-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: bold;
     color: #333;
     padding: 0 10px;
+    line-height: 1.3;
+    min-height: 55px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .pkg-price {
     font-weight: bold;
-    margin-top: 15px;
-}
-
-.pkg-discount {
-    font-size: 12px;
-    color: #666;
+    margin-top: 10px;
+    font-size: 1.8rem;
+    color: #ff8c32;
 }
 
 .pkg-features {
     list-style: none;
-    font-size: 14px;
+    font-size: 13px;
+    margin-bottom: 10px;
 }
 
 .pkg-features li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pkg-features li strong {
+    min-width: 100px;
+    font-size: 12px;
 }
 
 .pkg-desc {
-    font-size: 13px;
+    font-size: 12px;
     color: #555;
-    line-height: 1.6;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
 
 
@@ -97,10 +149,21 @@
     border: 1px solid black;
     background: transparent;
     padding: 10px;
-    margin: 15px;
+    margin: 10px 0 0 0;
     font-weight: bold;
     transition: 0.3s;
+    width: 100%;
+    cursor: pointer;
 }
+
+.inquire-btn:hover:not(.sold-out-footer) {
+    background-color: #ff8c32;
+    color: white;
+    border-color: #ff8c32;
+}
+
+
+/* Popular button style */
 
 .popular-btn {
     background-color: #639c4e !important;
@@ -108,33 +171,120 @@
     border: none !important;
 }
 
+.popular-btn:hover {
+    background-color: #4a6d36 !important;
+    transform: translateY(-2px);
+}
+
+
+/* Sold Out button style */
+
 .sold-out-footer {
     background-color: #94a3b8 !important;
     color: #475569 !important;
     border: none !important;
+    cursor: not-allowed;
 }
 
 
-/* Sold Out Styling */
+/* Sold Out Container */
+
+.sold-out-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+}
 
 .sold-out-btn {
     background-color: #e00000;
     color: white;
     font-weight: bold;
-    padding: 15px;
+    padding: 12px 20px;
     border: 2px solid black;
     width: 80%;
     margin: 0 auto;
-}
-
-.sold-out-container {
-    height: 100%;
-    display: flex;
-    align-items: center;
+    text-align: center;
+    font-size: 14px;
 }
 
 
-/* 2nd div section code  */
+/* Card hover effect */
+
+.investment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ==================== POPULAR BADGE - CENTERED STYLE ==================== */
+
+.popular-badge-centered {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #639c4e, #4a6d36);
+    color: white;
+    padding: 8px 25px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 20;
+    white-space: nowrap;
+    letter-spacing: 1.5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 25px 25px 25px 25px;
+    animation: slideInTop 0.5s ease-out;
+}
+
+
+/* Add star icon */
+
+.popular-badge-centered::before {
+    content: "★ ";
+    font-size: 13px;
+    font-weight: bold;
+}
+
+
+/* Add notch at bottom for 50/50 effect */
+
+.popular-badge-centered::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #4a6d36;
+}
+
+
+/* Hover effect for badge */
+
+.investment-card:hover .popular-badge-centered {
+    transform: translateX(-50%) translateY(-2px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Animation for badge */
+
+@keyframes slideInTop {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
 
 
 /* Benefits Section Styling */
@@ -169,42 +319,16 @@
 
 .benefit-item {
     border: 1px solid #333;
-    padding: 10px 15px;
+    padding: 12px 15px;
     height: 100%;
     background: #fff;
+    transition: all 0.3s ease;
 }
-
-
-/* Hover state */
 
 .benefit-item:hover {
     border-color: #639c4e;
+    transform: translateX(5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    animation: vibrate 0.3s linear infinite;
-    /* Text styling */
-    color: #639c4e;
-    text-decoration-color: #639c4e;
-}
-
-
-/* Animation definition */
-
-@keyframes vibrate {
-    0% {
-        transform: translate(0);
-    }
-    25% {
-        transform: translate(2px, -2px);
-    }
-    50% {
-        transform: translate(-2px, 2px);
-    }
-    75% {
-        transform: translate(2px, 2px);
-    }
-    100% {
-        transform: translate(0);
-    }
 }
 
 .benefit-number {
@@ -216,12 +340,14 @@
     margin-right: 15px;
     min-width: 35px;
     text-align: center;
+    border-radius: 2px;
 }
 
 .benefit-text {
     font-size: 14px;
     color: #333;
     line-height: 1.4;
+    flex: 1;
 }
 
 
@@ -245,10 +371,118 @@
 }
 
 
-/* Responsive adjustment */
+/* Responsive adjustments */
 
-@media (max-width: 768px) {
-    .benefits-main-title {
+@media (max-width: 1200px) {
+    .investment-card {
+        min-height: 580px;
+        max-height: 620px;
+    }
+    .pkg-title {
+        font-size: 1.2rem;
+        min-height: 50px;
+    }
+    .pkg-price {
         font-size: 1.5rem;
     }
+}
+
+@media (max-width: 992px) {
+    .investment-card {
+        min-height: 550px;
+        max-height: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .investment-card {
+        min-height: auto;
+        max-height: none;
+        height: auto;
+    }
+    .card-content {
+        overflow-y: visible;
+    }
+    .pkg-title {
+        min-height: auto;
+    }
+    .main-title {
+        font-size: 2rem;
+    }
+    .benefit-item {
+        margin-bottom: 10px;
+    }
+    /* Adjust centered badge for mobile */
+    .popular-badge-centered {
+        padding: 6px 20px;
+        font-size: 10px;
+        top: -12px;
+    }
+    .popular-badge-centered::before {
+        font-size: 11px;
+    }
+    .popular-badge-centered::after {
+        bottom: -6px;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #4a6d36;
+    }
+}
+
+@media (max-width: 576px) {
+    .pkg-features li strong {
+        min-width: 80px;
+    }
+    .pkg-price {
+        font-size: 1.3rem;
+    }
+    .sold-out-btn {
+        font-size: 12px;
+        padding: 10px 15px;
+    }
+    .popular-badge-centered {
+        padding: 5px 15px;
+        font-size: 9px;
+        top: -10px;
+    }
+    .popular-badge-centered::before {
+        font-size: 10px;
+    }
+}
+
+
+/* Animation for cards on load */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.col-lg-3 {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+
+/* Stagger animation delay for cards */
+
+.col-lg-3:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.col-lg-3:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.col-lg-3:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.col-lg-3:nth-child(4) {
+    animation-delay: 0.4s;
 }

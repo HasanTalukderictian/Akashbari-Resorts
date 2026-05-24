@@ -23,7 +23,8 @@ const EventsDetails = () => {
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     textMuted: isDarkMode ? '#adb5bd' : '#6c757d',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    heroBg: isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #ff8c32 0%, #ff8c32 100%)',
+    // সুন্দর রিসোর্ট ব্যাকগ্রাউন্ড ইমেজ ও টেক্সট রিডিবিলিটির জন্য ওভারলে
+    heroBg: 'linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.65)), url("https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80")',
   };
 
   // Helper function to get full image URL
@@ -84,7 +85,10 @@ const EventsDetails = () => {
     },
     heroSection: {
       background: theme.heroBg,
-      padding: '60px 0',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed', // প্যারালাক্স ইফেক্টের জন্য
+      padding: '80px 0',
       color: 'white',
       position: 'relative',
       overflow: 'hidden',
@@ -93,7 +97,7 @@ const EventsDetails = () => {
       fontSize: '3rem',
       fontWeight: 'bold',
       marginBottom: '1rem',
-      textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+      textShadow: '2px 4px 8px rgba(0,0,0,0.5)',
     },
     breadcrumb: {
       background: 'transparent',
@@ -101,7 +105,7 @@ const EventsDetails = () => {
       marginBottom: '1rem',
     },
     breadcrumbLink: {
-      color: 'rgba(255,255,255,0.8)',
+      color: 'rgba(255,255,255,0.9)',
       textDecoration: 'none',
       transition: 'color 0.3s ease',
     },
@@ -137,10 +141,11 @@ const EventsDetails = () => {
       marginBottom: '20px',
     },
     infoCard: {
-      backgroundColor: isDarkMode ? '#1a1a2e' : '#f8f9fa',
+      backgroundColor: isDarkMode ? '#16213e' : '#f8f9fa',
       borderRadius: '15px',
       padding: '20px',
       marginBottom: '20px',
+      border: `1px solid ${theme.border}`,
     },
     infoIcon: {
       fontSize: '24px',
@@ -307,9 +312,9 @@ const EventsDetails = () => {
               </li>
             </ol>
           </nav>
-          <div className="text-center">
+          <div className="text-center py-3">
             <h1 style={styles.heroTitle}>{event.title}</h1>
-            <p className="lead" style={{ opacity: 0.9 }}>Discover the magic of this extraordinary event</p>
+            <p className="lead" style={{ opacity: 0.95, textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>Discover the magic of this extraordinary event</p>
           </div>
         </div>
       </div>

@@ -94,6 +94,9 @@ const Header = ({ scrollToOwner }) => {
               <Nav.Link onClick={() => navigate("/blog")}>
                 BLOG
               </Nav.Link>
+              <Nav.Link onClick={() => navigate("/all-events")}>
+                EVENT
+              </Nav.Link>
 
               {/* AFFILIATES Dropdown Menu */}
               <NavDropdown title="AFFILIATES" id="affiliates-dropdown">

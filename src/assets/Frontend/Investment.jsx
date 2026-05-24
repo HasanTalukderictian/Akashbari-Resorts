@@ -5,38 +5,28 @@ import '../css/Investment.css';
 const Investment = () => {
     const navigate = useNavigate();
     const [packages, setPackages] = useState([]);
-    const [benefitsData, setBenefitsData] = useState(null); // বেনিফিট ডাটা স্টেট
+    const [benefitsData, setBenefitsData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // BASE_URL from environment variables
     const BASE_URL = import.meta.env.VITE_BASE_URL;
-    
-    // API URLs using BASE_URL
     const API_URL = `${BASE_URL}/get-investment`;
     const BENEFITS_API_URL = `${BASE_URL}/get-investment-benefits`;
 
     const fetchData = async () => {
         try {
             setLoading(true);
-            
-            // একই সাথে দুটি API কল করা হচ্ছে
             const [packageRes, benefitsRes] = await Promise.all([
                 fetch(API_URL),
                 fetch(BENEFITS_API_URL)
             ]);
-
             const packageResult = await packageRes.json();
             const benefitsResult = await benefitsRes.json();
-
             if (packageResult.status) {
                 setPackages(packageResult.data);
             }
-
             if (benefitsResult.status) {
-                // প্যাগিনেশন রেসপন্স থেকে প্রথম অবজেক্টটি নেওয়া হচ্ছে
                 setBenefitsData(benefitsResult.data.data[0]);
             }
-
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -75,13 +65,13 @@ const Investment = () => {
                                 style={{ cursor: pkg.is_sold_out == 1 ? 'default' : 'pointer' }}
                             >
                                 {pkg.is_popular == 1 && (
-                                    <div className="popular-badge">
-                                       
+                                    <div className="popular-badge-centered">
+                                        POPULAR
                                     </div>
                                 )}
 
-                                <div className="card-content d-flex flex-column h-100">
-                                    <h3 className="pkg-title mt-4">{pkg.title}</h3>
+                                <div className="card-content d-flex flex-column h-100 p-3">
+                                    <h3 className="pkg-title mt-3">{pkg.title}</h3>
 
                                     {pkg.is_sold_out == 1 ? (
                                         <div className="sold-out-container my-auto">
@@ -89,19 +79,23 @@ const Investment = () => {
                                         </div>
                                     ) : (
                                         <>
-                                            <h2 className="pkg-price">৳BDT {pkg.price}</h2>
-                                            <p className="pkg-discount">Discount: ৳BDT {pkg.discount}</p>
-                                            <ul className="pkg-features text-start ps-4 mt-3">
+                                            <h2 className="pkg-price mb-0">৳BDT {parseInt(pkg.price).toLocaleString()}</h2>
+                                            {/* CashBack line removed */}
+                                            <ul className="pkg-features text-start ps-3 mt-2 mb-2">
                                                 <li><strong>Land:</strong> {pkg.land || 'N/A'}</li>
                                                 <li><strong>Building:</strong> {pkg.building || 'N/A'}</li>
-                                                <li><strong>Total Room Size:</strong> {pkg.total_size || 'N/A'}</li>
-                                                <li>+ Amenities</li>
+                                                <li><strong>Total Room Size:</strong> {pkg.total_size || 'N/A'} sqft</li>
+                                                <li><strong>+ Amenities</strong></li>
                                             </ul>
-                                            <p className="pkg-desc px-3 mt-3">{pkg.description}</p>
+                                            <p className="pkg-desc px-2 mt-2 mb-2">
+                                                {pkg.description && pkg.description.length > 80 
+                                                    ? `${pkg.description.substring(0, 80)}...` 
+                                                    : pkg.description}
+                                            </p>
                                         </>
                                     )}
 
-                                    <button className={`inquire-btn mt-auto ${pkg.is_popular == 1 ? 'popular-btn' : pkg.is_sold_out == 1 ? 'sold-out-footer' : ''}`}>
+                                    <button className={`inquire-btn mt-2 ${pkg.is_popular == 1 ? 'popular-btn' : pkg.is_sold_out == 1 ? 'sold-out-footer' : ''}`}>
                                         {pkg.is_sold_out == 1 ? "NOT AVAILABLE" : "INQUIRE NOW"}
                                     </button>
                                 </div>
@@ -111,15 +105,8 @@ const Investment = () => {
                 </div>
             </div>
             
-            {/* Dynamic Benefits Container */}
             {benefitsData && (
                 <div className="benefits-container container mt-5 p-5 bg-white">
-                    {/* <div className="text-center mb-4">
-                        <span className="benefits-badge">WHY INVEST WITH US</span>
-                        <h2 className="benefits-main-title">{benefitsData.title}</h2>
-                        <p className="benefits-sub-text">{benefitsData.subtitle}</p>
-                    </div> */}
-
                     <div className="row g-3">
                         {benefitsData.benefits && benefitsData.benefits.map((benefit, index) => (
                             <div className={index === benefitsData.benefits.length - 1 ? "col-12" : "col-md-6"} key={index}>
@@ -130,9 +117,7 @@ const Investment = () => {
                             </div>
                         ))}
                     </div>
-
                     <div className="footer-promo text-center mt-5">
-                        {/* <div className="promo-divider mb-4"></div> */}
                         <h4 className="promo-question">Ready to Secure Your Future?</h4>
                         <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
                     </div>
