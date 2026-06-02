@@ -13,6 +13,8 @@ import img4 from '../image/facility4.jpg';
 import image1 from '../image/place-1-1.jpg';
 import image2 from '../image/place-1-3.jpg';
 import image3 from '../image/place-1-2.jpg';
+// CEO Image - আপনার ইমেজ পাথ অনুযায়ী পরিবর্তন করুন
+import ceoImage from '../../assets/image/section/Blog/ceo.jpg';
 
 const AboutUs = () => {
     const [selectedImage, setSelectedImage] = useState(king1);
@@ -23,13 +25,13 @@ const AboutUs = () => {
 
     const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+    // পেজ লোড হলে টপে স্ক্রল করার জন্য
     useEffect(() => {
         window.scrollTo({
             top: 0,
-            behavior: 'instant' // 'smooth' অথবা 'instant'
+            behavior: 'instant'
         });
-    }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+    }, []);
 
     const galleryImages = [
         { id: 1, img: king1, title: "King Room", alt: "Luxury king room with modern amenities" },
@@ -94,20 +96,16 @@ const AboutUs = () => {
             <section className="akashbari-intro-section py-5" style={{ backgroundColor: '#fcfcfc' }}>
                 <div className="container">
                     <div className="row align-items-center g-5">
-                        {/* Left Side - Text Details */}
                         <div className="col-lg-6">
                             <div className="modern-content">
                                 <div className="section-badge mb-3">
                                     <span className="badge-dot"></span>
                                     ✨ WELCOME TO AKASHBARI
                                 </div>
-
                                 <h2 className="modern-title mb-4">
                                     Experience Luxury At
                                     <span className="text-gradient"> Akashbari Hotel & Resort</span>
                                 </h2>
-
-                                {/* Business Info Details */}
                                 <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4 border-warning">
                                     <p className="mb-2">
                                         <strong>🏢 Business Type:</strong> Luxury Hospitality & Eco Resort
@@ -116,13 +114,10 @@ const AboutUs = () => {
                                         <strong>📅 Established Since:</strong> 2015
                                     </p>
                                 </div>
-
-                                <p className="modern-description text-muted mb-4">
+                                <p className="modern-description text-muted mb-4" style={{ fontFamily: 'inherit', fontSize: '1rem', lineHeight: '1.6' }}>
                                     Akashbari Hotel & Resort is a premier getaway destination blending nature with world-class hospitality. 
                                     Designed for families, couples, and corporate events, we offer a tranquil environment away from the hustle of daily life.
                                 </p>
-
-                                {/* Facilities List */}
                                 <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600' }}>
                                     🏆 Our Premium Facilities:
                                 </h4>
@@ -133,14 +128,11 @@ const AboutUs = () => {
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Guided Nature Trails & Kids Zone</li>
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Corporate Conference Hall & Event Spaces</li>
                                 </ul>
-
                                 <button className="explore-btn" onClick={() => window.location.href = '/booking'}>
                                     📅 Book Your Stay
                                 </button>
                             </div>
                         </div>
-
-                        {/* Right Side - Resort Image */}
                         <div className="col-lg-6">
                             <div className="modern-gallery-wrapper">
                                 <div className="main-image-container position-relative overflow-hidden rounded-4 shadow-lg">
@@ -157,10 +149,10 @@ const AboutUs = () => {
                 </div>
             </section>
 
-            {/* Vision Section */}
-            <section className="vision-section py-5" style={{ backgroundColor: '#ffffff' }}>
+            {/* ========== CEO SECTION - Same design as existing sections ========== */}
+            <section className="ceo-section py-5" style={{ backgroundColor: '#ffffff' }}>
                 <div className="container">
-                    {/* Section Header */}
+                    {/* Section Header - Same as vision section */}
                     <div className="text-center mb-5">
                         <div className="section-badge d-inline-flex align-items-center gap-2 mb-3" style={{
                             backgroundColor: '#f0f0ff',
@@ -168,229 +160,170 @@ const AboutUs = () => {
                             borderRadius: '50px',
                             color: '#9a55ff',
                             fontSize: '14px',
-                            fontWeight: '600'
+                            fontWeight: '600',
+                            fontFamily: 'inherit'
                         }}>
-                            <span style={{ fontSize: '18px' }}>👁️</span>
-                            OUR VISION
+                            <span style={{ fontSize: '18px' }}>👑</span>
+                            LEADERSHIP CORNER
                         </div>
-                        <h2 className="modern-title mb-3">
-                            Shaping the Future of
-                            <span className="text-gradient"> Luxury Hospitality</span>
+                        <h2 className="modern-title mb-3" style={{ fontFamily: 'inherit' }}>
+                            Message from Our
+                            <span className="text-gradient"> CEO & Founder</span>
                         </h2>
-                        <p className="vision-description text-muted mx-auto" style={{ maxWidth: '700px', fontSize: '1.1rem', lineHeight: '1.6' }}>
-                            At Akashbari Hotel & Resort, we envision a future where luxury and sustainability coexist harmoniously. 
-                            Our vision is to create a sanctuary that not only provides exceptional comfort but also inspires a deeper 
-                            connection with nature and community.
+                        <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontFamily: 'inherit', fontSize: '1rem' }}>
+                            Meet the visionary behind Akashbari's success
                         </p>
                     </div>
 
-                    {/* Vision Points Grid */}
-                    <div className="row g-4 mb-5">
-                        <div className="col-md-6 col-lg-3">
-                            <div className="vision-card h-100 text-center p-4 rounded-4" style={{
-                                backgroundColor: '#fcfcfc',
-                                border: '1px solid #e9ecef',
-                                transition: 'all 0.3s ease',
-                                cursor: 'pointer'
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-8px)';
-                                    e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}>
-                                <div className="vision-icon-wrapper mb-3" style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    margin: '0 auto',
-                                    background: 'linear-gradient(135deg, #10b98115 0%, #10b98105 100%)',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <span style={{ fontSize: '32px' }}>🌿</span>
-                                </div>
-                                <h4 className="vision-point-title mb-3" style={{ fontSize: '1.2rem', fontWeight: '700', color: '#2c3e50' }}>
-                                    Sustainable Excellence
-                                </h4>
-                                <p className="vision-point-description text-muted" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                                    Pioneering eco-friendly luxury that minimizes environmental impact while maximizing guest comfort and satisfaction.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6 col-lg-3">
-                            <div className="vision-card h-100 text-center p-4 rounded-4" style={{
-                                backgroundColor: '#fcfcfc',
-                                border: '1px solid #e9ecef',
-                                transition: 'all 0.3s ease',
-                                cursor: 'pointer'
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-8px)';
-                                    e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}>
-                                <div className="vision-icon-wrapper mb-3" style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    margin: '0 auto',
-                                    background: 'linear-gradient(135deg, #3b82f615 0%, #3b82f605 100%)',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <span style={{ fontSize: '32px' }}>🤝</span>
-                                </div>
-                                <h4 className="vision-point-title mb-3" style={{ fontSize: '1.2rem', fontWeight: '700', color: '#2c3e50' }}>
-                                    Community First
-                                </h4>
-                                <p className="vision-point-description text-muted" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                                    Empowering local communities through employment, cultural preservation, and responsible tourism initiatives.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6 col-lg-3">
-                            <div className="vision-card h-100 text-center p-4 rounded-4" style={{
-                                backgroundColor: '#fcfcfc',
-                                border: '1px solid #e9ecef',
-                                transition: 'all 0.3s ease',
-                                cursor: 'pointer'
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-8px)';
-                                    e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}>
-                                <div className="vision-icon-wrapper mb-3" style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    margin: '0 auto',
-                                    background: 'linear-gradient(135deg, #9a55ff15 0%, #9a55ff05 100%)',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <span style={{ fontSize: '32px' }}>✨</span>
-                                </div>
-                                <h4 className="vision-point-title mb-3" style={{ fontSize: '1.2rem', fontWeight: '700', color: '#2c3e50' }}>
-                                    Innovation & Growth
-                                </h4>
-                                <p className="vision-point-description text-muted" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                                    Continuously evolving our services and facilities to exceed global hospitality standards and guest expectations.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6 col-lg-3">
-                            <div className="vision-card h-100 text-center p-4 rounded-4" style={{
-                                backgroundColor: '#fcfcfc',
-                                border: '1px solid #e9ecef',
-                                transition: 'all 0.3s ease',
-                                cursor: 'pointer'
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-8px)';
-                                    e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}>
-                                <div className="vision-icon-wrapper mb-3" style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    margin: '0 auto',
-                                    background: 'linear-gradient(135deg, #ef444415 0%, #ef444405 100%)',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <span style={{ fontSize: '32px' }}>❤️</span>
-                                </div>
-                                <h4 className="vision-point-title mb-3" style={{ fontSize: '1.2rem', fontWeight: '700', color: '#2c3e50' }}>
-                                    Guest Centricity
-                                </h4>
-                                <p className="vision-point-description text-muted" style={{ fontSize: '0.9rem', lineHeight: '1.6' }}>
-                                    Creating unforgettable memories through personalized experiences and genuine warm hospitality.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Vision Stats Row */}
-                    <div className="vision-stats-wrapper mt-4 p-4 rounded-4" style={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        borderRadius: '20px'
-                    }}>
-                        <div className="row text-center">
-                            <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                <div className="stat-item">
-                                    <div className="stat-icon mb-2">
-                                        <span style={{ fontSize: '32px' }}>😊</span>
+                    <div className="row align-items-center g-5">
+                        {/* Left Side - CEO Image */}
+                        <div className="col-lg-5">
+                            <div className="ceo-image-area text-center">
+                                <div className="position-relative d-inline-block">
+                                    <div className="ceo-image-wrapper rounded-4 overflow-hidden shadow-lg" style={{
+                                        border: '5px solid white',
+                                        borderRadius: '20px',
+                                        maxWidth: '350px',
+                                        margin: '0 auto'
+                                    }}>
+                                        <img 
+                                            src={ceoImage} 
+                                            alt="CEO & Founder" 
+                                            className="img-fluid w-100"
+                                            style={{ minHeight: '350px', objectFit: 'cover' }}
+                                            onError={(e) => {
+                                                e.target.src = 'https://via.placeholder.com/350x400?text=CEO+Image';
+                                            }}
+                                        />
                                     </div>
-                                    <h3 className="stat-value text-white mb-1" style={{ fontSize: '2rem', fontWeight: '700' }}>500+</h3>
-                                    <p className="stat-label text-white-50 mb-0" style={{ fontSize: '0.9rem' }}>Happy Guests Daily</p>
-                                </div>
-                            </div>
-                            <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                <div className="stat-item">
-                                    <div className="stat-icon mb-2">
-                                        <span style={{ fontSize: '32px' }}>⭐</span>
+                                    <div className="ceo-name-card mt-3 p-3 bg-white rounded-3 shadow-sm" style={{
+                                        position: 'relative',
+                                        zIndex: '2',
+                                        fontFamily: 'inherit'
+                                    }}>
+                                        <h4 className="mb-0" style={{ color: '#2c3e50', fontWeight: '700', fontFamily: 'inherit' }}>Touhidul Alam Milky</h4>
+                                        <p className="mb-0 text-muted" style={{ fontFamily: 'inherit' }}>CEO & Founder, Akashbari Group</p>
                                     </div>
-                                    <h3 className="stat-value text-white mb-1" style={{ fontSize: '2rem', fontWeight: '700' }}>98%</h3>
-                                    <p className="stat-label text-white-50 mb-0" style={{ fontSize: '0.9rem' }}>Guest Satisfaction</p>
-                                </div>
-                            </div>
-                            <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                <div className="stat-item">
-                                    <div className="stat-icon mb-2">
-                                        <span style={{ fontSize: '32px' }}>🏆</span>
-                                    </div>
-                                    <h3 className="stat-value text-white mb-1" style={{ fontSize: '2rem', fontWeight: '700' }}>15+</h3>
-                                    <p className="stat-label text-white-50 mb-0" style={{ fontSize: '0.9rem' }}>Years of Excellence</p>
-                                </div>
-                            </div>
-                            <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                <div className="stat-item">
-                                    <div className="stat-icon mb-2">
-                                        <span style={{ fontSize: '32px' }}>🎖️</span>
-                                    </div>
-                                    <h3 className="stat-value text-white mb-1" style={{ fontSize: '2rem', fontWeight: '700' }}>50+</h3>
-                                    <p className="stat-label text-white-50 mb-0" style={{ fontSize: '0.9rem' }}>Awards Won</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Vision Quote/Footer */}
-                    <div className="vision-quote text-center mt-5 pt-3">
-                        <div className="quote-icon mb-3">
-                            <span style={{ fontSize: '40px', opacity: '0.5' }}>❝</span>
-                        </div>
-                        <p className="quote-text" style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#6c757d', maxWidth: '800px', margin: '0 auto' }}>
-                            "To be the most loved and trusted hospitality brand that transforms every stay into a cherished memory,
-                            while nurturing the environment and communities we serve."
-                        </p>
-                        <div className="quote-author mt-3">
-                            <p className="mb-0" style={{ fontWeight: '600', color: '#2c3e50' }}>- Akashbari Management</p>
+                        {/* Right Side - CEO Content */}
+                        <div className="col-lg-7">
+                            {/* CEO Message Box - Same style as business info box */}
+                            <div className="ceo-message-box p-4 rounded-4 mb-4" style={{
+                                backgroundColor: '#fcfcfc',
+                                borderLeft: '4px solid #ffc107',
+                                boxShadow: '0 5px 20px rgba(0,0,0,0.05)',
+                                fontFamily: 'inherit'
+                            }}>
+                                <span style={{ fontSize: '40px', color: '#ffc107', opacity: '0.4', fontFamily: 'inherit' }}>"</span>
+                                <p className="ceo-quote-text px-3" style={{ 
+                                    fontSize: '1rem', 
+                                    lineHeight: '1.7', 
+                                    color: '#4a5568', 
+                                    fontStyle: 'italic',
+                                    fontFamily: 'inherit'
+                                }}>
+                                    Akashbari was born from a dream to create a sanctuary where luxury meets nature, 
+                                    where every guest feels like family, and where hospitality goes beyond service to become 
+                                    an unforgettable experience. Our journey is driven by passion, integrity, and an unwavering 
+                                    commitment to excellence.
+                                </p>
+                                <span style={{ fontSize: '40px', color: '#ffc107', opacity: '0.4', display: 'block', textAlign: 'right', fontFamily: 'inherit' }}>"</span>
+                            </div>
+
+                            {/* Vision, Mission, Goal Grid - Same style as facilities */}
+                            <div className="row g-3">
+                                <div className="col-md-4">
+                                    <div className="vm-card text-center p-3 rounded-3" style={{
+                                        backgroundColor: '#fcfcfc',
+                                        border: '1px solid #e9ecef',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer',
+                                        height: '100%',
+                                        fontFamily: 'inherit'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                    }}>
+                                        <div className="vm-icon mb-2">
+                                            <span style={{ fontSize: '36px' }}>👁️</span>
+                                        </div>
+                                        <h5 className="mb-2" style={{ fontWeight: '700', color: '#2c3e50', fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Vision</h5>
+                                        <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                                            To be Bangladesh's most preferred eco-luxury resort, setting global benchmarks in sustainable hospitality.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="col-md-4">
+                                    <div className="vm-card text-center p-3 rounded-3" style={{
+                                        backgroundColor: '#fcfcfc',
+                                        border: '1px solid #e9ecef',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer',
+                                        height: '100%',
+                                        fontFamily: 'inherit'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                    }}>
+                                        <div className="vm-icon mb-2">
+                                            <span style={{ fontSize: '36px' }}>🎯</span>
+                                        </div>
+                                        <h5 className="mb-2" style={{ fontWeight: '700', color: '#2c3e50', fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Mission</h5>
+                                        <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                                            To provide exceptional hospitality experiences while preserving nature and empowering local communities.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="col-md-4">
+                                    <div className="vm-card text-center p-3 rounded-3" style={{
+                                        backgroundColor: '#fcfcfc',
+                                        border: '1px solid #e9ecef',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer',
+                                        height: '100%',
+                                        fontFamily: 'inherit'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-5px)';
+                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                    }}>
+                                        <div className="vm-icon mb-2">
+                                            <span style={{ fontSize: '36px' }}>⭐</span>
+                                        </div>
+                                        <h5 className="mb-2" style={{ fontWeight: '700', color: '#2c3e50', fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Goal</h5>
+                                        <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                                            To expand sustainably across Bangladesh, creating 1000+ jobs and becoming a model for responsible tourism.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                           
+
                         </div>
                     </div>
                 </div>
             </section>
+            {/* ========== CEO SECTION ENDS HERE ========== */}
+
+           
 
             <style>{`
                 .vision-card:hover .vision-icon-wrapper {
@@ -422,6 +355,19 @@ const AboutUs = () => {
                 .vision-card:nth-child(2) { animation-delay: 0.2s; }
                 .vision-card:nth-child(3) { animation-delay: 0.3s; }
                 .vision-card:nth-child(4) { animation-delay: 0.4s; }
+                
+                .ceo-section {
+                    animation: fadeIn 0.8s ease-out;
+                }
+                
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                    }
+                    to {
+                        opacity: 1;
+                    }
+                }
             `}</style>
 
             {/* Team Section - Dynamic from API */}
@@ -435,11 +381,11 @@ const AboutUs = () => {
                             <span className="tag-dot"></span>
                             MEET OUR EXPERTS
                         </div>
-                        <h2 className="team-title">
+                        <h2 className="team-title" style={{ fontFamily: 'inherit' }}>
                             The Passionate <span className="text-gradient">People Behind</span><br />
                             Your Perfect Stay
                         </h2>
-                        <p className="team-subtitle">
+                        <p className="team-subtitle" style={{ fontFamily: 'inherit', fontSize: '0.95rem' }}>
                             Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment. 
                             From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
                         </p>
@@ -489,12 +435,12 @@ const AboutUs = () => {
                                             </div>
                                         </div>
                                         <div className="team-info">
-                                            <h3 className="team-member-name">{member.name}</h3>
-                                            <p className="team-member-role">{member.designation}</p>
-                                            <p className="team-member-bio">{member.subtitle}</p>
+                                            <h3 className="team-member-name" style={{ fontFamily: 'inherit' }}>{member.name}</h3>
+                                            <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
+                                            <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
                                             <div className="team-divider"></div>
                                             <div className="team-contact-badge">
-                                                <span>📧 {member.email ? 'Contact' : 'Book a Meeting'}</span>
+                                                <span style={{ fontFamily: 'inherit' }}>📧 {member.email ? 'Contact' : 'Book a Meeting'}</span>
                                             </div>
                                         </div>
                                     </div>

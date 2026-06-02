@@ -6,33 +6,34 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     const [isLandingOpen, setIsLandingOpen] = useState(false);
     const location = useLocation();
 
-   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2', path: '/dashboard' },
-    { id: 'users', label: 'Users', icon: 'bi bi-people-fill', path: '/users' },
-    { id: 'gallery', label: 'Gallery', icon: 'bi bi-images', path: '/admin-gallery' },
-    { id: 'blog', label: 'Blog Page', icon: 'bi bi-newspaper', path: '/admin-blog' },
-    { id: 'notice', label: 'Notice', icon: 'bi bi-megaphone-fill', path: '/admin-notice' },
-    { id: 'statistics', label: 'Price statistics', icon: 'bi bi-graph-up', path: '/admin-stat' },
-    { id: 'affilites', label: 'Affiliates', icon: 'bi bi-share-fill', path: '/admin-affilites' },
-     { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
-      { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
-    { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
-    
-];
+    const menuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2', path: '/dashboard' },
+        { id: 'users', label: 'Users', icon: 'bi bi-people-fill', path: '/users' },
+        { id: 'gallery', label: 'Gallery', icon: 'bi bi-images', path: '/admin-gallery' },
+        { id: 'blog', label: 'Blog Page', icon: 'bi bi-newspaper', path: '/admin-blog' },
+        { id: 'notice', label: 'Notice', icon: 'bi bi-megaphone-fill', path: '/admin-notice' },
+        { id: 'statistics', label: 'Price statistics', icon: 'bi bi-graph-up', path: '/admin-stat' },
+        { id: 'affilites', label: 'Affiliates', icon: 'bi bi-share-fill', path: '/admin-affilites' },
+        { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
+        { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
+        { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
+        { id: 'query', label: 'Query', icon: 'bi bi-chat-dots-fill', path: '/admin-query' },
 
-const landingSubItems = [
-    { id: 'content', label: 'Contents', icon: 'bi bi-files', path: '/content' },
-    { id: 'welcome', label: 'Welcome Section', icon: 'bi bi-emoji-smile', path: '/welcome' },
-    { id: 'video', label: 'Video Section', icon: 'bi bi-play-btn', path: '/video' },
-    { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-badge', path: '/owner-section' },
-    { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-gem', path: '/owner-benefit' },
-    { id: 'investment', label: 'Investment Package', icon: 'bi bi-piggy-bank', path: '/admin-investment' },
-    { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
-   
-    { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
-    { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
-    { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' }
-];
+    ];
+
+    const landingSubItems = [
+        { id: 'content', label: 'Contents', icon: 'bi bi-files', path: '/content' },
+        { id: 'welcome', label: 'Welcome Section', icon: 'bi bi-emoji-smile', path: '/welcome' },
+        { id: 'video', label: 'Video Section', icon: 'bi bi-play-btn', path: '/video' },
+        { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-badge', path: '/owner-section' },
+        { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-gem', path: '/owner-benefit' },
+        { id: 'investment', label: 'Investment Package', icon: 'bi bi-piggy-bank', path: '/admin-investment' },
+        { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
+
+        { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
+        { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
+        { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' }
+    ];
 
     // Check if any sub-menu item is active
     const isAnySubItemActive = () => {
@@ -76,12 +77,12 @@ const landingSubItems = [
 
     return (
         <div className="d-none d-md-block shadow-sm" style={styles?.sidebar || sidebarBg}>
-            
+
             {/* Logo Section */}
             <div className="p-4 mb-2 text-center">
                 {isCollapsed ? (
-                    <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto" 
-                         style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #da8cff 0%, #9a55ff 100%)', boxShadow: '0 4px 10px rgba(182, 109, 255, 0.3)' }}>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                        style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #da8cff 0%, #9a55ff 100%)', boxShadow: '0 4px 10px rgba(182, 109, 255, 0.3)' }}>
                         <span className="text-white fw-bold">D</span>
                     </div>
                 ) : (
@@ -92,12 +93,12 @@ const landingSubItems = [
             </div>
 
             {/* User Card */}
-            <div className="mx-3 mb-4 p-2 d-flex align-items-center rounded-3" 
-                 style={{ backgroundColor: theme?.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
-                <img src="https://i.pravatar.cc/40?img=12" 
-                     className="rounded-circle shadow-sm" 
-                     alt="user" 
-                     style={{ border: '2px solid #b66dff', padding: '2px' }} />
+            <div className="mx-3 mb-4 p-2 d-flex align-items-center rounded-3"
+                style={{ backgroundColor: theme?.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
+                <img src="https://i.pravatar.cc/40?img=12"
+                    className="rounded-circle shadow-sm"
+                    alt="user"
+                    style={{ border: '2px solid #b66dff', padding: '2px' }} />
                 {!isCollapsed && (
                     <div className="ms-3 overflow-hidden">
                         <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Hasan Talukder</p>
@@ -111,14 +112,14 @@ const landingSubItems = [
                 {/* Dashboard & Users */}
                 {menuItems.slice(0, 2).map((item) => (
                     <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i> 
+                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
                     </NavLink>
                 ))}
 
                 {/* Landing Page Mother Menu */}
                 <div className="w-100">
-                    <div 
+                    <div
                         onClick={() => !isCollapsed && setIsLandingOpen(!isLandingOpen)}
                         style={navLinkStyle(isAnySubItemActive())}
                     >
@@ -135,9 +136,9 @@ const landingSubItems = [
                     {!isCollapsed && isLandingOpen && (
                         <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
                             {landingSubItems.map((sub) => (
-                                <NavLink 
-                                    key={sub.id} 
-                                    to={sub.path} 
+                                <NavLink
+                                    key={sub.id}
+                                    to={sub.path}
                                     style={({ isActive }) => ({
                                         ...navLinkStyle(isActive),
                                         padding: '10px 15px',
@@ -160,7 +161,7 @@ const landingSubItems = [
                 {/* Settings & Profile */}
                 {menuItems.slice(2).map((item) => (
                     <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i> 
+                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
                     </NavLink>
                 ))}

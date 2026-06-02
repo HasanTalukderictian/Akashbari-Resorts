@@ -16,6 +16,7 @@ import HappyClient from "./HappyClient";
 import Notice from "./Notice";
 import Member from "./Member";
 import ProjectView from "./ProjectView";
+import OngoingView from "./OngoingView";
 
 const LandingPage = () => {
 
@@ -62,7 +63,8 @@ const LandingPage = () => {
       <Facility />
       
       <ProjectView/>
-
+       
+       <OngoingView/>
       {/* <Event /> */}
 
       {/* <Member/> */}
