@@ -39,6 +39,7 @@ import Partner from './assets/Frontend/Partner'
 import OngoingView from './assets/Frontend/OngoingView'
 import AdminSister from './Backend/AdminSister'
 import Query from './Backend/Query'
+import Achievement from './Backend/Achievement'
 
 
 function App() {
@@ -165,6 +166,11 @@ function App() {
         <Route path="/admin-client" element={
           <PrivateRoute>
             <HappyClientsection />
+          </PrivateRoute>
+        } />
+          <Route path="/admin-achievement" element={
+          <PrivateRoute>
+            <Achievement />
           </PrivateRoute>
         } />
 

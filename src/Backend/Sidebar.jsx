@@ -19,6 +19,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
         { id: 'query', label: 'Query', icon: 'bi bi-chat-dots-fill', path: '/admin-query' },
 
+
     ];
 
     const landingSubItems = [
@@ -29,10 +30,10 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-gem', path: '/owner-benefit' },
         { id: 'investment', label: 'Investment Package', icon: 'bi bi-piggy-bank', path: '/admin-investment' },
         { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
-
         { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
         { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
-        { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' }
+        { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' },
+        { id: 'achievement', label: 'Achievement', icon: 'bi bi-trophy-fill', path: '/admin-achievement' },
     ];
 
     // Check if any sub-menu item is active

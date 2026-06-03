@@ -16,9 +16,9 @@ const Gallery = () => {
     useEffect(() => {
         window.scrollTo({
             top: 0,
-            behavior: 'instant' // 'smooth' বা 'instant'
+            behavior: 'instant' 
         });
-    }, []); // Empty dependency array - শুধু প্রথমবার লোড হলে
+    }, []); 
 
     // 👉 Fetch Gallery Data from API
     useEffect(() => {
