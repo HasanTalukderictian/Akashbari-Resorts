@@ -322,7 +322,7 @@ const PackageDetails = () => {
                                 </div>
                                 <div className="col-6">
                                     <small className="text-muted d-block mb-1">
-                                        <i className="bi bi-tag me-1"></i>Discount Amount
+                                        <i className="bi bi-tag me-1"></i>CashBack
                                     </small>
                                     <h4 className="text-primary fw-bold" style={{ fontSize: 'clamp(1rem, 3.5vw, 1.2rem)' }}>৳ {parseInt(packageData.discount).toLocaleString()}</h4>
                                 </div>
@@ -331,16 +331,11 @@ const PackageDetails = () => {
                             <div className="bg-light p-3 p-md-4 rounded-4 mb-3 mb-md-4">
                                 <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
                                     <span className="text-secondary" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>
-                                        <i className="bi bi-geo-fill me-2"></i>Land Area
+                                        <i className="bi bi-geo-fill me-2"></i>Land Area and  Building Size
                                     </span>
                                     <span className="fw-bold" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>{packageData.land}</span>
                                 </div>
-                                <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                    <span className="text-secondary" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>
-                                        <i className="bi bi-building me-2"></i>Building Size
-                                    </span>
-                                    <span className="fw-bold" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>{packageData.building}</span>
-                                </div>
+                             
                                 <div className="d-flex justify-content-between">
                                     <span className="text-secondary" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>
                                         <i className="bi bi-aspect-ratio me-2"></i>Total Space

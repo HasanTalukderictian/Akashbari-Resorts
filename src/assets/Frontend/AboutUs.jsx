@@ -128,9 +128,7 @@ const AboutUs = () => {
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Guided Nature Trails & Kids Zone</li>
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Corporate Conference Hall & Event Spaces</li>
                                 </ul>
-                                <button className="explore-btn" onClick={() => window.location.href = '/booking'}>
-                                    📅 Book Your Stay
-                                </button>
+                               
                             </div>
                         </div>
                         <div className="col-lg-6">
@@ -374,9 +372,7 @@ const AboutUs = () => {
             <section className="team-section-modern py-5">
                 <div className="container">
                     <div className="team-header-modern text-center">
-                        <div className="header-icon-wrapper">
-                            <span className="header-icon" style={{ fontSize: '2rem' }}>👥</span>
-                        </div>
+                        
                         <div className="section-tag centered">
                             <span className="tag-dot"></span>
                             MEET OUR EXPERTS
@@ -439,9 +435,7 @@ const AboutUs = () => {
                                             <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
                                             <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
                                             <div className="team-divider"></div>
-                                            <div className="team-contact-badge">
-                                                <span style={{ fontFamily: 'inherit' }}>📧 {member.email ? 'Contact' : 'Book a Meeting'}</span>
-                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>

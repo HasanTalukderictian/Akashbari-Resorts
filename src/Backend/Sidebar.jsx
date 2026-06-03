@@ -101,7 +101,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                     style={{ border: '2px solid #b66dff', padding: '2px' }} />
                 {!isCollapsed && (
                     <div className="ms-3 overflow-hidden">
-                        <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Hasan Talukder</p>
+                        <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Welcome</p>
                         <span className="text-muted" style={{ fontSize: '11px' }}>Premium Admin</span>
                     </div>
                 )}

@@ -38,7 +38,7 @@ body {
 
 .about-banner {
     min-height: 450px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('../image/page-header-bg.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('../image/section/Blog/Hotel3.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

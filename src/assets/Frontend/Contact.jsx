@@ -5,7 +5,7 @@ import '../css/blog.css';
 import '../css/Contact.css'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-import contactImg from '../image/section/Blog/orrivaa_contact_image_new.webp'
+import contactImg from '../image/section/Blog/Hotel6.png'
 // CEO Image
 import ceoImage from '../../assets/image/section/Blog/ceo.jpg';
 import axios from 'axios';

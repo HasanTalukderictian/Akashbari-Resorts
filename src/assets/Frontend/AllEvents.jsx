@@ -27,8 +27,8 @@ const AllEvents = () => {
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
     // সুন্দর রিসোর্ট ব্যাকগ্রাউন্ড ইমেজ এবং টেক্সট ক্লিয়ার দেখার জন্য ওভারলে সেট করা হয়েছে
     heroBg: isDarkMode 
-      ? 'linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1920&auto=format&fit=crop")' 
-      : 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1920&auto=format&fit=crop")',
+      ? 'linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")' 
+      : 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")',
     primaryColor: '#ff8c32',
     primaryHover: '#e67e22',
   };
