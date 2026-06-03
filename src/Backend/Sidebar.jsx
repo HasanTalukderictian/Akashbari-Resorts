@@ -17,7 +17,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
         { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
-        { id: 'query', label: 'Query', icon: 'bi bi-chat-dots-fill', path: '/admin-query' },
+
 
 
     ];
@@ -34,6 +34,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
         { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' },
         { id: 'achievement', label: 'Achievement', icon: 'bi bi-trophy-fill', path: '/admin-achievement' },
+      { id: 'investrecord', label: 'Invest Record', icon: 'bi bi-cash-stack', path: '/admin-investrecord' }
     ];
 
     // Check if any sub-menu item is active

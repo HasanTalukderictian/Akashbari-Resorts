@@ -40,6 +40,7 @@ import OngoingView from './assets/Frontend/OngoingView'
 import AdminSister from './Backend/AdminSister'
 import Query from './Backend/Query'
 import Achievement from './Backend/Achievement'
+import InvestmentRecord from './Backend/InvestmentRecord'
 
 
 function App() {
@@ -157,9 +158,9 @@ function App() {
           </PrivateRoute>
         } />
 
-         <Route path="/admin-sister" element={
+        <Route path="/admin-sister" element={
           <PrivateRoute>
-            <AdminSister/>
+            <AdminSister />
           </PrivateRoute>
         } />
 
@@ -168,15 +169,24 @@ function App() {
             <HappyClientsection />
           </PrivateRoute>
         } />
-          <Route path="/admin-achievement" element={
+
+        <Route path="/admin-achievement" element={
           <PrivateRoute>
             <Achievement />
           </PrivateRoute>
         } />
 
-           <Route path="/admin-query" element={
+        <Route path="/admin-investrecord" element={
           <PrivateRoute>
-            <Query/>
+            <InvestmentRecord />
+          </PrivateRoute>
+        } />
+
+
+
+        <Route path="/admin-query" element={
+          <PrivateRoute>
+            <Query />
           </PrivateRoute>
         } />
 

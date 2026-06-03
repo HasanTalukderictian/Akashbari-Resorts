@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 // কাউন্টার কম্পোনেন্ট
 const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
@@ -27,38 +28,119 @@ const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
 };
 
 const HappyClient = () => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [combinedData, setCombinedData] = useState({
+        record_members: [],
+        invest_records: []
+    });
+
+    const BASE_URL = 'http://localhost:8000/api';
+
     // ইমেজ এবং কনফিগারেশন JSON
     const pageConfig = {
         heroBgImage: "https://img.freepik.com/free-vector/stock-market-trading-graph-blue-background_1017-31846.jpg",
         overlayOpacity: 0.95
     };
 
-    const featuresData = [
-        {
-            id: 1,
-            title: "Passive Income",
-            desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits."
-        },
-        {
-            id: 2,
-            title: "Elite Status",
-            desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club."
-        },
-        {
-            id: 3,
-            title: "Luxury Living",
-            desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort."
-        }
-    ];
-
-    const statsData = [
-        { id: 1, target: 4000, suffix: "+", prefix: "", label: "Happy Members" },
-        { id: 2, target: 12, suffix: "%", prefix: "Up to ", label: "Yearly Revenue" },
-        { id: 3, target: 25, suffix: "+", prefix: "", label: "Club Amenities" },
-        { id: 4, target: 15, suffix: "+", prefix: "", label: "Years of Trust" }
-    ];
-
     const featureIcons = ["💰", "💎", "✨"];
+
+    // Fetch combined data from API
+    const fetchCombinedData = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${BASE_URL}/combined-records`, {
+                headers: {
+                    'Accept': 'application/json',
+                }
+            });
+            
+            console.log('Combined data response:', response.data);
+            
+            if (response.data.status === true && response.data.data) {
+                setCombinedData({
+                    record_members: response.data.data.record_members || [],
+                    invest_records: response.data.data.invest_records || []
+                });
+            } else {
+                setCombinedData({
+                    record_members: [],
+                    invest_records: []
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching combined data:', error);
+            setError('Failed to load data. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCombinedData();
+    }, []);
+
+    // Get the first member record for stats (assuming single record or using first one)
+    const getMemberStats = () => {
+        if (combinedData.record_members.length > 0) {
+            const member = combinedData.record_members[0];
+            return {
+                member: parseInt(member.member) || 0,
+                revenue: parseInt(member.revenue) || 0,
+                amenities: parseInt(member.amenities) || 0,
+                experience: parseInt(member.expericence) || 0
+            };
+        }
+        return {
+            member: 0,
+            revenue: 0,
+            amenities: 0,
+            experience: 0
+        };
+    };
+
+    // Dynamic stats data from API
+    const getStatsData = () => {
+        const stats = getMemberStats();
+        return [
+            { id: 1, target: stats.member, suffix: "+", prefix: "", label: "Happy Members" },
+            { id: 2, target: stats.revenue, suffix: "%", prefix: "Up to ", label: "Yearly Revenue" },
+            { id: 3, target: stats.amenities, suffix: "+", prefix: "", label: "Club Amenities" },
+            { id: 4, target: stats.experience, suffix: "+", prefix: "", label: "Years of Trust" }
+        ];
+    };
+
+    // Dynamic features data from invest_records API
+    const getFeaturesData = () => {
+        if (combinedData.invest_records.length > 0) {
+            return combinedData.invest_records.map((record, index) => ({
+                id: record.id,
+                title: record.title,
+                desc: record.desc
+            }));
+        }
+        // Fallback data if API returns empty
+        return [
+            {
+                id: 1,
+                title: "Passive Income",
+                desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits."
+            },
+            {
+                id: 2,
+                title: "Elite Status",
+                desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club."
+            },
+            {
+                id: 3,
+                title: "Luxury Living",
+                desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort."
+            }
+        ];
+    };
+
+    const featuresData = getFeaturesData();
+    const statsData = getStatsData();
 
     // স্টাইল অবজেক্টে JSON ডেটা ব্যবহার করা হয়েছে
     const heroSectionStyle = {
@@ -79,6 +161,35 @@ const HappyClient = () => {
         zIndex: '10'
     };
 
+    if (loading) {
+        return (
+            <section>
+                <div style={heroSectionStyle}>
+                    <div className="container text-center">
+                        <div className="spinner-border text-light" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-3 text-white">Loading amazing content...</p>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section>
+                <div style={heroSectionStyle}>
+                    <div className="container text-center">
+                        <div className="alert alert-danger" role="alert">
+                            {error}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section>
             <div style={heroSectionStyle}>
@@ -86,7 +197,7 @@ const HappyClient = () => {
                     <div className="row align-items-center">
                         <div className="col-md-6">
                             <span className="text-warning fw-bold border-start border-warning border-3 ps-3 mb-3 d-inline-block" style={{ fontSize: '14px', letterSpacing: '1px' }}>
-                                AKASHBARI RESORT & CLUB
+                                AKASHBARI HOTEL & RESORT
                             </span>
                             <h1 className="display-4 fw-bold mb-4" style={{ lineHeight: '1.2' }}>
                                 Investments that <br />
@@ -104,7 +215,7 @@ const HappyClient = () => {
                                     {featuresData.map((item, index) => (
                                         <div key={item.id} className={`py-3 border-top border-white-25 ${index === featuresData.length - 1 ? 'border-bottom' : ''}`}>
                                             <div className="d-flex align-items-center">
-                                                <span className="fs-3 me-3">{featureIcons[index]}</span>
+                                                <span className="fs-3 me-3">{featureIcons[index % featureIcons.length]}</span>
                                                 <div>
                                                     <h6 className="fw-bold mb-0">{item.title}</h6>
                                                     <p className="small mb-0 opacity-75">{item.desc}</p>
@@ -126,11 +237,17 @@ const HappyClient = () => {
                             <div className="row g-4">
                                 {statsData.map((stat, index) => (
                                     <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`}>
-                                        <CountUpItem 
-                                            target={stat.target} 
-                                            suffix={stat.suffix} 
-                                            prefix={stat.prefix} 
-                                        />
+                                        {stat.target > 0 ? (
+                                            <CountUpItem 
+                                                target={stat.target} 
+                                                suffix={stat.suffix} 
+                                                prefix={stat.prefix} 
+                                            />
+                                        ) : (
+                                            <h2 className="fw-bold" style={{ color: '#5DB8C1' }}>
+                                                {stat.prefix}0{stat.suffix}
+                                            </h2>
+                                        )}
                                         <p className="text-muted fw-bold mb-0">{stat.label}</p>
                                     </div>
                                 ))}
