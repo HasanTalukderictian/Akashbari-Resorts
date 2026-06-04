@@ -42,6 +42,7 @@ import Query from './Backend/Query'
 import Achievement from './Backend/Achievement'
 import InvestmentRecord from './Backend/InvestmentRecord'
 import ClubSettings from './Backend/ClubSettings'
+import Clubgallery from './Backend/Clubgallery'
 
 
 function App() {
@@ -208,6 +209,13 @@ function App() {
             <Teamate />
           </PrivateRoute>
         } />
+
+            <Route path="/admin-club-gallery" element={
+          <PrivateRoute>
+            <Clubgallery />
+          </PrivateRoute>
+        } />
+
 
         <Route path="/admin-blog" element={
           <PrivateRoute>

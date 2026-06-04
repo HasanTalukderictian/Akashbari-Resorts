@@ -25,8 +25,8 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     // Club এর সাব-মেনু আইটেম
     const clubSubItems = [
         { id: 'club-info', label: 'Club Info', icon: 'bi bi-info-circle', path: '/admin-club' },
-        { id: 'club-members', label: 'Club Members', icon: 'bi bi-people-fill', path: '/admin-club-members' },
-        { id: 'club-events', label: 'Club Events', icon: 'bi bi-calendar-event', path: '/admin-club-events' },
+        // { id: 'club-members', label: 'Club Members', icon: 'bi bi-people-fill', path: '/admin-club-members' },
+        // { id: 'club-events', label: 'Club Events', icon: 'bi bi-calendar-event', path: '/admin-club-events' },
         { id: 'club-gallery', label: 'Club Gallery', icon: 'bi bi-images', path: '/admin-club-gallery' },
         { id: 'club-rules', label: 'Club Rules', icon: 'bi bi-file-text-fill', path: '/admin-club-rules' },
         { id: 'club-facilities', label: 'Facilities', icon: 'bi bi-building', path: '/admin-club-facilities' },

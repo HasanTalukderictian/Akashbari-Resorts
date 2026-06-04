@@ -4,11 +4,11 @@ import Footer from './Common/Footer';
 import { FaBuilding, FaMask, FaCamera, FaCocktail, FaBirthdayCake, FaCrown, FaGlassMartiniAlt, FaPhoneAlt, FaTimes } from 'react-icons/fa';
 import { Modal } from 'react-bootstrap';
 
-// Swiper Components এবং Styles ইম্পোর্ট
+// Swiper Components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 
-// সঠিক CSS পাথসমূহ
+// CSS
 import 'swiper/css';
 import 'swiper/css/pagination'; 
 import 'swiper/css/navigation';
@@ -18,12 +18,14 @@ const Club = () => {
   const [clubInfo, setClubInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [galleryLoading, setGalleryLoading] = useState(true);
 
   // Modal open/close functions
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
-  // ✅ পেজ লোড হলে টপে স্ক্রল করার জন্য
+  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -40,7 +42,7 @@ const Club = () => {
         const result = await response.json();
 
         if (result.success && result.data && result.data.length > 0) {
-          setClubInfo(result.data[0]); // Get the first club from the array
+          setClubInfo(result.data[0]);
           setError(null);
         } else {
           setError('No club information found');
@@ -56,6 +58,38 @@ const Club = () => {
     fetchClubInfo();
   }, []);
 
+  // Fetch gallery images for facilities section
+  useEffect(() => {
+    const fetchGalleryImages = async () => {
+      try {
+        setGalleryLoading(true);
+        const response = await fetch('http://localhost:8000/api/club-gallery');
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.data) {
+          setGalleryImages(result.data.data);
+        } else {
+          setGalleryImages([]);
+        }
+      } catch (err) {
+        console.error('Error fetching gallery:', err);
+        setGalleryImages([]);
+      } finally {
+        setGalleryLoading(false);
+      }
+    };
+
+    fetchGalleryImages();
+  }, []);
+
+  // Function to get correct image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
+    if (imagePath.startsWith('http')) return imagePath;
+    const cleanPath = imagePath.replace(/^\/+/, '');
+    return `http://localhost:8000/storage/${cleanPath}`;
+  };
+
   // ২য় সেকশনের ডাটা
   const servicesData = {
     title: "Our Services",
@@ -67,33 +101,6 @@ const Club = () => {
       { id: 4, title: "HAN PARTIES", description: "Psum dolor sit amet, ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et", icon: <FaCocktail size={30} style={{ color: '#ff003c' }} /> },
       { id: 5, title: "BIRTHDAY PARTIES", description: "Olor sit tetur adicing elit, sed do eiusmod tempor incididunt ut labore et", icon: <FaBirthdayCake size={30} style={{ color: '#ff003c' }} /> },
       { id: 6, title: "VIP SERVICE", description: "Isum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut", icon: <FaCrown size={30} style={{ color: '#ff003c' }} /> }
-    ]
-  };
-
-  // ৩য় সেকশনের ডাটা 
-  const facilitiesData = {
-    title: "Facilities Overview",
-    items: [
-      {
-        id: 1,
-        title: "OUTDOOR SPORTS",
-        imageUrl: "https://i.ibb.co.com/jP8Hz8Fx/spor-sahasi-yapiminda-dikkat-edilmesi-gerekenler.jpg"
-      },
-      {
-        id: 2,
-        title: "HALL",
-        imageUrl: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 3,
-        title: "FOOD & BEVERAGE",
-        imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80"
-      },
-      {
-        id: 4,
-        title: "GYMNASIUM",
-        imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80"
-      }
     ]
   };
 
@@ -161,7 +168,7 @@ const Club = () => {
     <> 
       <Header/>
       
-      {/* Sticky Circular Button - WhatsApp Color */}
+      {/* Sticky Circular Button */}
       <div 
         className="sticky-member-btn"
         onClick={handleShowModal}
@@ -210,7 +217,7 @@ const Club = () => {
         </button>
       </div>
 
-      {/* Simple Modal Component - No Border Radius */}
+      {/* Modal Component */}
       <Modal 
         show={showModal} 
         onHide={handleCloseModal}
@@ -263,7 +270,6 @@ const Club = () => {
           }}
         >
           <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-            {/* Simple Bold Text */}
             <h3 
               style={{
                 fontSize: '28px',
@@ -299,7 +305,6 @@ const Club = () => {
               Membership
             </h3>
             
-            {/* Year */}
             <div 
               style={{
                 display: 'inline-block',
@@ -362,7 +367,7 @@ const Club = () => {
 
       {/* Main Content Container */}
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* 1st section - DYNAMIC */}
+        {/* 1st section - Club Info */}
         <section className="py-5" style={{ backgroundColor: '#1a1a1a', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
             <h3 className='text-center mt-1 mb-15 font-bw' style={{ marginBottom: '2rem' }}>
@@ -425,7 +430,7 @@ const Club = () => {
           </div>
         </section>
       
-        {/* 2nd section */}
+        {/* 2nd section - Services */}
         <section className="py-5" style={{ backgroundColor: '#07111e', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
             <div className="text-center mb-5">
@@ -458,97 +463,106 @@ const Club = () => {
           </div>
         </section>
 
-        {/* 3rd section */}
+        {/* 3rd section - Facilities Overview (Dynamic from Gallery API) */}
         <section className="py-5" style={{ backgroundColor: '#111111', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
             <div className="mb-4">
               <h2 style={{ color: '#b8860b', fontFamily: 'serif', fontSize: '2.2rem', fontWeight: '300' }}>
-                {facilitiesData.title}
+                Facilities Overview
               </h2>
             </div>
 
-            <Swiper
-              modules={[Autoplay, Navigation, Pagination]}
-              spaceBetween={24} 
-              slidesPerView={1}
-              loop={true}
-              autoplay={{ delay: 3500, disableOnInteraction: false }}
-              breakpoints={{
-                640: { slidesPerView: 1 },
-                768: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
-              }}
-            >
-              {facilitiesData.items.map((facility) => (
-                <SwiperSlide key={facility.id}>
-                  <div 
-                    className="position-relative overflow-hidden"
-                    style={{ 
-                      height: '400px', 
-                      cursor: 'pointer',
-                      role: 'group'
-                    }}
-                    onMouseEnter={(e) => {
-                      const overlay = e.currentTarget.querySelector('.facility-overlay');
-                      if (overlay) overlay.style.opacity = '0';
-                    }}
-                    onMouseLeave={(e) => {
-                      const overlay = e.currentTarget.querySelector('.facility-overlay');
-                      if (overlay) overlay.style.opacity = '1';
-                    }}
-                  >
-                    <img 
-                      src={facility.imageUrl} 
-                      alt={facility.title} 
-                      className="w-100 h-100" 
-                      style={{ objectFit: 'cover', display: 'block' }}
-                    />
-
+            {galleryLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-warning" role="status">
+                  <span className="visually-hidden">Loading facilities...</span>
+                </div>
+                <p className="mt-3">Loading gallery images...</p>
+              </div>
+            ) : galleryImages.length === 0 ? (
+              <div className="text-center py-5">
+                <p>No facilities images available</p>
+              </div>
+            ) : (
+              <Swiper
+                modules={[Autoplay, Navigation, Pagination]}
+                spaceBetween={24} 
+                slidesPerView={1}
+                loop={true}
+                autoplay={{ delay: 3500, disableOnInteraction: false }}
+                breakpoints={{
+                  640: { slidesPerView: 1 },
+                  768: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+              >
+                {galleryImages.map((image) => (
+                  <SwiperSlide key={image.id}>
                     <div 
-                      className="facility-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-4"
+                      className="position-relative overflow-hidden"
                       style={{ 
-                        backgroundColor: 'rgba(0, 0, 0, 0.65)', 
-                        transition: 'all 0.4s ease-in-out',
-                        opacity: 1
+                        height: '400px', 
+                        cursor: 'pointer',
+                        role: 'group'
+                      }}
+                      onMouseEnter={(e) => {
+                        const overlay = e.currentTarget.querySelector('.facility-overlay');
+                        if (overlay) overlay.style.opacity = '0';
+                      }}
+                      onMouseLeave={(e) => {
+                        const overlay = e.currentTarget.querySelector('.facility-overlay');
+                        if (overlay) overlay.style.opacity = '1';
                       }}
                     >
+                      <img 
+                        src={getImageUrl(image.image)} 
+                        alt={image.title || 'Facility Image'} 
+                        className="w-100 h-100" 
+                        style={{ objectFit: 'cover', display: 'block' }}
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+                        }}
+                      />
+
                       <div 
-                        className="w-100 h-100 d-flex align-items-center justify-content-center"
-                        style={{ border: '1px solid rgba(184, 134, 11, 0.4)' }}
+                        className="facility-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-4"
+                        style={{ 
+                          backgroundColor: 'rgba(0, 0, 0, 0.65)', 
+                          transition: 'all 0.4s ease-in-out',
+                          opacity: 1
+                        }}
                       >
-                        <h4 
-                          className="fw-normal text-white text-center px-3" 
-                          style={{ letterSpacing: '2px', fontSize: '1.25rem', fontFamily: 'serif' }}
+                        <div 
+                          className="w-100 h-100 d-flex align-items-center justify-content-center"
+                          style={{ border: '1px solid rgba(184, 134, 11, 0.4)' }}
                         >
-                          {facility.title}
-                        </h4>
+                          <h4 
+                            className="fw-normal text-white text-center px-3" 
+                            style={{ letterSpacing: '2px', fontSize: '1.25rem', fontFamily: 'serif' }}
+                          >
+                            {image.title || 'Club Facility'}
+                          </h4>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
           </div>
         </section>
 
         <Footer/>
       </div>
 
-      {/* Add animation and modal styles */}
+      {/* Styles */}
       <style jsx="true">{`
         @keyframes pulse {
-          0% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.1);
-          }
-          100% {
-            transform: scale(1);
-          }
+          0% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
         }
         
-        /* Remove border radius from modal */
         .modal-content-no-radius {
           border-radius: 0 !important;
         }
@@ -559,7 +573,6 @@ const Club = () => {
           border-radius: 0 !important;
         }
         
-        /* Ensure button doesn't overlap content on mobile */
         @media (max-width: 768px) {
           .sticky-member-btn button {
             width: 60px !important;
@@ -577,4 +590,4 @@ const Club = () => {
   )
 }
 
-export default Club
+export default Club  
