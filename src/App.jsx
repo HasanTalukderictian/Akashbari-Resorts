@@ -41,6 +41,7 @@ import AdminSister from './Backend/AdminSister'
 import Query from './Backend/Query'
 import Achievement from './Backend/Achievement'
 import InvestmentRecord from './Backend/InvestmentRecord'
+import ClubSettings from './Backend/ClubSettings'
 
 
 function App() {
@@ -94,6 +95,12 @@ function App() {
         <Route path="/video" element={
           <PrivateRoute>
             <VideoSection />
+          </PrivateRoute>
+        } />
+
+        <Route path="/admin-club" element={
+          <PrivateRoute>
+            <ClubSettings />
           </PrivateRoute>
         } />
 

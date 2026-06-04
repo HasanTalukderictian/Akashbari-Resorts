@@ -15,6 +15,9 @@ import 'swiper/css/navigation';
 
 const Club = () => {
   const [showModal, setShowModal] = useState(false);
+  const [clubInfo, setClubInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Modal open/close functions
   const handleShowModal = () => setShowModal(true);
@@ -28,13 +31,30 @@ const Club = () => {
     });
   }, []);
 
-  // ১ম সেকশনের ডাটা
-  const sectionData = {
-    description: "At the heart of Akashbari  Club is the collective kinship amongst its Members. Founded in 2027, GCL prides itself for being more than just a club, but a home away from home. The Club was set up on the belief that life is best spent in the company of loved ones. It is at this juncture that some members, recognizing the importance of personal growth and academic achievement alongside social bonding, have opted to enhance their qualifications by engaging services to, seeing it as a way to balance their professional and personal lives effectively. Presently, it is the only family club in Bangladesh. Governing administrations, throughout the years, have been working relentlessly strengthening the bond and fellowship of its Members, as well as bringing families closer together through arts, culture, sports, and various initiatives and events.",
-    imageUrl: "https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg",
-    imageAlt: "Gulshan Club Building",
-    ContactNumber: "01768712230"
-  };
+  // Fetch club information from API
+  useEffect(() => {
+    const fetchClubInfo = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8000/api/club-infos');
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.length > 0) {
+          setClubInfo(result.data[0]); // Get the first club from the array
+          setError(null);
+        } else {
+          setError('No club information found');
+        }
+      } catch (err) {
+        console.error('Error fetching club info:', err);
+        setError('Failed to load club information');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClubInfo();
+  }, []);
 
   // ২য় সেকশনের ডাটা
   const servicesData = {
@@ -76,6 +96,66 @@ const Club = () => {
       }
     ]
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <>
+        <Header/>
+        <div style={{ 
+          minHeight: '100vh', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          backgroundColor: '#1a1a1a',
+          color: '#ffffff'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div className="spinner-border text-warning mb-3" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading club information...</p>
+          </div>
+        </div>
+        <Footer/>
+      </>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <>
+        <Header/>
+        <div style={{ 
+          minHeight: '100vh', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          backgroundColor: '#1a1a1a',
+          color: '#ffffff'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: '#dc3545' }}>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              style={{
+                backgroundColor: '#b8860b',
+                color: '#ffffff',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+        <Footer/>
+      </>
+    );
+  }
 
   return (
     <> 
@@ -126,7 +206,6 @@ const Club = () => {
             e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
           }}
         >
-         
           <span style={{ fontSize: '11px', letterSpacing: '1px' }}>MEMBER</span>
         </button>
       </div>
@@ -156,7 +235,7 @@ const Club = () => {
               letterSpacing: '1px'
             }}
           >
-            Akashbari Club
+            {clubInfo?.club_name || 'Akashbari Club'}
           </Modal.Title>
           <button
             onClick={handleCloseModal}
@@ -206,7 +285,7 @@ const Club = () => {
                 lineHeight: '1.2'
               }}
             >
-              Akashbari Club
+              {clubInfo?.club_name || 'Akashbari Club'}
             </h2>
             
             <h3 
@@ -283,22 +362,24 @@ const Club = () => {
 
       {/* Main Content Container */}
       <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* 1st section */}
+        {/* 1st section - DYNAMIC */}
         <section className="py-5" style={{ backgroundColor: '#1a1a1a', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-            <h3 className='text-center mt-1 mb-15 font-bw' style={{ marginBottom: '2rem' }}>AKASHBARI CLUB</h3>
+            <h3 className='text-center mt-1 mb-15 font-bw' style={{ marginBottom: '2rem' }}>
+              {clubInfo?.club_name || 'AKASHBARI CLUB'}
+            </h3>
             <div className="row align-items-center">
               <div className="col-lg-7 pe-lg-5 mb-4 mb-lg-0">
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   <div style={{ position: 'absolute', top: '-20px', left: '-40px', width: '150px', height: '150px', border: '15px solid rgba(184, 134, 11, 0.15)', borderRadius: '50%', zIndex: -1 }} />
                   
                   <p style={{ lineHeight: '1.8', fontSize: '1.05rem', color: '#e0e0e0', textAlign: 'justify' }}>
-                    {sectionData.description}
+                    {clubInfo?.club_history || 'No history available'}
                   </p>
                   
                   <div className="mt-4 d-inline-block">
                     <a 
-                      href={`tel:${sectionData.ContactNumber}`}
+                      href={`tel:${clubInfo?.club_phone || ''}`}
                       className="d-flex align-items-center text-decoration-none"
                       style={{ 
                         color: '#b8860b', 
@@ -322,15 +403,22 @@ const Club = () => {
                       >
                         <FaPhoneAlt size={16} />
                       </span>
-                      {sectionData.ContactNumber}
+                      {clubInfo?.club_phone || 'No phone number available'}
                     </a>
                   </div>
-
                 </div>
               </div>
               <div className="col-lg-5">
                 <div className="p-3" style={{ backgroundColor: '#262626', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                  <img src={sectionData.imageUrl} alt={sectionData.imageAlt} className="img-fluid w-100" style={{ display: 'block', objectFit: 'cover', height: '420px' }} />
+                  <img 
+                    src={clubInfo?.image ? `http://localhost:8000/${clubInfo.image}` : 'https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg'} 
+                    alt={clubInfo?.club_name || 'Club Building'} 
+                    className="img-fluid w-100" 
+                    style={{ display: 'block', objectFit: 'cover', height: '420px' }}
+                    onError={(e) => {
+                      e.target.src = 'https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg';
+                    }}
+                  />
                 </div>
               </div>
             </div>

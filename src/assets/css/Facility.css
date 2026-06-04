@@ -58,7 +58,7 @@
     transform: translateY(-10px);
     background: #ffffff;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-    border-color: #d4af37;
+    border-color: #4a6d36;
 }
 
 .facility-card-new:hover .icon-wrapper {
@@ -68,7 +68,7 @@
 }
 
 .facility-card-new:hover .facility-name-text {
-    color: #d4af37;
+    color: #4a6d36;
 }
 
 

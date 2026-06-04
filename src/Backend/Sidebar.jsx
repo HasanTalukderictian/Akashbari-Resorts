@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { FaBuilding } from "react-icons/fa";
 
 const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     // Sub-menu open/close state
     const [isLandingOpen, setIsLandingOpen] = useState(false);
+    const [isClubOpen, setIsClubOpen] = useState(false);
     const location = useLocation();
 
     const menuItems = [
@@ -17,9 +19,19 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
         { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
+        // Club সরাসরি মেনু থেকে সরিয়ে সাব-মেনু হিসেবে নিচে যোগ করা হবে
+    ];
 
-
-
+    // Club এর সাব-মেনু আইটেম
+    const clubSubItems = [
+        { id: 'club-info', label: 'Club Info', icon: 'bi bi-info-circle', path: '/admin-club' },
+        { id: 'club-members', label: 'Club Members', icon: 'bi bi-people-fill', path: '/admin-club-members' },
+        { id: 'club-events', label: 'Club Events', icon: 'bi bi-calendar-event', path: '/admin-club-events' },
+        { id: 'club-gallery', label: 'Club Gallery', icon: 'bi bi-images', path: '/admin-club-gallery' },
+        { id: 'club-rules', label: 'Club Rules', icon: 'bi bi-file-text-fill', path: '/admin-club-rules' },
+        { id: 'club-facilities', label: 'Facilities', icon: 'bi bi-building', path: '/admin-club-facilities' },
+        { id: 'club-committee', label: 'Committee', icon: 'bi bi-person-badge', path: '/admin-club-committee' },
+        { id: 'club-notice', label: 'Club Notice', icon: 'bi bi-megaphone-fill', path: '/admin-club-notice' },
     ];
 
     const landingSubItems = [
@@ -34,18 +46,23 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
         { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' },
         { id: 'achievement', label: 'Achievement', icon: 'bi bi-trophy-fill', path: '/admin-achievement' },
-      { id: 'investrecord', label: 'Invest Record', icon: 'bi bi-cash-stack', path: '/admin-investrecord' }
+        { id: 'investrecord', label: 'Invest Record', icon: 'bi bi-cash-stack', path: '/admin-investrecord' }
     ];
 
     // Check if any sub-menu item is active
-    const isAnySubItemActive = () => {
-        return landingSubItems.some(subItem => location.pathname === subItem.path);
+    const isAnySubItemActive = (subItems) => {
+        return subItems.some(subItem => location.pathname === subItem.path);
     };
 
     // Auto-open submenu if any sub-item is active and sidebar is not collapsed
     useEffect(() => {
-        if (!isCollapsed && isAnySubItemActive()) {
-            setIsLandingOpen(true);
+        if (!isCollapsed) {
+            if (isAnySubItemActive(landingSubItems)) {
+                setIsLandingOpen(true);
+            }
+            if (isAnySubItemActive(clubSubItems)) {
+                setIsClubOpen(true);
+            }
         }
     }, [location.pathname, isCollapsed]);
 
@@ -114,7 +131,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                 {/* Dashboard & Users */}
                 {menuItems.slice(0, 2).map((item) => (
                     <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
+                        <i className={`${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
                     </NavLink>
                 ))}
@@ -123,7 +140,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                 <div className="w-100">
                     <div
                         onClick={() => !isCollapsed && setIsLandingOpen(!isLandingOpen)}
-                        style={navLinkStyle(isAnySubItemActive())}
+                        style={navLinkStyle(isAnySubItemActive(landingSubItems))}
                     >
                         <i className={`bi bi-browser-safari ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
                         {!isCollapsed && (
@@ -134,7 +151,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                         )}
                     </div>
 
-                    {/* Sub-items rendering - Keep submenu open when collapsed changes */}
+                    {/* Landing Page Sub-items */}
                     {!isCollapsed && isLandingOpen && (
                         <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
                             {landingSubItems.map((sub) => (
@@ -147,10 +164,6 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                                         marginBottom: '2px',
                                         fontSize: '13px'
                                     })}
-                                    onClick={() => {
-                                        // Keep submenu open when clicking sub-items
-                                        // No need to close it
-                                    }}
                                 >
                                     <i className={`${sub.icon} me-3`}></i>
                                     <span>{sub.label}</span>
@@ -160,13 +173,61 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                     )}
                 </div>
 
-                {/* Settings & Profile */}
+                {/* Gallery to Sister (মেনু আইটেম) */}
                 {menuItems.slice(2).map((item) => (
                     <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-                        <i className={`bi bi-${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
+                        <i className={`${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
                     </NavLink>
                 ))}
+
+                {/* Club Mother Menu - নতুন যোগ করা */}
+                <div className="w-100 mt-2">
+                    <div
+                        onClick={() => !isCollapsed && setIsClubOpen(!isClubOpen)}
+                        style={navLinkStyle(isAnySubItemActive(clubSubItems))}
+                    >
+                        <i className={`bi bi-building ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
+                        {!isCollapsed && (
+                            <div className="d-flex justify-content-between align-items-center w-100">
+                                <span style={{ fontSize: '14px', fontWeight: '500' }}>Club</span>
+                                <i className={`bi bi-chevron-${isClubOpen ? 'down' : 'right'}`} style={{ fontSize: '12px' }}></i>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Club Sub-items */}
+                    {!isCollapsed && isClubOpen && (
+                        <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
+                            {clubSubItems.map((sub) => (
+                                <NavLink
+                                    key={sub.id}
+                                    to={sub.path}
+                                    style={({ isActive }) => ({
+                                        ...navLinkStyle(isActive),
+                                        padding: '10px 15px',
+                                        marginBottom: '2px',
+                                        fontSize: '13px'
+                                    })}
+                                >
+                                    <i className={`${sub.icon} me-3`}></i>
+                                    <span>{sub.label}</span>
+                                </NavLink>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Events & Teams (যদি আলাদা রাখতে চান) */}
+                <NavLink to="/admin-events" style={({ isActive }) => navLinkStyle(isActive)}>
+                    <i className={`bi bi-calendar-event ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
+                    {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>Events</span>}
+                </NavLink>
+
+                <NavLink to="/admin-team" style={({ isActive }) => navLinkStyle(isActive)}>
+                    <i className={`bi bi-people-fill ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
+                    {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>Teams</span>}
+                </NavLink>
             </div>
         </div>
     );

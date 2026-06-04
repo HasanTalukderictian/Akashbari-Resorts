@@ -111,7 +111,7 @@ const Luxury = () => {
           .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-            border-color: #FFD700 !important;
+            border-color: #4a6d36 !important;
           }
           .feature-item {
             transition: all 0.3s ease;
@@ -120,7 +120,7 @@ const Luxury = () => {
             transform: translateX(5px);
           }
           .feature-item:hover .feature-dot {
-            background-color: #FFD700 !important;
+            background-color: #4a6d36 !important;
           }
           .feature-item:hover .feature-text {
             color: #28a745 !important;
@@ -143,7 +143,7 @@ const Luxury = () => {
         </h1>
         <div 
           className="mx-auto mb-3" 
-          style={{ width: '80px', height: '4px', backgroundColor: '#FFD700' }}
+          style={{ width: '80px', height: '4px', backgroundColor: '#4a6d36' }}
         ></div>
         <p className="text-muted fst-italic">
           Hotel Rooms and Suite Will be like this

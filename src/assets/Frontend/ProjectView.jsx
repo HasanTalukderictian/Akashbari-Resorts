@@ -101,7 +101,7 @@ const ProjectView = () => {
 
   return (
     <div className="container my-5 project-view-container">
-      <h3 className='text-center fw-bold'>Our Achievement</h3>
+      <h3 className='display-4 fw-normal text-uppercase mb-2 text-center'>Our Achievement</h3>
       <p className='text-center'>Some of our Customers</p>
 
       {/* 1st Div/Row: Left 50% Big, Right 50% Two Small */}

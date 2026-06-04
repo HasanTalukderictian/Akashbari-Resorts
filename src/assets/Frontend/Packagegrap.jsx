@@ -332,8 +332,9 @@ const PackageGraph = () => {
             color: '#2c3e50',
             marginBottom: '10px'
           }}>
-            <i className="bi bi-graph-up" style={{ color: '#9a55ff', marginRight: '10px' }}></i>
-            Package Price History
+            <i className="bi bi-graph-up display-4 fw-normal text-uppercase mb-2 " ></i>
+            <span className='display-4 fw-normal text-uppercase mb-2'> Package Price History</span>
+            
           </h2>
           <p style={{ color: '#7f8c8d' }}>
             Track price trends and make informed decisions
