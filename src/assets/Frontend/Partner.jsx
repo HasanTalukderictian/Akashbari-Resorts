@@ -9,18 +9,37 @@ const Partner = () => {
   const [error, setError] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
 
-  // API Configuration
-  const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-  const API_URL = import.meta.env.API_URL;
+  // API Configuration - Fix these in your .env file
+  const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'https://backend.akashbariresort.com/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://backend.akashbariresort.com';
 
-  // Helper function to get full image URL
+  // Helper function to get full image URL - CORRECTED
   const getFullImageUrl = (imagePath) => {
     if (!imagePath) return null;
+    
+    // If already a full URL
     if (imagePath.startsWith('http')) return imagePath;
-    if (imagePath.startsWith('/storage/')) return `${API_URL.slice(0, -1)}${imagePath}`;
-    if (imagePath.startsWith('storage/')) return `${API_URL}${imagePath}`;
-    if (imagePath.startsWith('partners/')) return `${API_URL}storage/${imagePath}`;
-    return `${API_URL}storage/${imagePath}`;
+    
+    // Clean the path
+    let cleanPath = imagePath;
+    
+    // Remove /storage/ or storage/ prefix
+    if (cleanPath.startsWith('/storage/')) {
+      cleanPath = cleanPath.replace('/storage/', '');
+    } else if (cleanPath.startsWith('storage/')) {
+      cleanPath = cleanPath.replace('storage/', '');
+    }
+    
+    // Remove leading slashes
+    cleanPath = cleanPath.replace(/^\/+/, '');
+    
+    // Construct full URL
+    const baseUrl = API_URL.replace(/\/$/, '');
+    const fullUrl = `${baseUrl}/storage/${cleanPath}`;
+    
+    console.log('Generated Image URL:', fullUrl); // For debugging
+    
+    return fullUrl;
   };
 
   // Fetch partners from API
@@ -32,10 +51,9 @@ const Partner = () => {
       console.log('API Response:', response.data);
       
       if (response.data.success && response.data.data) {
-        // Extract the data array from the nested data property
         let partnersData = response.data.data;
         
-        // Check if data has nested data property (pagination)
+        // Handle pagination structure
         if (partnersData.data && Array.isArray(partnersData.data)) {
           partnersData = partnersData.data;
         } else if (Array.isArray(partnersData)) {
@@ -46,19 +64,19 @@ const Partner = () => {
         
         // Transform the data for the component
         const transformedData = partnersData.map(partner => {
-          // Get image URL from either image_url or image field
-          let imageUrl = null;
-          if (partner.image_url) {
-            imageUrl = getFullImageUrl(partner.image_url);
-          } else if (partner.image) {
-            imageUrl = getFullImageUrl(partner.image);
+          // Get image URL - priority: image_url then image
+          let imagePath = partner.image_url || partner.image;
+          let fullImageUrl = null;
+          
+          if (imagePath) {
+            fullImageUrl = getFullImageUrl(imagePath);
           }
           
           return {
             id: partner.id,
             name: partner.title,
             description: partner.description,
-            logo: imageUrl,
+            logo: fullImageUrl,
             website: partner.website,
             buttonText: "VISIT WEBSITE ↗",
             status: partner.status,
@@ -90,6 +108,7 @@ const Partner = () => {
 
   // Handle image error
   const handleImageError = (id) => {
+    console.log(`Image failed to load for partner ${id}`);
     setImageErrors(prev => ({ ...prev, [id]: true }));
   };
 
@@ -178,6 +197,7 @@ const Partner = () => {
                           alt={item.name} 
                           style={styles.logo}
                           onError={() => handleImageError(item.id)}
+                          onLoad={() => console.log(`Image loaded: ${item.logo}`)}
                         />
                       ) : (
                         <div style={styles.placeholderImage}>
@@ -225,7 +245,7 @@ const Partner = () => {
       <Footer />
 
       {/* Add responsive styles */}
-      <style jsx="true">{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
