@@ -10,8 +10,8 @@ const Partner = () => {
   const [imageErrors, setImageErrors] = useState({});
 
   // API Configuration
-  const API_BASE_URL = 'http://localhost:8000/api';
-  const API_URL = 'http://localhost:8000/';
+  const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const API_URL = import.meta.env.API_URL;
 
   // Helper function to get full image URL
   const getFullImageUrl = (imagePath) => {

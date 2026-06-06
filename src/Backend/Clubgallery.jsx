@@ -23,6 +23,11 @@ const Clubgallery = ({ theme: propsTheme }) => {
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
 
+    // Environment variables
+    const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+    const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
+    const BASE_URL = API_URL.replace('/api', '');
+
     const theme = propsTheme || {
         isDarkMode,
         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
@@ -36,7 +41,7 @@ const Clubgallery = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    // Function to get correct image URL
+    // Function to get correct image URL - FIXED
     const getImageUrl = (imagePath) => {
         if (!imagePath) return 'https://via.placeholder.com/300x250?text=No+Image';
         
@@ -44,16 +49,23 @@ const Clubgallery = ({ theme: propsTheme }) => {
             return imagePath;
         }
         
-        // For Laravel storage
-        const cleanPath = imagePath.replace(/^\/+/, '');
-        return `http://localhost:8000/storage/${cleanPath}`;
+        // Remove leading slashes
+        let cleanPath = imagePath.replace(/^\/+/, '');
+        
+        // If path already contains storage, don't add it again
+        if (cleanPath.startsWith('storage/')) {
+            return `${BASE_URL}/${cleanPath}`;
+        }
+        
+        // Return with storage prefix
+        return `${BASE_URL}/storage/${cleanPath}`;
     };
 
-    // Fetch gallery images with pagination
+    // Fetch gallery images with pagination - FIXED
     const fetchGalleryImages = async (page = 1) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:8000/api/club-gallery?page=${page}`);
+            const response = await fetch(`${API_BASE_URL}/club-gallery?page=${page}`);
             const result = await response.json();
             
             console.log('API Response:', result);
@@ -127,7 +139,7 @@ const Clubgallery = ({ theme: propsTheme }) => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8000/api/del-club-gallery/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/del-club-gallery/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -167,11 +179,11 @@ const Clubgallery = ({ theme: propsTheme }) => {
         }
 
         try {
-            let url = 'http://localhost:8000/api/add-club-gallery';
+            let url = `${API_BASE_URL}/add-club-gallery`;
             let method = 'POST';
             
             if (isEdit && editId) {
-                url = `http://localhost:8000/api/edit-club-gallery/${editId}`;
+                url = `${API_BASE_URL}/edit-club-gallery/${editId}`;
                 method = 'POST';
                 formData.append('_method', 'PUT');
             }
@@ -265,6 +277,8 @@ const Clubgallery = ({ theme: propsTheme }) => {
                                     onClick={handleAddClick}
                                     style={styles.uploadBtn}
                                     className="btn"
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
                                 >
                                     <FaPlus /> Upload New Image
                                 </button>
@@ -471,7 +485,14 @@ const Clubgallery = ({ theme: propsTheme }) => {
                                 
                                 <div className="modal-footer" style={{ borderTop: `1px solid ${theme.border}` }}>
                                     <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                    <button type="submit" className="btn btn-primary" disabled={uploading}>
+                                    <button 
+                                        type="submit" 
+                                        className="btn btn-primary" 
+                                        disabled={uploading}
+                                        style={{ backgroundColor: '#28a745', border: 'none' }}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
+                                    >
                                         {uploading ? (<> <FaSpinner className="spinner-border-sm me-2" /> {isEdit ? 'Updating...' : 'Uploading...'} </>) : (<> <FaUpload className="me-2" /> {isEdit ? 'Update Image' : 'Upload Image'} </>)}
                                     </button>
                                 </div>
@@ -485,6 +506,22 @@ const Clubgallery = ({ theme: propsTheme }) => {
                 @keyframes spin {
                     from { transform: rotate(0deg); }
                     to { transform: rotate(360deg); }
+                }
+                
+                .spinner-border {
+                    animation: spin 1s linear infinite;
+                }
+                
+                .modal.show {
+                    display: block;
+                }
+                
+                .page-link {
+                    cursor: pointer;
+                }
+                
+                .page-item.disabled .page-link {
+                    cursor: not-allowed;
                 }
             `}</style>
         </div>

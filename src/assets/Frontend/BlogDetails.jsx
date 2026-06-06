@@ -18,14 +18,9 @@ const fallbackImages = [king1, king2, king3, king4, king5, king6];
 
 // Use environment variables for API URLs
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.API_URL ||
-  (import.meta.env.DEV
-    ? 'http://localhost:8000'
-    : 'https://backend.akashbariresort.com');
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
-// Helper function to get full image URL - COMPLETELY FIXED
+// Helper function to get full image URL - COMPLETELY FIXED (no hardcoded URLs)
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   
@@ -38,10 +33,10 @@ const getImageUrl = (imagePath) => {
     cleanPath = cleanPath.substring(1);
   }
   
-  // Construct the full URL for Laravel storage
-  const baseUrl = API_URL.replace(/\/$/, '');
+  // Get base URL without /api
+  const baseUrl = API_URL.replace('/api', '');
   
-  // For Laravel storage, the correct URL structure is: {API_URL}/storage/{path}
+  // For Laravel storage, the correct URL structure is: {BASE_URL}/storage/{path}
   const imageUrl = `${baseUrl}/storage/${cleanPath}`;
   
   console.log('Original path:', imagePath);

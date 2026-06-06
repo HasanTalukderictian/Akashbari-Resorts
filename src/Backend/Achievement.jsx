@@ -29,15 +29,24 @@ const Achievement = ({ theme: propsTheme }) => {
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
     };
 
-    const BASE_URL = 'http://localhost:8000/api';
-    const STORAGE_URL = 'http://localhost:8000/storage';
+    // Environment variables - FIXED
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
+    
+    // Storage URL - FIXED (removed localhost)
+    const STORAGE_URL = API_URL.replace('/api', '');
 
-    // Function to get image URL
+    // Function to get image URL - FIXED
     const getImageUrl = (imagePath) => {
         if (!imagePath) return 'https://via.placeholder.com/300x200?text=No+Image';
         if (imagePath.startsWith('http')) return imagePath;
-        if (imagePath.startsWith('storage/')) return `http://localhost:8000/${imagePath}`;
-        return `${STORAGE_URL}/${imagePath}`;
+        
+        // Remove backslashes and clean the path
+        let cleanPath = imagePath.replace(/\\/g, '/');
+        cleanPath = cleanPath.replace(/^\/+/, '');
+        
+        // Return the full URL with storage
+        return `${STORAGE_URL}/storage/${cleanPath}`;
     };
 
     // Configure axios defaults

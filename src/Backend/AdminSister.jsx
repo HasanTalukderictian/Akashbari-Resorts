@@ -21,9 +21,12 @@ const AdminSister = ({ theme: propsTheme }) => {
     const [errors, setErrors] = useState({});
     const [editingId, setEditingId] = useState(null);
 
-    // API Configuration
-    const API_BASE_URL = 'http://localhost:8000/api';
-    const API_URL = 'http://localhost:8000/';
+    // API Configuration - FIXED
+    const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+    const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
+    
+    // Get base URL without /api
+    const BASE_URL = API_URL.replace('/api', '');
 
     const theme = propsTheme || {
         isDarkMode,
@@ -41,10 +44,17 @@ const AdminSister = ({ theme: propsTheme }) => {
     const getFullImageUrl = (imagePath) => {
         if (!imagePath) return 'https://via.placeholder.com/50?text=No+Image';
         if (imagePath.startsWith('http')) return imagePath;
-        if (imagePath.startsWith('/storage/')) return `${API_URL.slice(0, -1)}${imagePath}`;
-        if (imagePath.startsWith('storage/')) return `${API_URL}${imagePath}`;
-        if (imagePath.startsWith('partners/')) return `${API_URL}storage/${imagePath}`;
-        return `${API_URL}storage/${imagePath}`;
+        
+        // Remove leading slashes
+        let cleanPath = imagePath.replace(/^\/+/, '');
+        
+        // If the path already contains storage, don't add it again
+        if (cleanPath.startsWith('storage/')) {
+            return `${BASE_URL}/${cleanPath}`;
+        }
+        
+        // Return with storage prefix
+        return `${BASE_URL}/storage/${cleanPath}`;
     };
 
     // Fetch affiliates from API
@@ -52,7 +62,8 @@ const AdminSister = ({ theme: propsTheme }) => {
         setLoading(true);
         try {
             const response = await axios.get(`${API_BASE_URL}/partners`);
-        
+            
+            console.log('API Response:', response.data);
             
             if (response.data.success && response.data.data) {
                 // Extract the data array from the nested data property
@@ -71,13 +82,16 @@ const AdminSister = ({ theme: propsTheme }) => {
                 const transformedData = partnersData.map(partner => {
                     // Use image_url if available, otherwise construct from image
                     let imageUrl = '';
+                    
                     if (partner.image_url) {
-                        imageUrl = partner.image_url.startsWith('http') ? partner.image_url : getFullImageUrl(partner.image_url);
+                        imageUrl = getFullImageUrl(partner.image_url);
                     } else if (partner.image) {
                         imageUrl = getFullImageUrl(partner.image);
                     } else {
                         imageUrl = 'https://via.placeholder.com/50?text=No+Image';
                     }
+                    
+                    console.log(`Partner ${partner.id} image URL:`, imageUrl);
                     
                     return {
                         ...partner,
@@ -86,12 +100,12 @@ const AdminSister = ({ theme: propsTheme }) => {
                 });
                 
                 setAffiliates(transformedData);
-                
+                setErrors({});
             } else {
                 setAffiliates([]);
             }
         } catch (error) {
-            
+            console.error('Error fetching affiliates:', error);
             if (error.response?.status === 500) {
                 setErrors({ api: 'Server error. Please try again later.' });
             } else {
@@ -243,7 +257,7 @@ const AdminSister = ({ theme: propsTheme }) => {
         setEditingId(affiliate.id);
         setFormData({
             image: null,
-            imagePreview: affiliate.display_image_url || getFullImageUrl(affiliate.image),
+            imagePreview: affiliate.display_image_url,
             title: affiliate.title,
             description: affiliate.description,
             website: affiliate.website
@@ -579,24 +593,25 @@ const AdminSister = ({ theme: propsTheme }) => {
                                                         alt={affiliate.title}
                                                         style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' }}
                                                         onError={(e) => {
+                                                            console.error('Image failed to load:', affiliate.display_image_url);
                                                             e.target.onerror = null;
                                                             e.target.src = 'https://via.placeholder.com/50?text=No+Image';
                                                         }}
                                                     />
-                                                </td>
+                                                 </td>
                                                 <td style={{ padding: '12px', fontWeight: '500' }}>{affiliate.title}</td>
                                                 <td style={{ padding: '12px' }}>
                                                     {affiliate.description && affiliate.description.length > 60 
                                                         ? `${affiliate.description.substring(0, 60)}...` 
                                                         : affiliate.description}
-                                                </td>
+                                                 </td>
                                                 <td style={{ padding: '12px' }}>
                                                     <a href={affiliate.website} target="_blank" rel="noopener noreferrer" style={styles.websiteLink}>
                                                         {affiliate.website && affiliate.website.length > 30 
                                                             ? affiliate.website.substring(0, 30) + '...' 
                                                             : affiliate.website}
                                                     </a>
-                                                </td>
+                                                 </td>
                                                 <td style={{ padding: '12px' }}>
                                                     <span style={{
                                                         ...styles.statusBadge,
@@ -605,10 +620,10 @@ const AdminSister = ({ theme: propsTheme }) => {
                                                     }}>
                                                         {affiliate.status === 'active' ? 'Active' : 'Inactive'}
                                                     </span>
-                                                </td>
+                                                 </td>
                                                 <td style={{ padding: '12px' }}>
                                                     {affiliate.created_at ? new Date(affiliate.created_at).toLocaleDateString() : 'N/A'}
-                                                </td>
+                                                 </td>
                                                 <td style={{ padding: '12px' }}>
                                                     <div style={styles.actionButtons}>
                                                         <button 
@@ -628,7 +643,7 @@ const AdminSister = ({ theme: propsTheme }) => {
                                                             <i className="bi bi-trash"></i> Delete
                                                         </button>
                                                     </div>
-                                                </td>
+                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>

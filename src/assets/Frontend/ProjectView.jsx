@@ -6,15 +6,24 @@ const ProjectView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const BASE_URL = 'http://localhost:8000/api';
-  const STORAGE_URL = 'http://localhost:8000/storage';
+  // Environment variables
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
-  // Function to get image URL
+  // Function to get image URL - FIXED for achievements path
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://via.placeholder.com/600x400?text=No+Image';
     if (imagePath.startsWith('http')) return imagePath;
-    if (imagePath.startsWith('storage/')) return `http://localhost:8000/${imagePath}`;
-    return `${STORAGE_URL}/${imagePath}`;
+    
+    // Remove backslashes and clean the path
+    let cleanPath = imagePath.replace(/\\/g, '/');
+    cleanPath = cleanPath.replace(/^\/+/, '');
+    
+    // Get base URL without /api
+    const baseUrl = API_URL.replace('/api', '');
+    
+    // Return the full URL - images are in storage/achievements folder
+    return `${baseUrl}/storage/${cleanPath}`;
   };
 
   // Fetch achievements from API
@@ -28,11 +37,15 @@ const ProjectView = () => {
       });
       
       console.log('Achievements data:', response.data);
+      console.log('API_URL:', API_URL);
+      console.log('BASE_URL:', BASE_URL);
       
       if (response.data.status === true && response.data.data) {
         setAchievements(response.data.data);
+        setError(null);
       } else {
         setAchievements([]);
+        setError('No achievements found');
       }
     } catch (error) {
       console.error('Error fetching achievements:', error);
@@ -44,7 +57,15 @@ const ProjectView = () => {
 
   useEffect(() => {
     fetchAchievements();
-  }, []);
+  }, [BASE_URL]);
+
+  // Test image URL for debugging
+  useEffect(() => {
+    if (achievements.length > 0) {
+      console.log('First image path:', achievements[0].image);
+      console.log('Generated URL:', getImageUrl(achievements[0].image));
+    }
+  }, [achievements]);
 
   // Loading state
   if (loading) {
@@ -65,6 +86,12 @@ const ProjectView = () => {
         <div className="alert alert-danger" role="alert">
           {error}
         </div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="btn btn-primary mt-3"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -81,10 +108,11 @@ const ProjectView = () => {
   }
 
   // Ensure we have at least 6 images
-  // If less than 6, we'll use available images with repetition
   const getImageAtIndex = (index) => {
     if (achievements[index]) {
-      return getImageUrl(achievements[index].image);
+      const imageUrl = getImageUrl(achievements[index].image);
+      console.log(`Image ${index} URL:`, imageUrl);
+      return imageUrl;
     }
     // If not enough images, use the first image or placeholder
     const fallbackIndex = index % achievements.length;
@@ -113,6 +141,10 @@ const ProjectView = () => {
             src={getImageAtIndex(0)} 
             alt={getTitleAtIndex(0)} 
             className="w-100 h-100 rounded custom-fit-img" 
+            onError={(e) => {
+              console.error('Image failed to load:', e.target.src);
+              e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+            }}
           />
         </div>
         
@@ -123,6 +155,10 @@ const ProjectView = () => {
               src={getImageAtIndex(1)} 
               alt={getTitleAtIndex(1)} 
               className="w-100 h-100 rounded custom-fit-img" 
+              onError={(e) => {
+                console.error('Image failed to load:', e.target.src);
+                e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+              }}
             />
           </div>
           <div className="small-img-wrapper pt-md-2">
@@ -130,6 +166,10 @@ const ProjectView = () => {
               src={getImageAtIndex(2)} 
               alt={getTitleAtIndex(2)} 
               className="w-100 h-100 rounded custom-fit-img" 
+              onError={(e) => {
+                console.error('Image failed to load:', e.target.src);
+                e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+              }}
             />
           </div>
         </div>
@@ -146,6 +186,10 @@ const ProjectView = () => {
               src={getImageAtIndex(3)} 
               alt={getTitleAtIndex(3)} 
               className="w-100 h-100 rounded custom-fit-img" 
+              onError={(e) => {
+                console.error('Image failed to load:', e.target.src);
+                e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+              }}
             />
           </div>
           <div className="small-img-wrapper pt-md-2">
@@ -153,6 +197,10 @@ const ProjectView = () => {
               src={getImageAtIndex(4)} 
               alt={getTitleAtIndex(4)} 
               className="w-100 h-100 rounded custom-fit-img" 
+              onError={(e) => {
+                console.error('Image failed to load:', e.target.src);
+                e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+              }}
             />
           </div>
         </div>
@@ -163,15 +211,18 @@ const ProjectView = () => {
             src={getImageAtIndex(5)} 
             alt={getTitleAtIndex(5)} 
             className="w-100 h-100 rounded custom-fit-img" 
+            onError={(e) => {
+              console.error('Image failed to load:', e.target.src);
+              e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
+            }}
           />
         </div>
 
       </div>
 
-      {/* CSS Styles - Same as your original design */}
+      {/* CSS Styles */}
       <style>
         {`
-          /* সব ইমেজের ফাঁকা অংশ দূর করার জন্য আপডেট করা স্টাইল */
           .custom-fit-img {
             object-fit: cover !important;
             width: 100%;
@@ -179,18 +230,15 @@ const ProjectView = () => {
             transition: transform 0.3s ease;
           }
 
-          /* ইমেজ বক্সের বাইরে যেন কিছু না যায় */
           .big-img-col, .small-img-wrapper {
             overflow: hidden;
             position: relative;
           }
 
-          /* মাউস নিলে হালকা জুম হবে */
           .custom-fit-img:hover {
             transform: scale(1.03); 
           }
 
-          /* ডেক্সটপ ও বড় স্ক্রিনের ডিফল্ট হাইট */
           .custom-project-row {
             height: 500px;
           }
@@ -204,13 +252,11 @@ const ProjectView = () => {
             height: 50%;
           }
 
-          /* মোবাইল ও ট্যাবলেট ডিভাইস (max-width: 768px) */
           @media (max-width: 768px) {
             .custom-project-row {
               height: auto !important;
             }
             
-            /* প্রতিটি ইমেজ কন্টেইনার সমান আনুপাতিক হাইট পাবে */
             .big-img-col, 
             .small-img-wrapper {
               height: 280px !important;
@@ -221,7 +267,6 @@ const ProjectView = () => {
               height: auto !important;
             }
 
-            /* মোবাইলে অপ্রয়োজনীয় এক্সট্রা প্যাডিং রিমুভ */
             .pb-md-2, .pt-md-2 {
               padding: 0 !important;
             }
@@ -231,7 +276,6 @@ const ProjectView = () => {
             }
           }
           
-          /* খুব ছোট মোবাইল স্ক্রিন (max-width: 480px) */
           @media (max-width: 480px) {
             .big-img-col, 
             .small-img-wrapper {
@@ -243,7 +287,6 @@ const ProjectView = () => {
             }
           }
           
-          /* মাঝারি স্ক্রিন বা ট্যাবলেট (769px - 1024px) */
           @media (min-width: 769px) and (max-width: 1024px) {
             .custom-project-row {
               height: 400px;

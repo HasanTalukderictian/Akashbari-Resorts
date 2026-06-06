@@ -5,17 +5,11 @@ import '../css/blog.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// API Base URL
+// API Base URL - FIXED (no hardcoded URLs)
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.API_URL ||
-  (import.meta.env.DEV
-    ? 'http://localhost:8000'
-    : 'https://backend.akashbariresort.com');
-
-// Helper function to get full image URL - FIXED for Laravel storage
+// Helper function to get full image URL - FIXED for Laravel storage (no hardcoded URLs)
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
   
@@ -28,8 +22,10 @@ const getImageUrl = (imagePath) => {
     cleanPath = cleanPath.substring(1);
   }
   
+  // Get base URL without /api
+  const baseUrl = API_URL.replace('/api', '');
+  
   // Construct the full URL for Laravel storage
-  const baseUrl = API_URL.replace(/\/$/, '');
   const imageUrl = `${baseUrl}/storage/${cleanPath}`;
   
   return imageUrl;

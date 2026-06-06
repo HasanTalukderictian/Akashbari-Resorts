@@ -38,7 +38,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
     };
 
-    const BASE_URL = 'http://localhost:8000/api';
+    const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     // Configure axios defaults
     axios.defaults.withCredentials = false;
