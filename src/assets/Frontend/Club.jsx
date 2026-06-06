@@ -20,6 +20,9 @@ const Club = () => {
   const [error, setError] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryLoading, setGalleryLoading] = useState(true);
+  
+  const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+  const API_URL = import.meta.env.VITE_BASE_URL;
 
   // Modal open/close functions
   const handleShowModal = () => setShowModal(true);
@@ -38,7 +41,7 @@ const Club = () => {
     const fetchClubInfo = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8000/api/club-infos');
+        const response = await fetch(`${API_BASE_URL}/club-infos`);
         const result = await response.json();
 
         if (result.success && result.data && result.data.length > 0) {
@@ -56,14 +59,14 @@ const Club = () => {
     };
 
     fetchClubInfo();
-  }, []);
+  }, [API_BASE_URL]);
 
   // Fetch gallery images for facilities section
   useEffect(() => {
     const fetchGalleryImages = async () => {
       try {
         setGalleryLoading(true);
-        const response = await fetch('http://localhost:8000/api/club-gallery');
+        const response = await fetch(`${API_BASE_URL}/club-gallery`);
         const result = await response.json();
 
         if (result.success && result.data && result.data.data) {
@@ -80,15 +83,22 @@ const Club = () => {
     };
 
     fetchGalleryImages();
-  }, []);
+  }, [API_BASE_URL]);
 
   // Function to get correct image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
-    if (imagePath.startsWith('http')) return imagePath;
-    const cleanPath = imagePath.replace(/^\/+/, '');
-    return `http://localhost:8000/storage/${cleanPath}`;
-  };
+ // Function to get correct image URL
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
+  if (imagePath.startsWith('http')) return imagePath;
+  
+  // Remove leading slashes if any
+  const cleanPath = imagePath.replace(/^\/+/, '');
+  
+  // Use the API_URL from env for storage path
+  // Remove /api from API_URL to get base URL for storage
+  const baseUrl = API_URL.replace('/api', '');
+  return `${baseUrl}/storage/${cleanPath}`;
+};
 
   // ২য় সেকশনের ডাটা
   const servicesData = {
@@ -197,8 +207,8 @@ const Club = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            marginRight:'260px',
-            marginBottom:'150px',
+            marginRight: '260px',
+            marginBottom: '150px',
             gap: '5px',
             fontFamily: "'Playfair Display', serif"
           }}
@@ -213,6 +223,7 @@ const Club = () => {
             e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
           }}
         >
+          <FaPhoneAlt size={24} />
           <span style={{ fontSize: '11px', letterSpacing: '1px' }}>MEMBER</span>
         </button>
       </div>
@@ -416,7 +427,7 @@ const Club = () => {
               <div className="col-lg-5">
                 <div className="p-3" style={{ backgroundColor: '#262626', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
                   <img 
-                    src={clubInfo?.image ? `http://localhost:8000/${clubInfo.image}` : 'https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg'} 
+                    src={clubInfo?.image ? `${API_URL}/${clubInfo.image}` : 'https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg'} 
                     alt={clubInfo?.club_name || 'Club Building'} 
                     className="img-fluid w-100" 
                     style={{ display: 'block', objectFit: 'cover', height: '420px' }}
@@ -490,6 +501,8 @@ const Club = () => {
                 slidesPerView={1}
                 loop={true}
                 autoplay={{ delay: 3500, disableOnInteraction: false }}
+                navigation={true}
+                pagination={{ clickable: true }}
                 breakpoints={{
                   640: { slidesPerView: 1 },
                   768: { slidesPerView: 2 },
@@ -577,6 +590,8 @@ const Club = () => {
           .sticky-member-btn button {
             width: 60px !important;
             height: 60px !important;
+            margin-right: 20px !important;
+            margin-bottom: 20px !important;
           }
           .sticky-member-btn span {
             font-size: 9px !important;
@@ -590,4 +605,4 @@ const Club = () => {
   )
 }
 
-export default Club  
+export default Club

@@ -35,7 +35,9 @@ const HappyClient = () => {
         invest_records: []
     });
 
-    const BASE_URL = 'http://localhost:8000/api';
+    // Environment variables - FIXED
+    const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+    const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
     // ইমেজ এবং কনফিগারেশন JSON
     const pageConfig = {
@@ -45,11 +47,11 @@ const HappyClient = () => {
 
     const featureIcons = ["💰", "💎", "✨"];
 
-    // Fetch combined data from API
+    // Fetch combined data from API - FIXED URL
     const fetchCombinedData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${BASE_URL}/combined-records`, {
+            const response = await axios.get(`${API_BASE_URL}/combined-records`, {
                 headers: {
                     'Accept': 'application/json',
                 }
@@ -62,11 +64,13 @@ const HappyClient = () => {
                     record_members: response.data.data.record_members || [],
                     invest_records: response.data.data.invest_records || []
                 });
+                setError(null);
             } else {
                 setCombinedData({
                     record_members: [],
                     invest_records: []
                 });
+                setError('No data found');
             }
         } catch (error) {
             console.error('Error fetching combined data:', error);
@@ -78,9 +82,9 @@ const HappyClient = () => {
 
     useEffect(() => {
         fetchCombinedData();
-    }, []);
+    }, [API_BASE_URL]); // Added dependency
 
-    // Get the first member record for stats (assuming single record or using first one)
+    // Get the first member record for stats
     const getMemberStats = () => {
         if (combinedData.record_members.length > 0) {
             const member = combinedData.record_members[0];
@@ -113,7 +117,7 @@ const HappyClient = () => {
     // Dynamic features data from invest_records API
     const getFeaturesData = () => {
         if (combinedData.invest_records.length > 0) {
-            return combinedData.invest_records.map((record, index) => ({
+            return combinedData.invest_records.map((record) => ({
                 id: record.id,
                 title: record.title,
                 desc: record.desc
@@ -142,7 +146,7 @@ const HappyClient = () => {
     const featuresData = getFeaturesData();
     const statsData = getStatsData();
 
-    // স্টাইল অবজেক্টে JSON ডেটা ব্যবহার করা হয়েছে
+    // Hero section style
     const heroSectionStyle = {
         background: `linear-gradient(rgba(3, 27, 51, ${pageConfig.overlayOpacity}), rgba(3, 27, 51, ${pageConfig.overlayOpacity})), url("${pageConfig.heroBgImage}")`,
         backgroundSize: 'cover',
@@ -161,6 +165,7 @@ const HappyClient = () => {
         zIndex: '10'
     };
 
+    // Loading state
     if (loading) {
         return (
             <section>
@@ -176,6 +181,7 @@ const HappyClient = () => {
         );
     }
 
+    // Error state
     if (error) {
         return (
             <section>
@@ -184,6 +190,12 @@ const HappyClient = () => {
                         <div className="alert alert-danger" role="alert">
                             {error}
                         </div>
+                        <button 
+                            onClick={() => window.location.reload()}
+                            className="btn btn-light mt-3"
+                        >
+                            Try Again
+                        </button>
                     </div>
                 </div>
             </section>

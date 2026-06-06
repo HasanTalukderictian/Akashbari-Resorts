@@ -20,6 +20,10 @@ const ClubSettings = ({ theme: propsTheme }) => {
     const [isEdit, setIsEdit] = useState(false);
     const [editId, setEditId] = useState(null); // Added for edit functionality
 
+    // Environment variables
+    const API_BASE_URL = import.meta.env.VITE_BASE_URL;
+    const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
+
     const theme = propsTheme || {
         isDarkMode,
         bg: isDarkMode ? '#1a1a2e' : '#f8f9fa',
@@ -37,9 +41,25 @@ const ClubSettings = ({ theme: propsTheme }) => {
         fetchClubInfo();
     }, []);
 
+    // Function to get image URL
+    // Function to get correct image URL
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return 'https://via.placeholder.com/60x60?text=No+Image';
+        if (imagePath.startsWith('http')) return imagePath;
+
+        // Remove leading slashes if any
+        const cleanPath = imagePath.replace(/^\/+/, '');
+
+        // Get base URL without /api for the main URL
+        const baseUrl = API_URL.replace('/api', '');
+
+        // Return the image URL directly from the base URL (not from storage folder)
+        return `${baseUrl}/${cleanPath}`;
+    };
+
     const fetchClubInfo = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/club-infos');
+            const response = await fetch(`${API_BASE_URL}/club-infos`);
             const result = await response.json();
 
             if (result.success && result.data) {
@@ -60,41 +80,40 @@ const ClubSettings = ({ theme: propsTheme }) => {
     };
 
     const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this club?')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(
-            `http://localhost:8000/api/del-club-infos/${id}`,
-            {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert(result.message);
-            fetchClubInfo(); // Refresh the list
-            setClubName('');
-            setClubHistory('');
-            setClubPhone('');
-            setImage(null);
-        } else {
-            alert(result.message);
+        if (!window.confirm('Are you sure you want to delete this club?')) {
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        alert('Delete failed');
-    }
-};
 
-    // Form Submit Handler
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/del-club-infos/${id}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+                fetchClubInfo(); // Refresh the list
+                setClubName('');
+                setClubHistory('');
+                setClubPhone('');
+                setImage(null);
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Delete failed');
+        }
+    };
+
     // Form Submit Handler
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -114,10 +133,9 @@ const ClubSettings = ({ theme: propsTheme }) => {
         }
 
         try {
-            // FIXED: Use editId instead of undefined 'id' variable
             const url = isEdit
-                ? `http://localhost:8000/api/edit-club-infos/${editId}`  
-                : 'http://localhost:8000/api/club-infos';
+                ? `${API_BASE_URL}/edit-club-infos/${editId}`
+                : `${API_BASE_URL}/club-infos`;
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -261,7 +279,7 @@ const ClubSettings = ({ theme: propsTheme }) => {
                                                         <td style={styles.td}>
                                                             {club.image && (
                                                                 <img
-                                                                    src={`http://localhost:8000/${club.image}`}
+                                                                    src={getImageUrl(club.image)}
                                                                     alt={club.club_name}
                                                                     width="60"
                                                                     height="60"
