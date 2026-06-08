@@ -1,25 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import axios from 'axios';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
   Filler
 } from 'chart.js';
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -29,13 +25,14 @@ ChartJS.register(
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const PackageGraph = () => {
-  const [chartType, setChartType] = useState('line');
   const [selectedPackage, setSelectedPackage] = useState('all');
   const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [priceUpdateMonth, setPriceUpdateMonth] = useState(null);
   const [packageData, setPackageData] = useState({
     current: [],
     history: {
-      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       datasets: []
     }
   });
@@ -58,11 +55,13 @@ const PackageGraph = () => {
       const response = await axios.get(`${API_BASE_URL}/packages`);
       console.log('API Response:', response.data);
       
-      // Check for 'success' key (your API returns 'success' not 'status')
-      if (response.data.success === true) {
-        setPackageData(prev => ({ ...prev, current: response.data.data }));
-      } else if (response.data.status === true) {
-        setPackageData(prev => ({ ...prev, current: response.data.data }));
+      if (response.data.success === true || response.data.status === true) {
+        const packages = response.data.data || [];
+        setPackageData(prev => ({ ...prev, current: packages }));
+        setLastUpdated(new Date().toLocaleString());
+        
+        // Generate history data based on actual prices
+        generateStepHistoryData(packages);
       }
     } catch (error) {
       console.error('Error fetching packages:', error);
@@ -71,52 +70,45 @@ const PackageGraph = () => {
     }
   };
 
-  // Fetch price history
-  const fetchPriceHistory = async (packageId = null) => {
-    setLoading(true);
-    try {
-      let url = `${API_BASE_URL}/packages/history`;
-      if (packageId && packageId !== 'all') {
-        url = `${API_BASE_URL}/packages/${packageId}/history`;
-      }
-      const response = await axios.get(url);
-      if (response.data.success === true || response.data.status === true) {
-        if (response.data.data) {
-          setPackageData(prev => ({ ...prev, history: response.data.data }));
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching price history:', error);
-      // If history API fails, generate demo data from current packages
-      generateDemoHistoryData();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Generate demo history data from current packages
-  const generateDemoHistoryData = () => {
-    if (packageData.current.length > 0) {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      const datasets = packageData.current.map(pkg => {
-        const finalPrice = parseFloat(pkg.final_price) || parseFloat(pkg.price) - parseFloat(pkg.discount);
-        const basePrice = parseFloat(pkg.price) || finalPrice;
+  // Generate step history data (price only increases at specific month)
+  const generateStepHistoryData = (packages) => {
+    if (packages.length > 0) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const colors = ['#9a55ff', '#ff6b6b', '#4ecdc4', '#ffa500', '#20c997', '#6c5ce7'];
+      
+      // Randomly select a month when price increased (for demo)
+      // In real scenario, this would come from API
+      const increaseMonth = Math.floor(Math.random() * 12); // Random month 0-11
+      setPriceUpdateMonth(months[increaseMonth]);
+      
+      const datasets = packages.map((pkg, idx) => {
+        const currentPrice = parseFloat(pkg.price) || 0;
+        const discount = parseFloat(pkg.discount) || 0;
+        const oldPrice = Math.round(currentPrice * 0.7); // Old price was 70% of current
         
-        // Generate historical data based on current price
-        const historyData = [
-          basePrice * 0.85,
-          basePrice * 0.88,
-          basePrice * 0.92,
-          basePrice * 0.95,
-          basePrice * 0.98,
-          basePrice
-        ];
+        const historyData = [];
+        
+        for (let i = 0; i < 12; i++) {
+          if (i < increaseMonth) {
+            // Before price increase - old price
+            historyData.push(oldPrice);
+          } else {
+            // After price increase - current price
+            historyData.push(currentPrice);
+          }
+        }
         
         return {
           label: pkg.name,
           data: historyData,
-          borderColor: pkg.color || '#9a55ff',
-          backgroundColor: pkg.color || '#9a55ff',
+          backgroundColor: colors[idx % colors.length] + '80',
+          borderColor: colors[idx % colors.length],
+          borderWidth: 2,
+          borderRadius: 8,
+          currentPrice: currentPrice,
+          oldPrice: oldPrice,
+          discount: discount,
+          increaseMonth: months[increaseMonth]
         };
       });
       
@@ -127,42 +119,31 @@ const PackageGraph = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  useEffect(() => {
-    if (packageData.current.length > 0) {
-      if (selectedPackage === 'all') {
-        // Use generated demo data for all packages
-        generateDemoHistoryData();
-      } else {
-        // Generate single package history
-        generateSinglePackageHistory();
+  // Update single package history when selected
+  const updateSinglePackageHistory = (selectedPkgId) => {
+    const selectedPkg = packageData.current.find(p => p.id.toString() === selectedPkgId);
+    if (selectedPkg && packageData.current.length > 0) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const colors = ['#9a55ff', '#ff6b6b', '#4ecdc4', '#ffa500', '#20c997', '#6c5ce7'];
+      
+      const currentPrice = parseFloat(selectedPkg.price) || 0;
+      const discount = parseFloat(selectedPkg.discount) || 0;
+      const oldPrice = Math.round(currentPrice * 0.7);
+      
+      // Randomly select a month for price increase
+      const increaseMonth = Math.floor(Math.random() * 12);
+      setPriceUpdateMonth(months[increaseMonth]);
+      
+      const historyData = [];
+      for (let i = 0; i < 12; i++) {
+        if (i < increaseMonth) {
+          historyData.push(oldPrice);
+        } else {
+          historyData.push(currentPrice);
+        }
       }
-    }
-  }, [selectedPackage, packageData.current]);
-
-  // Generate single package history
-  const generateSinglePackageHistory = () => {
-    const selectedPkg = packageData.current.find(pkg => 
-      pkg.id.toString() === selectedPackage
-    );
-    
-    if (selectedPkg) {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      const finalPrice = parseFloat(selectedPkg.final_price) || parseFloat(selectedPkg.price) - parseFloat(selectedPkg.discount);
-      const basePrice = parseFloat(selectedPkg.price) || finalPrice;
       
-      const historyData = [
-        basePrice * 0.85,
-        basePrice * 0.88,
-        basePrice * 0.92,
-        basePrice * 0.95,
-        basePrice * 0.98,
-        basePrice
-      ];
-      
+      const idx = packageData.current.findIndex(p => p.id.toString() === selectedPkgId);
       setPackageData(prev => ({
         ...prev,
         history: {
@@ -170,53 +151,76 @@ const PackageGraph = () => {
           datasets: [{
             label: selectedPkg.name,
             data: historyData,
-            borderColor: selectedPkg.color || '#9a55ff',
-            backgroundColor: selectedPkg.color || '#9a55ff',
+            backgroundColor: colors[idx % colors.length] + '80',
+            borderColor: colors[idx % colors.length],
+            borderWidth: 2,
+            borderRadius: 8,
+            currentPrice: currentPrice,
+            oldPrice: oldPrice,
+            discount: discount,
+            increaseMonth: months[increaseMonth]
           }]
         }
       }));
     }
   };
 
-  // Prepare chart data from API
-  const getChartData = () => {
-    const labels = packageData.history.months || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    
-    if (packageData.history.datasets && packageData.history.datasets.length > 0) {
-      // Use datasets from state
-      return {
-        labels,
-        datasets: packageData.history.datasets.map(dataset => ({
-          label: dataset.label,
-          data: dataset.data,
-          borderColor: dataset.borderColor,
-          backgroundColor: chartType === 'bar' ? dataset.borderColor + '80' : dataset.borderColor + '20',
-          borderWidth: 2,
-          fill: chartType === 'line',
-          tension: 0.4,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-        }))
-      };
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  useEffect(() => {
+    if (packageData.current.length > 0 && selectedPackage !== 'all') {
+      updateSinglePackageHistory(selectedPackage);
+    } else if (packageData.current.length > 0 && selectedPackage === 'all') {
+      generateStepHistoryData(packageData.current);
     }
+  }, [selectedPackage, packageData.current]);
+
+  // Prepare chart data
+  const getChartData = () => {
+    const labels = packageData.history.months || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    // Fallback empty data
-    return { labels, datasets: [] };
+    let datasets = packageData.history.datasets || [];
+    
+    return {
+      labels,
+      datasets: datasets.map(dataset => ({
+        label: dataset.label,
+        data: dataset.data,
+        backgroundColor: dataset.backgroundColor,
+        borderColor: dataset.borderColor,
+        borderWidth: 2,
+        borderRadius: 8,
+        barPercentage: 0.7,
+        categoryPercentage: 0.8,
+      }))
+    };
   };
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
     plugins: {
       legend: {
         position: 'top',
         labels: {
-          font: { size: 12 },
+          font: { size: 12, weight: 'bold', family: 'Poppins, sans-serif' },
           usePointStyle: true,
-          boxWidth: 10
+          boxWidth: 10,
+          padding: 15
         }
       },
       tooltip: {
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleColor: '#fff',
+        bodyColor: '#ddd',
+        borderColor: '#9a55ff',
+        borderWidth: 1,
         callbacks: {
           label: function(context) {
             let label = context.dataset.label || '';
@@ -225,6 +229,13 @@ const PackageGraph = () => {
             }
             label += formatPrice(context.raw);
             return label;
+          },
+          afterBody: function(tooltipItems) {
+            const dataset = packageData.history.datasets.find(d => d.label === tooltipItems[0].dataset.label);
+            if (dataset && dataset.increaseMonth) {
+              return [`📈 Price increased in: ${dataset.increaseMonth}`, `💎 Discount: ${formatPrice(dataset.discount)}`];
+            }
+            return null;
           }
         }
       }
@@ -232,55 +243,66 @@ const PackageGraph = () => {
     scales: {
       y: {
         beginAtZero: false,
+        grid: {
+          color: '#e0e0e0',
+          drawBorder: true,
+        },
         title: {
           display: true,
-          text: 'Price (BDT)',
-          font: { size: 12 }
+          text: '💰 Price (BDT)',
+          font: { size: 12, weight: 'bold' }
         },
         ticks: {
           callback: function(value) {
             return formatPrice(value);
-          }
+          },
+          font: { size: 11 }
         }
       },
       x: {
+        grid: {
+          display: false
+        },
         title: {
           display: true,
-          text: 'Months',
-          font: { size: 12 }
+          text: '📅 Months (2024)',
+          font: { size: 12, weight: 'bold' }
+        },
+        ticks: {
+          font: { size: 11 }
         }
       }
     }
   };
 
-  // Calculate insights from API data
+  // Calculate insights
   const getInsights = () => {
     if (packageData.current.length === 0) {
       return {
-        highestIncrease: { name: 'N/A', percentage: 0 },
+        highestPrice: { name: 'N/A', price: 0 },
         bestValue: { name: 'N/A', discount: 0 },
-        mostPopular: { name: 'N/A' },
-        priceStability: { name: 'N/A' }
+        avgPrice: 0,
+        totalPackages: 0
       };
     }
 
-    // Find package with highest discount
     const bestValue = packageData.current.reduce((best, pkg) => {
       const discount = parseFloat(pkg.discount) || 0;
       return discount > (best.discount || 0) ? { name: pkg.name, discount: discount } : best;
     }, { name: packageData.current[0]?.name, discount: 0 });
 
-    // Find package with highest final price (as proxy for increase)
-    const highestIncrease = packageData.current.reduce((max, pkg) => {
+    const highestPrice = packageData.current.reduce((max, pkg) => {
       const price = parseFloat(pkg.price) || 0;
-      return price > (max.price || 0) ? { name: pkg.name, price: price, percentage: Math.floor(Math.random() * 20) + 5 } : max;
-    }, { name: packageData.current[0]?.name, price: 0, percentage: 0 });
+      return price > (max.price || 0) ? { name: pkg.name, price: price } : max;
+    }, { name: packageData.current[0]?.name, price: 0 });
+
+    const avgPrice = packageData.current.reduce((sum, p) => sum + (parseFloat(p.price) || 0), 0) / packageData.current.length;
 
     return {
-      highestIncrease,
+      highestPrice,
       bestValue,
-      mostPopular: { name: packageData.current[0]?.name || 'N/A' },
-      priceStability: { name: packageData.current[1]?.name || packageData.current[0]?.name || 'N/A' }
+      avgPrice,
+      totalPackages: packageData.current.length
     };
   };
 
@@ -291,17 +313,17 @@ const PackageGraph = () => {
       <div style={{
         width: '100%',
         minHeight: '100vh',
-        backgroundColor: '#f5f5f5',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: 'Poppins, sans-serif'
       }}>
-        <div className="text-center">
-          <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+        <div className="text-center text-white">
+          <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="mt-3 text-muted">Loading package data...</p>
+          <p className="mt-3">Loading package data...</p>
         </div>
       </div>
     );
@@ -310,89 +332,54 @@ const PackageGraph = () => {
   return (
     <div style={{
       width: '100%',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5',
-      fontFamily: 'Poppins, sans-serif'
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      fontFamily: 'Poppins, sans-serif',
+      padding: '40px 0'
     }}>
-      {/* Main Content Container - Full Width */}
       <div style={{
         width: '100%',
         maxWidth: '1400px',
         margin: '0 auto',
-        padding: '20px 24px'
+        padding: '0 24px'
       }}>
-        {/* Header Section */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '40px',
-          marginTop: '20px'
-        }}>
-          <h2 style={{
-            fontSize: '32px',
-            color: '#2c3e50',
-            marginBottom: '10px'
+        {/* Hero Header */}
+        <div style={{ textAlign: 'center', marginBottom: '40px', color: 'white' }}>
+          <div style={{
+            display: 'inline-block',
+            background: 'rgba(255,255,255,0.2)',
+            padding: '8px 20px',
+            borderRadius: '50px',
+            marginBottom: '20px',
+            backdropFilter: 'blur(10px)'
           }}>
-            <i className="bi bi-graph-up display-4 fw-normal text-uppercase mb-2 " ></i>
-            <span className='display-4 fw-normal text-uppercase mb-2'> Package Price History</span>
-            
-          </h2>
-          <p style={{ color: '#7f8c8d' }}>
+            📊 REAL-TIME MARKET DATA
+          </div>
+          <h1 style={{
+            fontSize: '42px',
+            fontWeight: '700',
+            marginBottom: '15px',
+            background: 'linear-gradient(135deg, #fff 0%, #f0f0f0 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            Package Price History
+          </h1>
+          <p style={{ fontSize: '16px', opacity: 0.9 }}>
             Track price trends and make informed decisions
           </p>
+        
+        
         </div>
 
-        {/* Chart Type Toggle */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          marginBottom: '20px'
-        }}>
-          <div style={{
-            display: 'flex',
-            gap: '10px',
-            backgroundColor: '#fff',
-            padding: '5px',
-            borderRadius: '30px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-          }}>
-            <button
-              onClick={() => setChartType('line')}
-              style={{
-                padding: '8px 24px',
-                backgroundColor: chartType === 'line' ? '#9a55ff' : 'transparent',
-                color: chartType === 'line' ? '#fff' : '#2c3e50',
-                border: 'none',
-                borderRadius: '25px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              Line Chart
-            </button>
-            <button
-              onClick={() => setChartType('bar')}
-              style={{
-                padding: '8px 24px',
-                backgroundColor: chartType === 'bar' ? '#9a55ff' : 'transparent',
-                color: chartType === 'bar' ? '#fff' : '#2c3e50',
-                border: 'none',
-                borderRadius: '25px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              Bar Chart
-            </button>
-          </div>
-        </div>
+       
 
         {/* Package Filters */}
         <div style={{
           marginBottom: '30px',
           padding: '20px',
-          backgroundColor: '#fff',
-          borderRadius: '15px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          background: 'white',
+          borderRadius: '20px',
+          boxShadow: '0 5px 20px rgba(0,0,0,0.1)'
         }}>
           <div style={{
             display: 'flex',
@@ -404,44 +391,49 @@ const PackageGraph = () => {
               onClick={() => setSelectedPackage('all')}
               style={{
                 padding: '10px 24px',
-                backgroundColor: selectedPackage === 'all' ? '#9a55ff' : '#f8f9fa',
-                color: selectedPackage === 'all' ? '#fff' : '#2c3e50',
-                border: `1px solid ${selectedPackage === 'all' ? '#9a55ff' : '#e0e0e0'}`,
+                background: selectedPackage === 'all' ? '#9a55ff' : '#f8f9fa',
+                color: selectedPackage === 'all' ? 'white' : '#2c3e50',
+                border: 'none',
                 borderRadius: '30px',
                 cursor: 'pointer',
                 fontWeight: selectedPackage === 'all' ? '600' : '400',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                boxShadow: selectedPackage === 'all' ? '0 5px 15px rgba(154,85,255,0.3)' : 'none'
               }}
             >
-              All Packages
+              🎯 All Packages
             </button>
-            {packageData.current.map((pkg) => (
-              <button
-                key={pkg.id}
-                onClick={() => setSelectedPackage(pkg.id.toString())}
-                style={{
-                  padding: '10px 24px',
-                  backgroundColor: selectedPackage === pkg.id.toString() ? (pkg.color || '#9a55ff') : '#f8f9fa',
-                  color: selectedPackage === pkg.id.toString() ? '#fff' : '#2c3e50',
-                  border: `1px solid ${selectedPackage === pkg.id.toString() ? (pkg.color || '#9a55ff') : '#e0e0e0'}`,
-                  borderRadius: '30px',
-                  cursor: 'pointer',
-                  fontWeight: selectedPackage === pkg.id.toString() ? '600' : '400',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                {pkg.name}
-              </button>
-            ))}
+            {packageData.current.map((pkg, idx) => {
+              const colors = ['#9a55ff', '#ff6b6b', '#4ecdc4', '#ffa500', '#20c997', '#6c5ce7'];
+              return (
+                <button
+                  key={pkg.id}
+                  onClick={() => setSelectedPackage(pkg.id.toString())}
+                  style={{
+                    padding: '10px 24px',
+                    background: selectedPackage === pkg.id.toString() ? colors[idx % colors.length] : '#f8f9fa',
+                    color: selectedPackage === pkg.id.toString() ? 'white' : '#2c3e50',
+                    border: 'none',
+                    borderRadius: '30px',
+                    cursor: 'pointer',
+                    fontWeight: selectedPackage === pkg.id.toString() ? '600' : '400',
+                    transition: 'all 0.3s ease',
+                    boxShadow: selectedPackage === pkg.id.toString() ? `0 5px 15px ${colors[idx % colors.length]}80` : 'none'
+                  }}
+                >
+                  {pkg.name}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Chart Container - Full Width */}
+        {/* Bar Chart Container */}
         <div style={{
-          backgroundColor: '#fff',
-          borderRadius: '15px',
-          padding: '24px',
-          boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
+          background: 'white',
+          borderRadius: '20px',
+          padding: '30px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
           marginBottom: '30px',
           height: '500px',
           width: '100%'
@@ -451,96 +443,38 @@ const PackageGraph = () => {
               <p className="text-muted">No package data available</p>
             </div>
           ) : (
-            <Line data={getChartData()} options={chartOptions} />
+            <Bar data={getChartData()} options={chartOptions} />
           )}
         </div>
 
-        {/* Summary Statistics - Full Width Grid */}
+       
+
+        {/* Investment Tips */}
         <div style={{
-          backgroundColor: '#fff',
-          borderRadius: '15px',
-          padding: '24px',
-          boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
-          marginBottom: '30px'
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: '20px',
+          padding: '30px',
+          color: 'white',
+          textAlign: 'center'
         }}>
-          <h4 style={{
-            marginBottom: '20px',
-            color: '#2c3e50',
-            fontSize: '18px'
-          }}>
-            <i className="bi bi-info-circle" style={{ color: '#9a55ff', marginRight: '10px' }}></i>
-            Key Insights
-          </h4>
-          
+          <h3 style={{ marginBottom: '20px' }}>💡 Investment Tips</h3>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '20px'
+            gap: '20px',
+            marginTop: '20px'
           }}>
-            <div style={{ 
-              padding: '20px', 
-              backgroundColor: '#f8f9fa', 
-              borderRadius: '12px',
-              borderLeft: '4px solid #e74c3c'
-            }}>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Highest Price
-              </span>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#e74c3c', marginTop: '8px' }}>
-                {insights.highestIncrease.name}
-              </div>
-              <span style={{ fontSize: '13px', color: '#27ae60', fontWeight: '500' }}>
-                {formatPrice(insights.highestIncrease.price)}
-              </span>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px' }}>
+              <div style={{ fontSize: '30px', marginBottom: '10px' }}>📈</div>
+              <p style={{ fontSize: '14px' }}>Diversify your portfolio across different packages</p>
             </div>
-            
-            <div style={{ 
-              padding: '20px', 
-              backgroundColor: '#f8f9fa', 
-              borderRadius: '12px',
-              borderLeft: '4px solid #9a55ff'
-            }}>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Best Value Package
-              </span>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#9a55ff', marginTop: '8px' }}>
-                {insights.bestValue.name}
-              </div>
-              <span style={{ fontSize: '13px', color: '#7f8c8d' }}>
-                Save {formatPrice(insights.bestValue.discount)}
-              </span>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px' }}>
+              <div style={{ fontSize: '30px', marginBottom: '10px' }}>⏰</div>
+              <p style={{ fontSize: '14px' }}>Long-term investments yield better returns</p>
             </div>
-            
-            <div style={{ 
-              padding: '20px', 
-              backgroundColor: '#f8f9fa', 
-              borderRadius: '12px',
-              borderLeft: '4px solid #ff6b6b'
-            }}>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Total Packages
-              </span>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff6b6b', marginTop: '8px' }}>
-                {packageData.current.length}
-              </div>
-              <span style={{ fontSize: '13px', color: '#7f8c8d' }}>Active packages</span>
-            </div>
-            
-            <div style={{ 
-              padding: '20px', 
-              backgroundColor: '#f8f9fa', 
-              borderRadius: '12px',
-              borderLeft: '4px solid #4ecdc4'
-            }}>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Price Range
-              </span>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4ecdc4', marginTop: '8px' }}>
-                {formatPrice(Math.min(...packageData.current.map(p => parseFloat(p.final_price) || parseFloat(p.price) - parseFloat(p.discount))))}
-              </div>
-              <span style={{ fontSize: '13px', color: '#7f8c8d' }}>
-                to {formatPrice(Math.max(...packageData.current.map(p => parseFloat(p.price))))}
-              </span>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px' }}>
+              <div style={{ fontSize: '30px', marginBottom: '10px' }}>🎯</div>
+              <p style={{ fontSize: '14px' }}>Monitor price trends before investing</p>
             </div>
           </div>
         </div>

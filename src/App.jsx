@@ -210,7 +210,7 @@ function App() {
           </PrivateRoute>
         } />
 
-            <Route path="/admin-club-gallery" element={
+        <Route path="/admin-club-gallery" element={
           <PrivateRoute>
             <Clubgallery />
           </PrivateRoute>

@@ -8,12 +8,12 @@ const PackageDetails = () => {
     const { id } = useParams();
     const location = useLocation();
     const pkg = location.state?.packageData;
-    
+
     const [packageData, setPackageData] = useState(null);
     const [benefitsData, setBenefitsData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    
+
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     // প্যাকেজ ডাটা লোড করা
@@ -24,7 +24,7 @@ const PackageDetails = () => {
                 setLoading(false);
                 return;
             }
-            
+
             const savedPackages = localStorage.getItem('investmentPackages');
             if (savedPackages) {
                 const packages = JSON.parse(savedPackages);
@@ -35,7 +35,7 @@ const PackageDetails = () => {
                     return;
                 }
             }
-            
+
             try {
                 const response = await fetch(`${BASE_URL}/get-investment`);
                 const result = await response.json();
@@ -55,7 +55,7 @@ const PackageDetails = () => {
                 setLoading(false);
             }
         };
-        
+
         if (id) {
             loadPackageData();
         }
@@ -73,11 +73,11 @@ const PackageDetails = () => {
     useEffect(() => {
         if (packageData?.images && packageData.images.length > 1) {
             const interval = setInterval(() => {
-                setCurrentImageIndex((prevIndex) => 
+                setCurrentImageIndex((prevIndex) =>
                     prevIndex === packageData.images.length - 1 ? 0 : prevIndex + 1
                 );
             }, 3000);
-            
+
             return () => clearInterval(interval);
         }
     }, [packageData?.images]);
@@ -100,7 +100,7 @@ const PackageDetails = () => {
 
     const nextImage = () => {
         if (packageData?.images) {
-            setCurrentImageIndex((prevIndex) => 
+            setCurrentImageIndex((prevIndex) =>
                 prevIndex === packageData.images.length - 1 ? 0 : prevIndex + 1
             );
         }
@@ -108,7 +108,7 @@ const PackageDetails = () => {
 
     const prevImage = () => {
         if (packageData?.images) {
-            setCurrentImageIndex((prevIndex) => 
+            setCurrentImageIndex((prevIndex) =>
                 prevIndex === 0 ? packageData.images.length - 1 : prevIndex - 1
             );
         }
@@ -182,18 +182,18 @@ const PackageDetails = () => {
                             }}
                         />
                     )}
-                    
+
                     <div className="position-absolute w-100 h-100" style={{
                         background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))',
                         zIndex: 2
                     }} />
-                    
+
                     <div className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 3 }}>
                         <div className="text-center text-white px-4">
                             <h6 className="text-uppercase mb-3" style={{ letterSpacing: '3px', fontWeight: '300', marginTop: '0' }}>
                                 Investment Tier
                             </h6>
-                            <h1 className="fw-bold mb-4 animate-title" style={{ 
+                            <h1 className="fw-bold mb-4 animate-title" style={{
                                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
                                 fontSize: 'clamp(2rem, 8vw, 4rem)',
                                 marginTop: '0'
@@ -217,7 +217,7 @@ const PackageDetails = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {packageData.images && packageData.images.length > 1 && (
                         <>
                             <button
@@ -256,7 +256,7 @@ const PackageDetails = () => {
                             </button>
                         </>
                     )}
-                    
+
                     {packageData.images && packageData.images.length > 1 && (
                         <div className="position-absolute bottom-0 start-50 translate-middle-x mb-4 d-flex gap-2" style={{ zIndex: 4 }}>
                             {packageData.images.map((_, index) => (
@@ -335,7 +335,7 @@ const PackageDetails = () => {
                                     </span>
                                     <span className="fw-bold" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>{packageData.land}</span>
                                 </div>
-                             
+
                                 <div className="d-flex justify-content-between">
                                     <span className="text-secondary" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>
                                         <i className="bi bi-aspect-ratio me-2"></i>Total Space
@@ -350,7 +350,7 @@ const PackageDetails = () => {
                                     {packageData.description}
                                 </p>
                             )}
-                            
+
                             <a
                                 href="tel:01768712230"
                                 className="btn btn-dark w-100 py-2 py-md-3 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2"
@@ -367,7 +367,13 @@ const PackageDetails = () => {
                 {!loading && benefitsData && benefitsData.benefits && benefitsData.benefits.length > 0 && (
                     <div className="mt-4 mt-md-5 pt-3 pt-md-5">
                         <div className="text-center mb-4 mb-md-5">
-                            <span className="badge bg-primary px-3 py-2 mb-2 text-uppercase" style={{ fontSize: '0.7rem' }}>
+                            <span
+                                className="badge bg-primary px-3 py-2 mb-2 text-uppercase"
+                                style={{
+                                    fontSize: '0.7rem',
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                }}
+                            >
                                 <i className="bi bi-gift me-1"></i>Exclusive Rewards
                             </span>
                             <h2 className="fw-bold" style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}>{benefitsData.title}</h2>
@@ -379,8 +385,14 @@ const PackageDetails = () => {
                                 <div className={index === benefitsData.benefits.length - 1 ? "col-12" : "col-12 col-md-6"} key={index}>
                                     <div className="p-3 p-md-4 bg-white rounded-4 border shadow-sm h-100 d-flex gap-2 gap-md-3 hover-shadow transition-all">
                                         <div className="flex-shrink-0">
-                                            <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                                style={{ width: '35px', height: '35px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                                            <div className="text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                style={{
+                                                    width: '35px',
+                                                    height: '35px',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.9rem',
+                                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                                }}>
                                                 {index + 1}
                                             </div>
                                         </div>
@@ -395,7 +407,7 @@ const PackageDetails = () => {
                 )}
             </div>
 
-            <Terms/>
+            <Terms />
             <Footer />
 
             <style>{`

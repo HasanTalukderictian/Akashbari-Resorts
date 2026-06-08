@@ -512,3 +512,315 @@
 .pkg-features li {
     justify-content: flex-start;
 }
+
+
+/* ============================================ */
+
+
+/* RESPONSIVE DESIGN - WITHOUT CHANGING DESIGN */
+
+
+/* ============================================ */
+
+
+/* Large Desktop (1200px to 1399px) */
+
+@media (max-width: 1399px) and (min-width: 1200px) {
+    .new-design-section .col {
+        flex: 1 0 18% !important;
+        max-width: 18% !important;
+    }
+}
+
+
+/* Desktop (992px to 1199px) */
+
+@media (max-width: 1199px) {
+    .new-design-section .col {
+        flex: 1 0 30% !important;
+        max-width: 30% !important;
+    }
+    .col-lg-3 {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
+}
+
+
+/* Tablet (768px to 991px) */
+
+@media (max-width: 991px) {
+    .new-design-section .col {
+        flex: 1 0 45% !important;
+        max-width: 45% !important;
+    }
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .benefit-item {
+        margin-bottom: 15px;
+    }
+    .benefits-container .row .col-md-6:last-child .benefit-item {
+        margin-bottom: 0;
+    }
+}
+
+
+/* Mobile Landscape (576px to 767px) */
+
+@media (max-width: 767px) {
+    .new-design-section .col {
+        flex: 1 0 100% !important;
+        max-width: 100% !important;
+    }
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .investment-card {
+        min-height: auto;
+        max-height: none;
+        height: auto;
+    }
+    .card-content {
+        overflow-y: visible;
+    }
+    .pkg-title {
+        min-height: auto;
+    }
+    .main-title {
+        font-size: 2rem;
+    }
+    .benefit-item {
+        margin-bottom: 12px;
+    }
+    .popular-badge-centered {
+        padding: 6px 20px;
+        font-size: 10px;
+        top: -12px;
+        white-space: nowrap;
+    }
+    .popular-badge-centered::before {
+        font-size: 11px;
+    }
+    .popular-badge-centered::after {
+        bottom: -6px;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #4a6d36;
+    }
+    .row.g-4 {
+        --bs-gutter-y: 1.5rem;
+    }
+}
+
+
+/* Mobile Portrait (575px and below) */
+
+@media (max-width: 575px) {
+    .new-design-section .col {
+        flex: 1 0 100% !important;
+        max-width: 100% !important;
+    }
+    .col-lg-3,
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .main-title {
+        font-size: 1.6rem;
+    }
+    .sub-text {
+        font-size: 0.9rem;
+        padding: 0 10px;
+    }
+    .badge-opportunity {
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+    .pkg-title {
+        font-size: 1.1rem;
+        padding: 0 5px;
+    }
+    .pkg-price {
+        font-size: 1.3rem;
+    }
+    .pkg-cashback {
+        font-size: 1rem !important;
+    }
+    .pkg-features li strong {
+        min-width: 85px;
+        font-size: 11px;
+    }
+    .pkg-features li {
+        font-size: 11px;
+    }
+    .pkg-desc {
+        font-size: 11px;
+    }
+    .sold-out-btn {
+        font-size: 12px;
+        padding: 10px 15px;
+        width: 90%;
+    }
+    .inquire-btn {
+        padding: 8px;
+        font-size: 12px;
+    }
+    .popular-badge-centered {
+        padding: 4px 12px;
+        font-size: 8px;
+        top: -10px;
+        letter-spacing: 1px;
+    }
+    .popular-badge-centered::before {
+        font-size: 9px;
+    }
+    .popular-badge-centered::after {
+        bottom: -5px;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #4a6d36;
+    }
+    .benefits-container {
+        padding: 1.5rem !important;
+        margin-top: 2rem !important;
+    }
+    .benefits-container h2 {
+        font-size: 1.5rem !important;
+    }
+    .benefit-item {
+        padding: 10px 12px;
+    }
+    .benefit-number {
+        min-width: 30px;
+        font-size: 12px;
+        margin-right: 10px;
+    }
+    .benefit-text {
+        font-size: 12px;
+    }
+    .promo-question {
+        font-size: 1.1rem;
+    }
+    .promo-text {
+        font-size: 13px;
+        padding: 0 10px;
+    }
+    .yellow-divider {
+        width: 50px;
+    }
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+
+/* Extra Small Devices (375px and below) */
+
+@media (max-width: 375px) {
+    .main-title {
+        font-size: 1.3rem;
+    }
+    .pkg-title {
+        font-size: 1rem;
+    }
+    .pkg-price {
+        font-size: 1.1rem;
+    }
+    .pkg-cashback {
+        font-size: 0.85rem !important;
+    }
+    .popular-badge-centered {
+        padding: 3px 10px;
+        font-size: 7px;
+        top: -8px;
+    }
+    .popular-badge-centered::before {
+        font-size: 8px;
+    }
+    .sold-out-btn {
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+    .benefits-container h2 {
+        font-size: 1.3rem !important;
+    }
+    .benefit-text {
+        font-size: 11px;
+    }
+}
+
+
+/* Fix for row gap in small devices */
+
+@media (max-width: 767px) {
+    .row.g-4 {
+        --bs-gutter-y: 1.2rem;
+    }
+    .mt-5 {
+        margin-top: 2rem !important;
+    }
+    .py-5 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+}
+
+
+/* Ensure new design cards don't break on small devices */
+
+@media (max-width: 991px) {
+    .new-design-section .investment-card {
+        min-height: 160px;
+        max-height: 180px;
+    }
+    .new-design-section .pkg-title {
+        font-size: 0.9rem;
+    }
+    .new-design-section div[style*="backgroundColor"] {
+        font-size: 12px !important;
+        padding: 8px 10px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .new-design-section .investment-card {
+        min-height: 140px;
+        max-height: 160px;
+    }
+    .new-design-section .pkg-title {
+        font-size: 0.85rem;
+    }
+    .new-design-section div[style*="backgroundColor"] {
+        font-size: 11px !important;
+        padding: 6px 8px !important;
+    }
+}
+
+
+/* Fix for benefits section last item alignment */
+
+@media (min-width: 768px) {
+    .benefits-container .row .col-md-6:last-child .benefit-item {
+        margin-bottom: 0;
+    }
+}
+
+
+/* Animation adjustment for mobile - reduce motion if preferred */
+
+@media (prefers-reduced-motion: reduce) {
+    .investment-card,
+    .popular-badge-centered,
+    .benefit-item,
+    .col-lg-3 {
+        animation: none !important;
+        transition: none !important;
+    }
+    .investment-card:hover {
+        transform: none !important;
+    }
+}

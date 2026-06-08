@@ -55,7 +55,7 @@ const AboutUs = () => {
                 setLoading(true);
                 const response = await fetch(`${API_BASE_URL}/team-members`);
                 const result = await response.json();
-                
+
                 if (result.status === true) {
                     setTeamMembers(result.data);
                 } else {
@@ -79,16 +79,30 @@ const AboutUs = () => {
             {/* Section 1: Banner */}
             <section className="about-banner text-center d-flex flex-column justify-content-center">
                 <div className="container">
+
                     <div className="row">
-                        <div className="col-12 text-white">
-                            <h1 className="banner-title serif mb-2">About Us</h1>
-                            <div className="breadcrumb-wrapper">
-                                <a href="/" className="text-white text-decoration-none small">🏠 Home</a>
-                                <span className="separator mx-2 text-warning small">&gt;</span>
-                                <span className="current-page text-white small">📄 About</span>
+                        <div className="col-12 text-white text-center">
+                            <h1 className="banner-title serif mb-3">About Us</h1>
+                            <div className="message-wrapper">
+                                <p className="mb-0" style={{
+                                    fontSize: '1.1rem',
+                                    fontWeight: '300',
+                                    fontStyle: 'italic',
+                                    borderLeft: '3px solid #f39c12',
+                                    borderRight: '3px solid #f39c12',
+                                    display: 'inline-block',
+                                    padding: '0 25px',
+                                    letterSpacing: '0.3px'
+                                }}>
+                                    <i className="bi bi-heart-fill me-2 text-warning"></i>
+                                    Crafting dreams, building futures
+                                    <i className="bi bi-heart-fill ms-2 text-warning"></i>
+                                </p>
                             </div>
                         </div>
                     </div>
+
+
                 </div>
             </section>
 
@@ -115,7 +129,7 @@ const AboutUs = () => {
                                     </p>
                                 </div>
                                 <p className="modern-description text-muted mb-4" style={{ fontFamily: 'inherit', fontSize: '1rem', lineHeight: '1.6' }}>
-                                    Akashbari Hotel & Resort is a premier getaway destination blending nature with world-class hospitality. 
+                                    Akashbari Hotel & Resort is a premier getaway destination blending nature with world-class hospitality.
                                     Designed for families, couples, and corporate events, we offer a tranquil environment away from the hustle of daily life.
                                 </p>
                                 <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600' }}>
@@ -128,7 +142,7 @@ const AboutUs = () => {
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Guided Nature Trails & Kids Zone</li>
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Corporate Conference Hall & Event Spaces</li>
                                 </ul>
-                               
+
                             </div>
                         </div>
                         <div className="col-lg-6">
@@ -184,9 +198,9 @@ const AboutUs = () => {
                                         maxWidth: '350px',
                                         margin: '0 auto'
                                     }}>
-                                        <img 
-                                            src={ceoImage} 
-                                            alt="CEO & Founder" 
+                                        <img
+                                            src={ceoImage}
+                                            alt="CEO & Founder"
                                             className="img-fluid w-100"
                                             style={{ minHeight: '350px', objectFit: 'cover' }}
                                             onError={(e) => {
@@ -216,16 +230,16 @@ const AboutUs = () => {
                                 fontFamily: 'inherit'
                             }}>
                                 <span style={{ fontSize: '40px', color: '#ffc107', opacity: '0.4', fontFamily: 'inherit' }}>"</span>
-                                <p className="ceo-quote-text px-3" style={{ 
-                                    fontSize: '1rem', 
-                                    lineHeight: '1.7', 
-                                    color: '#4a5568', 
+                                <p className="ceo-quote-text px-3" style={{
+                                    fontSize: '1rem',
+                                    lineHeight: '1.7',
+                                    color: '#4a5568',
                                     fontStyle: 'italic',
                                     fontFamily: 'inherit'
                                 }}>
-                                    Akashbari was born from a dream to create a sanctuary where luxury meets nature, 
-                                    where every guest feels like family, and where hospitality goes beyond service to become 
-                                    an unforgettable experience. Our journey is driven by passion, integrity, and an unwavering 
+                                    Akashbari was born from a dream to create a sanctuary where luxury meets nature,
+                                    where every guest feels like family, and where hospitality goes beyond service to become
+                                    an unforgettable experience. Our journey is driven by passion, integrity, and an unwavering
                                     commitment to excellence.
                                 </p>
                                 <span style={{ fontSize: '40px', color: '#ffc107', opacity: '0.4', display: 'block', textAlign: 'right', fontFamily: 'inherit' }}>"</span>
@@ -242,14 +256,14 @@ const AboutUs = () => {
                                         height: '100%',
                                         fontFamily: 'inherit'
                                     }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-5px)';
-                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}>
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-5px)';
+                                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}>
                                         <div className="vm-icon mb-2">
                                             <span style={{ fontSize: '36px' }}>👁️</span>
                                         </div>
@@ -268,14 +282,14 @@ const AboutUs = () => {
                                         height: '100%',
                                         fontFamily: 'inherit'
                                     }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-5px)';
-                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}>
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-5px)';
+                                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}>
                                         <div className="vm-icon mb-2">
                                             <span style={{ fontSize: '36px' }}>🎯</span>
                                         </div>
@@ -294,14 +308,14 @@ const AboutUs = () => {
                                         height: '100%',
                                         fontFamily: 'inherit'
                                     }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-5px)';
-                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'none';
-                                    }}>
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-5px)';
+                                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}>
                                         <div className="vm-icon mb-2">
                                             <span style={{ fontSize: '36px' }}>⭐</span>
                                         </div>
@@ -313,7 +327,7 @@ const AboutUs = () => {
                                 </div>
                             </div>
 
-                           
+
 
                         </div>
                     </div>
@@ -321,7 +335,7 @@ const AboutUs = () => {
             </section>
             {/* ========== CEO SECTION ENDS HERE ========== */}
 
-           
+
 
             <style>{`
                 .vision-card:hover .vision-icon-wrapper {
@@ -372,7 +386,7 @@ const AboutUs = () => {
             <section className="team-section-modern py-5">
                 <div className="container">
                     <div className="team-header-modern text-center">
-                        
+
                         <div className="section-tag centered">
                             <span className="tag-dot"></span>
                             MEET OUR EXPERTS
@@ -382,7 +396,7 @@ const AboutUs = () => {
                             Your Perfect Stay
                         </h2>
                         <p className="team-subtitle" style={{ fontFamily: 'inherit', fontSize: '0.95rem' }}>
-                            Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment. 
+                            Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment.
                             From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
                         </p>
                     </div>
@@ -397,7 +411,7 @@ const AboutUs = () => {
                     ) : error ? (
                         <div className="text-center py-5">
                             <p className="text-danger">⚠️ {error}</p>
-                            <button 
+                            <button
                                 className="btn btn-primary mt-3"
                                 onClick={() => window.location.reload()}
                             >
@@ -410,9 +424,9 @@ const AboutUs = () => {
                                 <div className="team-card-modern" key={member.id}>
                                     <div className="team-card-inner">
                                         <div className="team-image-wrapper">
-                                            <img 
-                                                src={member.image} 
-                                                alt={member.name} 
+                                            <img
+                                                src={member.image}
+                                                alt={member.name}
                                                 className="team-image"
                                                 onError={(e) => {
                                                     e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
@@ -435,7 +449,7 @@ const AboutUs = () => {
                                             <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
                                             <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
                                             <div className="team-divider"></div>
-                                            
+
                                         </div>
                                     </div>
                                 </div>

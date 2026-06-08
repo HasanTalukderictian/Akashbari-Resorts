@@ -35,19 +35,31 @@ const HappyClient = () => {
         invest_records: []
     });
 
-    // Environment variables - FIXED
+    // Environment variables
     const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-    const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
-    // ইমেজ এবং কনফিগারেশন JSON
-    const pageConfig = {
-        heroBgImage: "https://img.freepik.com/free-vector/stock-market-trading-graph-blue-background_1017-31846.jpg",
-        overlayOpacity: 0.95
+    // Hero section style - Background changed to WHITE
+    const heroSectionStyle = {
+        backgroundColor: '#ffffff', // Changed from gradient to white
+        padding: '100px 0 160px 0',
+        color: '#1a1a1a' // Changed text color to dark for contrast on white background
+    };
+
+    // Stats card style - Background white with subtle shadow
+    const statsCardStyle = {
+        backgroundColor: '#ffffff',
+        borderRadius: '15px',
+        padding: '40px 20px',
+        boxShadow: '0 15px 40px rgba(0,0,0,0.08)', // Subtle shadow
+        marginTop: '-80px',
+        position: 'relative',
+        zIndex: '10',
+        border: '1px solid #eef2f6' // Light border
     };
 
     const featureIcons = ["💰", "💎", "✨"];
 
-    // Fetch combined data from API - FIXED URL
+    // Fetch combined data from API
     const fetchCombinedData = async () => {
         setLoading(true);
         try {
@@ -82,7 +94,7 @@ const HappyClient = () => {
 
     useEffect(() => {
         fetchCombinedData();
-    }, [API_BASE_URL]); // Added dependency
+    }, []);
 
     // Get the first member record for stats
     const getMemberStats = () => {
@@ -146,35 +158,16 @@ const HappyClient = () => {
     const featuresData = getFeaturesData();
     const statsData = getStatsData();
 
-    // Hero section style
-    const heroSectionStyle = {
-        background: `linear-gradient(rgba(3, 27, 51, ${pageConfig.overlayOpacity}), rgba(3, 27, 51, ${pageConfig.overlayOpacity})), url("${pageConfig.heroBgImage}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        padding: '100px 0 160px 0',
-        color: 'white'
-    };
-
-    const statsCardStyle = {
-        backgroundColor: 'white',
-        borderRadius: '15px',
-        padding: '40px 20px',
-        boxShadow: '0 15px 40px rgba(0,0,0,0.15)',
-        marginTop: '-80px',
-        position: 'relative',
-        zIndex: '10'
-    };
-
     // Loading state
     if (loading) {
         return (
             <section>
                 <div style={heroSectionStyle}>
                     <div className="container text-center">
-                        <div className="spinner-border text-light" role="status">
+                        <div className="spinner-border text-primary" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>
-                        <p className="mt-3 text-white">Loading amazing content...</p>
+                        <p className="mt-3">Loading amazing content...</p>
                     </div>
                 </div>
             </section>
@@ -192,7 +185,7 @@ const HappyClient = () => {
                         </div>
                         <button 
                             onClick={() => window.location.reload()}
-                            className="btn btn-light mt-3"
+                            className="btn btn-primary mt-3"
                         >
                             Try Again
                         </button>
@@ -203,7 +196,7 @@ const HappyClient = () => {
     }
 
     return (
-        <section>
+        <section style={{ backgroundColor: '#ffffff' }}> {/* Added white background to section */}
             <div style={heroSectionStyle}>
                 <div className="container">
                     <div className="row align-items-center">
@@ -211,26 +204,26 @@ const HappyClient = () => {
                             <span className="text-warning fw-bold border-start border-warning border-3 ps-3 mb-3 d-inline-block" style={{ fontSize: '14px', letterSpacing: '1px' }}>
                                 AKASHBARI HOTEL & RESORT
                             </span>
-                            <h1 className="display-4 fw-bold mb-4" style={{ lineHeight: '1.2' }}>
+                            <h1 className="display-4 fw-bold mb-4" style={{ lineHeight: '1.2', color: '#1a1a1a' }}>
                                 Investments that <br />
                                 <span style={{ color: '#5DB8C1' }}>make you a Property Owner</span>
                             </h1>
                         </div>
                         <div className="col-md-6">
-                            <div className="ps-md-4" style={{ borderLeft: '1px solid rgba(255,255,255,0.2)' }}>
-                                <h4 className="fw-light mb-3">Your Investment, Your Future</h4>
-                                <p className="lead mb-2">
-                                    Become a proud <strong>Property Owner</strong> by investing in Akashbari Resort shares.
+                            <div className="ps-md-4" style={{ borderLeft: '1px solid rgba(0,0,0,0.1)' }}>
+                                <h4 className="fw-light mb-3" style={{ color: '#4a5568' }}>Your Investment, Your Future</h4>
+                                <p className="lead mb-2" style={{ color: '#2d3748' }}>
+                                    "Become a proud <strong>Property Owner</strong> by investing in  Akashbari Resorts' projects".
                                 </p>
                                 
                                 <div className="mt-4">
                                     {featuresData.map((item, index) => (
-                                        <div key={item.id} className={`py-3 border-top border-white-25 ${index === featuresData.length - 1 ? 'border-bottom' : ''}`}>
+                                        <div key={item.id} className={`py-3 border-top ${index === featuresData.length - 1 ? 'border-bottom' : ''}`} style={{ borderColor: '#e2e8f0 !important' }}>
                                             <div className="d-flex align-items-center">
                                                 <span className="fs-3 me-3">{featureIcons[index % featureIcons.length]}</span>
                                                 <div>
-                                                    <h6 className="fw-bold mb-0">{item.title}</h6>
-                                                    <p className="small mb-0 opacity-75">{item.desc}</p>
+                                                    <h6 className="fw-bold mb-0" style={{ color: '#2d3748' }}>{item.title}</h6>
+                                                    <p className="small mb-0" style={{ color: '#718096' }}>{item.desc}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -242,13 +235,13 @@ const HappyClient = () => {
                 </div>
             </div>
 
-            <div className="container">
+            {/* <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-lg-11">
                         <div style={statsCardStyle} className="text-center">
                             <div className="row g-4">
                                 {statsData.map((stat, index) => (
-                                    <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`}>
+                                    <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`} style={{ borderColor: '#e2e8f0' }}>
                                         {stat.target > 0 ? (
                                             <CountUpItem 
                                                 target={stat.target} 
@@ -260,14 +253,14 @@ const HappyClient = () => {
                                                 {stat.prefix}0{stat.suffix}
                                             </h2>
                                         )}
-                                        <p className="text-muted fw-bold mb-0">{stat.label}</p>
+                                        <p className="fw-bold mb-0" style={{ color: '#718096' }}>{stat.label}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </section>
     );
 };

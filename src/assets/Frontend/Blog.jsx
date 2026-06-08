@@ -12,29 +12,29 @@ const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 // Helper function to get full image URL - FIXED for Laravel storage (no hardcoded URLs)
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
-  
+
   // If already a full URL, return as is
   if (imagePath.startsWith('http')) return imagePath;
-  
+
   // Clean the path - remove any leading slashes
   let cleanPath = imagePath;
   if (cleanPath.startsWith('/')) {
     cleanPath = cleanPath.substring(1);
   }
-  
+
   // Get base URL without /api
   const baseUrl = API_URL.replace('/api', '');
-  
+
   // Construct the full URL for Laravel storage
   const imageUrl = `${baseUrl}/storage/${cleanPath}`;
-  
+
   return imageUrl;
 };
 
 // Placeholder image when no image is available
 const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image+Available';
 
-const Blog = () => {  
+const Blog = () => {
   const navigate = useNavigate();
   const [blogData, setBlogData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,15 +73,15 @@ const Blog = () => {
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/blogs`);
-      
+
       if (response.data.status === true) {
         const blogs = response.data.data;
-        
+
         // Transform API data to match component structure
         const formattedBlogs = blogs.map((blog) => {
           // Generate image URL from API
           const imageUrl = blog.image ? getImageUrl(blog.image) : null;
-          
+
           return {
             id: blog.id,
             title: blog.title,
@@ -105,7 +105,7 @@ const Blog = () => {
             status: blog.status
           };
         });
-        
+
         setBlogData(formattedBlogs);
       } else {
         setError('Failed to load blogs');
@@ -149,7 +149,7 @@ const Blog = () => {
           <div className="alert alert-danger mx-auto" style={{ maxWidth: '500px', borderRadius: '15px' }}>
             <h4 className="alert-heading">Oops! Something went wrong</h4>
             <p>{error}</p>
-            <button 
+            <button
               className="btn btn-warning mt-3 px-4 py-2 rounded-pill"
               onClick={() => fetchBlogs()}
             >
@@ -181,19 +181,31 @@ const Blog = () => {
   return (
     <>
       <Header />
-      
+
       {/* Banner Section */}
       <section className="blog-banner text-center d-flex flex-column justify-content-center">
         <div className="container">
           <div className="row">
-            <div className="col-12 text-white">
-              <h1 className="blog-title serif mb-2">Blog</h1>
-              <div className="breadcrumb-wrapper">
-                <a href="/" className="text-white text-decoration-none small">Home</a>
-                <span className="separator mx-2 text-warning small">&gt;</span>
-                <span className="current-page text-white small">Blog</span>
-              </div>
-            </div>
+
+          <div className="col-12 text-white text-center">
+  <h1 className="blog-title serif mb-3">Blog</h1>
+  <div className="message-wrapper">
+    <p className="lead mb-0" style={{ 
+      fontSize: '1.1rem', 
+      fontWeight: '300',
+      letterSpacing: '0.5px',
+      borderLeft: '3px solid #f39c12',
+      borderRight: '3px solid #f39c12',
+      display: 'inline-block',
+      padding: '0 20px'
+    }}>
+      <i className="bi bi-journal-bookmark-fill me-2 text-warning"></i>
+      Stories, insights, and updates from our world
+      <i className="bi bi-arrow-right ms-2 text-warning"></i>
+    </p>
+  </div>
+</div>
+
           </div>
         </div>
       </section>
@@ -203,20 +215,20 @@ const Blog = () => {
         <div className="container">
           <div className="row g-4">
             {blogData.map((post) => (
-              <div 
-                className="col-lg-4 col-md-6" 
-                key={post.id} 
+              <div
+                className="col-lg-4 col-md-6"
+                key={post.id}
                 onClick={() => handleCardClick(post)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="blog-card h-100 shadow-sm rounded-4 overflow-hidden">
                   <div className="blog-img-wrapper position-relative overflow-hidden">
-                    <img 
-                      src={getFinalImageUrl(post)} 
-                      alt={post.title} 
-                      className="img-fluid w-100" 
-                      style={{ 
-                        height: '250px', 
+                    <img
+                      src={getFinalImageUrl(post)}
+                      alt={post.title}
+                      className="img-fluid w-100"
+                      style={{
+                        height: '250px',
                         objectFit: 'cover',
                         transition: 'transform 0.3s ease'
                       }}
@@ -238,8 +250,8 @@ const Blog = () => {
                           <i className="far fa-eye"></i> {post.views || 0}
                         </span>
                       </div>
-                      <h4 className="blog-card-title my-3" style={{ 
-                        fontSize: '1.25rem', 
+                      <h4 className="blog-card-title my-3" style={{
+                        fontSize: '1.25rem',
                         fontWeight: '700',
                         lineHeight: '1.4',
                         color: '#2c3e50'
@@ -258,8 +270,8 @@ const Blog = () => {
                         </span>
                       </div>
                       <p className="blog-excerpt text-muted small" style={{ lineHeight: '1.6' }}>
-                        {post.excerpt && post.excerpt.length > 100 
-                          ? post.excerpt.substring(0, 100) + '...' 
+                        {post.excerpt && post.excerpt.length > 100
+                          ? post.excerpt.substring(0, 100) + '...'
                           : post.excerpt || 'Click to read more about this amazing blog post...'}
                       </p>
                     </div>
