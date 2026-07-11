@@ -53,7 +53,7 @@ const Video = () => {
                         <div className="col-lg-8">
                             <div className="mx-auto mb-3"></div>
                             {/* ডাইনামিক টাইটেল */}
-                            <p className="gateway-text mb-2" style={{ fontSize: '1.2rem', fontWeight: '500', color: '#333' }}>{videoData.title}</p>
+                            <p className="gateway-text mb-2" style={{ fontSize: '1.8rem', fontWeight: '500', color: '#5e2e10' }}>{videoData.title}</p>
                             {/* ডাইনামিক ডেসক্রিপশন */}
                             <h5 className="video-subtext text-muted" style={{ fontSize: '1rem', lineHeight: '1.6', color: '#666' }}>
                                 {videoData.description.length > 200 

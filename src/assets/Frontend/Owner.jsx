@@ -15,26 +15,26 @@ const Owner = () => {
     // Helper function to get image URL - FIXED for both local and production
     const getImageUrl = (imagePath) => {
         if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
-        
+
         // If already a full URL, return as is
         if (imagePath.startsWith('http')) return imagePath;
-        
+
         // Handle different path formats
         let cleanPath = imagePath;
-        
+
         // Remove any storage prefix if present
         if (cleanPath.startsWith('/storage/')) {
             cleanPath = cleanPath.replace('/storage/', '');
         } else if (cleanPath.startsWith('storage/')) {
             cleanPath = cleanPath.replace('storage/', '');
         }
-        
+
         // Remove leading slashes
         cleanPath = cleanPath.replace(/^\/+/, '');
-        
+
         // Ensure the base URL doesn't have trailing slash
         const baseUrl = STORAGE_URL.replace(/\/$/, '');
-        
+
         // Construct the full URL
         return `${baseUrl}/storage/${cleanPath}`;
     };
@@ -44,7 +44,7 @@ const Owner = () => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 const response = await axios.get(`${API_BASE_URL}/gets-property-offers`);
 
                 if (response.data.status) {
@@ -137,7 +137,7 @@ const Owner = () => {
             transition: 'all 0.3s ease'
         },
         brandText: {
-            color: '#d4af37',
+            color: '#5e2e10',
             fontSize: '1.8rem',
             fontWeight: 'bold'
         },
@@ -208,7 +208,7 @@ const Owner = () => {
                     <div style={{ fontSize: '64px', marginBottom: '20px' }}>⚠️</div>
                     <h4 className="text-danger">Error Loading Content</h4>
                     <p className="text-muted">{error}</p>
-                    <button 
+                    <button
                         className="btn btn-primary mt-3"
                         onClick={() => window.location.reload()}
                         style={{ borderRadius: '50px', padding: '10px 30px' }}
@@ -237,7 +237,7 @@ const Owner = () => {
             {/* Hero Section */}
             <div className="container py-3 py-md-4">
                 <div className="row g-0 shadow-lg d-lg-flex align-items-lg-stretch" style={styles.mainCard}>
-                    
+
                     {/* Left Side - Image Slider */}
                     <div className="col-lg-6 d-flex flex-column" style={styles.sliderContainer}>
                         <div className="w-100 flex-grow-1 position-relative" style={{ minHeight: '400px' }}>
@@ -272,7 +272,7 @@ const Owner = () => {
                                 </div>
                             ))}
                         </div>
-                        
+
                         {/* Slider Dots */}
                         {property.slider_images && property.slider_images.length > 1 && (
                             <div className="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2" style={{ zIndex: 2 }}>
@@ -297,27 +297,27 @@ const Owner = () => {
                     <div className="col-lg-6 d-flex flex-column justify-content-center" style={{ backgroundColor: '#ffffff' }}>
                         <div className="p-3 p-md-4">
                             <div className="mb-2">
-                                <span className="badge bg-warning text-dark px-3 py-2 rounded-pill" style={{ fontSize: '12px' }}>
-                                    🏆 Premium Investment
+                                <span className="badge text-white px-3 py-2 rounded-pill" style={{ background: '#5e2e10', fontSize: '1.2rem' }}>
+                                    Premium Investment
                                 </span>
                             </div>
-                            
+
                             <h2 className="display-6 fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '2rem' }}>
                                 {property.title}
                             </h2>
-                            
+
                             <h3 style={styles.brandText} className="mb-3">
                                 {property.brand_name}
                             </h3>
-                            
+
                             <p className="text-muted mb-3" style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
                                 {property.description}
                             </p>
 
                             {/* Features */}
                             <div className="mb-3">
-                                <h6 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '0.9rem' }}>
-                                    ✨ Key Features
+                                <h6 className="fw-bold mb-2" style={{ color: '#5e2e10', fontSize: '0.9rem' }}>
+                                    Key Features
                                 </h6>
                                 {property.features && property.features.map((text, i) => (
                                     <div
@@ -325,7 +325,7 @@ const Owner = () => {
                                         style={styles.featureItem}
                                         className="hover-feature"
                                     >
-                                        <i className="bi bi-check-circle-fill me-2" style={{ color: '#10b981', fontSize: '14px' }}></i>
+                                        <i className="bi bi-check-circle-fill me-2" style={{ color: '#5e2e10', fontSize: '14px' }}></i>
                                         <span style={{ color: '#4a5568', fontSize: '0.9rem' }}>{text}</span>
                                     </div>
                                 ))}
@@ -359,16 +359,23 @@ const Owner = () => {
                                     onClick={handleCallClick}
                                     className="btn text-white py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
                                     style={{
+                                        background: '#5e2e10',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        padding: '12px 24px',
+                                        transition: 'all 0.3s ease',
                                         ...styles.actionBtn,
                                         ...styles.callBtn
                                     }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.5)';
+                                        e.currentTarget.style.background = '#4a250d'; // Darker on hover
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
+                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+                                        e.currentTarget.style.background = '#5e2e10'; // Back to original
                                     }}
                                 >
                                     <i className="bi bi-telephone-fill fs-5"></i>
@@ -384,13 +391,13 @@ const Owner = () => {
             {benefits.length > 0 && (
                 <div className="container py-3 py-md-4">
                     <div className="text-center mb-4">
-                        <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill mb-2" style={{ fontSize: '11px' }}>
+                        <span className="badge  bg-opacity-10  px-5 py-1 rounded-pill mb-2" style={{ fontSize: '20px', background: '#5e2e10' }}>
                             Why Choose Us
                         </span>
                         <h2 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '1.8rem' }}>
-                            Why Invest with Us?
+                            Invest with Us?
                         </h2>
-                        <div className="mx-auto" style={{ width: '60px', height: '3px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }}></div>
+                        <div className="mx-auto" style={{ width: '220px', height: '3px', background: '#5e2e10', borderRadius: '2px' }}></div>
                         <p className="text-muted mt-2" style={{ maxWidth: '600px', margin: '0 auto', fontSize: '0.9rem' }}>
                             Discover the advantages of choosing us for your investment journey
                         </p>
@@ -412,9 +419,9 @@ const Owner = () => {
                                     }}
                                 >
                                     <div style={styles.benefitIcon}>
-                                        <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: '#b66dff' }}></i>
+                                        <i className="bi bi-gem" style={{ fontSize: '1.8rem', color: '#5e2e10' }}></i>
                                     </div>
-                                    <h4 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '1.2rem' }}>
+                                    <h4 className="fw-bold mb-2" style={{ color: '#5e2e10', fontSize: '1.2rem' }}>
                                         {item.title}
                                     </h4>
                                     <p className="text-muted mb-0" style={{ lineHeight: '1.5', fontSize: '0.85rem' }}>

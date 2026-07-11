@@ -23,7 +23,7 @@ const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
     }, [target, duration]);
 
     return (
-        <h2 className="fw-bold" style={{ color: '#5DB8C1' }}>
+        <h2 className="fw-bold" style={{ color: '#5e2e10' }}>
             {prefix}{count.toLocaleString()}{suffix}
         </h2>
     );
@@ -32,7 +32,7 @@ const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
 const Investment = () => {
     const navigate = useNavigate();
     const [packages, setPackages] = useState([]);
-    const [benefitsData, setBenefitsData] = useState(null);
+    const [benefits, setBenefits] = useState([]);
     const [loading, setLoading] = useState(true);
     const [combinedData, setCombinedData] = useState({
         record_members: [],
@@ -56,33 +56,14 @@ const Investment = () => {
         border: '1px solid #eef2f6'
     };
 
-    // Fixed Investment Benefits Data (12 items)
-    const fixedBenefitsList = [
-        "Saaf-Qabla Registration",
-        "Return annual profit by utilizing our whole resort",
-        "Yearly increase in asset worth",
-        "Passive income",
-        "Money-Back Guarantee",
-        "Free stay facilities per share yearly: 02 nights 03 days on accommodation",
-        "Discount on accommodation all over the year: 40%",
-        "Discount all over the year on membership card facilities in Akashbari Hotel & Resorts and Akashbari Holidays",
-        "No Down Payment",
-        "Get 36-month, interest-free EMI option",
-        "Based on construction progress, the share price will be increased every six months in phases, according to demand and supply. By the handover stage, the price of the lowest category of shares may reach up to 990,000 taka",
-        "EMI Facilitist"
-    ];
-
-    const fetchData = async () => {
+    // Fetch investment packages
+    const fetchPackages = async () => {
         try {
-            setLoading(true);
-            const [packageRes, benefitsRes] = await Promise.all([
-                fetch(API_URL),
-                fetch(BENEFITS_API_URL)
-            ]);
-            const packageResult = await packageRes.json();
-            const benefitsResult = await benefitsRes.json();
-            if (packageResult.status) {
-                let filteredPackages = packageResult.data.filter(pkg =>
+            const response = await fetch(API_URL);
+            const result = await response.json();
+            
+            if (result.status) {
+                let filteredPackages = result.data.filter(pkg =>
                     pkg.title?.toUpperCase().trim() !== 'VILLA'
                 );
 
@@ -101,16 +82,41 @@ const Investment = () => {
 
                 setPackages(filteredPackages);
             }
-            if (benefitsResult.status) {
-                setBenefitsData(benefitsResult.data.data[0]);
-            }
         } catch (error) {
-            console.error("Error fetching data:", error);
-        } finally {
-            setLoading(false);
+            console.error("Error fetching packages:", error);
+            setError('Failed to load packages');
         }
     };
 
+    // Fetch investment benefits - FIXED VERSION
+    const fetchBenefits = async () => {
+        try {
+            const response = await fetch(BENEFITS_API_URL);
+            const result = await response.json();
+            
+            console.log('Benefits API Response:', result); // Debug log
+            
+            if (result.status && result.data && result.data.data) {
+                const benefitsData = result.data.data;
+                
+                // Extract benefits from the first item's benefits array
+                if (benefitsData.length > 0 && benefitsData[0].benefits) {
+                    console.log('Benefits found:', benefitsData[0].benefits); // Debug log
+                    setBenefits(benefitsData[0].benefits);
+                } else {
+                    console.log('No benefits found in response');
+                    setBenefits([]);
+                }
+            } else {
+                setBenefits([]);
+            }
+        } catch (error) {
+            console.error("Error fetching benefits:", error);
+            setBenefits([]);
+        }
+    };
+
+    // Fetch combined data for stats
     const fetchCombinedData = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/combined-records`, {
@@ -118,8 +124,6 @@ const Investment = () => {
                     'Accept': 'application/json',
                 }
             });
-
-            console.log('Combined data response:', response.data);
 
             if (response.data.status === true && response.data.data) {
                 setCombinedData({
@@ -132,7 +136,6 @@ const Investment = () => {
                     record_members: [],
                     invest_records: []
                 });
-                setError('No data found');
             }
         } catch (error) {
             console.error('Error fetching combined data:', error);
@@ -140,39 +143,25 @@ const Investment = () => {
         }
     };
 
+    // Fetch all data
     useEffect(() => {
-        fetchData();
-        fetchCombinedData();
+        const fetchAllData = async () => {
+            setLoading(true);
+            await Promise.all([
+                fetchPackages(),
+                fetchBenefits(),
+                fetchCombinedData()
+            ]);
+            setLoading(false);
+        };
+        
+        fetchAllData();
     }, []);
 
     const handleCardClick = (pkg) => {
         if (pkg.is_sold_out != 1) {
             navigate(`/package-details/${pkg.id}`, { state: { packageData: pkg } });
         }
-    };
-
-    const getMessage = (title) => {
-        switch (title) {
-            case 'VILLA':
-                return 'SOLD OUT';
-            case 'EARTH SHELTER':
-                return 'Different Touch';
-            case 'PRESIDENTIAL SUITES':
-                return 'Exclusive Apartment';
-            case 'EXECUTIVE SUITE SHARE':
-                return 'Smart Looky';
-            case 'SUPERIOR DELUXE':
-                return 'Lake View';
-            default:
-                return '';
-        }
-    };
-
-    const getMessageBgColor = (title) => {
-        if (title === 'VILLA') {
-            return '#e00000';
-        }
-        return '#639c4e';
     };
 
     const getStatsData = () => {
@@ -187,36 +176,12 @@ const Investment = () => {
 
     const statsData = getStatsData();
 
-    const newCards = [
-        {
-            id: 'villa-card',
-            title: 'VILLA',
-            is_sold_out: 1
-        },
-        {
-            id: 'presidential-card',
-            title: 'PRESIDENTIAL SUITES',
-            is_sold_out: 0
-        },
-        {
-            id: 'earthshelter-card',
-            title: 'EARTH SHELTER',
-            is_sold_out: 0
-        },
-        {
-            id: 'executive-card',
-            title: 'EXECUTIVE SUITE SHARE',
-            is_sold_out: 0
-        },
-        {
-            id: 'superior-card',
-            title: 'SUPERIOR DELUXE',
-            is_sold_out: 0
-        }
-    ];
-
     if (loading) {
         return <div className="text-center py-5">Loading Investment Packages...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center py-5 text-danger">{error}</div>;
     }
 
     return (
@@ -225,90 +190,74 @@ const Investment = () => {
                 <div className="container text-center">
                     <div className="badge-opportunity mb-3">INVESTMENT OPPORTUNITIES</div>
                     <h1 className="main-title mb-2">RESORT INVESTMENT PACKAGES</h1>
-                    <div className="yellow-divider mx-auto mb-4"></div>
+                    <div className="mx-auto"></div>
                     <p className="sub-text mb-5">Become a partner in Bangladesh's premier luxury resort destination</p>
 
-                    <div className="new-design-section">
-                        <div className="row g-4 justify-content-center">
-                            {newCards.map((pkg) => (
-                                <div className="col" key={pkg.id} style={{ flex: '1 0 18%', maxWidth: '20%' }}>
-                                    <div
-                                        className="investment-card popular-border new-card-no-hover"
-                                        style={{ minHeight: '180px', maxHeight: '200px', cursor: 'default' }}
-                                    >
-                                        <div className="card-content d-flex flex-column h-100 p-3" style={{ marginTop: '5px', overflow: 'visible' }}>
-                                            <h4 className="pkg-title mt-3" style={{ minHeight: 'auto', fontSize: '1rem', textAlign: 'left' }}>{pkg.title}</h4>
-                                            <div style={{
-                                                backgroundColor: getMessageBgColor(pkg.title),
-                                                color: 'white',
-                                                padding: '10px 12px',
-                                                marginTop: '12px',
-                                                textAlign: 'center',
-                                                fontWeight: '400',
-                                                fontSize: '14px',
-                                                fontFamily: "'Cormorant Infant', 'Georgia', serif",
-                                                fontStyle: 'italic',
-                                                letterSpacing: '0.5px',
-                                                wordSpacing: '2px',
-                                                minHeight: '50px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                width: '100%',
-                                                borderRadius: '3px',
-                                                textShadow: '0 1px 1px rgba(0,0,0,0.1)'
-                                            }}>
-                                                {getMessage(pkg.title)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="row g-4 justify-content-center mt-5">
-                        {packages.map((pkg) => {
-                            const isPopular = pkg.title === 'SUPERIOR DELUXE';
-
+                    {/* Investment Packages Grid */}
+                    <div className="row g-4 justify-content-center">
+                        {packages.map((pkg, index) => {
+                            const isSoldOut = pkg.is_sold_out == 1;
+                            const isPopular = pkg.title?.toUpperCase().includes('EXECUTIVE');
+                            
                             return (
-                                <div className="col-lg-3 col-md-6" key={pkg.id}>
-                                    <div
-                                        className={`investment-card popular-border ${pkg.is_sold_out == 1 ? 'sold-out-card' : 'clickable-card'}`}
-                                        onClick={() => handleCardClick(pkg)}
-                                        style={{ cursor: pkg.is_sold_out == 1 ? 'default' : 'pointer' }}
+                                <div className="col-lg-3 col-md-6" key={pkg.id || index}>
+                                    <div 
+                                        className={`investment-card ${isSoldOut ? 'sold-out-card' : 'clickable-card'}`}
+                                        onClick={() => !isSoldOut && handleCardClick(pkg)}
+                                        style={{ 
+                                            cursor: isSoldOut ? 'default' : 'pointer',
+                                            position: 'relative',
+                                            overflow: 'visible'
+                                        }}
                                     >
-                                        {isPopular && <div className="popular-badge-centered">POPULAR</div>}
+                                        {/* Popular Badge */}
+                                        {isPopular && !isSoldOut && (
+                                            <div className="popular-badge-centered">POPULAR</div>
+                                        )}
 
-                                        <div className="card-content d-flex flex-column h-100 p-3">
-                                            <h3 className="pkg-title mt-3" style={{ textAlign: 'left' }}>{pkg.title}</h3>
-
-                                            {pkg.is_sold_out == 1 ? (
-                                                <div className="sold-out-container my-auto">
-                                                    <div className="sold-out-btn">SOLD OUT</div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <h2 className="fw-bold mb-0" style={{ textAlign: 'left', fontSize: '1.2rem', color: '#ff8c32' }}>Price: ৳ {parseInt(pkg.price).toLocaleString()} BDT</h2>
-                                                    <p className="fw-bold mb-0" style={{ fontSize: '1.2rem', textAlign: 'left', color: '#198754' }}>
-                                                        Cashback: ৳ {parseInt(pkg.discount).toLocaleString()} BDT
-                                                    </p>
-                                                    <ul className="pkg-features text-start ps-3 mt-2 mb-2" style={{ textAlign: 'left', paddingLeft: '0' }}>
-                                                        <li><strong>Land & Building:</strong> {pkg.land || 'N/A'}</li>
-                                                        <li><strong>Total Room Size:</strong> {pkg.total_size || 'N/A'} sqft</li>
-                                                        <li><strong>+ Amenities</strong></li>
-                                                    </ul>
-                                                    <p className="pkg-desc px-2 mt-2 mb-2" style={{ textAlign: 'left' }}>
-                                                        {pkg.description && pkg.description.length > 80
-                                                            ? `${pkg.description.substring(0, 80)}...`
-                                                            : pkg.description}
-                                                    </p>
-                                                </>
+                                        <div className="card-content d-flex flex-column h-100 p-4">
+                                            {/* Title */}
+                                            <h3 className="pkg-title mb-2">{pkg.title}</h3>
+                                            
+                                            {/* Price */}
+                                            <h2 className="pkg-price mb-1">
+                                                ৳ {parseInt(pkg.price || 0).toLocaleString()}
+                                            </h2>
+                                            
+                                            {/* Cashback */}
+                                            <p className="pkg-cashback mb-2" style={{ color: '#198754', fontWeight: '600' }}>
+                                                Cashback: ৳ {parseInt(pkg.discount || 0).toLocaleString()}
+                                            </p>
+                                            
+                                            {/* Land & Building */}
+                                            <p className="pkg-detail mb-1" style={{ fontSize: '14px', color: '#555' }}>
+                                                <strong>Land & building —</strong> {pkg.land || 'N/A'}
+                                            </p>
+                                            
+                                            {/* Room Size */}
+                                            <p className="pkg-detail mb-3" style={{ fontSize: '14px', color: '#555' }}>
+                                                <strong>Room size —</strong> {pkg.total_size || 'N/A'} sft
+                                            </p>
+                                            
+                                            {/* Description (optional) */}
+                                            {pkg.description && (
+                                                <p className="pkg-desc mb-3" style={{ fontSize: '13px', color: '#666' }}>
+                                                    {pkg.description.length > 80 
+                                                        ? `${pkg.description.substring(0, 80)}...` 
+                                                        : pkg.description}
+                                                </p>
                                             )}
-
-                                            <button className={`inquire-btn mt-2 ${pkg.is_sold_out == 1 ? 'sold-out-footer' : 'popular-btn'}`}>
-                                                {pkg.is_sold_out == 1 ? "NOT AVAILABLE" : "INQUIRE NOW"}
-                                            </button>
+                                            
+                                            {/* Inquire Now Button */}
+                                            {isSoldOut ? (
+                                                <button className="inquire-btn sold-out-footer" disabled>
+                                                    SOLD OUT
+                                                </button>
+                                            ) : (
+                                                <button className="inquire-btn popular-btn">
+                                                    INQUIRE NOW
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -332,7 +281,7 @@ const Investment = () => {
                                                     prefix={stat.prefix}
                                                 />
                                             ) : (
-                                                <h2 className="fw-bold" style={{ color: '#5DB8C1' }}>
+                                                <h2 className="fw-bold" style={{ color: '#5e2e10' }}>
                                                     {stat.prefix}0{stat.suffix}
                                                 </h2>
                                             )}
@@ -345,25 +294,27 @@ const Investment = () => {
                     </div>
                 </div>
 
-                {/* BENEFITS SECTION - Using original design classes */}
-                <div className="benefits-container container mt-5 p-5 bg-white">
-                    <h2 className='display-4 fw-normal text-uppercase mb-2 text-center'>Investment Benefits</h2>
-                    <div className="yellow-divider mx-auto mb-4"></div>
-                    <div className="row g-3">
-                        {fixedBenefitsList.map((benefit, index) => (
-                            <div className="col-12 col-md-6" key={index}>
-                                <div className="benefit-item d-flex align-items-center">
-                                    <span className="benefit-number">{String(index + 1).padStart(2, '0')}</span>
-                                    <span className="benefit-text">{benefit}</span>
+                {/* BENEFITS SECTION */}
+                {benefits.length > 0 && (
+                    <div className="benefits-container container mt-5 p-5 bg-white">
+                        <h2 className='display-4 fw-normal text-uppercase mb-2 text-center'>Investment Benefits</h2>
+                        <div className="yellow-divider mx-auto mb-4"></div>
+                        <div className="row g-3">
+                            {benefits.map((benefit, index) => (
+                                <div className="col-12 col-md-6" key={index}>
+                                    <div className="benefit-item d-flex align-items-center">
+                                        <span className="benefit-number">{String(index + 1).padStart(2, '0')}</span>
+                                        <span className="benefit-text">{benefit}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                        <div className="footer-promo text-center mt-5">
+                            <h4 className="promo-question">Ready to Secure Your Future?</h4>
+                            <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
+                        </div>
                     </div>
-                    <div className="footer-promo text-center mt-5">
-                        <h4 className="promo-question">Ready to Secure Your Future?</h4>
-                        <p className="promo-text">Join hundreds of successful investors who have already secured their financial future with Akashbari Hotels & Resorts.</p>
-                    </div>
-                </div>
+                )}
             </section>
         </>
     );

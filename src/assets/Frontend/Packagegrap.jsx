@@ -37,6 +37,9 @@ const PackageGraph = () => {
     }
   });
 
+  // Brand color
+  const brandColor = '#5e2e10';
+
   // Format price
   const formatPrice = (price) => {
     const numPrice = parseFloat(price) || 0;
@@ -60,7 +63,6 @@ const PackageGraph = () => {
         setPackageData(prev => ({ ...prev, current: packages }));
         setLastUpdated(new Date().toLocaleString());
         
-        // Generate history data based on actual prices
         generateStepHistoryData(packages);
       }
     } catch (error) {
@@ -70,30 +72,26 @@ const PackageGraph = () => {
     }
   };
 
-  // Generate step history data (price only increases at specific month)
+  // Generate step history data
   const generateStepHistoryData = (packages) => {
     if (packages.length > 0) {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const colors = ['#9a55ff', '#ff6b6b', '#4ecdc4', '#ffa500', '#20c997', '#6c5ce7'];
+      const colors = ['#5e2e10', '#8B4513', '#A0522D', '#CD853F', '#D2691E', '#6B3A2A'];
       
-      // Randomly select a month when price increased (for demo)
-      // In real scenario, this would come from API
-      const increaseMonth = Math.floor(Math.random() * 12); // Random month 0-11
+      const increaseMonth = Math.floor(Math.random() * 12);
       setPriceUpdateMonth(months[increaseMonth]);
       
       const datasets = packages.map((pkg, idx) => {
         const currentPrice = parseFloat(pkg.price) || 0;
         const discount = parseFloat(pkg.discount) || 0;
-        const oldPrice = Math.round(currentPrice * 0.7); // Old price was 70% of current
+        const oldPrice = Math.round(currentPrice * 0.7);
         
         const historyData = [];
         
         for (let i = 0; i < 12; i++) {
           if (i < increaseMonth) {
-            // Before price increase - old price
             historyData.push(oldPrice);
           } else {
-            // After price increase - current price
             historyData.push(currentPrice);
           }
         }
@@ -119,18 +117,17 @@ const PackageGraph = () => {
     }
   };
 
-  // Update single package history when selected
+  // Update single package history
   const updateSinglePackageHistory = (selectedPkgId) => {
     const selectedPkg = packageData.current.find(p => p.id.toString() === selectedPkgId);
     if (selectedPkg && packageData.current.length > 0) {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const colors = ['#9a55ff', '#ff6b6b', '#4ecdc4', '#ffa500', '#20c997', '#6c5ce7'];
+      const colors = ['#5e2e10', '#8B4513', '#A0522D', '#CD853F', '#D2691E', '#6B3A2A'];
       
       const currentPrice = parseFloat(selectedPkg.price) || 0;
       const discount = parseFloat(selectedPkg.discount) || 0;
       const oldPrice = Math.round(currentPrice * 0.7);
       
-      // Randomly select a month for price increase
       const increaseMonth = Math.floor(Math.random() * 12);
       setPriceUpdateMonth(months[increaseMonth]);
       
@@ -216,10 +213,10 @@ const PackageGraph = () => {
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.8)',
+        backgroundColor: brandColor,
         titleColor: '#fff',
         bodyColor: '#ddd',
-        borderColor: '#9a55ff',
+        borderColor: brandColor,
         borderWidth: 1,
         callbacks: {
           label: function(context) {
@@ -265,7 +262,7 @@ const PackageGraph = () => {
         },
         title: {
           display: true,
-          text: '📅 Months (2024)',
+          text: '📅 Months (2026)',
           font: { size: 12, weight: 'bold' }
         },
         ticks: {
@@ -313,14 +310,14 @@ const PackageGraph = () => {
       <div style={{
         width: '100%',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: brandColor,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: 'Poppins, sans-serif'
       }}>
         <div className="text-center text-white">
-          <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem', color: '#ffd700' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
           <p className="mt-3">Loading package data...</p>
@@ -332,7 +329,7 @@ const PackageGraph = () => {
   return (
     <div style={{
       width: '100%',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: brandColor,
       fontFamily: 'Poppins, sans-serif',
       padding: '40px 0'
     }}>
@@ -346,32 +343,31 @@ const PackageGraph = () => {
         <div style={{ textAlign: 'center', marginBottom: '40px', color: 'white' }}>
           <div style={{
             display: 'inline-block',
-            background: 'rgba(255,255,255,0.2)',
+            background: 'rgba(255,255,255,0.15)',
             padding: '8px 20px',
             borderRadius: '50px',
             marginBottom: '20px',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,215,0,0.2)'
           }}>
-             REAL-TIME MARKET DATA
+            <span style={{ color: '#ffd700' }}>✦</span> REAL-TIME MARKET DATA
           </div>
           <h1 style={{
             fontSize: '42px',
             fontWeight: '700',
             marginBottom: '15px',
-            background: 'linear-gradient(135deg, #fff 0%, #f0f0f0 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            color: '#ffffff',
+            letterSpacing: '2px'
           }}>
             Package Price History
           </h1>
           <p style={{ fontSize: '16px', opacity: 0.9 }}>
             Track price trends and make informed decisions
           </p>
-        
-        
         </div>
 
-       
+        {/* Stats Cards */}
+      
 
         {/* Package Filters */}
         <div style={{
@@ -391,20 +387,20 @@ const PackageGraph = () => {
               onClick={() => setSelectedPackage('all')}
               style={{
                 padding: '10px 24px',
-                background: selectedPackage === 'all' ? '#9a55ff' : '#f8f9fa',
+                background: selectedPackage === 'all' ? brandColor : '#f8f9fa',
                 color: selectedPackage === 'all' ? 'white' : '#2c3e50',
                 border: 'none',
                 borderRadius: '30px',
                 cursor: 'pointer',
                 fontWeight: selectedPackage === 'all' ? '600' : '400',
                 transition: 'all 0.3s ease',
-                boxShadow: selectedPackage === 'all' ? '0 5px 15px rgba(154,85,255,0.3)' : 'none'
+                boxShadow: selectedPackage === 'all' ? `0 5px 15px ${brandColor}80` : 'none'
               }}
             >
               🎯 All Packages
             </button>
             {packageData.current.map((pkg, idx) => {
-              const colors = ['#9a55ff', '#ff6b6b', '#4ecdc4', '#ffa500', '#20c997', '#6c5ce7'];
+              const colors = ['#5e2e10', '#8B4513', '#A0522D', '#CD853F', '#D2691E', '#6B3A2A'];
               return (
                 <button
                   key={pkg.id}
@@ -447,32 +443,31 @@ const PackageGraph = () => {
           )}
         </div>
 
-       
-
         {/* Investment Tips */}
         <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: brandColor,
           borderRadius: '20px',
           padding: '30px',
           color: 'white',
-          textAlign: 'center'
+          textAlign: 'center',
+          border: '1px solid rgba(255,215,0,0.15)'
         }}>
-          <h3 style={{ marginBottom: '20px' }}>💡 Investment Tips</h3>
+          <h3 style={{ marginBottom: '20px', color: '#ffd700' }}>💡 Investment Tips</h3>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '20px',
             marginTop: '20px'
           }}>
-            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px', border: '1px solid rgba(255,215,0,0.1)' }}>
               <div style={{ fontSize: '30px', marginBottom: '10px' }}>📈</div>
               <p style={{ fontSize: '14px' }}>Diversify your portfolio across different packages</p>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px', border: '1px solid rgba(255,215,0,0.1)' }}>
               <div style={{ fontSize: '30px', marginBottom: '10px' }}>⏰</div>
               <p style={{ fontSize: '14px' }}>Long-term investments yield better returns</p>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '15px', border: '1px solid rgba(255,215,0,0.1)' }}>
               <div style={{ fontSize: '30px', marginBottom: '10px' }}>🎯</div>
               <p style={{ fontSize: '14px' }}>Monitor price trends before investing</p>
             </div>

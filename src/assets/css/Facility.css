@@ -1,89 +1,89 @@
-/* Custom Divider */
+.facility-section {
+    background: #fcfcfc;
+}
 
 .custom-divider {
-    width: 80px;
-    height: 4px;
-    background: #d4af37;
-    /* Gold color for premium feel */
-    border-radius: 10px;
+    width: 60px;
+    height: 3px;
+    background: #5e2e10;
+    margin: 10px auto;
 }
-
-
-/* Facility Card Base */
 
 .facility-card-new {
-    background: #ffffff;
-    border: 1px solid #eee;
-    border-radius: 20px;
-    padding: 30px 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 25px 15px;
     text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #e8e8e8;
     height: 100%;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+    cursor: default;
 }
 
-
-/* Icon Styling */
+.facility-card-new:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(94, 46, 16, 0.15);
+    border-color: #5e2e10;
+}
 
 .icon-wrapper {
-    width: 65px;
-    height: 65px;
-    background: #f8f9fa;
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+    background: rgba(94, 46, 16, 0.08);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
-    font-size: 1.8rem;
-    transition: transform 0.3s ease;
-}
-
-.facility-name-text {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #333;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
-}
-
-
-/* Hover Effects */
-
-.facility-card-new:hover {
-    transform: translateY(-10px);
-    background: #ffffff;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-    border-color: #4a6d36;
+    transition: all 0.3s ease;
 }
 
 .facility-card-new:hover .icon-wrapper {
-    background: #fff9e6;
-    /* Very light gold */
-    transform: scale(1.1) rotate(5deg);
+    background: rgba(94, 46, 16, 0.15);
 }
 
-.facility-card-new:hover .facility-name-text {
-    color: #4a6d36;
+.icon-emoji {
+    font-size: 32px;
+    line-height: 1;
 }
 
+.facility-name-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
 
-/* Responsive adjustments */
+@media (max-width: 768px) {
+    .facility-card-new {
+        padding: 20px 12px;
+    }
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+    }
+    .icon-emoji {
+        font-size: 28px;
+    }
+    .facility-name-text {
+        font-size: 12px;
+    }
+}
 
 @media (max-width: 576px) {
     .facility-card-new {
-        padding: 20px 10px;
+        padding: 15px 10px;
     }
     .icon-wrapper {
         width: 50px;
         height: 50px;
-        font-size: 1.4rem;
+    }
+    .icon-emoji {
+        font-size: 24px;
     }
     .facility-name-text {
-        font-size: 0.75rem;
+        font-size: 11px;
     }
 }

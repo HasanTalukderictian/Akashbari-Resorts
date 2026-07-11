@@ -3,7 +3,7 @@ import axios from 'axios';
 import '../css/Notice.css';
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-  
+
 
 const Notice = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -16,7 +16,7 @@ const Notice = () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/notices/active`);
-      
+
       if (response.data.success && response.data.data && response.data.data.length > 0) {
         // Use data directly from API
         const apiNotices = response.data.data.map(notice => ({
@@ -26,7 +26,7 @@ const Notice = () => {
           color: notice.color || "#ff6b6b",
           status: notice.status
         }));
-        
+
         setNotices(apiNotices);
       } else {
         setNotices([]);
@@ -63,7 +63,7 @@ const Notice = () => {
       let scrollPosition = 0;
       let animationId;
       let speed = 1.5;
-      
+
       const scroll = () => {
         if (!isHovered) {
           scrollPosition += speed;
@@ -75,7 +75,7 @@ const Notice = () => {
         }
         animationId = requestAnimationFrame(scroll);
       };
-      
+
       animationId = requestAnimationFrame(scroll);
       return () => cancelAnimationFrame(animationId);
     }
@@ -91,12 +91,12 @@ const Notice = () => {
       <div className="notice-wrapper">
         {/* Left Icon */}
         <div className="notice-icon-left">
-          <i className="bi bi-megaphone-fill"></i>
+          <i className="bi bi-bell-fill"></i>
         </div>
 
         {/* Scrolling Content */}
-        <div 
-          className="notice-scroll" 
+        <div
+          className="notice-scroll"
           ref={scrollRef}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -111,7 +111,7 @@ const Notice = () => {
           ) : (
             <div className="notice-scroll-content">
               {scrollingNotices.map((notice, index) => (
-                <div 
+                <div
                   key={`${notice.id}-${index}`}
                   className="notice-item"
                   style={{ '--notice-color': notice.color }}
@@ -125,7 +125,7 @@ const Notice = () => {
           )}
         </div>
 
-        
+
       </div>
     </div>
   );

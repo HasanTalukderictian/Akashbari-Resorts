@@ -21,7 +21,7 @@ const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
     }, [target, duration]);
 
     return (
-        <h2 className="fw-bold" style={{ color: '#5DB8C1' }}>
+        <h2 className="fw-bold" style={{ color: '#5e2e10' }}>
             {prefix}{count.toLocaleString()}{suffix}
         </h2>
     );
@@ -40,9 +40,9 @@ const HappyClient = () => {
 
     // Hero section style - Background changed to WHITE
     const heroSectionStyle = {
-        backgroundColor: '#ffffff', // Changed from gradient to white
+        backgroundColor: '#ffffff',
         padding: '100px 0 160px 0',
-        color: '#1a1a1a' // Changed text color to dark for contrast on white background
+        color: '#1a1a1a'
     };
 
     // Stats card style - Background white with subtle shadow
@@ -50,14 +50,27 @@ const HappyClient = () => {
         backgroundColor: '#ffffff',
         borderRadius: '15px',
         padding: '40px 20px',
-        boxShadow: '0 15px 40px rgba(0,0,0,0.08)', // Subtle shadow
+        boxShadow: '0 15px 40px rgba(0,0,0,0.08)',
         marginTop: '-80px',
         position: 'relative',
         zIndex: '10',
-        border: '1px solid #eef2f6' // Light border
+        border: '1px solid #eef2f6'
     };
 
-    const featureIcons = ["💰", "💎", "✨"];
+    // Professional icons for features
+    const featureIcons = [
+        "🏦", // Bank/Investment
+        "👑", // Crown/Elite
+        "🏨"  // Hotel/Luxury
+    ];
+
+    // Professional icons for stats (optional - can be used in stats section)
+    const statIcons = [
+        "👥", // Members
+        "📈", // Revenue Growth
+        "🏆", // Amenities/Awards
+        "⭐"  // Experience/Trust
+    ];
 
     // Fetch combined data from API
     const fetchCombinedData = async () => {
@@ -119,20 +132,21 @@ const HappyClient = () => {
     const getStatsData = () => {
         const stats = getMemberStats();
         return [
-            { id: 1, target: stats.member, suffix: "+", prefix: "", label: "Happy Members" },
-            { id: 2, target: stats.revenue, suffix: "%", prefix: "Up to ", label: "Yearly Revenue" },
-            { id: 3, target: stats.amenities, suffix: "+", prefix: "", label: "Club Amenities" },
-            { id: 4, target: stats.experience, suffix: "+", prefix: "", label: "Years of Trust" }
+            { id: 1, target: stats.member, suffix: "+", prefix: "", label: "Happy Members", icon: "👥" },
+            { id: 2, target: stats.revenue, suffix: "%", prefix: "Up to ", label: "Yearly Revenue", icon: "📈" },
+            { id: 3, target: stats.amenities, suffix: "+", prefix: "", label: "Club Amenities", icon: "🏆" },
+            { id: 4, target: stats.experience, suffix: "+", prefix: "", label: "Years of Trust", icon: "⭐" }
         ];
     };
 
     // Dynamic features data from invest_records API
     const getFeaturesData = () => {
         if (combinedData.invest_records.length > 0) {
-            return combinedData.invest_records.map((record) => ({
+            return combinedData.invest_records.map((record, index) => ({
                 id: record.id,
                 title: record.title,
-                desc: record.desc
+                desc: record.desc,
+                icon: featureIcons[index % featureIcons.length]
             }));
         }
         // Fallback data if API returns empty
@@ -140,17 +154,20 @@ const HappyClient = () => {
             {
                 id: 1,
                 title: "Passive Income",
-                desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits."
+                desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits.",
+                icon: "🏦"
             },
             {
                 id: 2,
                 title: "Elite Status",
-                desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club."
+                desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club.",
+                icon: "👑"
             },
             {
                 id: 3,
                 title: "Luxury Living",
-                desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort."
+                desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort.",
+                icon: "🏨"
             }
         ];
     };
@@ -196,33 +213,33 @@ const HappyClient = () => {
     }
 
     return (
-        <section style={{ backgroundColor: '#ffffff' }}> {/* Added white background to section */}
+        <section style={{ backgroundColor: '#ffffff' }}>
             <div style={heroSectionStyle}>
                 <div className="container">
                     <div className="row align-items-center">
                         <div className="col-md-6">
-                            <span className="text-warning fw-bold border-start border-warning border-3 ps-3 mb-3 d-inline-block" style={{ fontSize: '14px', letterSpacing: '1px' }}>
+                            <span className="fw-bold mb-3 d-inline-block" style={{ fontSize: '25px', letterSpacing: '1px', color: '#5e2e10' }}>
                                 AKASHBARI HOTEL & RESORT
                             </span>
                             <h1 className="display-4 fw-bold mb-4" style={{ lineHeight: '1.2', color: '#1a1a1a' }}>
                                 Investments that <br />
-                                <span style={{ color: '#5DB8C1' }}>make you a Property Owner</span>
+                                <span style={{ color: '#5e2e10' }}>make you a Property Owner</span>
                             </h1>
                         </div>
                         <div className="col-md-6">
                             <div className="ps-md-4" style={{ borderLeft: '1px solid rgba(0,0,0,0.1)' }}>
-                                <h4 className="fw-light mb-3" style={{ color: '#4a5568' }}>Your Investment, Your Future</h4>
+                                <h4 className="fw-light mb-3" style={{ color: '#5e2e10' }}>Your Investment, Your Future</h4>
                                 <p className="lead mb-2" style={{ color: '#2d3748' }}>
-                                    "Become a proud <strong>Property Owner</strong> by investing in  Akashbari Resorts' projects".
+                                    "Become a proud <strong>Property Owner</strong> by investing in Akashbari Resorts' projects".
                                 </p>
                                 
                                 <div className="mt-4">
                                     {featuresData.map((item, index) => (
                                         <div key={item.id} className={`py-3 border-top ${index === featuresData.length - 1 ? 'border-bottom' : ''}`} style={{ borderColor: '#e2e8f0 !important' }}>
                                             <div className="d-flex align-items-center">
-                                                <span className="fs-3 me-3">{featureIcons[index % featureIcons.length]}</span>
+                                                <span className="fs-2 me-3" style={{ color: '#5e2e10' }}>{item.icon}</span>
                                                 <div>
-                                                    <h6 className="fw-bold mb-0" style={{ color: '#2d3748' }}>{item.title}</h6>
+                                                    <h6 className="fw-bold mb-0" style={{ color: '#5e2e10' }}>{item.title}</h6>
                                                     <p className="small mb-0" style={{ color: '#718096' }}>{item.desc}</p>
                                                 </div>
                                             </div>
@@ -234,33 +251,6 @@ const HappyClient = () => {
                     </div>
                 </div>
             </div>
-
-            {/* <div className="container">
-                <div className="row justify-content-center">
-                    <div className="col-lg-11">
-                        <div style={statsCardStyle} className="text-center">
-                            <div className="row g-4">
-                                {statsData.map((stat, index) => (
-                                    <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`} style={{ borderColor: '#e2e8f0' }}>
-                                        {stat.target > 0 ? (
-                                            <CountUpItem 
-                                                target={stat.target} 
-                                                suffix={stat.suffix} 
-                                                prefix={stat.prefix} 
-                                            />
-                                        ) : (
-                                            <h2 className="fw-bold" style={{ color: '#5DB8C1' }}>
-                                                {stat.prefix}0{stat.suffix}
-                                            </h2>
-                                        )}
-                                        <p className="fw-bold mb-0" style={{ color: '#718096' }}>{stat.label}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> */}
         </section>
     );
 };

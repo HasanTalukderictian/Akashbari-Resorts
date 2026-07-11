@@ -9,9 +9,20 @@
 
 /* টেক্সটগুলোকে বাম দিকে অ্যালাইন করার জন্য */
 
-.welcome-title,
-.welcome-subtitle {
+.welcome-title {
     color: #4a4a4a;
+    font-weight: 500;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    text-align: left;
+    /* বাম থেকে শুরু হবে */
+    margin-left: 0;
+    /* নিশ্চিত করবে কোনো বাম মার্জিন নেই */
+    padding-left: 0;
+}
+
+.welcome-subtitle {
+    color: #5e2e10;
     font-weight: 500;
     font-size: 2.5rem;
     line-height: 1.2;
@@ -25,12 +36,12 @@
 
 /* ইয়েলো ডিভাইডার বড় এবং বাম পাশে সেট করা */
 
-.yellow-divider {
-    width: 120px;
+.line-divider {
+    width: 260px;
     /* ডিভাইডার লাইনের সাইজ বড় করা হয়েছে (আগে ৬০/৮০ ছিল) */
     height: 4px;
     /* পুরুত্ব সামান্য বাড়ানো হয়েছে */
-    background-color: #ffd700;
+    background-color: #5e2e10;
     margin-top: 10px;
     margin-left: 0;
     /* বাম পাশ থেকে শুরু হবে */
@@ -61,7 +72,7 @@
 }
 
 .features-title {
-    color: #4a4a4a;
+    color: #5e2e10;
     font-weight: 500;
     font-size: 1.5rem;
     letter-spacing: 1px;
@@ -78,7 +89,7 @@
 
 .features-list li::before {
     content: '✓';
-    color: #5cb85c;
+    color: #5e2e10;
     font-weight: bold;
     margin-right: 12px;
     font-size: 1rem;

@@ -1,8 +1,7 @@
-/* Investment.css - Complete File */
+/* Investment.css - Updated Card Design */
 
 .investment-section {
-    background-color: #ff8c32;
-    /* Orange Background */
+    background-color: #ad9d96;
     min-height: 100vh;
     font-family: 'Times New Roman', serif;
     position: relative;
@@ -10,7 +9,7 @@
 }
 
 .badge-opportunity {
-    background-color: #639c4e;
+    background-color: #5e2e10;
     color: white;
     display: inline-block;
     padding: 5px 15px;
@@ -19,47 +18,56 @@
 }
 
 .main-title {
-    color: white;
-    font-size: 3rem;
+    color: #2b8145;
+    letter-spacing: 4px;
+    font-size: 1.6rem;
     font-weight: 500;
 }
 
 .yellow-divider {
     width: 60px;
     height: 3px;
-    background-color: #ffd700;
 }
 
 .sub-text {
-    color: white;
-    font-style: italic;
+    color: 5e2e10;
+    font-style: bold;
+    letter-spacing: 3px;
+    font-size: 1.5rem;
+    font-weight: 500;
 }
 
 
-/* Card Styling */
+/* Card Styling - Clean White Cards */
 
 .investment-card {
     background-color: white;
-    border: 2px solid black;
-    height: auto;
-    min-height: 550px;
-    max-height: 600px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    height: 100%;
+    min-height: 400px;
     position: relative;
-    transition: transform 0.3s;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     overflow: visible !important;
-    /* Important for badge */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.popular-border {
-    border: 3px solid #639c4e !important;
+.investment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .sold-out-card {
-    opacity: 0.8;
+    opacity: 0.7;
     background: #f8f9fa;
     position: relative;
+}
+
+.sold-out-card:hover {
+    transform: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
 .clickable-card {
@@ -70,110 +78,89 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    margin-top: 15px;
-    /* Space for popular badge */
+    padding: 25px 20px;
 }
 
 
-/* Custom scrollbar for card content */
-
-.card-content::-webkit-scrollbar {
-    width: 4px;
-}
-
-.card-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.card-content::-webkit-scrollbar-thumb {
-    background: #ff8c32;
-    border-radius: 2px;
-}
+/* Title */
 
 .pkg-title {
-    font-size: 1.3rem;
-    font-weight: bold;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: #333;
-    padding: 0 10px;
-    line-height: 1.3;
-    min-height: 55px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    text-transform: capitalize;
+    margin-bottom: 8px;
+    font-family: 'Times New Roman', serif;
 }
+
+
+/* Price */
 
 .pkg-price {
-    font-weight: bold;
-    margin-top: 10px;
     font-size: 1.8rem;
+    font-weight: 700;
     color: #ff8c32;
+    margin-bottom: 2px;
 }
 
-.pkg-features {
-    list-style: none;
-    font-size: 13px;
-    margin-bottom: 10px;
+
+/* Cashback */
+
+.pkg-cashback {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #198754;
+    margin-bottom: 12px;
 }
 
-.pkg-features li {
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
 
-.pkg-features li strong {
-    min-width: 100px;
-    font-size: 12px;
-}
+/* Details */
 
-.pkg-desc {
-    font-size: 12px;
+.pkg-detail {
+    font-size: 14px;
     color: #555;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
+}
+
+.pkg-detail strong {
+    color: #333;
+    font-weight: 600;
 }
 
 
-/* Buttons */
+/* Inquire Button */
 
 .inquire-btn {
-    border: 1px solid black;
-    background: transparent;
-    padding: 10px;
-    margin: 10px 0 0 0;
-    font-weight: bold;
+    border: none;
+    background: #5e2e10;
+    color: white;
+    padding: 12px;
+    margin-top: auto;
+    font-weight: 600;
+    font-size: 14px;
     transition: 0.3s;
     width: 100%;
     cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
 }
 
 .inquire-btn:hover:not(.sold-out-footer) {
-    background-color: #ff8c32;
-    color: white;
-    border-color: #ff8c32;
+    background-color: #4a250d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(94, 46, 16, 0.3);
 }
 
 
 /* Popular button style */
 
 .popular-btn {
-    background-color: #639c4e !important;
+    background-color: #5e2e10 !important;
     color: white !important;
-    border: none !important;
 }
 
 .popular-btn:hover {
-    background-color: #4a6d36 !important;
-    transform: translateY(-2px);
+    background-color: #4a250d !important;
 }
 
 
@@ -182,73 +169,36 @@
 .sold-out-footer {
     background-color: #94a3b8 !important;
     color: #475569 !important;
-    border: none !important;
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
 
-/* Sold Out Container */
-
-.sold-out-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 250px;
-}
-
-.sold-out-btn {
-    background-color: #e00000;
-    color: white;
-    font-weight: bold;
-    padding: 12px 20px;
-    border: 2px solid black;
-    width: 80%;
-    margin: 0 auto;
-    text-align: center;
-    font-size: 14px;
-}
-
-
-/* Card hover effect */
-
-.investment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-
-/* ==================== POPULAR BADGE - CENTERED STYLE ==================== */
+/* ==================== POPULAR BADGE ==================== */
 
 .popular-badge-centered {
     position: absolute;
     top: -15px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, #639c4e, #4a6d36);
-    color: white;
-    padding: 8px 25px;
-    font-size: 12px;
-    font-weight: bold;
+    background: linear-gradient(135deg, #5e2e10, #3d1d0a);
+    color: #ffd700;
+    padding: 6px 20px;
+    font-size: 11px;
+    font-weight: 700;
     z-index: 20;
     white-space: nowrap;
-    letter-spacing: 1.5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(94, 46, 16, 0.3);
     border-radius: 25px 25px 25px 25px;
     animation: slideInTop 0.5s ease-out;
+    text-transform: uppercase;
 }
-
-
-/* Add star icon */
 
 .popular-badge-centered::before {
-    content: "★ ";
-    font-size: 13px;
-    font-weight: bold;
+    content: "⭐ ";
+    font-size: 12px;
 }
-
-
-/* Add notch at bottom for 50/50 effect */
 
 .popular-badge-centered::after {
     content: '';
@@ -260,20 +210,8 @@
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 8px solid #4a6d36;
+    border-top: 8px solid #3d1d0a;
 }
-
-
-/* Hover effect for badge */
-
-.investment-card:hover .popular-badge-centered {
-    transform: translateX(-50%) translateY(-2px);
-    transition: transform 0.3s ease;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-
-/* Animation for badge */
 
 @keyframes slideInTop {
     from {
@@ -287,60 +225,40 @@
 }
 
 
-/* Benefits Section Styling */
+/* Benefits Section */
 
 .benefits-container {
     border: 1px solid #ddd;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-}
-
-.benefits-badge {
-    background-color: #639c4e;
-    color: white;
-    padding: 8px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    display: inline-block;
-    margin-bottom: 15px;
-}
-
-.benefits-main-title {
-    color: #4a4a4a;
-    font-size: 2.2rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-}
-
-.benefits-sub-text {
-    color: #666;
-    font-size: 16px;
+    border-radius: 8px;
+    background: white;
 }
 
 .benefit-item {
-    border: 1px solid #333;
+    border: 1px solid #e0e0e0;
     padding: 12px 15px;
     height: 100%;
     background: #fff;
     transition: all 0.3s ease;
+    border-radius: 4px;
 }
 
 .benefit-item:hover {
-    border-color: #639c4e;
+    border-color: #5e2e10;
     transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 .benefit-number {
-    background-color: #639c4e;
+    background-color: #5e2e10;
     color: white;
-    padding: 2px 8px;
-    font-size: 14px;
-    font-weight: bold;
+    padding: 2px 10px;
+    font-size: 13px;
+    font-weight: 700;
     margin-right: 15px;
     min-width: 35px;
     text-align: center;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 .benefit-text {
@@ -350,17 +268,8 @@
     flex: 1;
 }
 
-
-/* Footer Section */
-
-.promo-divider {
-    width: 100%;
-    height: 1px;
-    background-color: #639c4e;
-}
-
 .promo-question {
-    color: #4a4a4a;
+    color: #5e2e10;
     font-weight: 600;
 }
 
@@ -371,456 +280,33 @@
 }
 
 
-/* Responsive adjustments */
+/* Responsive */
 
-@media (max-width: 1200px) {
-    .investment-card {
-        min-height: 580px;
-        max-height: 620px;
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
     }
-    .pkg-title {
-        font-size: 1.2rem;
-        min-height: 50px;
+    .investment-card {
+        min-height: 350px;
     }
     .pkg-price {
         font-size: 1.5rem;
     }
 }
 
-@media (max-width: 992px) {
-    .investment-card {
-        min-height: 550px;
-        max-height: 600px;
-    }
-}
-
-@media (max-width: 768px) {
-    .investment-card {
-        min-height: auto;
-        max-height: none;
-        height: auto;
-    }
-    .card-content {
-        overflow-y: visible;
-    }
-    .pkg-title {
-        min-height: auto;
-    }
-    .main-title {
-        font-size: 2rem;
-    }
-    .benefit-item {
-        margin-bottom: 10px;
-    }
-    /* Adjust centered badge for mobile */
-    .popular-badge-centered {
-        padding: 6px 20px;
-        font-size: 10px;
-        top: -12px;
-    }
-    .popular-badge-centered::before {
-        font-size: 11px;
-    }
-    .popular-badge-centered::after {
-        bottom: -6px;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 6px solid #4a6d36;
-    }
-}
-
 @media (max-width: 576px) {
-    .pkg-features li strong {
-        min-width: 80px;
-    }
-    .pkg-price {
-        font-size: 1.3rem;
-    }
-    .sold-out-btn {
-        font-size: 12px;
-        padding: 10px 15px;
-    }
-    .popular-badge-centered {
-        padding: 5px 15px;
-        font-size: 9px;
-        top: -10px;
-    }
-    .popular-badge-centered::before {
-        font-size: 10px;
-    }
-}
-
-
-/* Animation for cards on load */
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.col-lg-3 {
-    animation: fadeInUp 0.5s ease-out forwards;
-}
-
-
-/* Stagger animation delay for cards */
-
-.col-lg-3:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.col-lg-3:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.col-lg-3:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.col-lg-3:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-
-/* Remove hover effect from new design cards */
-
-.new-card-no-hover:hover {
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-.new-card-no-hover:hover .popular-badge-centered {
-    transform: translateX(-50%) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Infant:wght@400;500;600;700&display=swap');
-.card-content {
-    text-align: left;
-}
-
-.pkg-features {
-    padding-left: 0 !important;
-}
-
-.pkg-features li {
-    justify-content: flex-start;
-}
-
-
-/* ============================================ */
-
-
-/* RESPONSIVE DESIGN - WITHOUT CHANGING DESIGN */
-
-
-/* ============================================ */
-
-
-/* Large Desktop (1200px to 1399px) */
-
-@media (max-width: 1399px) and (min-width: 1200px) {
-    .new-design-section .col {
-        flex: 1 0 18% !important;
-        max-width: 18% !important;
-    }
-}
-
-
-/* Desktop (992px to 1199px) */
-
-@media (max-width: 1199px) {
-    .new-design-section .col {
-        flex: 1 0 30% !important;
-        max-width: 30% !important;
-    }
-    .col-lg-3 {
-        flex: 0 0 33.333%;
-        max-width: 33.333%;
-    }
-}
-
-
-/* Tablet (768px to 991px) */
-
-@media (max-width: 991px) {
-    .new-design-section .col {
-        flex: 1 0 45% !important;
-        max-width: 45% !important;
-    }
-    .col-md-6 {
-        flex: 0 0 50%;
-        max-width: 50%;
-    }
-    .benefit-item {
-        margin-bottom: 15px;
-    }
-    .benefits-container .row .col-md-6:last-child .benefit-item {
-        margin-bottom: 0;
-    }
-}
-
-
-/* Mobile Landscape (576px to 767px) */
-
-@media (max-width: 767px) {
-    .new-design-section .col {
-        flex: 1 0 100% !important;
-        max-width: 100% !important;
-    }
-    .col-md-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
     .investment-card {
-        min-height: auto;
-        max-height: none;
-        height: auto;
-    }
-    .card-content {
-        overflow-y: visible;
-    }
-    .pkg-title {
-        min-height: auto;
-    }
-    .main-title {
-        font-size: 2rem;
-    }
-    .benefit-item {
-        margin-bottom: 12px;
-    }
-    .popular-badge-centered {
-        padding: 6px 20px;
-        font-size: 10px;
-        top: -12px;
-        white-space: nowrap;
-    }
-    .popular-badge-centered::before {
-        font-size: 11px;
-    }
-    .popular-badge-centered::after {
-        bottom: -6px;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 6px solid #4a6d36;
-    }
-    .row.g-4 {
-        --bs-gutter-y: 1.5rem;
-    }
-}
-
-
-/* Mobile Portrait (575px and below) */
-
-@media (max-width: 575px) {
-    .new-design-section .col {
-        flex: 1 0 100% !important;
-        max-width: 100% !important;
-    }
-    .col-lg-3,
-    .col-md-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-    .main-title {
-        font-size: 1.6rem;
-    }
-    .sub-text {
-        font-size: 0.9rem;
-        padding: 0 10px;
-    }
-    .badge-opportunity {
-        font-size: 12px;
-        padding: 4px 12px;
-    }
-    .pkg-title {
-        font-size: 1.1rem;
-        padding: 0 5px;
-    }
-    .pkg-price {
-        font-size: 1.3rem;
-    }
-    .pkg-cashback {
-        font-size: 1rem !important;
-    }
-    .pkg-features li strong {
-        min-width: 85px;
-        font-size: 11px;
-    }
-    .pkg-features li {
-        font-size: 11px;
-    }
-    .pkg-desc {
-        font-size: 11px;
-    }
-    .sold-out-btn {
-        font-size: 12px;
-        padding: 10px 15px;
-        width: 90%;
-    }
-    .inquire-btn {
-        padding: 8px;
-        font-size: 12px;
-    }
-    .popular-badge-centered {
-        padding: 4px 12px;
-        font-size: 8px;
-        top: -10px;
-        letter-spacing: 1px;
-    }
-    .popular-badge-centered::before {
-        font-size: 9px;
-    }
-    .popular-badge-centered::after {
-        bottom: -5px;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 5px solid #4a6d36;
-    }
-    .benefits-container {
-        padding: 1.5rem !important;
-        margin-top: 2rem !important;
-    }
-    .benefits-container h2 {
-        font-size: 1.5rem !important;
-    }
-    .benefit-item {
-        padding: 10px 12px;
-    }
-    .benefit-number {
-        min-width: 30px;
-        font-size: 12px;
-        margin-right: 10px;
-    }
-    .benefit-text {
-        font-size: 12px;
-    }
-    .promo-question {
-        font-size: 1.1rem;
-    }
-    .promo-text {
-        font-size: 13px;
-        padding: 0 10px;
-    }
-    .yellow-divider {
-        width: 50px;
-    }
-    .container {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-}
-
-
-/* Extra Small Devices (375px and below) */
-
-@media (max-width: 375px) {
-    .main-title {
-        font-size: 1.3rem;
+        min-height: 320px;
     }
     .pkg-title {
         font-size: 1rem;
     }
     .pkg-price {
-        font-size: 1.1rem;
-    }
-    .pkg-cashback {
-        font-size: 0.85rem !important;
+        font-size: 1.3rem;
     }
     .popular-badge-centered {
-        padding: 3px 10px;
-        font-size: 7px;
-        top: -8px;
-    }
-    .popular-badge-centered::before {
-        font-size: 8px;
-    }
-    .sold-out-btn {
-        font-size: 10px;
-        padding: 8px 12px;
-    }
-    .benefits-container h2 {
-        font-size: 1.3rem !important;
-    }
-    .benefit-text {
-        font-size: 11px;
-    }
-}
-
-
-/* Fix for row gap in small devices */
-
-@media (max-width: 767px) {
-    .row.g-4 {
-        --bs-gutter-y: 1.2rem;
-    }
-    .mt-5 {
-        margin-top: 2rem !important;
-    }
-    .py-5 {
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
-    }
-}
-
-
-/* Ensure new design cards don't break on small devices */
-
-@media (max-width: 991px) {
-    .new-design-section .investment-card {
-        min-height: 160px;
-        max-height: 180px;
-    }
-    .new-design-section .pkg-title {
-        font-size: 0.9rem;
-    }
-    .new-design-section div[style*="backgroundColor"] {
-        font-size: 12px !important;
-        padding: 8px 10px !important;
-    }
-}
-
-@media (max-width: 575px) {
-    .new-design-section .investment-card {
-        min-height: 140px;
-        max-height: 160px;
-    }
-    .new-design-section .pkg-title {
-        font-size: 0.85rem;
-    }
-    .new-design-section div[style*="backgroundColor"] {
-        font-size: 11px !important;
-        padding: 6px 8px !important;
-    }
-}
-
-
-/* Fix for benefits section last item alignment */
-
-@media (min-width: 768px) {
-    .benefits-container .row .col-md-6:last-child .benefit-item {
-        margin-bottom: 0;
-    }
-}
-
-
-/* Animation adjustment for mobile - reduce motion if preferred */
-
-@media (prefers-reduced-motion: reduce) {
-    .investment-card,
-    .popular-badge-centered,
-    .benefit-item,
-    .col-lg-3 {
-        animation: none !important;
-        transition: none !important;
-    }
-    .investment-card:hover {
-        transform: none !important;
+        font-size: 9px;
+        padding: 4px 14px;
+        top: -12px;
     }
 }
