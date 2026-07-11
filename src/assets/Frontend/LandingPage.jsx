@@ -58,7 +58,7 @@ const LandingPage = () => {
 
       <Packagegrap />
 
-      <Luxury />
+      {/* <Luxury /> */}
 
       <Facility />
       

@@ -24,7 +24,7 @@
     margin: 0 12px;
     font-size: 13px;
     font-weight: 500;
-    color: #000 !important;
+    color: #5e2e10 !important;
     letter-spacing: 0.5px;
 }
 
@@ -39,7 +39,7 @@
 /* Contact button */
 
 .contact-btn {
-    background: #111;
+    background: #5e2e10;
     color: #fff;
     border: none;
     padding: 8px 18px;
@@ -50,7 +50,7 @@
 }
 
 
-/* Hover */
+/* Contact button hover */
 
 .contact-btn:hover {
     background: #6b9e3e;
@@ -74,26 +74,27 @@
     border-radius: 0 !important;
     margin-top: 0 !important;
     border: 1px solid #ddd !important;
-    background-color: #f8f8f8 !important;
+    background-color: #5e2e10 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
     padding: 0 !important;
 }
 
 
-/* Dropdown items - no border radius */
+/* Dropdown items - white text on dark brown background */
 
 .dropdown-item {
     border-radius: 0 !important;
     padding: 10px 25px !important;
     font-size: 13px !important;
     font-weight: 500 !important;
-    color: #000 !important;
+    color: #ffffff !important;
+    /* WHITE text for visibility */
     letter-spacing: 0.5px !important;
     transition: all 0.3s ease !important;
 }
 
 
-/* Dropdown item hover - black background */
+/* Dropdown item hover - black background with white text */
 
 .dropdown-item:hover {
     background-color: black !important;
@@ -112,19 +113,20 @@
 /* Remove focus outline and gray background */
 
 .dropdown-item:focus {
-    background-color: transparent !important;
+    background-color: #5e2e10 !important;
+    color: #ffffff !important;
     outline: none !important;
     box-shadow: none !important;
 }
 
 
-/* Dropdown toggle link styling */
+/* Dropdown toggle link styling - AFFILIATES text color */
 
 .navbar-nav .nav-link.dropdown-toggle {
     margin: 0 12px !important;
     font-size: 13px !important;
     font-weight: 500 !important;
-    color: #000 !important;
+    color: #5e2e10 !important;
     letter-spacing: 0.5px !important;
 }
 

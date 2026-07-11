@@ -68,7 +68,7 @@
 /* Button */
 
 .discover-btn {
-    background: #6b9e3e;
+    background: #5e2e10;
     border: none;
     color: #fff;
     padding: 12px 25px;
@@ -78,7 +78,7 @@
 }
 
 .discover-btn:hover {
-    background: #73f104;
+    background: #6b9e3e;
 }
 
 

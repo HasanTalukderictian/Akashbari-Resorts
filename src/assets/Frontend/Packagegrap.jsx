@@ -352,7 +352,7 @@ const PackageGraph = () => {
             marginBottom: '20px',
             backdropFilter: 'blur(10px)'
           }}>
-            📊 REAL-TIME MARKET DATA
+             REAL-TIME MARKET DATA
           </div>
           <h1 style={{
             fontSize: '42px',

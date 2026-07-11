@@ -80,7 +80,7 @@ const Header = ({ scrollToOwner }) => {
               </Nav.Link>
 
               <Nav.Link onClick={handleInvestmentClick}>
-                 INVESTMENT
+                INVESTMENT
               </Nav.Link>
 
               <Nav.Link onClick={() => navigate("/gallery")}>
@@ -99,7 +99,10 @@ const Header = ({ scrollToOwner }) => {
               </Nav.Link>
 
               {/* AFFILIATES Dropdown Menu */}
-              <NavDropdown title="AFFILIATES" id="affiliates-dropdown">
+              <NavDropdown
+                title={<span style={{ color: "#5e2e10" }}>AFFILIATES</span>}
+                id="affiliates-dropdown"
+              >
                 <NavDropdown.Item onClick={() => navigate("/partner")}>
                   PARTNER
                 </NavDropdown.Item>
