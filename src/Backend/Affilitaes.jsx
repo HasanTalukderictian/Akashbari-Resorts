@@ -31,7 +31,9 @@ const Affilitaes = ({ theme: propsTheme }) => {
         card: isDarkMode ? '#16213e' : '#ffffff',
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
-        sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
+        sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)'
     };
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -276,7 +278,7 @@ const Affilitaes = ({ theme: propsTheme }) => {
             margin: 0
         },
         addButton: {
-            backgroundColor: '#ff8c32',
+            backgroundColor: '#5e2e10',
             border: 'none',
             padding: '10px 24px',
             borderRadius: '8px',
@@ -286,7 +288,8 @@ const Affilitaes = ({ theme: propsTheme }) => {
             transition: 'all 0.3s ease',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         tableWrapper: {
             backgroundColor: theme.card,
@@ -370,7 +373,7 @@ const Affilitaes = ({ theme: propsTheme }) => {
             fontSize: '14px'
         },
         requiredStar: {
-            color: '#ff8c32',
+            color: '#5e2e10',
             marginLeft: '4px'
         },
         input: {
@@ -417,7 +420,7 @@ const Affilitaes = ({ theme: propsTheme }) => {
         },
         uploadIcon: {
             fontSize: '40px',
-            color: '#ff8c32',
+            color: '#5e2e10',
             marginBottom: '10px'
         },
         uploadText: {
@@ -434,7 +437,7 @@ const Affilitaes = ({ theme: propsTheme }) => {
             gap: '8px'
         },
         editBtn: {
-            backgroundColor: '#28a745',
+            backgroundColor: '#5e2e10',
             border: 'none',
             padding: '5px 12px',
             borderRadius: '6px',
@@ -461,7 +464,7 @@ const Affilitaes = ({ theme: propsTheme }) => {
             display: 'inline-block'
         },
         websiteLink: {
-            color: '#ff8c32',
+            color: '#5e2e10',
             textDecoration: 'none',
             fontSize: '12px'
         },
@@ -513,8 +516,16 @@ const Affilitaes = ({ theme: propsTheme }) => {
                                 <button 
                                     style={styles.addButton}
                                     onClick={() => setShowModal(true)}
-                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e67e22'}
-                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff8c32'}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#8B4513';
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#5e2e10';
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+                                    }}
                                 >
                                     <i className="bi bi-plus-lg"></i>
                                     Add New Affiliate
@@ -584,16 +595,28 @@ const Affilitaes = ({ theme: propsTheme }) => {
                                                         <button 
                                                             style={styles.editBtn}
                                                             onClick={() => handleEdit(affiliate)}
-                                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
-                                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
+                                                            onMouseEnter={(e) => {
+                                                                e.currentTarget.style.backgroundColor = '#8B4513';
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                e.currentTarget.style.backgroundColor = '#5e2e10';
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                            }}
                                                         >
                                                             <i className="bi bi-pencil"></i> Edit
                                                         </button>
                                                         <button 
                                                             style={styles.deleteBtn}
                                                             onClick={() => handleDelete(affiliate.id)}
-                                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
-                                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+                                                            onMouseEnter={(e) => {
+                                                                e.currentTarget.style.backgroundColor = '#c82333';
+                                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                e.currentTarget.style.backgroundColor = '#dc3545';
+                                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                            }}
                                                         >
                                                             <i className="bi bi-trash"></i> Delete
                                                         </button>
@@ -724,9 +747,22 @@ const Affilitaes = ({ theme: propsTheme }) => {
                             <button 
                                 className="btn btn-primary"
                                 onClick={handleSubmit}
-                                style={{ backgroundColor: '#ff8c32', border: 'none', padding: '8px 24px' }}
-                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e67e22'}
-                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff8c32'}
+                                style={{ 
+                                    backgroundColor: '#5e2e10', 
+                                    border: 'none', 
+                                    padding: '8px 24px',
+                                    boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#8B4513';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#5e2e10';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+                                }}
                                 disabled={submitting}
                             >
                                 {submitting ? (
@@ -763,8 +799,8 @@ const Affilitaes = ({ theme: propsTheme }) => {
                 
                 input:focus, textarea:focus {
                     outline: none;
-                    border-color: #ff8c32 !important;
-                    box-shadow: 0 0 0 2px rgba(255, 140, 50, 0.1);
+                    border-color: #5e2e10 !important;
+                    box-shadow: 0 0 0 2px rgba(94, 46, 16, 0.1);
                 }
                 
                 .table-responsive {

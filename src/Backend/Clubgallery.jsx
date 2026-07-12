@@ -35,7 +35,8 @@ const Clubgallery = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
-        accent: '#5e72e4'
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)'
     };
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -223,6 +224,19 @@ const Clubgallery = ({ theme: propsTheme }) => {
         }
     };
 
+    // Hover handlers for buttons
+    const handleButtonHover = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+    };
+
+    const handleButtonLeave = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+    };
+
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
         mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
@@ -238,7 +252,7 @@ const Clubgallery = ({ theme: propsTheme }) => {
             cursor: 'pointer'
         },
         uploadBtn: {
-            backgroundColor: '#28a745',
+            background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
             color: '#fff',
             border: 'none',
             padding: '12px 28px',
@@ -247,7 +261,8 @@ const Clubgallery = ({ theme: propsTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         }
     };
 
@@ -277,8 +292,8 @@ const Clubgallery = ({ theme: propsTheme }) => {
                                     onClick={handleAddClick}
                                     style={styles.uploadBtn}
                                     className="btn"
-                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
-                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
+                                    onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                    onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                 >
                                     <FaPlus /> Upload New Image
                                 </button>
@@ -489,9 +504,21 @@ const Clubgallery = ({ theme: propsTheme }) => {
                                         type="submit" 
                                         className="btn btn-primary" 
                                         disabled={uploading}
-                                        style={{ backgroundColor: '#28a745', border: 'none' }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#218838'}
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
+                                        style={{ 
+                                            background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
+                                            border: 'none',
+                                            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+                                        }}
                                     >
                                         {uploading ? (<> <FaSpinner className="spinner-border-sm me-2" /> {isEdit ? 'Updating...' : 'Uploading...'} </>) : (<> <FaUpload className="me-2" /> {isEdit ? 'Update Image' : 'Upload Image'} </>)}
                                     </button>
@@ -522,6 +549,11 @@ const Clubgallery = ({ theme: propsTheme }) => {
                 
                 .page-item.disabled .page-link {
                     cursor: not-allowed;
+                }
+                
+                .page-item.active .page-link {
+                    background-color: #5e2e10;
+                    border-color: #5e2e10;
                 }
             `}</style>
         </div>

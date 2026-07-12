@@ -35,7 +35,8 @@ const Teamate = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
-        primary: '#9a55ff',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b'
@@ -385,8 +386,8 @@ const Teamate = ({ theme: propsTheme }) => {
         },
         alert: {
             padding: '12px 20px',
-            backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096',
+            backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10',
             borderRadius: '8px',
             marginBottom: '20px',
             fontWeight: '500'
@@ -413,7 +414,7 @@ const Teamate = ({ theme: propsTheme }) => {
             margin: 0
         },
         addButton: {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: theme.primaryGradient,
             color: 'white',
             border: 'none',
             padding: '10px 24px',
@@ -423,7 +424,8 @@ const Teamate = ({ theme: propsTheme }) => {
             fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         searchBox: {
             padding: '10px 15px',
@@ -463,14 +465,15 @@ const Teamate = ({ theme: propsTheme }) => {
         },
         editBtn: {
             padding: '6px 12px',
-            backgroundColor: '#3b82f6',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            transition: 'all 0.3s ease'
         },
         deleteBtn: {
             padding: '6px 12px',
@@ -481,7 +484,8 @@ const Teamate = ({ theme: propsTheme }) => {
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            transition: 'all 0.3s ease'
         },
         modalOverlay: {
             position: 'fixed',
@@ -550,6 +554,17 @@ const Teamate = ({ theme: propsTheme }) => {
         }
     };
 
+    // Hover handlers
+    const handleButtonHover = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(-2px)';
+    };
+
+    const handleButtonLeave = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(0)';
+    };
+
     return (
         <div style={styles.container} className="container-fluid p-0">
             <div className="d-flex">
@@ -583,6 +598,8 @@ const Teamate = ({ theme: propsTheme }) => {
                                             style={styles.addButton} 
                                             onClick={() => openModal()}
                                             disabled={loading}
+                                            onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                            onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                         >
                                             ➕ Add Member
                                         </button>
@@ -641,6 +658,8 @@ const Teamate = ({ theme: propsTheme }) => {
                                                                         style={styles.editBtn} 
                                                                         onClick={() => openModal(member)}
                                                                         disabled={loading}
+                                                                        onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                                        onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                                                     >
                                                                         ✏️ Edit
                                                                     </button>
@@ -648,6 +667,14 @@ const Teamate = ({ theme: propsTheme }) => {
                                                                         style={styles.deleteBtn} 
                                                                         onClick={() => handleDelete(member.id)}
                                                                         disabled={loading}
+                                                                        onMouseEnter={(e) => {
+                                                                            e.currentTarget.style.backgroundColor = '#c82333';
+                                                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                        }}
+                                                                        onMouseLeave={(e) => {
+                                                                            e.currentTarget.style.backgroundColor = '#ef4444';
+                                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                                        }}
                                                                     >
                                                                         🗑️ Delete
                                                                     </button>
@@ -664,6 +691,8 @@ const Teamate = ({ theme: propsTheme }) => {
                                                                 style={{ ...styles.addButton, marginTop: '10px' }} 
                                                                 onClick={() => openModal()}
                                                                 disabled={loading}
+                                                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                                             >
                                                                 Add your first team member
                                                             </button>
@@ -682,6 +711,8 @@ const Teamate = ({ theme: propsTheme }) => {
                                             style={{...styles.editBtn, ...(currentPage === 1 && styles.disabledBtn)}}
                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                             disabled={currentPage === 1 || loading}
+                                            onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                            onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                         >
                                             ← Previous
                                         </button>
@@ -692,6 +723,8 @@ const Teamate = ({ theme: propsTheme }) => {
                                             style={{...styles.editBtn, ...(currentPage === totalPages && styles.disabledBtn)}}
                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                             disabled={currentPage === totalPages || loading}
+                                            onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                            onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                         >
                                             Next →
                                         </button>
@@ -794,6 +827,8 @@ const Teamate = ({ theme: propsTheme }) => {
                                     type="submit" 
                                     style={{...styles.addButton, ...(loading && styles.disabledBtn)}}
                                     disabled={loading}
+                                    onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                    onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                 >
                                     {loading ? (
                                         <>

@@ -227,7 +227,7 @@ const CustomModal = ({ theme, onClose, fetchItems, editingItem, readOnly }) => {
             backgroundColor: theme.bg
         },
         badge: {
-            background: theme.accentGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: theme.accentGradient || 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
             color: 'white',
             padding: '4px 12px',
             borderRadius: '20px',
@@ -306,7 +306,7 @@ const CustomModal = ({ theme, onClose, fetchItems, editingItem, readOnly }) => {
                             {!readOnly && (
                                 <span 
                                     onClick={addFeatureField}
-                                    style={{ cursor: 'pointer', color: '#667eea', fontSize: '12px' }}
+                                    style={{ cursor: 'pointer', color: '#5e2e10', fontSize: '12px' }}
                                 >
                                     <i className="bi bi-plus-circle"></i> Add Feature
                                 </span>
@@ -345,7 +345,13 @@ const CustomModal = ({ theme, onClose, fetchItems, editingItem, readOnly }) => {
                             className="btn btn-primary w-100 fw-bold" 
                             onClick={handleSubmit} 
                             disabled={loading}
-                            style={{ padding: '10px', borderRadius: '10px' }}
+                            style={{ 
+                                padding: '10px', 
+                                borderRadius: '10px',
+                                background: theme.accentGradient || 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
+                                border: 'none',
+                                color: 'white'
+                            }}
                         >
                             {loading ? (
                                 <>
@@ -393,8 +399,8 @@ const LuxurySection = () => {
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
-        primary: '#667eea',
-        accentGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        primary: '#5e2e10',
+        accentGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981'
     };
@@ -518,8 +524,8 @@ const LuxurySection = () => {
         },
         alert: {
             padding: '12px 20px',
-            backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096',
+            backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10',
             borderRadius: '8px',
             marginBottom: '20px',
             fontWeight: '500'
@@ -591,7 +597,8 @@ const LuxurySection = () => {
             transition: 'all 0.3s',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         itemsGrid: {
             display: 'grid',
@@ -729,7 +736,7 @@ const LuxurySection = () => {
                     }
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     .item-card:hover {
                         transform: translateY(-6px);
@@ -742,8 +749,8 @@ const LuxurySection = () => {
                         transform: translateY(-2px);
                     }
                     .search-box:focus {
-                        border-color: #667eea;
-                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                        border-color: #5e2e10;
+                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
                     }
                 `}
             </style>

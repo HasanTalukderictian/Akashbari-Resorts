@@ -36,8 +36,8 @@ const GallerySection = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
-        primary: '#9a55ff',
-        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b',
@@ -298,8 +298,8 @@ const GallerySection = ({ theme: propsTheme }) => {
         },
         alert: {
             padding: '12px 20px',
-            backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096',
+            backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10',
             borderRadius: '8px',
             marginBottom: '20px',
             fontWeight: '500'
@@ -372,7 +372,7 @@ const GallerySection = ({ theme: propsTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         galleryGrid: {
             display: 'grid',
@@ -559,7 +559,7 @@ const GallerySection = ({ theme: propsTheme }) => {
                     }
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     .gallery-card:hover {
                         transform: translateY(-6px);
@@ -572,8 +572,8 @@ const GallerySection = ({ theme: propsTheme }) => {
                         transform: translateY(-2px);
                     }
                     .search-box:focus {
-                        border-color: #9a55ff;
-                        box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1);
+                        border-color: #5e2e10;
+                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
                     }
                     .gallery-card {
                         animation: slideUp 0.3s ease;

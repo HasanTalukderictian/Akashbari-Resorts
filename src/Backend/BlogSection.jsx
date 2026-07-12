@@ -34,8 +34,8 @@ const BlogSection = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
-        primary: '#9a55ff',
-        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b',
@@ -509,7 +509,7 @@ const BlogSection = ({ theme: propsTheme }) => {
         pageHeader: { marginBottom: '30px' },
         pageTitle: { fontSize: '28px', fontWeight: '700', background: theme.primaryGradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '8px' },
         pageSubtitle: { color: theme.textLight, fontSize: '14px' },
-        alert: { padding: '12px 20px', backgroundColor: 'rgba(254, 112, 150, 0.15)', color: '#fe7096', borderRadius: '8px', marginBottom: '20px', fontWeight: '500' },
+        alert: { padding: '12px 20px', backgroundColor: 'rgba(94, 46, 16, 0.15)', color: '#5e2e10', borderRadius: '8px', marginBottom: '20px', fontWeight: '500' },
         statsContainer: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' },
         statCard: { backgroundColor: theme.card, borderRadius: '16px', padding: '20px', border: `1px solid ${theme.border}`, transition: 'all 0.3s ease', cursor: 'pointer' },
         statIcon: { width: '45px', height: '45px', borderRadius: '12px', background: theme.primaryGradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '12px' },
@@ -517,7 +517,7 @@ const BlogSection = ({ theme: propsTheme }) => {
         statLabel: { fontSize: '13px', color: theme.textLight, fontWeight: '500' },
         toolbar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' },
         searchBox: { padding: '12px 20px', borderRadius: '12px', border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text, width: '300px', fontSize: '14px', outline: 'none', transition: 'all 0.3s' },
-        addBtn: { background: theme.primaryGradient, color: 'white', border: 'none', padding: '12px 28px', borderRadius: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', transition: 'all 0.3s', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)' },
+        addBtn: { background: theme.primaryGradient, color: 'white', border: 'none', padding: '12px 28px', borderRadius: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', transition: 'all 0.3s', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)' },
         blogsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px', marginBottom: '30px' },
         blogCard: { backgroundColor: theme.card, borderRadius: '20px', overflow: 'hidden', border: `1px solid ${theme.border}`, transition: 'all 0.3s ease', position: 'relative' },
         blogImage: { width: '100%', height: '200px', objectFit: 'cover', transition: 'transform 0.5s ease' },
@@ -555,11 +555,11 @@ const BlogSection = ({ theme: propsTheme }) => {
     return (
         <div style={styles.container}>
             <style>{`
-                .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15); }
+                .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15); }
                 .blog-card:hover { transform: translateY(-6px); box-shadow: 0 12px 35px rgba(0,0,0,0.2); }
                 .blog-card:hover img { transform: scale(1.05); }
                 button:hover { transform: translateY(-2px); }
-                .search-box:focus { border-color: #9a55ff; box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1); }
+                .search-box:focus { border-color: #5e2e10; box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1); }
                 .blog-card { animation: slideUp 0.3s ease; }
                 @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
                 @keyframes slideInRight { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }

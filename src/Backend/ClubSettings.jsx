@@ -31,7 +31,8 @@ const ClubSettings = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
-        accent: '#5e72e4'
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)'
     };
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -165,6 +166,19 @@ const ClubSettings = ({ theme: propsTheme }) => {
         }
     };
 
+    // Hover handlers
+    const handleButtonHover = (e) => {
+        e.currentTarget.style.backgroundColor = '#8B4513';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+    };
+
+    const handleButtonLeave = (e) => {
+        e.currentTarget.style.backgroundColor = '#5e2e10';
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 6px rgba(94, 46, 16, 0.3)';
+    };
+
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
         mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
@@ -180,14 +194,14 @@ const ClubSettings = ({ theme: propsTheme }) => {
             padding: '24px'
         },
         button: {
-            backgroundColor: '#5e72e4',
+            background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
             color: '#fff',
             border: 'none',
             padding: '10px 20px',
             borderRadius: '8px',
             fontWeight: '600',
-            transition: 'all 0.2s',
-            boxShadow: '0 4px 6px rgba(50,50,93,.11)'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 6px rgba(94, 46, 16, 0.3)'
         },
         th: {
             backgroundColor: isDarkMode ? '#1f293d' : '#f6f9fc',
@@ -253,7 +267,9 @@ const ClubSettings = ({ theme: propsTheme }) => {
                                             setImage(null);
                                             setShowModal(true);
                                         }}
-                                        className="btn btn-primary d-flex align-items-center gap-2"
+                                        className="btn d-flex align-items-center gap-2"
+                                        onMouseEnter={handleButtonHover}
+                                        onMouseLeave={handleButtonLeave}
                                     >
                                         <i className="bi bi-plus-circle"></i> Add Club
                                     </button>
@@ -316,12 +332,21 @@ const ClubSettings = ({ theme: propsTheme }) => {
                                                             <button
                                                                 className="btn btn-sm btn-outline-secondary me-2"
                                                                 onClick={() => handleEdit(club)}
+                                                                style={{ borderColor: theme.border, color: theme.text }}
                                                             >
                                                                 <i className="bi bi-pencil"></i>
                                                             </button>
                                                             <button
                                                                 className="btn btn-sm btn-outline-danger"
                                                                 onClick={() => handleDelete(club.id)}
+                                                                onMouseEnter={(e) => {
+                                                                    e.currentTarget.style.backgroundColor = '#c82333';
+                                                                    e.currentTarget.style.color = 'white';
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                                    e.currentTarget.style.color = '#dc3545';
+                                                                }}
                                                             >
                                                                 <i className="bi bi-trash"></i>
                                                             </button>
@@ -330,7 +355,7 @@ const ClubSettings = ({ theme: propsTheme }) => {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="5" className="text-center py-5">
+                                                    <td colSpan="5" className="text-center py-5" style={{ color: theme.text }}>
                                                         No Club Information Found
                                                     </td>
                                                 </tr>
@@ -366,7 +391,7 @@ const ClubSettings = ({ theme: propsTheme }) => {
 
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
-                                <label className="form-label fw-semibold small">Club Name</label>
+                                <label className="form-label fw-semibold small" style={{ color: theme.text }}>Club Name</label>
                                 <input
                                     type="text"
                                     className="form-control"
@@ -379,7 +404,7 @@ const ClubSettings = ({ theme: propsTheme }) => {
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label fw-semibold small">Club Phone</label>
+                                <label className="form-label fw-semibold small" style={{ color: theme.text }}>Club Phone</label>
                                 <input
                                     type="text"
                                     className="form-control"
@@ -392,7 +417,7 @@ const ClubSettings = ({ theme: propsTheme }) => {
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label fw-semibold small">
+                                <label className="form-label fw-semibold small" style={{ color: theme.text }}>
                                     Club Image {isEdit && '(Leave empty to keep current image)'}
                                 </label>
                                 <input
@@ -406,7 +431,7 @@ const ClubSettings = ({ theme: propsTheme }) => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="form-label fw-semibold small">Club History</label>
+                                <label className="form-label fw-semibold small" style={{ color: theme.text }}>Club History</label>
                                 <textarea
                                     className="form-control"
                                     rows="4"
@@ -421,17 +446,20 @@ const ClubSettings = ({ theme: propsTheme }) => {
                             <div className="d-flex justify-content-end gap-2 pt-2" style={{ borderTop: `1px solid ${theme.border}` }}>
                                 <button
                                     type="button"
-                                    className="btn btn-light px-4"
+                                    className="btn px-4"
                                     onClick={() => setShowModal(false)}
                                     disabled={loading}
+                                    style={{ backgroundColor: theme.border, color: theme.text, border: 'none' }}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     style={styles.button}
-                                    className="btn btn-primary px-4"
+                                    className="btn px-4"
                                     disabled={loading}
+                                    onMouseEnter={handleButtonHover}
+                                    onMouseLeave={handleButtonLeave}
                                 >
                                     {loading ? 'Submitting...' : (isEdit ? 'Update Club' : 'Save Club')}
                                 </button>

@@ -26,7 +26,8 @@ const Achievement = ({ theme: propsTheme }) => {
         card: isDarkMode ? '#16213e' : '#ffffff',
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
-        sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
+        sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
+        primary: '#5e2e10'
     };
 
     // Environment variables - FIXED
@@ -228,7 +229,7 @@ const Achievement = ({ theme: propsTheme }) => {
             text: `You want to delete "${name}"?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
+            confirmButtonColor: '#5e2e10',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
         }).then(async (result) => {
@@ -322,7 +323,7 @@ const Achievement = ({ theme: propsTheme }) => {
             marginTop: '10px'
         },
         editBtn: {
-            backgroundColor: '#4CAF50',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             padding: '8px 15px',
@@ -331,7 +332,8 @@ const Achievement = ({ theme: propsTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '5px',
-            fontSize: '14px'
+            fontSize: '14px',
+            transition: 'all 0.3s ease'
         },
         deleteBtn: {
             backgroundColor: '#f44336',
@@ -343,10 +345,11 @@ const Achievement = ({ theme: propsTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '5px',
-            fontSize: '14px'
+            fontSize: '14px',
+            transition: 'all 0.3s ease'
         },
         addBtn: {
-            backgroundColor: '#2196F3',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             padding: '10px 20px',
@@ -356,7 +359,8 @@ const Achievement = ({ theme: propsTheme }) => {
             alignItems: 'center',
             gap: '8px',
             fontSize: '16px',
-            transition: 'background-color 0.3s'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         modalOverlay: {
             position: 'fixed',
@@ -437,14 +441,15 @@ const Achievement = ({ theme: propsTheme }) => {
         submitBtn: {
             width: '100%',
             padding: '12px',
-            backgroundColor: '#2196F3',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
             fontSize: '16px',
             marginTop: '10px',
-            transition: 'background-color 0.3s'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         loadingText: {
             textAlign: 'center',
@@ -457,6 +462,17 @@ const Achievement = ({ theme: propsTheme }) => {
             padding: '40px',
             fontSize: '18px'
         }
+    };
+
+    // Hover effects for buttons
+    const handleButtonHover = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(-2px)';
+    };
+
+    const handleButtonLeave = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(0)';
     };
 
     return (
@@ -478,7 +494,12 @@ const Achievement = ({ theme: propsTheme }) => {
                             <div style={styles.card}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                                     <h2 style={{ color: theme.text, margin: 0 }}>Achievement Gallery</h2>
-                                    <button onClick={handleAddClick} style={styles.addBtn}>
+                                    <button 
+                                        onClick={handleAddClick} 
+                                        style={styles.addBtn}
+                                        onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                        onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                                    >
                                         <FaUpload /> Add New Achievement
                                     </button>
                                 </div>
@@ -518,10 +539,26 @@ const Achievement = ({ theme: propsTheme }) => {
                                             <div style={styles.imageInfo}>
                                                 <div style={styles.imageName}>{item.name}</div>
                                                 <div style={styles.buttonGroup}>
-                                                    <button onClick={() => handleEditClick(item)} style={styles.editBtn}>
+                                                    <button 
+                                                        onClick={() => handleEditClick(item)} 
+                                                        style={styles.editBtn}
+                                                        onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                        onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                                                    >
                                                         <FaEdit /> Edit
                                                     </button>
-                                                    <button onClick={() => handleDeleteClick(item.id, item.name)} style={styles.deleteBtn}>
+                                                    <button 
+                                                        onClick={() => handleDeleteClick(item.id, item.name)} 
+                                                        style={styles.deleteBtn}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#d32f2f';
+                                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#f44336';
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                        }}
+                                                    >
                                                         <FaTrash /> Delete
                                                     </button>
                                                 </div>
@@ -583,7 +620,13 @@ const Achievement = ({ theme: propsTheme }) => {
                                 )}
                             </div>
 
-                            <button type="submit" style={styles.submitBtn} disabled={loading}>
+                            <button 
+                                type="submit" 
+                                style={styles.submitBtn} 
+                                disabled={loading}
+                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                            >
                                 {loading ? 'Processing...' : (isEditing ? 'Update Achievement' : 'Add Achievement')}
                             </button>
                         </form>

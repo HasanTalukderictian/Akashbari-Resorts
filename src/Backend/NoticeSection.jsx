@@ -31,8 +31,8 @@ const NoticeSection = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
-        primary: '#9a55ff',
-        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b',
@@ -254,7 +254,7 @@ const NoticeSection = ({ theme: propsTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         table: {
             width: '100%',
@@ -290,7 +290,7 @@ const NoticeSection = ({ theme: propsTheme }) => {
         }),
         actionButtons: { display: 'flex', gap: '8px' },
         editBtn: {
-            backgroundColor: '#17a2b8',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             padding: '6px 12px',
@@ -417,16 +417,20 @@ const NoticeSection = ({ theme: propsTheme }) => {
                     }
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     button:hover {
                         transform: translateY(-2px);
                     }
                     .edit-btn:hover {
-                        background-color: #138496 !important;
+                        background-color: #8B4513 !important;
                     }
                     .delete-btn:hover {
                         background-color: #c82333 !important;
+                    }
+                    .search-box:focus {
+                        border-color: #5e2e10;
+                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
                     }
                 `}
             </style>
@@ -474,6 +478,7 @@ const NoticeSection = ({ theme: propsTheme }) => {
                                     type="text"
                                     placeholder="🔍 Search notices..."
                                     style={styles.searchBox}
+                                    className="search-box"
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
@@ -531,6 +536,14 @@ const NoticeSection = ({ theme: propsTheme }) => {
                                                                     className="edit-btn"
                                                                     style={styles.editBtn}
                                                                     onClick={() => handleEdit(notice)}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.target.style.backgroundColor = '#8B4513';
+                                                                        e.target.style.transform = 'translateY(-2px)';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.target.style.backgroundColor = '#5e2e10';
+                                                                        e.target.style.transform = 'translateY(0)';
+                                                                    }}
                                                                 >
                                                                     Edit
                                                                 </button>
@@ -538,6 +551,14 @@ const NoticeSection = ({ theme: propsTheme }) => {
                                                                     className="delete-btn"
                                                                     style={styles.deleteBtn}
                                                                     onClick={() => handleDelete(notice.id)}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.target.style.backgroundColor = '#c82333';
+                                                                        e.target.style.transform = 'translateY(-2px)';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.target.style.backgroundColor = '#dc3545';
+                                                                        e.target.style.transform = 'translateY(0)';
+                                                                    }}
                                                                 >
                                                                     Delete
                                                                 </button>
@@ -645,6 +666,14 @@ const NoticeSection = ({ theme: propsTheme }) => {
                                         className="btn w-100"
                                         style={{ background: theme.primaryGradient, color: 'white', border: 'none' }}
                                         disabled={loading}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.transform = 'translateY(-2px)';
+                                            e.target.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.transform = 'translateY(0)';
+                                            e.target.style.boxShadow = 'none';
+                                        }}
                                     >
                                         {loading ? 'Processing...' : (editingNotice ? 'Update Notice' : 'Save Notice')}
                                     </button>

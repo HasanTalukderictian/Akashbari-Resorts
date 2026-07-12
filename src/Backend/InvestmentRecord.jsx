@@ -35,7 +35,8 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         card: isDarkMode ? '#16213e' : '#ffffff',
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
-        sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
+        sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
+        primary: '#5e2e10'
     };
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -304,7 +305,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             text: `You want to delete "${title}"?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
+            confirmButtonColor: '#5e2e10',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
         }).then(async (result) => {
@@ -342,7 +343,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             text: `You want to delete record with ${member} members?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
+            confirmButtonColor: '#5e2e10',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
         }).then(async (result) => {
@@ -376,6 +377,17 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
+    // Hover handlers
+    const handleButtonHover = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(-2px)';
+    };
+
+    const handleButtonLeave = (e, color) => {
+        e.currentTarget.style.backgroundColor = color;
+        e.currentTarget.style.transform = 'translateY(0)';
+    };
+
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
         mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
@@ -403,7 +415,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
         },
         addBtn: {
-            backgroundColor: '#28a745',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             padding: '10px 20px',
@@ -413,7 +425,8 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             alignItems: 'center',
             gap: '8px',
             fontSize: '16px',
-            transition: 'background-color 0.3s'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         table: {
             width: '100%',
@@ -436,7 +449,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             borderBottom: `1px solid ${theme.border}`
         },
         editBtn: {
-            backgroundColor: '#4CAF50',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             padding: '6px 12px',
@@ -446,7 +459,8 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             alignItems: 'center',
             gap: '5px',
             marginRight: '8px',
-            fontSize: '12px'
+            fontSize: '12px',
+            transition: 'all 0.3s ease'
         },
         deleteBtn: {
             backgroundColor: '#f44336',
@@ -458,7 +472,8 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '5px',
-            fontSize: '12px'
+            fontSize: '12px',
+            transition: 'all 0.3s ease'
         },
         modalOverlay: {
             position: 'fixed',
@@ -499,7 +514,8 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
             border: 'none',
             fontSize: '24px',
             cursor: 'pointer',
-            color: theme.text
+            color: theme.text,
+            transition: 'all 0.3s ease'
         },
         formGroup: {
             marginBottom: '20px'
@@ -533,13 +549,15 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         submitBtn: {
             width: '100%',
             padding: '12px',
-            backgroundColor: '#007bff',
+            backgroundColor: '#5e2e10',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
             fontSize: '16px',
-            marginTop: '10px'
+            marginTop: '10px',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         loadingText: {
             textAlign: 'center',
@@ -579,7 +597,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         statValue: {
             fontSize: '24px',
             fontWeight: 'bold',
-            color: '#007bff',
+            color: '#5e2e10',
             marginBottom: '5px'
         },
         statLabel: {
@@ -611,7 +629,12 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                     <div style={styles.card}>
                                         <div style={styles.headerContainer}>
                                             <h2 style={styles.title}>Investment Records</h2>
-                                            <button onClick={handleAddClick} style={styles.addBtn}>
+                                            <button 
+                                                onClick={handleAddClick} 
+                                                style={styles.addBtn}
+                                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                                            >
                                                 <FaPlus /> Add New Record
                                             </button>
                                         </div>
@@ -649,12 +672,22 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                                                 <button 
                                                                     onClick={() => handleEditClick(record)} 
                                                                     style={styles.editBtn}
+                                                                    onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                                    onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                                                 >
                                                                     <FaEdit /> 
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => handleDeleteClick(record.id, record.title)} 
                                                                     style={styles.deleteBtn}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.currentTarget.style.backgroundColor = '#d32f2f';
+                                                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.currentTarget.style.backgroundColor = '#f44336';
+                                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                                    }}
                                                                 >
                                                                     <FaTrash /> 
                                                                 </button>
@@ -672,7 +705,12 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                     <div style={styles.card}>
                                         <div style={styles.headerContainer}>
                                             <h2 style={styles.title}>Value Records</h2>
-                                            <button onClick={handleAddValueClick} style={styles.addBtn}>
+                                            <button 
+                                                onClick={handleAddValueClick} 
+                                                style={styles.addBtn}
+                                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                                            >
                                                 <FaPlus /> Add Value Record
                                             </button>
                                         </div>
@@ -714,12 +752,22 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                                                 <button 
                                                                     onClick={() => handleEditValueClick(record)} 
                                                                     style={styles.editBtn}
+                                                                    onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                                                    onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
                                                                 >
                                                                     <FaEdit /> 
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => handleDeleteValueClick(record.id, record.member)} 
                                                                     style={styles.deleteBtn}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.currentTarget.style.backgroundColor = '#d32f2f';
+                                                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.currentTarget.style.backgroundColor = '#f44336';
+                                                                        e.currentTarget.style.transform = 'translateY(0)';
+                                                                    }}
                                                                 >
                                                                     <FaTrash /> 
                                                                 </button>
@@ -811,7 +859,13 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 />
                             </div>
 
-                            <button type="submit" style={styles.submitBtn} disabled={loading}>
+                            <button 
+                                type="submit" 
+                                style={styles.submitBtn} 
+                                disabled={loading}
+                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                            >
                                 {loading ? 'Processing...' : (isEditing ? 'Update Record' : 'Add Record')}
                             </button>
                         </form>
@@ -883,7 +937,13 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 />
                             </div>
 
-                            <button type="submit" style={styles.submitBtn} disabled={loading}>
+                            <button 
+                                type="submit" 
+                                style={styles.submitBtn} 
+                                disabled={loading}
+                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
+                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                            >
                                 {loading ? 'Processing...' : (isEditingValue ? 'Update Value Record' : 'Add Value Record')}
                             </button>
                         </form>

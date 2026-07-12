@@ -56,7 +56,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
         name: '',
         price: '',
         discount: '',
-        color: '#9a55ff'
+        color: '#5e2e10'
     });
 
     const theme = propsTheme || {
@@ -66,7 +66,8 @@ const Packagestatistics = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
-        primary: '#9a55ff',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         success: '#10b981',
         warning: '#f59e0b',
         danger: '#ef4444'
@@ -215,7 +216,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
             if (response.data.success === true) {
                 showToast('Package added successfully!', 'success');
                 setShowModal(false);
-                setFormData({ name: '', price: '', discount: '', color: '#9a55ff' });
+                setFormData({ name: '', price: '', discount: '', color: '#5e2e10' });
                 await fetchPackages();
             } else {
                 showToast(response.data.message || 'Failed to add package', 'error');
@@ -266,7 +267,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                 showToast('Package updated successfully!', 'success');
                 setShowModal(false);
                 setEditingPackage(null);
-                setFormData({ name: '', price: '', discount: '', color: '#9a55ff' });
+                setFormData({ name: '', price: '', discount: '', color: '#5e2e10' });
                 await fetchPackages();
             } else {
                 showToast(response.data.message || 'Failed to update package', 'error');
@@ -328,7 +329,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
     // Open Add Modal
     const openAddModal = () => {
         setModalMode('add');
-        setFormData({ name: '', price: '', discount: '', color: '#9a55ff' });
+        setFormData({ name: '', price: '', discount: '', color: '#5e2e10' });
         setShowModal(true);
     };
 
@@ -423,8 +424,8 @@ const Packagestatistics = ({ theme: propsTheme }) => {
         footerWrapper: { flexShrink: 0 },
         alert: {
             padding: '12px 20px',
-            backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096',
+            backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10',
             borderRadius: '8px',
             marginBottom: '20px',
             fontWeight: '500'
@@ -458,14 +459,15 @@ const Packagestatistics = ({ theme: propsTheme }) => {
             transition: 'all 0.3s ease'
         },
         primaryBtn: {
-            background: theme.primary,
+            background: theme.primaryGradient || theme.primary,
             color: '#fff',
             border: 'none',
             padding: '10px 24px',
             borderRadius: '10px',
             fontWeight: '600',
             cursor: 'pointer',
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         secondaryBtn: {
             background: 'transparent',
@@ -495,7 +497,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                 {`
                     .package-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     .modal-overlay {
                         position: fixed;
@@ -542,7 +544,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                     }
                     .btn-primary:hover {
                         transform: translateY(-2px);
-                        box-shadow: 0 5px 15px ${theme.primary}40;
+                        box-shadow: 0 5px 15px rgba(94, 46, 16, 0.4);
                     }
                     .btn-secondary:hover {
                         background: ${theme.border};

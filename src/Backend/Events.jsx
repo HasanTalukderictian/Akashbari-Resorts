@@ -45,8 +45,8 @@ const Events = () => {
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
-        primary: '#9a55ff',
-        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b',
@@ -395,7 +395,7 @@ const Events = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         eventGrid: {
             display: 'grid',
@@ -429,7 +429,7 @@ const Events = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'linear-gradient(135deg, rgba(154, 85, 255, 0.95) 0%, rgba(192, 132, 252, 0.95) 100%)',
+            background: 'linear-gradient(135deg, rgba(94, 46, 16, 0.95) 0%, rgba(139, 69, 19, 0.95) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -653,7 +653,7 @@ const Events = () => {
                     }
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     .event-card:hover {
                         transform: translateY(-8px);
@@ -673,8 +673,8 @@ const Events = () => {
                         transform: translateY(-2px);
                     }
                     .search-box:focus {
-                        border-color: #9a55ff;
-                        box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1);
+                        border-color: #5e2e10;
+                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
                     }
                 `}
             </style>

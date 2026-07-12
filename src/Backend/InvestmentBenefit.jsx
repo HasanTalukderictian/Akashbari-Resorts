@@ -31,8 +31,8 @@ const InvestmentBenefit = ({ theme: dashboardTheme }) => {
         text: isDarkMode ? '#e9ecef' : (dashboardTheme?.text || '#2c3e50'),
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : (dashboardTheme?.border || '#e9ecef'),
-        accent: dashboardTheme?.accent || '#9a55ff',
-        accentGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        accent: '#5e2e10',
+        accentGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b'
@@ -220,7 +220,7 @@ const InvestmentBenefit = ({ theme: dashboardTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         tableContainer: {
             backgroundColor: theme.card,
@@ -375,6 +375,22 @@ const InvestmentBenefit = ({ theme: dashboardTheme }) => {
 
     return (
         <div style={styles.container}>
+            <style>
+                {`
+                    .stat-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
+                    }
+                    button:hover {
+                        transform: translateY(-2px);
+                    }
+                    .search-box:focus {
+                        border-color: #5e2e10;
+                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
+                    }
+                `}
+            </style>
+
             <div className="d-flex" style={{ minHeight: '100vh', overflow: 'hidden' }}>
                 <Sidebar theme={theme} isCollapsed={isCollapsed} />
 
@@ -418,6 +434,7 @@ const InvestmentBenefit = ({ theme: dashboardTheme }) => {
                                 type="text"
                                 placeholder="🔍 Search by title or subtitle..."
                                 style={styles.searchBox}
+                                className="search-box"
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
