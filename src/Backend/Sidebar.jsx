@@ -19,14 +19,11 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
         { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
-        // Club সরাসরি মেনু থেকে সরিয়ে সাব-মেনু হিসেবে নিচে যোগ করা হবে
     ];
 
     // Club এর সাব-মেনু আইটেম
     const clubSubItems = [
         { id: 'club-info', label: 'Club Info', icon: 'bi bi-info-circle', path: '/admin-club' },
-        // { id: 'club-members', label: 'Club Members', icon: 'bi bi-people-fill', path: '/admin-club-members' },
-        // { id: 'club-events', label: 'Club Events', icon: 'bi bi-calendar-event', path: '/admin-club-events' },
         { id: 'club-gallery', label: 'Club Gallery', icon: 'bi bi-images', path: '/admin-club-gallery' },
         { id: 'club-rules', label: 'Club Rules', icon: 'bi bi-file-text-fill', path: '/admin-club-rules' },
         { id: 'club-facilities', label: 'Facilities', icon: 'bi bi-building', path: '/admin-club-facilities' },
@@ -79,7 +76,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     const navLinkStyle = (isActive) => ({
         ...(styles?.navLink || {}),
         color: isActive ? '#fff' : theme?.sidebarText,
-        background: isActive ? 'linear-gradient(to right, #da8cff, #9a55ff)' : 'transparent',
+        background: isActive ? 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)' : 'transparent',
         borderRadius: '8px',
         marginBottom: '5px',
         textDecoration: 'none',
@@ -87,7 +84,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         alignItems: 'center',
         padding: isCollapsed ? '12px 0' : '12px 20px',
         justifyContent: isCollapsed ? 'center' : 'flex-start',
-        boxShadow: isActive ? '0 4px 15px rgba(154, 85, 255, 0.3)' : 'none',
+        boxShadow: isActive ? '0 4px 15px rgba(94, 46, 16, 0.3)' : 'none',
         transition: 'all 0.3s ease',
         cursor: 'pointer',
         border: 'none',
@@ -101,11 +98,11 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
             <div className="p-4 mb-2 text-center">
                 {isCollapsed ? (
                     <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                        style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #da8cff 0%, #9a55ff 100%)', boxShadow: '0 4px 10px rgba(182, 109, 255, 0.3)' }}>
+                        style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)', boxShadow: '0 4px 10px rgba(94, 46, 16, 0.3)' }}>
                         <span className="text-white fw-bold">D</span>
                     </div>
                 ) : (
-                    <h3 style={{ color: '#b66dff', fontWeight: '800', letterSpacing: '1px', margin: 0 }}>
+                    <h3 style={{ color: '#5e2e10', fontWeight: '800', letterSpacing: '1px', margin: 0 }}>
                         DASHBOARD
                     </h3>
                 )}
@@ -117,7 +114,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
                 <img src="https://i.pravatar.cc/40?img=12"
                     className="rounded-circle shadow-sm"
                     alt="user"
-                    style={{ border: '2px solid #b66dff', padding: '2px' }} />
+                    style={{ border: '2px solid #5e2e10', padding: '2px' }} />
                 {!isCollapsed && (
                     <div className="ms-3 overflow-hidden">
                         <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Welcome</p>
@@ -153,7 +150,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
 
                     {/* Landing Page Sub-items */}
                     {!isCollapsed && isLandingOpen && (
-                        <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
+                        <div className="ms-3 ps-2 border-start" style={{ borderColor: '#5e2e10 !important' }}>
                             {landingSubItems.map((sub) => (
                                 <NavLink
                                     key={sub.id}
@@ -198,7 +195,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
 
                     {/* Club Sub-items */}
                     {!isCollapsed && isClubOpen && (
-                        <div className="ms-3 ps-2 border-start" style={{ borderColor: '#b66dff !important' }}>
+                        <div className="ms-3 ps-2 border-start" style={{ borderColor: '#5e2e10 !important' }}>
                             {clubSubItems.map((sub) => (
                                 <NavLink
                                     key={sub.id}

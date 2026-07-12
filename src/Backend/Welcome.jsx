@@ -39,7 +39,9 @@ const Welcome = ({ theme: propsTheme }) => {
         card: isDarkMode ? '#16213e' : '#ffffff',
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
-        inputBg: isDarkMode ? '#2d3436' : '#ffffff'
+        inputBg: isDarkMode ? '#2d3436' : '#ffffff',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)'
     };
 
     const fetchWelcomes = async () => {
@@ -115,6 +117,39 @@ const Welcome = ({ theme: propsTheme }) => {
         }
     };
 
+    // Custom button styles with brand color
+    const buttonStyles = {
+        primary: {
+            background: theme.primaryGradient,
+            border: 'none',
+            color: 'white',
+            padding: '8px 20px',
+            borderRadius: '8px',
+            fontWeight: '500',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
+        },
+        primaryModal: {
+            background: theme.primaryGradient,
+            border: 'none',
+            color: 'white',
+            padding: '10px 30px',
+            borderRadius: '8px',
+            fontWeight: '500',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
+        },
+        danger: {
+            backgroundColor: '#ef4444',
+            border: 'none',
+            color: 'white',
+            padding: '5px 15px',
+            borderRadius: '6px',
+            fontSize: '13px',
+            transition: 'all 0.3s ease'
+        }
+    };
+
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh', display: 'flex' }}>
             {/* Sidebar Section */}
@@ -133,7 +168,21 @@ const Welcome = ({ theme: propsTheme }) => {
                 <div className="flex-grow-1 overflow-auto p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h4 style={{ color: theme.text }} className="fw-bold">Welcome Section</h4>
-                        <button className="btn btn-primary px-4 shadow-sm" onClick={handleAddClick}>+ Add Record</button>
+                        <button 
+                            className="btn px-4 shadow-sm" 
+                            style={buttonStyles.primary}
+                            onClick={handleAddClick}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'translateY(-2px)';
+                                e.target.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+                            }}
+                        >
+                            + Add Record
+                        </button>
                     </div>
 
                     <div className="table-responsive p-3 shadow-sm" style={{ background: theme.card, borderRadius: "12px" }}>
@@ -157,9 +206,7 @@ const Welcome = ({ theme: propsTheme }) => {
                                                     <img src={b.image} alt="thumb" style={{width: '60px', height: '40px', borderRadius: '5px', objectFit: 'cover'}} />
                                                 ) : <span className="text-muted small">No Image</span>}
                                             </td>
-                                            {/* Title color adjust kora hoyeche */}
                                             <td className="fw-bold" style={{ color: theme.text }}>{b.title}</td>
-                                            {/* Description e 'isDarkMode' check kore white color deya hoyeche */}
                                             <td style={{ 
                                                 color: isDarkMode ? '#ffffff' : '#6c757d', 
                                                 fontSize: '0.9rem',
@@ -168,7 +215,19 @@ const Welcome = ({ theme: propsTheme }) => {
                                                 {b.description}
                                             </td>
                                             <td className="text-end">
-                                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(b.id)}>
+                                                <button 
+                                                    className="btn btn-sm" 
+                                                    style={buttonStyles.danger}
+                                                    onClick={() => handleDelete(b.id)}
+                                                    onMouseEnter={(e) => {
+                                                        e.target.style.backgroundColor = '#dc2626';
+                                                        e.target.style.transform = 'scale(1.05)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.target.style.backgroundColor = '#ef4444';
+                                                        e.target.style.transform = 'scale(1)';
+                                                    }}
+                                                >
                                                     Delete
                                                 </button>
                                             </td>
@@ -216,7 +275,21 @@ const Welcome = ({ theme: propsTheme }) => {
                                     </div>
                                     <div className="modal-footer border-top-0">
                                         <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                        <button type="submit" className="btn btn-primary px-4">Submit</button>
+                                        <button 
+                                            type="submit" 
+                                            className="btn px-4" 
+                                            style={buttonStyles.primaryModal}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.transform = 'translateY(-2px)';
+                                                e.target.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.transform = 'translateY(0)';
+                                                e.target.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
+                                            }}
+                                        >
+                                            Submit
+                                        </button>
                                     </div>
                                 </form>
                             </div>

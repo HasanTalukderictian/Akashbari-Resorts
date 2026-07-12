@@ -46,8 +46,8 @@ const Dashbord = () => {
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
         gridColor: isDarkMode ? '#2d3436' : '#f5f5f5',
-        primary: '#9a55ff',
-        primaryGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        primary: '#5e2e10',
+        primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         success: '#10b981',
         warning: '#f59e0b',
         danger: '#ef4444',
@@ -161,7 +161,7 @@ const Dashbord = () => {
             setRecentActivities([
                 { id: 1, action: 'New user registered', time: '2 minutes ago', icon: '👤', color: '#10b981' },
                 { id: 2, action: 'New blog post published', time: '1 hour ago', icon: '📝', color: '#3b82f6' },
-                { id: 3, action: 'New gallery image added', time: '3 hours ago', icon: '🖼️', color: '#9a55ff' },
+                { id: 3, action: 'New gallery image added', time: '3 hours ago', icon: '🖼️', color: '#5e2e10' },
                 { id: 4, action: 'New testimonial received', time: '5 hours ago', icon: '⭐', color: '#f59e0b' },
                 { id: 5, action: 'Event booking completed', time: '1 day ago', icon: '📅', color: '#ef4444' }
             ]);
@@ -217,7 +217,7 @@ const Dashbord = () => {
             display: 'flex',
             flexDirection: 'column'
         },
-        purpleIcon: { backgroundColor: '#b66dff', color: 'white', padding: '8px', borderRadius: '8px', marginRight: '10px' },
+        purpleIcon: { backgroundColor: '#5e2e10', color: 'white', padding: '8px', borderRadius: '8px', marginRight: '10px' },
         statCard: {
             backgroundColor: theme.card,
             borderRadius: '16px',
@@ -238,8 +238,8 @@ const Dashbord = () => {
         },
         alert: {
             padding: '12px 20px',
-            backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096',
+            backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10',
             borderRadius: '8px',
             marginBottom: '20px',
             fontWeight: '500'
@@ -247,14 +247,14 @@ const Dashbord = () => {
     };
 
     const statCards = [
-        { key: 'totalUsers', label: 'Total Users', icon: '👥', bg: 'linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%)' },
+        { key: 'totalUsers', label: 'Total Users', icon: '👥', bg: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)' },
         { key: 'totalEvents', label: 'Total Events', icon: '📅', bg: 'linear-gradient(135deg, #10b981 0%, #064e3b 100%)' },
-        { key: 'totalGallery', label: 'Gallery Images', icon: '🖼️', bg: 'linear-gradient(135deg, #9a55ff 0%, #581c87 100%)' },
+        { key: 'totalGallery', label: 'Gallery Images', icon: '🖼️', bg: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)' },
         { key: 'totalBlogs', label: 'Blog Posts', icon: '📝', bg: 'linear-gradient(135deg, #f59e0b 0%, #78350f 100%)' },
         { key: 'totalTestimonials', label: 'Testimonials', icon: '⭐', bg: 'linear-gradient(135deg, #ef4444 0%, #7f1d1d 100%)' },
         { key: 'totalNotices', label: 'Notices', icon: '📢', bg: 'linear-gradient(135deg, #06b6d4 0%, #164e63 100%)' },
         { key: 'totalLuxuryItems', label: 'Luxury Items', icon: '💎', bg: 'linear-gradient(135deg, #ec4899 0%, #831843 100%)' },
-        { key: 'totalInvestmentBenifit', label: 'Investment Benefits', icon: '💰', bg: 'linear-gradient(135deg, #14b8a6 0%, #134e4a 100%)' }
+        { key: 'totalInvestmentBenifit', label: 'Investment Benefits', icon: '💰', bg: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)' }
     ];
 
     const renderContent = () => {
@@ -414,7 +414,7 @@ const Dashbord = () => {
                 {`
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     .activity-item:hover {
                         background: ${theme.bg};

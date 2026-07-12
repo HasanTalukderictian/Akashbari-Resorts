@@ -2,11 +2,11 @@
 
 :root {
     --gold: #bfa37c;
-    --gold-dark: #8e7042;
+    --gold-dark: #5e2e10;
     --cream: #fffaf0;
     --dark-brown: #2c241a;
-    --hover-green: #6b9e3e;
-    /* Requested hover color */
+    --brand-color: #5e2e10;
+    /* Requested brand color */
 }
 
 .serif {
@@ -15,7 +15,7 @@
 }
 
 .text-gold {
-    color: var(--gold);
+    color: var(--brand-color);
 }
 
 .text-italic {
@@ -68,7 +68,7 @@
 }
 
 .read-more-btn-gold {
-    background-color: var(--gold);
+    background-color: var(--brand-color);
     color: white;
     border: none;
     padding: 8px 25px;
@@ -83,7 +83,7 @@
 }
 
 
-/* --- Custom Outline Button with #6b9e3e Hover --- */
+/* --- Custom Outline Button with Brand Color Hover --- */
 
 .custom-btn-outline {
     border-color: #343a40;
@@ -92,8 +92,8 @@
 }
 
 .custom-btn-outline:hover {
-    background-color: var(--hover-green) !important;
-    border-color: var(--hover-green) !important;
+    background-color: var(--brand-color) !important;
+    border-color: var(--brand-color) !important;
     color: #ffffff !important;
 }
 
@@ -127,11 +127,11 @@
 
 .custom-input:focus {
     box-shadow: none;
-    border-color: var(--gold);
+    border-color: var(--brand-color);
 }
 
 .btn-submit-query {
-    background-color: var(--gold);
+    background-color: var(--brand-color);
     color: white;
     border: none;
     padding: 12px 35px;
@@ -170,7 +170,7 @@
 
 .recent-posts-list li::before {
     content: "●";
-    color: var(--gold);
+    color: var(--brand-color);
     position: absolute;
     left: 0;
     font-size: 10px;
@@ -192,7 +192,7 @@
 }
 
 .book-btn-white {
-    background-color: var(--gold);
+    background-color: var(--brand-color);
     color: white;
     border: none;
     padding: 10px 25px;
@@ -213,7 +213,7 @@
 }
 
 .nav-btn.active {
-    background-color: var(--gold);
+    background-color: var(--brand-color);
 }
 
 
@@ -224,14 +224,11 @@
     border: 1px solid #f2e8d5;
     border-radius: 20px;
     transition: all 0.3s ease;
-    /* Height komanor jonno padding komano hoyeche */
     padding: 20px 10px !important;
-    /* Card gulo jate ekdom soman choto hoy */
     display: flex;
     flex-direction: column;
     justify-content: center;
     min-height: 150px;
-    /* Apnar proyojon moto eiti kom-beshi korte paren */
 }
 
 .contact-card:hover {
@@ -241,13 +238,11 @@
 
 .contact-icon-wrapper {
     margin-bottom: 15px !important;
-    /* Icon er nicher gap komano hoyeche */
 }
 
 .contact-icon-wrapper i {
     font-size: 2.2rem;
-    /* Icon size aktu boro kora hoyeche image er moto */
-    color: #bfa37c;
+    color: var(--brand-color);
 }
 
 

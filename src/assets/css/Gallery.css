@@ -1,41 +1,51 @@
 .gallery-wrapper {
-    background-color: #e4e2df;
-    /* হালকা ব্যাকগ্রাউন্ড ইমেজের মতো */
+    background-color: #f8f9fa;
+    min-height: 100vh;
 }
 
 .section-title {
-    font-weight: bold;
-    color: #333;
+    font-size: 2.5rem;
+    font-weight: 700;
     position: relative;
-    padding-bottom: 10px;
+    padding-bottom: 15px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #5e2e10;
+    border-radius: 2px;
 }
 
 .gallery-item {
     position: relative;
     overflow: hidden;
+    border-radius: 12px;
     cursor: pointer;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    height: 250px;
-    /* ফিক্সড হাইট ইমেজের গ্রিড ঠিক রাখার জন্য */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .gallery-item img {
     width: 100%;
-    height: 100%;
+    height: 280px;
     object-fit: cover;
     transition: transform 0.5s ease;
 }
 
-
-/* মাউস নিলে জুম ইফেক্ট */
-
 .gallery-item:hover img {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
-
-
-/* ইমেজের উপরের কালো শেড (Overlay) */
 
 .gallery-item .overlay {
     position: absolute;
@@ -43,7 +53,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,10 +64,32 @@
     opacity: 1;
 }
 
-.overlay i {
-    color: white;
-    font-size: 30px;
+
+/* Lightbox arrow hover effect */
+
+.lightbox-arrow {
+    transition: all 0.3s ease;
+}
+
+.lightbox-arrow:hover {
+    background: #5e2e10 !important;
+    transform: translateY(-50%) scale(1.1);
 }
 
 
-/* পপআপের স্লাইডার ডিজাইন কাস্টমাইজেশন (FsLightbox অটো হ্যান্ডেল করে) */
+/* Responsive */
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+    }
+    .gallery-item img {
+        height: 220px;
+    }
+}
+
+@media (max-width: 576px) {
+    .gallery-item img {
+        height: 180px;
+    }
+}

@@ -6,6 +6,7 @@ import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 
 const Gallery = () => {
+    const brandColor = '#5e2e10';
     const [currentIndex, setCurrentIndex] = useState(null);
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -58,17 +59,22 @@ const Gallery = () => {
 
             <div className="gallery-wrapper py-5">
                 <div className="container">
-                    <h2 className="text-center mb-3 section-title">
+                    <h2 className="text-center mb-3 section-title" style={{ color: brandColor }}>
                         Our Resort Gallery
                     </h2>
-                    <p className="text-center mb-5">
+                    <p className="text-center mb-5" style={{ color: '#555' }}>
                         Discover peaceful surroundings, breathtaking views, and relaxing spaces
                         <br/>
                         designed to give you the perfect escape from everyday life.
                     </p>
 
                     {loading ? (
-                        <div className="text-center py-5">Loading Gallery...</div>
+                        <div className="text-center py-5">
+                            <div className="spinner-border" role="status" style={{ color: brandColor }}>
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="mt-3">Loading Gallery...</p>
+                        </div>
                     ) : (
                         <div className="row g-4">
                             {images.map((item, index) => (
@@ -83,7 +89,7 @@ const Gallery = () => {
                                             className="img-fluid" 
                                             loading="lazy"
                                         />
-                                        <div className="overlay">
+                                        <div className="overlay" style={{ backgroundColor: `${brandColor}CC` }}>
                                             <FaSearchPlus color="#fff" size={30} />
                                         </div>
                                     </div>
@@ -131,7 +137,7 @@ const Gallery = () => {
                     {/* Left Arrow */}
                     <button
                         onClick={prevImage}
-                        style={arrowStyle("left")}
+                        style={arrowStyle("left", brandColor)}
                     >
                         <FaChevronLeft />
                     </button>
@@ -139,7 +145,7 @@ const Gallery = () => {
                     {/* Right Arrow */}
                     <button
                         onClick={nextImage}
-                        style={arrowStyle("right")}
+                        style={arrowStyle("right", brandColor)}
                     >
                         <FaChevronRight />
                     </button>
@@ -155,9 +161,12 @@ const Gallery = () => {
                             color: "white",
                             fontSize: "30px",
                             cursor: "pointer",
-                            zIndex: 10000
+                            zIndex: 10000,
+                            transition: "all 0.3s ease"
                         }}
                         onClick={() => setCurrentIndex(null)}
+                        onMouseEnter={(e) => e.target.style.color = brandColor}
+                        onMouseLeave={(e) => e.target.style.color = "white"}
                     >
                         ×
                     </button>
@@ -170,7 +179,7 @@ const Gallery = () => {
 };
 
 // Arrow style function
-const arrowStyle = (side) => ({
+const arrowStyle = (side, brandColor) => ({
     position: "fixed",
     top: "50%",
     [side]: "30px",

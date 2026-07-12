@@ -44,8 +44,8 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
         text: isDarkMode ? '#e9ecef' : (dashboardTheme?.text || '#2c3e50'),
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : (dashboardTheme?.border || '#e9ecef'),
-        accent: dashboardTheme?.accent || '#9a55ff',
-        accentGradient: 'linear-gradient(135deg, #9a55ff 0%, #c084fc 100%)',
+        accent: '#5e2e10',
+        accentGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b'
@@ -335,8 +335,8 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
         },
         alert: {
             padding: '12px 20px',
-            backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096',
+            backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10',
             borderRadius: '8px',
             marginBottom: '20px',
             fontWeight: '500'
@@ -409,7 +409,7 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(154, 85, 255, 0.3)'
+            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
         propertiesGrid: {
             display: 'grid',
@@ -626,7 +626,7 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                     }
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(154, 85, 255, 0.15);
+                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
                     }
                     .property-card:hover {
                         transform: translateY(-6px);
@@ -639,8 +639,8 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                         transform: translateY(-2px);
                     }
                     .search-box:focus {
-                        border-color: #9a55ff;
-                        box-shadow: 0 0 0 3px rgba(154, 85, 255, 0.1);
+                        border-color: #5e2e10;
+                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
                     }
                     .property-card {
                         animation: slideUp 0.3s ease;

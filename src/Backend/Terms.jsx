@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Terms = () => {
-  const primaryGreen = "#0D604F";
+  const brandColor = "#5e2e10";
 
   return (
     <div className="bg-light min-vh-100 py-md-5">
@@ -9,7 +9,7 @@ const Terms = () => {
       <div className="container-fluid shadow-lg bg-white p-0 rounded-3 overflow-hidden" style={{ maxWidth: '1275px' }}>
         
         {/* Header Section */}
-        <div style={{ backgroundColor: primaryGreen }} className="text-white p-5 pb-4">
+        <div style={{ backgroundColor: brandColor }} className="text-white p-5 pb-4">
           <div className="border-top border-white-50 pt-4 mt-2">
             <h1 className="display-3 fw-bold mb-0">Terms And Conditions Contract</h1>
           </div>
@@ -26,8 +26,8 @@ const Terms = () => {
           
           {/* Section 1 */}
           <div className="mb-5">
-            <h5 className="fw-bold d-flex align-items-center mb-3" style={{ color: primaryGreen }}>
-              <span className="rounded-circle me-2" style={{ width: '15px', height: '15px', backgroundColor: primaryGreen }}></span>
+            <h5 className="fw-bold d-flex align-items-center mb-3" style={{ color: brandColor }}>
+              <span className="rounded-circle me-2" style={{ width: '15px', height: '15px', backgroundColor: brandColor }}></span>
               The Agreement
             </h5>
             <hr className="mb-4" />
@@ -41,8 +41,8 @@ const Terms = () => {
 
           {/* Section 2 */}
           <div className="mb-5">
-            <h5 className="fw-bold d-flex align-items-center mb-3" style={{ color: primaryGreen }}>
-              <span className="rounded-circle me-2" style={{ width: '15px', height: '15px', backgroundColor: primaryGreen }}></span>
+            <h5 className="fw-bold d-flex align-items-center mb-3" style={{ color: brandColor }}>
+              <span className="rounded-circle me-2" style={{ width: '15px', height: '15px', backgroundColor: brandColor }}></span>
               User Obligations
             </h5>
             <hr className="mb-4" />
@@ -61,8 +61,8 @@ const Terms = () => {
 
           {/* Section 3 */}
           <div className="mb-5">
-            <h5 className="fw-bold d-flex align-items-center mb-3" style={{ color: primaryGreen }}>
-              <span className="rounded-circle me-2" style={{ width: '15px', height: '15px', backgroundColor: primaryGreen }}></span>
+            <h5 className="fw-bold d-flex align-items-center mb-3" style={{ color: brandColor }}>
+              <span className="rounded-circle me-2" style={{ width: '15px', height: '15px', backgroundColor: brandColor }}></span>
               Product/Service Details
             </h5>
             <hr className="mb-4" />

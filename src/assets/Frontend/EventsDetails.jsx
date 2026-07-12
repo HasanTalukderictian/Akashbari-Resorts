@@ -5,6 +5,7 @@ import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 
 const EventsDetails = () => {
+  const brandColor = '#5e2e10';
   const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
@@ -23,8 +24,9 @@ const EventsDetails = () => {
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     textMuted: isDarkMode ? '#adb5bd' : '#6c757d',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    // সুন্দর রিসোর্ট ব্যাকগ্রাউন্ড ইমেজ ও টেক্সট রিডিবিলিটির জন্য ওভারলে
-    heroBg: 'linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.65)), url("https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80")',
+    heroBg: `linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.65)), url("https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80")`,
+    primaryColor: brandColor,
+    primaryHover: '#3d1f0a',
   };
 
   // Helper function to get full image URL
@@ -87,7 +89,7 @@ const EventsDetails = () => {
       background: theme.heroBg,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      backgroundAttachment: 'fixed', // প্যারালাক্স ইফেক্টের জন্য
+      backgroundAttachment: 'fixed',
       padding: '80px 0',
       color: 'white',
       position: 'relative',
@@ -137,7 +139,7 @@ const EventsDetails = () => {
     },
     eventSubtitle: {
       fontSize: '1.2rem',
-      color: '#e74c3c',
+      color: brandColor,
       marginBottom: '20px',
     },
     infoCard: {
@@ -149,7 +151,7 @@ const EventsDetails = () => {
     },
     infoIcon: {
       fontSize: '24px',
-      color: '#ff8c32',
+      color: brandColor,
       marginRight: '15px',
     },
     infoLabel: {
@@ -178,7 +180,7 @@ const EventsDetails = () => {
       left: 0,
       width: '60px',
       height: '3px',
-      background: '#ff8c32',
+      background: brandColor,
       borderRadius: '2px',
     },
     description: {
@@ -199,7 +201,7 @@ const EventsDetails = () => {
       gap: '12px',
     },
     featureIcon: {
-      color: '#27ae60',
+      color: brandColor,
       fontSize: '18px',
     },
     shareSection: {
@@ -217,7 +219,7 @@ const EventsDetails = () => {
       transition: 'all 0.3s ease',
     },
     backButton: {
-      backgroundColor: '#ff8c32',
+      backgroundColor: brandColor,
       color: 'white',
       border: 'none',
       padding: '12px 30px',
@@ -251,7 +253,7 @@ const EventsDetails = () => {
         />
         <div className="container py-5">
           <div className="text-center py-5">
-            <div className="spinner-border text-primary" style={styles.spinner} role="status">
+            <div className="spinner-border" style={{ ...styles.spinner, color: brandColor }} role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="mt-3" style={styles.loadingText}>Loading event details...</p>
@@ -368,8 +370,8 @@ const EventsDetails = () => {
                       href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="btn btn-outline-primary"
-                      style={styles.shareBtn}
+                      className="btn"
+                      style={{ ...styles.shareBtn, backgroundColor: '#1877f2', color: 'white' }}
                     >
                       <i className="bi bi-facebook"></i> Facebook
                     </a>
@@ -377,8 +379,8 @@ const EventsDetails = () => {
                       href={`https://twitter.com/intent/tweet?url=${window.location.href}&text=${event.title}`}
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="btn btn-outline-info"
-                      style={styles.shareBtn}
+                      className="btn"
+                      style={{ ...styles.shareBtn, backgroundColor: '#1da1f2', color: 'white' }}
                     >
                       <i className="bi bi-twitter"></i> Twitter
                     </a>
@@ -386,8 +388,8 @@ const EventsDetails = () => {
                       href={`https://wa.me/?text=${event.title} - ${window.location.href}`}
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="btn btn-outline-success"
-                      style={styles.shareBtn}
+                      className="btn"
+                      style={{ ...styles.shareBtn, backgroundColor: '#25d366', color: 'white' }}
                     >
                       <i className="bi bi-whatsapp"></i> WhatsApp
                     </a>
@@ -450,12 +452,12 @@ const EventsDetails = () => {
             {/* Booking Card */}
             <div style={styles.infoCard}>
               <div className="text-center">
-                <i className="bi bi-ticket-perforated" style={{ fontSize: '48px', color: '#ff8c32', marginBottom: '15px', display: 'block' }}></i>
+                <i className="bi bi-ticket-perforated" style={{ fontSize: '48px', color: brandColor, marginBottom: '15px', display: 'block' }}></i>
                 <h5 style={{ color: theme.text, marginBottom: '15px' }}>Want to Join?</h5>
                 <p style={{ color: theme.textMuted, fontSize: '14px', marginBottom: '20px' }}>
                   Limited seats available. Book your spot now!
                 </p>
-                <button className="btn w-100" style={{ backgroundColor: '#ff8c32', color: 'white', padding: '12px', borderRadius: '25px', fontWeight: '600' }}>
+                <button className="btn w-100" style={{ backgroundColor: brandColor, color: 'white', padding: '12px', borderRadius: '25px', fontWeight: '600' }}>
                   <i className="bi bi-calendar-check me-2"></i>
                   Register Now
                 </button>
@@ -508,6 +510,11 @@ const EventsDetails = () => {
         .breadcrumb-item a:hover {
           color: white !important;
           text-decoration: underline !important;
+        }
+        
+        .btn:hover {
+          opacity: 0.9;
+          transform: translateY(-2px);
         }
         
         @media (max-width: 768px) {

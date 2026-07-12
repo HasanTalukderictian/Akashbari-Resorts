@@ -57,21 +57,6 @@ const HappyClient = () => {
         border: '1px solid #eef2f6'
     };
 
-    // Professional icons for features
-    const featureIcons = [
-        "🏦", // Bank/Investment
-        "👑", // Crown/Elite
-        "🏨"  // Hotel/Luxury
-    ];
-
-    // Professional icons for stats (optional - can be used in stats section)
-    const statIcons = [
-        "👥", // Members
-        "📈", // Revenue Growth
-        "🏆", // Amenities/Awards
-        "⭐"  // Experience/Trust
-    ];
-
     // Fetch combined data from API
     const fetchCombinedData = async () => {
         setLoading(true);
@@ -132,21 +117,20 @@ const HappyClient = () => {
     const getStatsData = () => {
         const stats = getMemberStats();
         return [
-            { id: 1, target: stats.member, suffix: "+", prefix: "", label: "Happy Members", icon: "👥" },
-            { id: 2, target: stats.revenue, suffix: "%", prefix: "Up to ", label: "Yearly Revenue", icon: "📈" },
-            { id: 3, target: stats.amenities, suffix: "+", prefix: "", label: "Club Amenities", icon: "🏆" },
-            { id: 4, target: stats.experience, suffix: "+", prefix: "", label: "Years of Trust", icon: "⭐" }
+            { id: 1, target: stats.member, suffix: "+", prefix: "", label: "Happy Members" },
+            { id: 2, target: stats.revenue, suffix: "%", prefix: "Up to ", label: "Yearly Revenue" },
+            { id: 3, target: stats.amenities, suffix: "+", prefix: "", label: "Club Amenities" },
+            { id: 4, target: stats.experience, suffix: "+", prefix: "", label: "Years of Trust" }
         ];
     };
 
     // Dynamic features data from invest_records API
     const getFeaturesData = () => {
         if (combinedData.invest_records.length > 0) {
-            return combinedData.invest_records.map((record, index) => ({
+            return combinedData.invest_records.map((record) => ({
                 id: record.id,
                 title: record.title,
-                desc: record.desc,
-                icon: featureIcons[index % featureIcons.length]
+                desc: record.desc
             }));
         }
         // Fallback data if API returns empty
@@ -154,20 +138,17 @@ const HappyClient = () => {
             {
                 id: 1,
                 title: "Passive Income",
-                desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits.",
-                icon: "🏦"
+                desc: "Maximize your wealth with guaranteed yearly revenue and steady annual profits."
             },
             {
                 id: 2,
                 title: "Elite Status",
-                desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club.",
-                icon: "👑"
+                desc: "Unlock premium benefits with exclusive membership to the prestigious Akashbari Club."
             },
             {
                 id: 3,
                 title: "Luxury Living",
-                desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort.",
-                icon: "🏨"
+                desc: "Experience the perfect blend of modern lifestyle, elegance, and comfort."
             }
         ];
     };
@@ -230,14 +211,14 @@ const HappyClient = () => {
                             <div className="ps-md-4" style={{ borderLeft: '1px solid rgba(0,0,0,0.1)' }}>
                                 <h4 className="fw-light mb-3" style={{ color: '#5e2e10' }}>Your Investment, Your Future</h4>
                                 <p className="lead mb-2" style={{ color: '#2d3748' }}>
-                                    "Become a proud <strong>Property Owner</strong> by investing in Akashbari Resorts' projects".
+                                    Become a proud <strong>Property Owner</strong> by investing in Akashbari Resorts' projects
+                                    .
                                 </p>
                                 
                                 <div className="mt-4">
                                     {featuresData.map((item, index) => (
                                         <div key={item.id} className={`py-3 border-top ${index === featuresData.length - 1 ? 'border-bottom' : ''}`} style={{ borderColor: '#e2e8f0 !important' }}>
                                             <div className="d-flex align-items-center">
-                                                <span className="fs-2 me-3" style={{ color: '#5e2e10' }}>{item.icon}</span>
                                                 <div>
                                                     <h6 className="fw-bold mb-0" style={{ color: '#5e2e10' }}>{item.title}</h6>
                                                     <p className="small mb-0" style={{ color: '#718096' }}>{item.desc}</p>

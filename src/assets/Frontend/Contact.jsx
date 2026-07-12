@@ -11,6 +11,7 @@ import contactImg from '../image/section/Blog/Hotel6.png'
 import axios from 'axios';
 
 const Contact = () => {
+    const brandColor = '#5e2e10';
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -210,11 +211,11 @@ const Contact = () => {
 
                         <div className="col-lg-6 text-start">
                             <div className="form-content">
-                                <span className="text-gold text-uppercase ls-2 small fw-bold d-block mb-2">
+                                <span className="text-uppercase ls-2 small fw-bold d-block mb-2" style={{ color: brandColor }}>
                                     <span className="dot-icon">●</span> Quick Enquiry
                                 </span>
                                 <h2 className="serif display-6 mb-3 text-start">
-                                    Send an <span className="text-italic">Enquiry</span>
+                                    Send an <span className="text-italic" style={{ color: brandColor }}>Enquiry</span>
                                 </h2>
                                 <p className="text-muted mb-4 text-start">
                                     Have a question or special request? Leave us a message and we'll
@@ -270,6 +271,9 @@ const Contact = () => {
                                         type="submit"
                                         className="btn-submit-query"
                                         disabled={isSubmitting}
+                                        style={{ backgroundColor: brandColor }}
+                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#3d1f0a'}
+                                        onMouseLeave={(e) => e.target.style.backgroundColor = brandColor}
                                     >
                                         {isSubmitting ? 'Sending...' : 'Submit Query'}
                                     </button>
@@ -298,17 +302,15 @@ const Contact = () => {
                 </div>
             </section>
 
-           
-
             {/* 3rd Section: Get in Touch */}
             <section className="contact-info-section py-5">
                 <div className="container">
                     <div className="text-center mb-5">
-                        <span className="text-gold text-uppercase ls-2 small fw-bold d-block mb-2">
+                        <span className="text-uppercase ls-2 small fw-bold d-block mb-2" style={{ color: brandColor }}>
                             <span className="dot-icon">●</span> Contact Us
                         </span>
                         <h2 className="serif display-6">
-                            Get in <span className="text-italic">Touch</span>
+                            Get in <span className="text-italic" style={{ color: brandColor }}>Touch</span>
                         </h2>
                         <p className="text-muted mt-3">
                             Prefer a quick call or a message? Use the option that suits you.
@@ -324,11 +326,11 @@ const Contact = () => {
                                     rel={item.id === 3 ? "noopener noreferrer" : ""}
                                     className="text-decoration-none"
                                 >
-                                    <div className="contact-card text-center h-100">
+                                    <div className="contact-card text-center h-100" style={{ borderColor: `${brandColor}30` }}>
                                         <div className="contact-icon-wrapper">
-                                            <i className={`bi ${item.icon} text-gold`}></i>
+                                            <i className={`bi ${item.icon}`} style={{ color: brandColor }}></i>
                                         </div>
-                                        <h4 className="serif">{item.title}</h4>
+                                        <h4 className="serif" style={{ color: brandColor }}>{item.title}</h4>
                                         <p className="text-muted mb-1">{item.detail}</p>
                                         {item.detail2 && <p className="text-muted">{item.detail2}</p>}
                                     </div>
@@ -343,11 +345,11 @@ const Contact = () => {
             <section className="map-section py-5" style={{ backgroundColor: '#f8f9fa' }}>
                 <div className="container">
                     <div className="text-center mb-5">
-                        <span className="text-gold text-uppercase ls-2 small fw-bold d-block mb-2">
+                        <span className="text-uppercase ls-2 small fw-bold d-block mb-2" style={{ color: brandColor }}>
                             <span className="dot-icon">●</span> Our Location
                         </span>
                         <h2 className="serif display-6">
-                            Find Us on <span className="text-italic">Google Maps</span>
+                            Find Us on <span className="text-italic" style={{ color: brandColor }}>Google Maps</span>
                         </h2>
                         <p className="text-muted mt-3">
                             Visit us at Akashbari Resort, Sreepur, Gazipur - where nature meets luxury
@@ -374,7 +376,7 @@ const Contact = () => {
                         {/* Location Details Column */}
                         <div className="col-lg-4 d-flex">
                             <div className="location-details w-100 p-4 rounded-4 shadow-sm d-flex flex-column" style={{ backgroundColor: '#fff' }}>
-                                <h4 className="serif mb-3 text-gold">📍 Address Details</h4>
+                                <h4 className="serif mb-3" style={{ color: brandColor }}>📍 Address Details</h4>
                                 <div className="location-info mb-4">
                                     <p className="mb-2">
                                         <strong>Resort Name:</strong><br />
@@ -405,8 +407,8 @@ const Contact = () => {
                                         href={`https://www.google.com/maps?q=${latitude},${longitude}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="btn btn-outline-primary w-100"
-                                        style={{ color: '#639c4e', borderColor: '#639c4e' }}
+                                        className="btn w-100"
+                                        style={{ color: brandColor, borderColor: brandColor }}
                                     >
                                         <i className="bi bi-navigation me-2"></i>
                                         Open in Google Maps App
@@ -420,28 +422,28 @@ const Contact = () => {
                     <div className="row g-4 mt-4">
                         <div className="col-md-3 col-6">
                             <div className="info-mini-card text-center p-3 rounded-3" style={{ backgroundColor: '#fff', transition: 'transform 0.3s' }}>
-                                <i className="bi bi-clock-history fs-1 text-gold"></i>
+                                <i className="bi bi-clock-history fs-1" style={{ color: brandColor }}></i>
                                 <h6 className="mt-2 mb-0">Check-in</h6>
                                 <small className="text-muted">2:00 PM</small>
                             </div>
                         </div>
                         <div className="col-md-3 col-6">
                             <div className="info-mini-card text-center p-3 rounded-3" style={{ backgroundColor: '#fff', transition: 'transform 0.3s' }}>
-                                <i className="bi bi-clock fs-1 text-gold"></i>
+                                <i className="bi bi-clock fs-1" style={{ color: brandColor }}></i>
                                 <h6 className="mt-2 mb-0">Check-out</h6>
                                 <small className="text-muted">12:00 PM</small>
                             </div>
                         </div>
                         <div className="col-md-3 col-6">
                             <div className="info-mini-card text-center p-3 rounded-3" style={{ backgroundColor: '#fff', transition: 'transform 0.3s' }}>
-                                <i className="bi bi-car-front fs-1 text-gold"></i>
+                                <i className="bi bi-car-front fs-1" style={{ color: brandColor }}></i>
                                 <h6 className="mt-2 mb-0">Parking</h6>
                                 <small className="text-muted">Free Parking</small>
                             </div>
                         </div>
                         <div className="col-md-3 col-6">
                             <div className="info-mini-card text-center p-3 rounded-3" style={{ backgroundColor: '#fff', transition: 'transform 0.3s' }}>
-                                <i className="bi bi-wifi fs-1 text-gold"></i>
+                                <i className="bi bi-wifi fs-1" style={{ color: brandColor }}></i>
                                 <h6 className="mt-2 mb-0">Wi-Fi</h6>
                                 <small className="text-muted">Free High-Speed</small>
                             </div>
@@ -452,7 +454,7 @@ const Contact = () => {
                     <div className="nearby-attractions-wrapper mt-5 pt-4">
                         <div className="text-center mb-4">
                             <h3 className="serif display-6 fs-2">
-                                <span className="text-italic">Nearby Attractions</span>
+                                <span className="text-italic" style={{ color: brandColor }}>Nearby Attractions</span>
                             </h3>
                             <p className="text-muted">Explore the beauty around Akashbari Resort</p>
                         </div>
@@ -460,7 +462,7 @@ const Contact = () => {
                             <div className="col-md-3 col-sm-6">
                                 <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
                                     <div className="attraction-icon mb-3">
-                                        <i className="bi bi-tree-fill fs-1 text-gold"></i>
+                                        <i className="bi bi-tree-fill fs-1" style={{ color: brandColor }}></i>
                                     </div>
                                     <h5 className="serif mb-2">Bhawal National Park</h5>
                                     <p className="text-muted small mb-0">Lush green forest, rich biodiversity & peaceful trails</p>
@@ -469,7 +471,7 @@ const Contact = () => {
                             <div className="col-md-3 col-sm-6">
                                 <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
                                     <div className="attraction-icon mb-3">
-                                        <i className="bi bi-building fs-1 text-gold"></i>
+                                        <i className="bi bi-building fs-1" style={{ color: brandColor }}></i>
                                     </div>
                                     <h5 className="serif mb-2">Rajendrapur Cantonment</h5>
                                     <p className="text-muted small mb-0">Historical military area with scenic surroundings</p>
@@ -478,7 +480,7 @@ const Contact = () => {
                             <div className="col-md-3 col-sm-6">
                                 <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
                                     <div className="attraction-icon mb-3">
-                                        <i className="bi bi-water fs-1 text-gold"></i>
+                                        <i className="bi bi-water fs-1" style={{ color: brandColor }}></i>
                                     </div>
                                     <h5 className="serif mb-2">Bangabandhu Safari Park</h5>
                                     <p className="text-muted small mb-0">Exciting wildlife safari, exotic animals & family fun</p>
@@ -487,7 +489,7 @@ const Contact = () => {
                             <div className="col-md-3 col-sm-6">
                                 <div className="attraction-card text-center p-4 rounded-4 h-100 shadow-sm" style={{ backgroundColor: '#fff', transition: 'all 0.3s ease', cursor: 'pointer' }}>
                                     <div className="attraction-icon mb-3">
-                                        <i className="bi bi-flower1 fs-1 text-gold"></i>
+                                        <i className="bi bi-flower1 fs-1" style={{ color: brandColor }}></i>
                                     </div>
                                     <h5 className="serif mb-2">Nuhash Polli</h5>
                                     <p className="text-muted small mb-0">Artistic village with sculptures & cultural vibes</p>

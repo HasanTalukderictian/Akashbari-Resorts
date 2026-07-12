@@ -4,6 +4,7 @@ import Header from './Common/Header';
 import Footer from './Common/Footer';
 
 const Partner = () => {
+  const brandColor = '#5e2e10';
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -125,7 +126,7 @@ const Partner = () => {
       <>
         <Header />
         <div style={styles.loadingContainer}>
-          <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem', color: brandColor }}>
             <span className="visually-hidden">Loading...</span>
           </div>
           <p style={{ marginTop: '20px', color: '#666' }}>Loading partners...</p>
@@ -143,7 +144,7 @@ const Partner = () => {
         <div style={styles.errorContainer}>
           <i className="bi bi-exclamation-triangle" style={{ fontSize: '48px', color: '#dc3545' }}></i>
           <p style={{ marginTop: '20px', color: '#666' }}>{error}</p>
-          <button onClick={fetchPartners} style={styles.retryButton}>
+          <button onClick={fetchPartners} style={{ ...styles.retryButton, backgroundColor: brandColor }}>
             Try Again
           </button>
         </div>
@@ -159,20 +160,20 @@ const Partner = () => {
       <main style={styles.container}>
         {/* Header Section */}
         <section style={styles.headerSection}>
-          <span style={styles.badge}>OUR NETWORK</span>
+          <span style={{ ...styles.badge, backgroundColor: brandColor }}>OUR NETWORK</span>
           <h1 style={styles.title}>Our Partners</h1>
           <p style={styles.subtitle}>
             Discover our partners dedicated to serving your travel, hospitality, 
             and lifestyle needs with excellence and integrity.
           </p>
-          <div style={styles.underline}></div>
+          <div style={{ ...styles.underline, backgroundColor: brandColor }}></div>
         </section>
 
         {/* Partners Grid */}
         <section style={styles.grid}>
           {partners.length === 0 ? (
             <div style={styles.noDataContainer}>
-              <i className="bi bi-inbox" style={{ fontSize: '48px', color: '#76a34d' }}></i>
+              <i className="bi bi-inbox" style={{ fontSize: '48px', color: brandColor }}></i>
               <p style={{ marginTop: '20px', color: '#666' }}>No partners found.</p>
             </div>
           ) : (
@@ -201,7 +202,7 @@ const Partner = () => {
                         />
                       ) : (
                         <div style={styles.placeholderImage}>
-                          <i className="bi bi-building" style={styles.placeholderIcon}></i>
+                          <i className="bi bi-building" style={{ ...styles.placeholderIcon, color: brandColor }}></i>
                           <p style={styles.placeholderText}>{item.name}</p>
                         </div>
                       )}
@@ -213,22 +214,22 @@ const Partner = () => {
                     className="partner-text-box"
                     style={{
                       ...styles.textBox,
-                      borderLeft: isReverse ? '1px solid #e0e0e0' : 'none',
-                      borderRight: isReverse ? 'none' : '1px solid #e0e0e0',
+                      borderLeft: isReverse ? `1px solid ${brandColor}30` : 'none',
+                      borderRight: isReverse ? 'none' : `1px solid ${brandColor}30`,
                     }}
                   >
-                    <h2 style={styles.cardTitle}>{item.name}</h2>
+                    <h2 style={{ ...styles.cardTitle, color: brandColor }}>{item.name}</h2>
                     <p style={styles.cardText}>{item.description}</p>
                     <button 
                       className="partner-button"
-                      style={styles.button}
+                      style={{ ...styles.button, backgroundColor: brandColor }}
                       onClick={() => handleViewDetails(item.website)}
                       onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = '#5e853d';
+                        e.target.style.backgroundColor = '#3d1f0a';
                         e.target.style.transform = 'translateY(-2px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = '#76a34d';
+                        e.target.style.backgroundColor = brandColor;
                         e.target.style.transform = 'translateY(0)';
                       }}
                     >
@@ -327,7 +328,7 @@ const Partner = () => {
         }
         
         .partner-button:hover {
-          box-shadow: 0 4px 12px rgba(118, 163, 77, 0.3);
+          box-shadow: 0 4px 12px rgba(94, 46, 16, 0.3);
           transition: all 0.3s ease;
         }
       `}</style>
@@ -348,14 +349,13 @@ const styles = {
     marginBottom: '80px',
   },
   badge: {
-    backgroundColor: '#76a34d',
     color: 'white',
     padding: '6px 18px',
     fontSize: '13px',
     letterSpacing: '2px',
     fontWeight: '700',
     borderRadius: '50px',
-    boxShadow: '0 4px 10px rgba(118, 163, 77, 0.3)',
+    boxShadow: '0 4px 10px rgba(94, 46, 16, 0.3)',
     display: 'inline-block',
   },
   title: {
@@ -374,7 +374,6 @@ const styles = {
   underline: {
     width: '80px',
     height: '4px',
-    backgroundColor: '#76a34d',
     margin: '30px auto 0',
     borderRadius: '2px',
   },
@@ -439,7 +438,6 @@ const styles = {
   },
   placeholderIcon: {
     fontSize: '48px',
-    color: '#76a34d',
     marginBottom: '10px',
   },
   placeholderText: {
@@ -450,7 +448,6 @@ const styles = {
   cardTitle: {
     fontSize: '32px',
     marginBottom: '20px',
-    color: '#1a1a1a',
     lineHeight: '1.2',
   },
   cardText: {
@@ -460,7 +457,6 @@ const styles = {
     marginBottom: '30px',
   },
   button: {
-    backgroundColor: '#76a34d',
     color: 'white',
     border: 'none',
     padding: '14px 28px',
@@ -491,7 +487,6 @@ const styles = {
   retryButton: {
     marginTop: '20px',
     padding: '10px 24px',
-    backgroundColor: '#76a34d',
     color: 'white',
     border: 'none',
     borderRadius: '4px',

@@ -29,41 +29,38 @@ const Users = ({ theme: propsTheme }) => {
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     // Helper to dynamically pull the latest token headers
-    // Users.js এর ভেতরের এই ফাংশনটি রিপ্লেস করুন
-  const getAuthHeaders = useCallback((extraHeaders = {}) => {
-    // সরাসরি এই মুহূর্তে লোকালস্টোরেজ থেকে লেটেস্ট টোকেনটি রিড করা হচ্ছে
-    let token = window.localStorage.getItem('token'); 
-    
-    console.log("Current Token from LocalStorage:", token); // এটি কনসোলে চেক করুন
+    const getAuthHeaders = useCallback((extraHeaders = {}) => {
+        let token = window.localStorage.getItem('token'); 
+        
+        console.log("Current Token from LocalStorage:", token);
 
-    if (!token) {
-        console.warn("Warning: No token found in localStorage!");
+        if (!token) {
+            console.warn("Warning: No token found in localStorage!");
+            return {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                ...extraHeaders
+            };
+        }
+
+        token = token.replace(/['"]+/g, ''); 
+
+        if (token.startsWith('Bearer ')) {
+            token = token.replace('Bearer ', '');
+        }
+
         return {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.trim()}`,
             ...extraHeaders
         };
-    }
+    }, []);
 
-    // যদি কোনো কারণে টোকেনটি অবজেক্ট বা স্ট্রিং আকারে কোটেশনের ভেতরে থাকে, তা ক্লিন করা
-    token = token.replace(/['"]+/g, ''); 
-
-    if (token.startsWith('Bearer ')) {
-        token = token.replace('Bearer ', '');
-    }
-
-    return {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token.trim()}`,
-        ...extraHeaders
-    };
-}, []);
     // Centralized authentication error check
     const handleApiResponse = useCallback((res) => {
         if (res.status === 401 || res.status === 403) {
             setAuthError("Your session has expired. Please log in again.");
-            // Optional: localStorage.removeItem('token'); window.location.href = '/login';
             return false;
         }
         return true;
@@ -82,9 +79,7 @@ const Users = ({ theme: propsTheme }) => {
 
             const data = await res.json();
 
-            // Handle Laravel pagination response
-            // Laravel returns { current_page, data, first_page_url, from, last_page, etc. }
-            setUsers(data.data || data); // data.data contains the actual users array
+            setUsers(data.data || data);
 
         } catch (err) {
             console.error("Failed to fetch users:", err);
@@ -172,8 +167,8 @@ const Users = ({ theme: propsTheme }) => {
             color: status === 'Active' ? '#07cdae' : '#fe7096', fontWeight: '600'
         }),
         alert: {
-            padding: '12px 20px', backgroundColor: 'rgba(254, 112, 150, 0.15)',
-            color: '#fe7096', borderRadius: '8px', marginBottom: '20px', fontWeight: '500'
+            padding: '12px 20px', backgroundColor: 'rgba(94, 46, 16, 0.15)',
+            color: '#5e2e10', borderRadius: '8px', marginBottom: '20px', fontWeight: '500'
         }
     };
 
@@ -192,7 +187,7 @@ const Users = ({ theme: propsTheme }) => {
                         </select>
                         <div className="d-flex gap-2">
                             <button className="btn btn-light flex-grow-1" onClick={() => setShowModal(false)}>Cancel</button>
-                            <button onClick={handleSubmit} className="btn btn-primary flex-grow-1" style={{ background: 'linear-gradient(to right, #da8cff, #9a55ff)', border: 'none' }}>Save</button>
+                            <button onClick={handleSubmit} className="btn btn-primary flex-grow-1" style={{ background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)', border: 'none' }}>Save</button>
                         </div>
                     </div>
                 </div>
@@ -220,7 +215,7 @@ const Users = ({ theme: propsTheme }) => {
                                     <div className="card-body p-4">
                                         <div className="d-flex justify-content-between align-items-center mb-4">
                                             <h5 className="m-0">System Users</h5>
-                                            <button onClick={() => setShowModal(true)} className="btn btn-primary btn-sm px-3" style={{ background: 'linear-gradient(to right, #da8cff, #9a55ff)', border: 'none' }}>
+                                            <button onClick={() => setShowModal(true)} className="btn btn-primary btn-sm px-3" style={{ background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)', border: 'none' }}>
                                                 <i className="bi bi-person-plus-fill me-2"></i>Add User
                                             </button>
                                         </div>
