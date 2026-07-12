@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -16,8 +15,9 @@ import 'swiper/css/pagination';
 const Testominal = () => {
 
   const [testimonials, setTestimonials] = useState([]);
+  const brandColor = '#5e2e10';
 
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   // Fetch Testimonials
   const fetchTestimonials = async () => {
@@ -56,7 +56,7 @@ const Testominal = () => {
           <p
             className="fst-italic mb-1"
             style={{
-              color: '#C6A07A',
+              color: brandColor,
               fontSize: '1.1rem',
               fontFamily: 'serif'
             }}
@@ -74,6 +74,30 @@ const Testominal = () => {
             Testimonials and Clients
           </h2>
 
+          {/* Decorative Line */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '15px',
+            marginTop: '15px',
+          }}>
+            <span style={{
+              flex: '0 0 60px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${brandColor})`,
+            }}></span>
+            <span style={{
+              color: brandColor,
+              fontSize: '18px',
+            }}>✦</span>
+            <span style={{
+              flex: '0 0 60px',
+              height: '2px',
+              background: `linear-gradient(90deg, ${brandColor}, transparent)`,
+            }}></span>
+          </div>
+
         </div>
 
         {/* --- Swiper Section --- */}
@@ -85,9 +109,10 @@ const Testominal = () => {
             style={{
               width: '40px',
               height: '40px',
-              backgroundColor: '#1A1A1A',
+              backgroundColor: brandColor,
               color: '#fff',
-              zIndex: 10
+              zIndex: 10,
+              transition: 'all 0.3s ease'
             }}
           >
             <FiChevronLeft size={24} />
@@ -98,9 +123,10 @@ const Testominal = () => {
             style={{
               width: '40px',
               height: '40px',
-              backgroundColor: '#1A1A1A',
+              backgroundColor: brandColor,
               color: '#fff',
-              zIndex: 10
+              zIndex: 10,
+              transition: 'all 0.3s ease'
             }}
           >
             <FiChevronRight size={24} />
@@ -144,7 +170,9 @@ const Testominal = () => {
                     className="card border-0 shadow-sm mx-auto position-relative pt-5 px-4 pb-4"
                     style={{
                       maxWidth: '360px',
-                      borderRadius: '15px'
+                      borderRadius: '15px',
+                      border: `1px solid ${brandColor}20`,
+                      transition: 'all 0.3s ease'
                     }}
                   >
 
@@ -153,7 +181,8 @@ const Testominal = () => {
                       className="position-absolute top-0 start-50 translate-middle border border-5 border-white rounded-circle shadow-sm overflow-hidden"
                       style={{
                         width: '100px',
-                        height: '100px'
+                        height: '100px',
+                        borderColor: `${brandColor} !important`
                       }}
                     >
 
@@ -173,7 +202,7 @@ const Testominal = () => {
                       <FaQuoteLeft
                         className="mb-3"
                         style={{
-                          color: '#C6A07A',
+                          color: brandColor,
                           fontSize: '1.2rem'
                         }}
                       />
@@ -199,7 +228,7 @@ const Testominal = () => {
                             style={{
                               color:
                                 idx < testimonial.stars
-                                  ? '#C6A07A'
+                                  ? brandColor
                                   : '#DCDCDC',
                               fontSize: '0.9rem'
                             }}
@@ -241,7 +270,7 @@ const Testominal = () => {
                         <span
                           className="position-absolute start-50 top-0 translate-middle bg-white px-2 fw-bold text-uppercase"
                           style={{
-                            color: '#C6A07A',
+                            color: brandColor,
                             fontSize: '0.65rem',
                             letterSpacing: '1px'
                           }}
@@ -253,7 +282,7 @@ const Testominal = () => {
                           className="position-absolute end-0 top-0 translate-middle-y"
                           style={{
                             opacity: 0.3,
-                            color: '#C6A07A'
+                            color: brandColor
                           }}
                         >
                           <FaQuoteLeft
@@ -295,18 +324,27 @@ const Testominal = () => {
         }
 
         .testimonial-swiper .swiper-custom-bullet-active {
-          background-color: #C6A07A;
-          border-color: #C6A07A;
+          background-color: ${brandColor};
+          border-color: ${brandColor};
           transform: scale(1.2);
         }
 
         .swiper-prev-btn:hover,
         .swiper-next-btn:hover {
-          background-color: #C6A07A !important;
+          background-color: ${brandColor} !important;
+          opacity: 0.8;
+          transform: translateY(-50%) scale(1.1);
         }
 
         .object-fit-cover {
           object-fit: cover;
+        }
+
+        /* Card hover effect */
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 30px ${brandColor}20 !important;
+          border-color: ${brandColor}40 !important;
         }
 
       `}</style>

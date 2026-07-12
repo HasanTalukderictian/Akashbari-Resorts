@@ -10,6 +10,9 @@ const ProjectView = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
+  // Brand Color
+  const brandColor = '#5e2e10';
+
   // Function to get image URL - FIXED for achievements path
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://via.placeholder.com/600x400?text=No+Image';
@@ -71,10 +74,10 @@ const ProjectView = () => {
   if (loading) {
     return (
       <div className="container my-5 text-center">
-        <div className="spinner-border text-primary" role="status">
+        <div className="spinner-border text-primary" role="status" style={{ color: brandColor }}>
           <span className="visually-hidden">Loading...</span>
         </div>
-        <p className="mt-3">Loading achievements...</p>
+        <p className="mt-3" style={{ color: brandColor }}>Loading achievements...</p>
       </div>
     );
   }
@@ -89,6 +92,7 @@ const ProjectView = () => {
         <button 
           onClick={() => window.location.reload()}
           className="btn btn-primary mt-3"
+          style={{ backgroundColor: brandColor, borderColor: brandColor }}
         >
           Try Again
         </button>
@@ -100,7 +104,7 @@ const ProjectView = () => {
   if (achievements.length === 0) {
     return (
       <div className="container my-5 text-center">
-        <div className="alert alert-info" role="alert">
+        <div className="alert alert-info" role="alert" style={{ borderColor: brandColor, color: brandColor }}>
           No achievements found.
         </div>
       </div>
@@ -129,8 +133,36 @@ const ProjectView = () => {
 
   return (
     <div className="container my-5 project-view-container">
-      <h3 className='display-4 fw-normal text-uppercase mb-2 text-center'>Our Achievement</h3>
-      <p className='text-center'>Some of our Customers</p>
+      <h4 className='display-4  text-uppercase mb-2 text-center' style={{ color: brandColor }}>
+        Our Achievement
+      </h4>
+      <p className='text-center' style={{ color: brandColor, opacity: 0.8 }}>
+        Some of our Customers
+      </p>
+
+      {/* Decorative Line */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '15px',
+        marginBottom: '30px',
+      }}>
+        <span style={{
+          flex: '0 0 60px',
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, ${brandColor})`,
+        }}></span>
+        <span style={{
+          color: brandColor,
+          fontSize: '18px',
+        }}>✦</span>
+        <span style={{
+          flex: '0 0 60px',
+          height: '2px',
+          background: `linear-gradient(90deg, ${brandColor}, transparent)`,
+        }}></span>
+      </div>
 
       {/* 1st Div/Row: Left 50% Big, Right 50% Two Small */}
       <div className="row g-3 custom-project-row">
@@ -220,7 +252,7 @@ const ProjectView = () => {
 
       </div>
 
-      {/* CSS Styles */}
+      {/* CSS Styles with Brand Color */}
       <style>
         {`
           .custom-fit-img {
@@ -228,11 +260,13 @@ const ProjectView = () => {
             width: 100%;
             height: 100%;
             transition: transform 0.3s ease;
+            border: 2px solid ${brandColor};
           }
 
           .big-img-col, .small-img-wrapper {
             overflow: hidden;
             position: relative;
+            border-radius: 12px;
           }
 
           .custom-fit-img:hover {
@@ -250,6 +284,33 @@ const ProjectView = () => {
           }
           .small-img-wrapper {
             height: 50%;
+          }
+
+          /* Hover overlay effect with brand color */
+          .big-img-col::after,
+          .small-img-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, ${brandColor}40);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            border-radius: 12px;
+          }
+
+          .big-img-col:hover::after,
+          .small-img-wrapper:hover::after {
+            opacity: 1;
+          }
+
+          /* Image border on hover */
+          .big-img-col:hover .custom-fit-img,
+          .small-img-wrapper:hover .custom-fit-img {
+            border-color: ${brandColor};
           }
 
           @media (max-width: 768px) {

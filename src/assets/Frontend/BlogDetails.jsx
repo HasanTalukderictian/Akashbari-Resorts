@@ -46,6 +46,7 @@ const getImageUrl = (imagePath) => {
 };
 
 const BlogDetails = () => {
+  const brandColor = '#5e2e10';
   const { id } = useParams();
   const navigate = useNavigate();
   const [blogPost, setBlogPost] = useState(null);
@@ -151,7 +152,7 @@ const BlogDetails = () => {
       <>
         <Header />
         <div className="text-center py-5" style={{ minHeight: '60vh' }}>
-          <div className="spinner-border text-warning" role="status" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem', color: brandColor }}>
             <span className="visually-hidden">Loading...</span>
           </div>
           <p className="mt-3 text-muted">Loading blog post...</p>
@@ -172,9 +173,9 @@ const BlogDetails = () => {
           <h2 className="text-danger mb-4">{error || 'No Blog Data Found!'}</h2>
           <p className="text-muted mb-4">The blog post you're looking for doesn't exist or has been moved.</p>
           <button 
-            className="btn btn-warning px-4 py-2 rounded-pill"
+            className="btn px-4 py-2 rounded-pill"
             onClick={() => navigate('/blog')}
-            style={{ fontWeight: '600' }}
+            style={{ fontWeight: '600', backgroundColor: brandColor, color: 'white', border: 'none' }}
           >
             ← Back to Blog
           </button>
@@ -199,9 +200,9 @@ const BlogDetails = () => {
         <div className="container">
           <div className="breadcrumb-wrapper mb-3">
             <span className="text-white-50">Home</span>
-            <span className="text-warning mx-2">›</span>
+            <span className="mx-2" style={{ color: brandColor }}>›</span>
             <span className="text-white-50">Blog</span>
-            <span className="text-warning mx-2">›</span>
+            <span className="mx-2" style={{ color: brandColor }}>›</span>
             <span className="text-white">Details</span>
           </div>
           <h1 className="blog-title serif mb-3 text-white" style={{ fontSize: '2.5rem', fontWeight: '700' }}>
@@ -226,7 +227,7 @@ const BlogDetails = () => {
               {blogPost.content?.introduction && (
                 <div className="introduction-block mb-4 p-4 rounded-4" style={{
                   backgroundColor: '#f8f9fa',
-                  borderLeft: '4px solid #ffc107'
+                  borderLeft: `4px solid ${brandColor}`
                 }}>
                   <p className="lead text-muted fst-italic mb-0" style={{ fontSize: '1.1rem' }}>
                     "{blogPost.content.introduction}"
@@ -247,7 +248,7 @@ const BlogDetails = () => {
                   }}
                   onError={handleImageError}
                 />
-                <div className="position-absolute bottom-0 start-0 bg-dark text-white px-3 py-1 m-3 rounded-pill" style={{ fontSize: '12px' }}>
+                <div className="position-absolute bottom-0 start-0 text-white px-3 py-1 m-3 rounded-pill" style={{ fontSize: '12px', backgroundColor: brandColor }}>
                   {blogPost.category}
                 </div>
               </div>
@@ -259,7 +260,7 @@ const BlogDetails = () => {
                     <div key={idx} className="section-block mb-5">
                       <h3 className="serif h4 mb-3 pb-2" style={{ 
                         color: '#2c3e50',
-                        borderLeft: '3px solid #ffc107',
+                        borderLeft: `3px solid ${brandColor}`,
                         paddingLeft: '15px'
                       }}>
                         {section.title}
@@ -275,7 +276,7 @@ const BlogDetails = () => {
               {/* Conclusion */}
               {blogPost.content?.conclusion && (
                 <div className="conclusion-block mt-5 p-4 rounded-4" style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: `linear-gradient(135deg, ${brandColor} 0%, #3d1f0a 100%)`,
                   color: 'white'
                 }}>
                   <h4 className="serif mb-3">✨ Conclusion</h4>
@@ -291,9 +292,9 @@ const BlogDetails = () => {
                 </div>
                 <div className="share-buttons">
                   <span className="text-muted me-2">Share:</span>
-                  <a href="#" className="text-decoration-none me-2">📘</a>
-                  <a href="#" className="text-decoration-none me-2">🐦</a>
-                  <a href="#" className="text-decoration-none">📌</a>
+                  <a href="#" className="text-decoration-none me-2" style={{ color: brandColor }}>📘</a>
+                  <a href="#" className="text-decoration-none me-2" style={{ color: brandColor }}>🐦</a>
+                  <a href="#" className="text-decoration-none" style={{ color: brandColor }}>📌</a>
                 </div>
               </div>
             </div>
@@ -301,20 +302,20 @@ const BlogDetails = () => {
             {/* Right Column - Sidebar */}
             <div className="col-lg-4">
               {/* About Author Card */}
-              <div className="sidebar-card mb-4 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#ffffff', border: '1px solid #e9ecef' }}>
-                <h5 className="serif mb-3" style={{ color: '#2c3e50' }}>✍️ About the Author</h5>
+              <div className="sidebar-card mb-4 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#ffffff', border: `1px solid ${brandColor}30` }}>
+                <h5 className="serif mb-3" style={{ color: brandColor }}>✍️ About the Author</h5>
                 <div className="d-flex align-items-center mb-3">
                   <div className="rounded-circle me-3 d-flex align-items-center justify-content-center" style={{
                     width: '50px',
                     height: '50px',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: brandColor,
                     fontSize: '24px',
                     color: 'white'
                   }}>
                     {blogPost.author?.charAt(0) || 'A'}
                   </div>
                   <div>
-                    <strong className="d-block" style={{ color: '#2c3e50' }}>{blogPost.author}</strong>
+                    <strong className="d-block" style={{ color: brandColor }}>{blogPost.author}</strong>
                     <small className="text-muted">Content Writer & Hospitality Expert</small>
                   </div>
                 </div>
@@ -324,12 +325,12 @@ const BlogDetails = () => {
               </div>
 
               {/* Blog Info Card */}
-              <div className="sidebar-card mb-4 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#ffffff', border: '1px solid #e9ecef' }}>
-                <h5 className="serif mb-4" style={{ color: '#2c3e50' }}>ℹ️ Blog Info</h5>
+              <div className="sidebar-card mb-4 p-4 rounded-4 shadow-sm" style={{ backgroundColor: '#ffffff', border: `1px solid ${brandColor}30` }}>
+                <h5 className="serif mb-4" style={{ color: brandColor }}>ℹ️ Blog Info</h5>
                 <ul className="list-unstyled">
                   <li className="mb-3 d-flex justify-content-between">
                     <strong className="text-muted">Status:</strong>
-                    <span className={`badge ${blogPost.status === 'Published' ? 'bg-success' : 'bg-warning'} px-3 py-2 rounded-pill`}>
+                    <span className={`badge ${blogPost.status === 'Published' ? '' : 'bg-warning'} px-3 py-2 rounded-pill`} style={{ backgroundColor: blogPost.status === 'Published' ? brandColor : '#ffc107' }}>
                       {blogPost.status}
                     </span>
                   </li>
@@ -363,7 +364,7 @@ const BlogDetails = () => {
                     onError={handleImageError}
                   />
                   <div className="position-absolute top-0 start-0 w-100 h-100" style={{
-                    background: 'linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%)'
+                    background: `linear-gradient(135deg, ${brandColor}CC 0%, ${brandColor}99 100%)`
                   }}></div>
                 </div>
                 <div className="book-content p-4 position-relative text-white" style={{ zIndex: 1 }}>
@@ -372,7 +373,7 @@ const BlogDetails = () => {
                   </div>
                   <h4 className="serif mb-3" style={{ fontWeight: '700' }}>Book Your Stay</h4>
                   <p className="small mb-4 text-white-50">Check availability and choose the perfect room for your needs.</p>
-                  <button className="btn btn-warning w-100 fw-bold py-2 rounded-pill" style={{ fontWeight: '600' }}>
+                  <button className="btn w-100 fw-bold py-2 rounded-pill" style={{ fontWeight: '600', backgroundColor: '#ffffff', color: brandColor }}>
                     Book Now <span className="ms-2">→</span>
                   </button>
                 </div>
@@ -380,9 +381,9 @@ const BlogDetails = () => {
 
               {/* Back Button */}
               <button 
-                className="btn btn-outline-secondary w-100 mt-2 py-2 rounded-pill"
+                className="btn w-100 mt-2 py-2 rounded-pill"
                 onClick={() => navigate('/blog')}
-                style={{ fontWeight: '500' }}
+                style={{ fontWeight: '500', backgroundColor: brandColor, color: 'white', border: 'none' }}
               >
                 ← Back to All Blogs
               </button>

@@ -4,6 +4,13 @@
 }
 
 
+/* Brand Color */
+
+:root {
+    --brand-color: #5e2e10;
+}
+
+
 /* Top layout */
 
 .footer-top {
@@ -25,6 +32,7 @@
     font-weight: 500;
     margin-bottom: 20px;
     font-family: Gascogne, serif;
+    color: var(--brand-color);
 }
 
 .footer-col h3 {
@@ -32,6 +40,7 @@
     font-weight: 500;
     margin-bottom: 20px;
     font-family: Gascogne, serif;
+    color: var(--brand-color);
 }
 
 .footer-col ul {
@@ -48,7 +57,7 @@
 }
 
 .footer-col ul li:hover {
-    color: #6b9e3e;
+    color: var(--brand-color);
 }
 
 
@@ -61,7 +70,7 @@
 }
 
 .footer-col.quick-links ul li a:hover {
-    color: #6b9e3e;
+    color: var(--brand-color);
 }
 
 
@@ -83,7 +92,7 @@
 
 .contact-icon {
     font-size: 16px;
-    color: #6b9e3e;
+    color: var(--brand-color);
     min-width: 20px;
 }
 
@@ -101,11 +110,11 @@
 }
 
 .phone:hover {
-    color: #6b9e3e;
+    color: var(--brand-color);
 }
 
 .phone:hover .contact-icon {
-    color: #6b9e3e;
+    color: var(--brand-color);
 }
 
 
@@ -116,7 +125,7 @@
 }
 
 .footer-col.services ul li:hover {
-    color: #6b9e3e;
+    color: var(--brand-color);
     padding-left: 5px;
 }
 
@@ -162,7 +171,7 @@
 
 .social-icons a:hover {
     color: #fff;
-    background: #6b9e3e;
+    background: var(--brand-color);
     transform: translateY(-3px);
 }
 
@@ -190,7 +199,7 @@
 }
 
 .footer-links a:hover {
-    color: #6b9e3e;
+    color: var(--brand-color);
 }
 
 
@@ -203,14 +212,14 @@
 }
 
 .developer-link {
-    color: #6b9e3e;
+    color: var(--brand-color);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .developer-link:hover {
-    color: #2b8145;
+    color: #3d1f0a;
     text-decoration: underline;
 }
 

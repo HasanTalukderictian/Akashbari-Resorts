@@ -14,6 +14,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 const Club = () => {
+  const brandColor = '#5e2e10';
   const [showModal, setShowModal] = useState(false);
   const [clubInfo, setClubInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,31 +87,26 @@ const Club = () => {
   }, [API_BASE_URL]);
 
   // Function to get correct image URL
- // Function to get correct image URL
-const getImageUrl = (imagePath) => {
-  if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
-  if (imagePath.startsWith('http')) return imagePath;
-  
-  // Remove leading slashes if any
-  const cleanPath = imagePath.replace(/^\/+/, '');
-  
-  // Use the API_URL from env for storage path
-  // Remove /api from API_URL to get base URL for storage
-  const baseUrl = API_URL.replace('/api', '');
-  return `${baseUrl}/storage/${cleanPath}`;
-};
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://via.placeholder.com/800x600?text=No+Image';
+    if (imagePath.startsWith('http')) return imagePath;
+    
+    const cleanPath = imagePath.replace(/^\/+/, '');
+    const baseUrl = API_URL.replace('/api', '');
+    return `${baseUrl}/storage/${cleanPath}`;
+  };
 
-  // ২য় সেকশনের ডাটা
+  // Services Data
   const servicesData = {
     title: "Our Services",
     subtitle: "Rem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
     services: [
-      { id: 1, title: "CORPORATE EVENTS", description: "Lor sit amet, ctetur adipisicing elit, sed deiusmod tempor incididunt ut labore et", icon: <FaBuilding size={30} style={{ color: '#ff003c' }} /> },
-      { id: 2, title: "BRANDED EVENTS", description: "Dolor sit amet, tetur adipisicing elit, sed do eiu smod temporin cididunt ut labore", icon: <FaMask size={30} style={{ color: '#ff003c' }} /> },
-      { id: 3, title: "COMMERCIAL SHOOTS", description: "Dolor sit amet, tetur adipisicing elit, sed do eiu smod temporin cididunt ut labore", icon: <FaCamera size={30} style={{ color: '#ff003c' }} /> },
-      { id: 4, title: "HAN PARTIES", description: "Psum dolor sit amet, ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et", icon: <FaCocktail size={30} style={{ color: '#ff003c' }} /> },
-      { id: 5, title: "BIRTHDAY PARTIES", description: "Olor sit tetur adicing elit, sed do eiusmod tempor incididunt ut labore et", icon: <FaBirthdayCake size={30} style={{ color: '#ff003c' }} /> },
-      { id: 6, title: "VIP SERVICE", description: "Isum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut", icon: <FaCrown size={30} style={{ color: '#ff003c' }} /> }
+      { id: 1, title: "CORPORATE EVENTS", description: "Lor sit amet, ctetur adipisicing elit, sed deiusmod tempor incididunt ut labore et", icon: <FaBuilding size={30} style={{ color: brandColor }} /> },
+      { id: 2, title: "BRANDED EVENTS", description: "Dolor sit amet, tetur adipisicing elit, sed do eiu smod temporin cididunt ut labore", icon: <FaMask size={30} style={{ color: brandColor }} /> },
+      { id: 3, title: "COMMERCIAL SHOOTS", description: "Dolor sit amet, tetur adipisicing elit, sed do eiu smod temporin cididunt ut labore", icon: <FaCamera size={30} style={{ color: brandColor }} /> },
+      { id: 4, title: "HAN PARTIES", description: "Psum dolor sit amet, ctetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et", icon: <FaCocktail size={30} style={{ color: brandColor }} /> },
+      { id: 5, title: "BIRTHDAY PARTIES", description: "Olor sit tetur adicing elit, sed do eiusmod tempor incididunt ut labore et", icon: <FaBirthdayCake size={30} style={{ color: brandColor }} /> },
+      { id: 6, title: "VIP SERVICE", description: "Isum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut", icon: <FaCrown size={30} style={{ color: brandColor }} /> }
     ]
   };
 
@@ -157,7 +153,7 @@ const getImageUrl = (imagePath) => {
             <button 
               onClick={() => window.location.reload()}
               style={{
-                backgroundColor: '#b8860b',
+                backgroundColor: brandColor,
                 color: '#ffffff',
                 border: 'none',
                 padding: '10px 20px',
@@ -195,7 +191,7 @@ const getImageUrl = (imagePath) => {
             width: '80px',
             height: '80px',
             borderRadius: '50%',
-            backgroundColor: '#25D366',
+            backgroundColor: brandColor,
             border: 'none',
             color: 'white',
             fontSize: '14px',
@@ -213,12 +209,12 @@ const getImageUrl = (imagePath) => {
             fontFamily: "'Playfair Display', serif"
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#128C7E';
+            e.currentTarget.style.backgroundColor = '#3d1f0a';
             e.currentTarget.style.transform = 'scale(1.1)';
             e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#25D366';
+            e.currentTarget.style.backgroundColor = brandColor;
             e.currentTarget.style.transform = 'scale(1)';
             e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
           }}
@@ -239,7 +235,7 @@ const getImageUrl = (imagePath) => {
       >
         <Modal.Header 
           style={{
-            borderBottom: '2px solid #25D366',
+            borderBottom: `2px solid ${brandColor}`,
             backgroundColor: '#1a1a1a',
             color: 'white',
             padding: '20px 30px',
@@ -265,7 +261,7 @@ const getImageUrl = (imagePath) => {
               cursor: 'pointer',
               transition: '0.3s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#25D366'}
+            onMouseEnter={(e) => e.currentTarget.style.color = brandColor}
             onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
           >
             <FaTimes />
@@ -297,7 +293,7 @@ const getImageUrl = (imagePath) => {
               style={{
                 fontSize: '36px',
                 fontWeight: '800',
-                color: '#25D366',
+                color: brandColor,
                 marginBottom: '15px',
                 lineHeight: '1.2'
               }}
@@ -319,7 +315,7 @@ const getImageUrl = (imagePath) => {
             <div 
               style={{
                 display: 'inline-block',
-                backgroundColor: '#25D366',
+                backgroundColor: brandColor,
                 color: 'white',
                 padding: '8px 25px',
                 margin: '15px 0',
@@ -355,7 +351,7 @@ const getImageUrl = (imagePath) => {
           <button
             onClick={handleCloseModal}
             style={{
-              backgroundColor: '#25D366',
+              backgroundColor: brandColor,
               color: 'white',
               border: 'none',
               padding: '10px 30px',
@@ -365,10 +361,10 @@ const getImageUrl = (imagePath) => {
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#128C7E';
+              e.currentTarget.style.backgroundColor = '#3d1f0a';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#25D366';
+              e.currentTarget.style.backgroundColor = brandColor;
             }}
           >
             Close
@@ -381,13 +377,13 @@ const getImageUrl = (imagePath) => {
         {/* 1st section - Club Info */}
         <section className="py-5" style={{ backgroundColor: '#1a1a1a', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-            <h3 className='text-center mt-1 mb-15 font-bw' style={{ marginBottom: '2rem' }}>
+            <h3 className='text-center mt-1 mb-15 font-bw' style={{ marginBottom: '2rem', color: brandColor }}>
               {clubInfo?.club_name || 'AKASHBARI CLUB'}
             </h3>
             <div className="row align-items-center">
               <div className="col-lg-7 pe-lg-5 mb-4 mb-lg-0">
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{ position: 'absolute', top: '-20px', left: '-40px', width: '150px', height: '150px', border: '15px solid rgba(184, 134, 11, 0.15)', borderRadius: '50%', zIndex: -1 }} />
+                  <div style={{ position: 'absolute', top: '-20px', left: '-40px', width: '150px', height: '150px', border: `15px solid ${brandColor}26`, borderRadius: '50%', zIndex: -1 }} />
                   
                   <p style={{ lineHeight: '1.8', fontSize: '1.05rem', color: '#e0e0e0', textAlign: 'justify' }}>
                     {clubInfo?.club_history || 'No history available'}
@@ -398,19 +394,19 @@ const getImageUrl = (imagePath) => {
                       href={`tel:${clubInfo?.club_phone || ''}`}
                       className="d-flex align-items-center text-decoration-none"
                       style={{ 
-                        color: '#b8860b', 
+                        color: brandColor, 
                         fontSize: '1.1rem', 
                         fontWeight: '500',
                         transition: 'color 0.3s ease',
                         letterSpacing: '0.5px'
                       }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#b8860b'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = brandColor}
                     >
                       <span 
                         className="d-flex align-items-center justify-content-center me-2"
                         style={{
-                          backgroundColor: 'rgba(184, 134, 11, 0.15)',
+                          backgroundColor: `${brandColor}26`,
                           padding: '10px',
                           borderRadius: '50%',
                           width: '38px',
@@ -425,7 +421,7 @@ const getImageUrl = (imagePath) => {
                 </div>
               </div>
               <div className="col-lg-5">
-                <div className="p-3" style={{ backgroundColor: '#262626', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+                <div className="p-3" style={{ backgroundColor: '#262626', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', border: `1px solid ${brandColor}40` }}>
                   <img 
                     src={clubInfo?.image ? `${API_URL}/${clubInfo.image}` : 'https://i.ibb.co.com/F4wxhh4L/Whats-App-Image-2026-05-24-at-3-40-22-PM-1.jpg'} 
                     alt={clubInfo?.club_name || 'Club Building'} 
@@ -445,8 +441,8 @@ const getImageUrl = (imagePath) => {
         <section className="py-5" style={{ backgroundColor: '#07111e', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
             <div className="text-center mb-5">
-              <div className="mb-2"><FaGlassMartiniAlt size={24} style={{ color: '#ff003c' }} /></div>
-              <h2 className="fw-bold mb-3" style={{ fontSize: '2.5rem', letterSpacing: '1px' }}>{servicesData.title}</h2>
+              <div className="mb-2"><FaGlassMartiniAlt size={24} style={{ color: brandColor }} /></div>
+              <h2 className="fw-bold mb-3" style={{ fontSize: '2.5rem', letterSpacing: '1px', color: brandColor }}>{servicesData.title}</h2>
               <div className="row justify-content-center">
                 <div className="col-md-8">
                   <p style={{ color: '#7a8a9e', fontSize: '0.95rem', lineHeight: '1.6' }}>{servicesData.subtitle}</p>
@@ -458,8 +454,8 @@ const getImageUrl = (imagePath) => {
                 <div key={service.id} className="col-md-6 col-lg-4">
                   <div 
                     className="p-4 h-100 d-flex align-items-start"
-                    style={{ backgroundColor: '#101c2c', borderRadius: '4px', transition: 'all 0.3s ease', cursor: 'pointer' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#800020'; e.currentTarget.style.transform = 'translateY(-5px)'; }}
+                    style={{ backgroundColor: '#101c2c', borderRadius: '4px', transition: 'all 0.3s ease', cursor: 'pointer', borderLeft: `3px solid ${brandColor}` }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = brandColor; e.currentTarget.style.transform = 'translateY(-5px)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#101c2c'; e.currentTarget.style.transform = 'translateY(0)'; }}
                   >
                     <div className="me-3 mt-1">{service.icon}</div>
@@ -478,7 +474,7 @@ const getImageUrl = (imagePath) => {
         <section className="py-5" style={{ backgroundColor: '#111111', color: '#ffffff' }}>
           <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
             <div className="mb-4">
-              <h2 style={{ color: '#b8860b', fontFamily: 'serif', fontSize: '2.2rem', fontWeight: '300' }}>
+              <h2 style={{ color: brandColor, fontFamily: 'serif', fontSize: '2.2rem', fontWeight: '300' }}>
                 Facilities Overview
               </h2>
             </div>
@@ -540,14 +536,14 @@ const getImageUrl = (imagePath) => {
                       <div 
                         className="facility-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-4"
                         style={{ 
-                          backgroundColor: 'rgba(0, 0, 0, 0.65)', 
+                          backgroundColor: `rgba(0, 0, 0, 0.65)`, 
                           transition: 'all 0.4s ease-in-out',
                           opacity: 1
                         }}
                       >
                         <div 
                           className="w-100 h-100 d-flex align-items-center justify-content-center"
-                          style={{ border: '1px solid rgba(184, 134, 11, 0.4)' }}
+                          style={{ border: `1px solid ${brandColor}66` }}
                         >
                           <h4 
                             className="fw-normal text-white text-center px-3" 

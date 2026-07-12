@@ -9,6 +9,8 @@ import customer5 from '../image/section/Blog/Customer5.jpeg';
 import customer6 from '../image/section/Blog/Customer6.jpg';
 
 const OngoingView = () => {
+  const brandColor = '#5e2e10';
+  
   const images = [
     customer1, // Image 1 (Big Left)
     customer2, // Image 2
@@ -32,7 +34,33 @@ const OngoingView = () => {
         }
       `}</style>
       <div className="container my-5 project-view-container">
-        <h3 className='text-center fw-bold mt-4 mb-5'>Going Project View</h3>
+        <h3 className='text-center fw-bold mt-4 mb-2' style={{ color: brandColor }}>
+          Going Project View
+        </h3>
+        
+        {/* Decorative Line */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '15px',
+          marginBottom: '30px',
+        }}>
+          <span style={{
+            flex: '0 0 60px',
+            height: '2px',
+            background: `linear-gradient(90deg, transparent, ${brandColor})`,
+          }}></span>
+           <span style={{
+          color: brandColor,
+          fontSize: '18px',
+        }}>✦</span>
+        <span style={{
+          flex: '0 0 60px',
+          height: '2px',
+          background: `linear-gradient(90deg, ${brandColor}, transparent)`,
+        }}></span>
+        </div>
 
         {/* 1st Div/Row: Left 50% Big, Right 50% Two Small */}
         <div className="row g-3 custom-project-row">
@@ -42,8 +70,7 @@ const OngoingView = () => {
             <img 
               src={images[0]} 
               alt="Customer 1" 
-              className="w-100 h-100 rounded" 
-              style={{ objectFit: 'cover' }} 
+              className="w-100 h-100 rounded custom-fit-img" 
             />
           </div>
           
@@ -53,16 +80,14 @@ const OngoingView = () => {
               <img 
                 src={images[1]} 
                 alt="Customer 2" 
-                className="w-100 h-100 rounded" 
-                style={{ objectFit: 'cover' }} 
+                className="w-100 h-100 rounded custom-fit-img" 
               />
             </div>
             <div className="small-img-wrapper pt-md-2">
               <img 
                 src={images[2]} 
                 alt="Customer 3" 
-                className="w-100 h-100 rounded" 
-                style={{ objectFit: 'cover' }} 
+                className="w-100 h-100 rounded custom-fit-img" 
               />
             </div>
           </div>
@@ -78,16 +103,14 @@ const OngoingView = () => {
               <img 
                 src={images[3]} 
                 alt="Customer 4" 
-                className="w-100 h-100 rounded" 
-                style={{ objectFit: 'cover' }} 
+                className="w-100 h-100 rounded custom-fit-img" 
               />
             </div>
             <div className="small-img-wrapper pt-md-2">
               <img 
                 src={images[4]} 
                 alt="Customer 5" 
-                className="w-100 h-100 rounded" 
-                style={{ objectFit: 'cover' }} 
+                className="w-100 h-100 rounded custom-fit-img" 
               />
             </div>
           </div>
@@ -97,8 +120,7 @@ const OngoingView = () => {
             <img 
               src={images[5]} 
               alt="Customer 6" 
-              className="w-100 h-100 rounded" 
-              style={{ objectFit: 'cover' }} 
+              className="w-100 h-100 rounded custom-fit-img" 
             />
           </div>
 
@@ -107,6 +129,47 @@ const OngoingView = () => {
         {/* রেস্পন্সিভ ও ক্লিন লেআউট সিএসএস */}
         <style>
           {`
+            /* Custom Fit Image with Brand Color Border */
+            .custom-fit-img {
+              object-fit: cover !important;
+              width: 100%;
+              height: 100%;
+              transition: transform 0.3s ease, border-color 0.3s ease;
+              border: 3px solid ${brandColor};
+            }
+
+            .big-img-col, .small-img-wrapper {
+              overflow: hidden;
+              position: relative;
+              border-radius: 12px;
+            }
+
+            /* Hover effect - zoom with brand color overlay */
+            .custom-fit-img:hover {
+              transform: scale(1.03);
+            }
+
+            /* Brand color overlay on hover */
+            .big-img-col::after,
+            .small-img-wrapper::after {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(to bottom, transparent 50%, ${brandColor}40);
+              opacity: 0;
+              transition: opacity 0.3s ease;
+              pointer-events: none;
+              border-radius: 12px;
+            }
+
+            .big-img-col:hover::after,
+            .small-img-wrapper:hover::after {
+              opacity: 1;
+            }
+
             /* ডেক্সটপ ও বড় স্ক্রিনের ডিফল্ট হাইট */
             .custom-project-row {
               height: 500px;

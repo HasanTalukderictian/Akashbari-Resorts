@@ -17,6 +17,7 @@ import image3 from '../image/place-1-2.jpg';
 import ceoImage from '../../assets/image/section/Blog/ceo.jpg';
 
 const AboutUs = () => {
+    const brandColor = '#5e2e10';
     const [selectedImage, setSelectedImage] = useState(king1);
     const [activeId, setActiveId] = useState(1);
     const [teamMembers, setTeamMembers] = useState([]);
@@ -88,15 +89,15 @@ const AboutUs = () => {
                                     fontSize: '1.1rem',
                                     fontWeight: '300',
                                     fontStyle: 'italic',
-                                    borderLeft: '3px solid #f39c12',
-                                    borderRight: '3px solid #f39c12',
+                                    borderLeft: `3px solid ${brandColor}`,
+                                    borderRight: `3px solid ${brandColor}`,
                                     display: 'inline-block',
                                     padding: '0 25px',
                                     letterSpacing: '0.3px'
                                 }}>
-                                    <i className="bi bi-heart-fill me-2 text-warning"></i>
+                                    <i className="bi bi-heart-fill me-2" style={{ color: brandColor }}></i>
                                     Crafting dreams, building futures
-                                    <i className="bi bi-heart-fill ms-2 text-warning"></i>
+                                    <i className="bi bi-heart-fill ms-2" style={{ color: brandColor }}></i>
                                 </p>
                             </div>
                         </div>
@@ -118,22 +119,22 @@ const AboutUs = () => {
                                 </div>
                                 <h2 className="modern-title mb-4">
                                     Experience Luxury At
-                                    <span className="text-gradient"> Akashbari Hotel & Resort</span>
+                                    <span className="text-gradient" style={{ color: '#5e2e10' }}> Akashbari Hotel & Resort</span>
                                 </h2>
-                                <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4 border-warning">
+                                <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4" style={{ borderColor: brandColor }}>
                                     <p className="mb-2">
-                                        <strong>🏢 Business Type:</strong> Luxury Hospitality & Eco Resort
+                                        <strong> Business Type:</strong> Luxury Hospitality & Eco Resort
                                     </p>
                                     <p className="mb-0">
-                                        <strong>📅 Established Since:</strong> 2015
+                                        <strong> Established Since:</strong> 2015
                                     </p>
                                 </div>
                                 <p className="modern-description text-muted mb-4" style={{ fontFamily: 'inherit', fontSize: '1rem', lineHeight: '1.6' }}>
                                     Akashbari Hotel & Resort is a premier getaway destination blending nature with world-class hospitality.
                                     Designed for families, couples, and corporate events, we offer a tranquil environment away from the hustle of daily life.
                                 </p>
-                                <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600' }}>
-                                    🏆 Our Premium Facilities:
+                                <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600', color: brandColor }}>
+                                     Our Premium Facilities:
                                 </h4>
                                 <ul className="list-unstyled mb-4">
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Premium Eco Cottages & Suites</li>
@@ -147,7 +148,7 @@ const AboutUs = () => {
                         </div>
                         <div className="col-lg-6">
                             <div className="modern-gallery-wrapper">
-                                <div className="main-image-container position-relative overflow-hidden rounded-4 shadow-lg">
+                                <div className="main-image-container position-relative overflow-hidden rounded-4 shadow-lg" style={{ border: `2px solid ${brandColor}40` }}>
                                     <img
                                         src={king3}
                                         alt="Akashbari Resort View"
@@ -167,20 +168,20 @@ const AboutUs = () => {
                     {/* Section Header - Same as vision section */}
                     <div className="text-center mb-5">
                         <div className="section-badge d-inline-flex align-items-center gap-2 mb-3" style={{
-                            backgroundColor: '#f0f0ff',
+                            backgroundColor: `${brandColor}15`,
                             padding: '8px 20px',
                             borderRadius: '50px',
-                            color: '#9a55ff',
+                            color: brandColor,
                             fontSize: '14px',
                             fontWeight: '600',
                             fontFamily: 'inherit'
                         }}>
-                            <span style={{ fontSize: '18px' }}>👑</span>
+                            <span style={{ fontSize: '18px' }}></span>
                             LEADERSHIP CORNER
                         </div>
                         <h2 className="modern-title mb-3" style={{ fontFamily: 'inherit' }}>
                             Message from Our
-                            <span className="text-gradient"> CEO & Founder</span>
+                            <span className="text-gradient" style={{ color: brandColor }}> CEO & Founder</span>
                         </h2>
                         <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontFamily: 'inherit', fontSize: '1rem' }}>
                             Meet the visionary behind Akashbari's success
@@ -193,7 +194,7 @@ const AboutUs = () => {
                             <div className="ceo-image-area text-center">
                                 <div className="position-relative d-inline-block">
                                     <div className="ceo-image-wrapper rounded-4 overflow-hidden shadow-lg" style={{
-                                        border: '5px solid white',
+                                        border: `5px solid ${brandColor}`,
                                         borderRadius: '20px',
                                         maxWidth: '350px',
                                         margin: '0 auto'
@@ -211,9 +212,10 @@ const AboutUs = () => {
                                     <div className="ceo-name-card mt-3 p-3 bg-white rounded-3 shadow-sm" style={{
                                         position: 'relative',
                                         zIndex: '2',
-                                        fontFamily: 'inherit'
+                                        fontFamily: 'inherit',
+                                        border: `1px solid ${brandColor}30`
                                     }}>
-                                        <h4 className="mb-0" style={{ color: '#2c3e50', fontWeight: '700', fontFamily: 'inherit' }}>Touhidul Alam Milky</h4>
+                                        <h4 className="mb-0" style={{ color: brandColor, fontWeight: '700', fontFamily: 'inherit' }}>Touhidul Alam Milky</h4>
                                         <p className="mb-0 text-muted" style={{ fontFamily: 'inherit' }}>CEO & Founder, Akashbari Group</p>
                                     </div>
                                 </div>
@@ -225,11 +227,11 @@ const AboutUs = () => {
                             {/* CEO Message Box - Same style as business info box */}
                             <div className="ceo-message-box p-4 rounded-4 mb-4" style={{
                                 backgroundColor: '#fcfcfc',
-                                borderLeft: '4px solid #ffc107',
+                                borderLeft: `4px solid ${brandColor}`,
                                 boxShadow: '0 5px 20px rgba(0,0,0,0.05)',
                                 fontFamily: 'inherit'
                             }}>
-                                <span style={{ fontSize: '40px', color: '#ffc107', opacity: '0.4', fontFamily: 'inherit' }}>"</span>
+                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4', fontFamily: 'inherit' }}>"</span>
                                 <p className="ceo-quote-text px-3" style={{
                                     fontSize: '1rem',
                                     lineHeight: '1.7',
@@ -242,7 +244,7 @@ const AboutUs = () => {
                                     an unforgettable experience. Our journey is driven by passion, integrity, and an unwavering
                                     commitment to excellence.
                                 </p>
-                                <span style={{ fontSize: '40px', color: '#ffc107', opacity: '0.4', display: 'block', textAlign: 'right', fontFamily: 'inherit' }}>"</span>
+                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4', display: 'block', textAlign: 'right', fontFamily: 'inherit' }}>"</span>
                             </div>
 
                             {/* Vision, Mission, Goal Grid - Same style as facilities */}
@@ -250,7 +252,7 @@ const AboutUs = () => {
                                 <div className="col-md-4">
                                     <div className="vm-card text-center p-3 rounded-3" style={{
                                         backgroundColor: '#fcfcfc',
-                                        border: '1px solid #e9ecef',
+                                        border: `1px solid ${brandColor}30`,
                                         transition: 'all 0.3s ease',
                                         cursor: 'pointer',
                                         height: '100%',
@@ -258,16 +260,18 @@ const AboutUs = () => {
                                     }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                            e.currentTarget.style.boxShadow = `0 10px 25px ${brandColor}30`;
+                                            e.currentTarget.style.borderColor = brandColor;
                                         }}
                                         onMouseLeave={(e) => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                             e.currentTarget.style.boxShadow = 'none';
+                                            e.currentTarget.style.borderColor = `${brandColor}30`;
                                         }}>
                                         <div className="vm-icon mb-2">
                                             <span style={{ fontSize: '36px' }}>👁️</span>
                                         </div>
-                                        <h5 className="mb-2" style={{ fontWeight: '700', color: '#2c3e50', fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Vision</h5>
+                                        <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Vision</h5>
                                         <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
                                             To be Bangladesh's most preferred eco-luxury resort, setting global benchmarks in sustainable hospitality.
                                         </p>
@@ -276,7 +280,7 @@ const AboutUs = () => {
                                 <div className="col-md-4">
                                     <div className="vm-card text-center p-3 rounded-3" style={{
                                         backgroundColor: '#fcfcfc',
-                                        border: '1px solid #e9ecef',
+                                        border: `1px solid ${brandColor}30`,
                                         transition: 'all 0.3s ease',
                                         cursor: 'pointer',
                                         height: '100%',
@@ -284,16 +288,18 @@ const AboutUs = () => {
                                     }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                            e.currentTarget.style.boxShadow = `0 10px 25px ${brandColor}30`;
+                                            e.currentTarget.style.borderColor = brandColor;
                                         }}
                                         onMouseLeave={(e) => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                             e.currentTarget.style.boxShadow = 'none';
+                                            e.currentTarget.style.borderColor = `${brandColor}30`;
                                         }}>
                                         <div className="vm-icon mb-2">
                                             <span style={{ fontSize: '36px' }}>🎯</span>
                                         </div>
-                                        <h5 className="mb-2" style={{ fontWeight: '700', color: '#2c3e50', fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Mission</h5>
+                                        <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Mission</h5>
                                         <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
                                             To provide exceptional hospitality experiences while preserving nature and empowering local communities.
                                         </p>
@@ -302,7 +308,7 @@ const AboutUs = () => {
                                 <div className="col-md-4">
                                     <div className="vm-card text-center p-3 rounded-3" style={{
                                         backgroundColor: '#fcfcfc',
-                                        border: '1px solid #e9ecef',
+                                        border: `1px solid ${brandColor}30`,
                                         transition: 'all 0.3s ease',
                                         cursor: 'pointer',
                                         height: '100%',
@@ -310,16 +316,18 @@ const AboutUs = () => {
                                     }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+                                            e.currentTarget.style.boxShadow = `0 10px 25px ${brandColor}30`;
+                                            e.currentTarget.style.borderColor = brandColor;
                                         }}
                                         onMouseLeave={(e) => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                             e.currentTarget.style.boxShadow = 'none';
+                                            e.currentTarget.style.borderColor = `${brandColor}30`;
                                         }}>
                                         <div className="vm-icon mb-2">
                                             <span style={{ fontSize: '36px' }}>⭐</span>
                                         </div>
-                                        <h5 className="mb-2" style={{ fontWeight: '700', color: '#2c3e50', fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Goal</h5>
+                                        <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Goal</h5>
                                         <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
                                             To expand sustainably across Bangladesh, creating 1000+ jobs and becoming a model for responsible tourism.
                                         </p>
@@ -387,12 +395,12 @@ const AboutUs = () => {
                 <div className="container">
                     <div className="team-header-modern text-center">
 
-                        <div className="section-tag centered">
+                        <div className="section-tag centered" style={{ color: brandColor }}>
                             <span className="tag-dot"></span>
                             MEET OUR EXPERTS
                         </div>
                         <h2 className="team-title" style={{ fontFamily: 'inherit' }}>
-                            The Passionate <span className="text-gradient">People Behind</span><br />
+                            The Passionate <span className="text-gradient" style={{ color: brandColor }}>People Behind</span><br />
                             Your Perfect Stay
                         </h2>
                         <p className="team-subtitle" style={{ fontFamily: 'inherit', fontSize: '0.95rem' }}>
@@ -403,7 +411,7 @@ const AboutUs = () => {
 
                     {loading ? (
                         <div className="text-center py-5">
-                            <div className="spinner-border text-primary" role="status">
+                            <div className="spinner-border text-primary" role="status" style={{ color: brandColor }}>
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                             <p className="mt-3 text-muted">Loading team members...</p>
@@ -414,6 +422,7 @@ const AboutUs = () => {
                             <button
                                 className="btn btn-primary mt-3"
                                 onClick={() => window.location.reload()}
+                                style={{ backgroundColor: brandColor, borderColor: brandColor }}
                             >
                                 Retry
                             </button>
@@ -433,22 +442,22 @@ const AboutUs = () => {
                                                 }}
                                             />
                                             <div className="team-social-overlay">
-                                                <a href={`mailto:${member.email || 'info@akashbari.com'}`} className="social-link" target="_blank" rel="noopener noreferrer">
+                                                <a href={`mailto:${member.email || 'info@akashbari.com'}`} className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
                                                     <i className="bi bi-envelope"></i>
                                                 </a>
-                                                <a href="#" className="social-link" target="_blank" rel="noopener noreferrer">
+                                                <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
                                                     <i className="bi bi-linkedin"></i>
                                                 </a>
-                                                <a href="#" className="social-link" target="_blank" rel="noopener noreferrer">
+                                                <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
                                                     <i className="bi bi-twitter"></i>
                                                 </a>
                                             </div>
                                         </div>
                                         <div className="team-info">
-                                            <h3 className="team-member-name" style={{ fontFamily: 'inherit' }}>{member.name}</h3>
+                                            <h3 className="team-member-name" style={{ fontFamily: 'inherit', color: brandColor }}>{member.name}</h3>
                                             <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
                                             <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
-                                            <div className="team-divider"></div>
+                                            <div className="team-divider" style={{ backgroundColor: brandColor }}></div>
 
                                         </div>
                                     </div>

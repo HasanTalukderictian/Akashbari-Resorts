@@ -35,6 +35,7 @@ const getImageUrl = (imagePath) => {
 const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image+Available';
 
 const Blog = () => {
+  const brandColor = '#5e2e10';
   const navigate = useNavigate();
   const [blogData, setBlogData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,7 +132,7 @@ const Blog = () => {
       <>
         <Header />
         <div className="text-center py-5" style={{ minHeight: '60vh' }}>
-          <div className="spinner-border text-warning" role="status" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem', color: brandColor }}>
             <span className="visually-hidden">Loading...</span>
           </div>
           <p className="mt-3 text-muted">Loading amazing blog posts...</p>
@@ -150,8 +151,9 @@ const Blog = () => {
             <h4 className="alert-heading">Oops! Something went wrong</h4>
             <p>{error}</p>
             <button
-              className="btn btn-warning mt-3 px-4 py-2 rounded-pill"
+              className="btn mt-3 px-4 py-2 rounded-pill"
               onClick={() => fetchBlogs()}
+              style={{ backgroundColor: brandColor, color: 'white', border: 'none' }}
             >
               Try Again
             </button>
@@ -194,14 +196,14 @@ const Blog = () => {
       fontSize: '1.1rem', 
       fontWeight: '300',
       letterSpacing: '0.5px',
-      borderLeft: '3px solid #f39c12',
-      borderRight: '3px solid #f39c12',
+      borderLeft: `3px solid ${brandColor}`,
+      borderRight: `3px solid ${brandColor}`,
       display: 'inline-block',
       padding: '0 20px'
     }}>
-      <i className="bi bi-journal-bookmark-fill me-2 text-warning"></i>
+      <i className="bi bi-journal-bookmark-fill me-2" style={{ color: brandColor }}></i>
       Stories, insights, and updates from our world
-      <i className="bi bi-arrow-right ms-2 text-warning"></i>
+      <i className="bi bi-arrow-right ms-2" style={{ color: brandColor }}></i>
     </p>
   </div>
 </div>
@@ -235,7 +237,7 @@ const Blog = () => {
                       onError={() => handleImageError(post.id)}
                     />
                     {post.status === 'Published' && (
-                      <span className="position-absolute top-0 end-0 m-3 px-3 py-1 bg-success text-white rounded-pill small">
+                      <span className="position-absolute top-0 end-0 m-3 px-3 py-1 text-white rounded-pill small" style={{ backgroundColor: brandColor }}>
                         {post.status}
                       </span>
                     )}
@@ -243,7 +245,7 @@ const Blog = () => {
                   <div className="blog-info p-4 d-flex flex-column justify-content-between">
                     <div>
                       <div className="d-flex justify-content-between align-items-center mb-2">
-                        <span className="blog-category text-warning small text-uppercase fw-semibold">
+                        <span className="blog-category small text-uppercase fw-semibold" style={{ color: brandColor }}>
                           {post.category}
                         </span>
                         <span className="text-muted small">
@@ -276,7 +278,7 @@ const Blog = () => {
                       </p>
                     </div>
                     <button className="read-more-btn-gold mt-3 w-100 py-2 rounded-pill border-0 fw-semibold" style={{
-                      background: 'linear-gradient(135deg, #ff8c32 0%, #ff8c32 100%)',
+                      backgroundColor: brandColor,
                       color: 'white',
                       transition: 'all 0.3s ease'
                     }}>
@@ -311,7 +313,8 @@ const Blog = () => {
         
         .read-more-btn-gold:hover {
           transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(255, 140, 50, 0.3);
+          box-shadow: 0 5px 15px rgba(94, 46, 16, 0.3);
+          background-color: #3d1f0a !important;
         }
         
         @keyframes fadeInUp {

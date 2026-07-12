@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AllEvents = () => {
+  const brandColor = '#5e2e10';
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [events, setEvents] = useState([]);
@@ -25,12 +26,11 @@ const AllEvents = () => {
     card: isDarkMode ? '#16213e' : '#ffffff',
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    // সুন্দর রিসোর্ট ব্যাকগ্রাউন্ড ইমেজ এবং টেক্সট ক্লিয়ার দেখার জন্য ওভারলে সেট করা হয়েছে
     heroBg: isDarkMode 
-      ? 'linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")' 
-      : 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")',
-    primaryColor: '#ff8c32',
-    primaryHover: '#e67e22',
+      ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")` 
+      : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`,
+    primaryColor: brandColor,
+    primaryHover: '#3d1f0a',
   };
 
   // Helper function to get full image URL
@@ -101,7 +101,7 @@ const AllEvents = () => {
       background: theme.heroBg,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      padding: '100px 0', // ইমেজটি ফুটিয়ে তোলার জন্য প্যাডিং কিছুটা বাড়ানো হয়েছে
+      padding: '100px 0',
       color: 'white',
       position: 'relative',
       overflow: 'hidden',
@@ -112,7 +112,7 @@ const AllEvents = () => {
       zIndex: 2,
     },
     heroTitle: {
-      textShadow: '2px 4px 10px rgba(0,0,0,0.5)', // টেক্সট যাতে ইমেজের ওপর স্পষ্ট ভাসে
+      textShadow: '2px 4px 10px rgba(0,0,0,0.5)',
     },
     heroSubtitle: {
       opacity: 0.95,
@@ -139,7 +139,7 @@ const AllEvents = () => {
       top: '50%',
       transform: 'translateY(-50%)',
       zIndex: 10,
-      color: '#ff8c32',
+      color: brandColor,
     },
     searchInput: {
       paddingLeft: '40px',
@@ -224,7 +224,7 @@ const AllEvents = () => {
       borderRadius: '25px',
       padding: '10px 25px',
       fontWeight: '600',
-      backgroundColor: '#ff8c32',
+      backgroundColor: brandColor,
       border: 'none',
       color: 'white',
     },
@@ -242,7 +242,7 @@ const AllEvents = () => {
     },
     eventCardSubtitle: {
       fontSize: '14px',
-      color: '#ff8c32',
+      color: brandColor,
       marginBottom: '12px',
     },
     eventMeta: {
@@ -312,7 +312,7 @@ const AllEvents = () => {
         />
         <div className="container py-5">
           <div className="text-center py-5">
-            <div className="spinner-border" style={{ ...styles.spinner, color: '#ff8c32' }} role="status">
+            <div className="spinner-border" style={{ ...styles.spinner, color: brandColor }} role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="mt-3" style={styles.loadingText}>Loading amazing events...</p>
@@ -388,20 +388,20 @@ const AllEvents = () => {
                 onClick={() => setSelectedCategory('all')}
                 style={{
                   ...styles.filterBtn,
-                  backgroundColor: selectedCategory === 'all' ? '#ff8c32' : 'transparent',
-                  borderColor: '#ff8c32',
-                  color: selectedCategory === 'all' ? 'white' : '#ff8c32',
+                  backgroundColor: selectedCategory === 'all' ? brandColor : 'transparent',
+                  borderColor: brandColor,
+                  color: selectedCategory === 'all' ? 'white' : brandColor,
                 }}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== 'all') {
-                    e.currentTarget.style.backgroundColor = '#ff8c32';
+                    e.currentTarget.style.backgroundColor = brandColor;
                     e.currentTarget.style.color = 'white';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'all') {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#ff8c32';
+                    e.currentTarget.style.color = brandColor;
                   }
                 }}
               >
@@ -413,20 +413,20 @@ const AllEvents = () => {
                 onClick={() => setSelectedCategory('upcoming')}
                 style={{
                   ...styles.filterBtn,
-                  backgroundColor: selectedCategory === 'upcoming' ? '#ff8c32' : 'transparent',
-                  borderColor: '#ff8c32',
-                  color: selectedCategory === 'upcoming' ? 'white' : '#ff8c32',
+                  backgroundColor: selectedCategory === 'upcoming' ? brandColor : 'transparent',
+                  borderColor: brandColor,
+                  color: selectedCategory === 'upcoming' ? 'white' : brandColor,
                 }}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== 'upcoming') {
-                    e.currentTarget.style.backgroundColor = '#ff8c32';
+                    e.currentTarget.style.backgroundColor = brandColor;
                     e.currentTarget.style.color = 'white';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'upcoming') {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#ff8c32';
+                    e.currentTarget.style.color = brandColor;
                   }
                 }}
               >
@@ -438,20 +438,20 @@ const AllEvents = () => {
                 onClick={() => setSelectedCategory('past')}
                 style={{
                   ...styles.filterBtn,
-                  backgroundColor: selectedCategory === 'past' ? '#ff8c32' : 'transparent',
-                  borderColor: '#ff8c32',
-                  color: selectedCategory === 'past' ? 'white' : '#ff8c32',
+                  backgroundColor: selectedCategory === 'past' ? brandColor : 'transparent',
+                  borderColor: brandColor,
+                  color: selectedCategory === 'past' ? 'white' : brandColor,
                 }}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== 'past') {
-                    e.currentTarget.style.backgroundColor = '#ff8c32';
+                    e.currentTarget.style.backgroundColor = brandColor;
                     e.currentTarget.style.color = 'white';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedCategory !== 'past') {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#ff8c32';
+                    e.currentTarget.style.color = brandColor;
                   }
                 }}
               >
@@ -523,7 +523,7 @@ const AllEvents = () => {
                       <div className="event-features" style={styles.eventFeatures}>
                         {event.features && event.features.slice(0, 2).map((feature, idx) => (
                           <span key={idx} className="feature-tag" style={styles.featureTag}>
-                            <i className="bi bi-check-circle-fill me-1" style={{ color: '#ff8c32' }}></i> {feature.substring(0, 30)}
+                            <i className="bi bi-check-circle-fill me-1" style={{ color: brandColor }}></i> {feature.substring(0, 30)}
                           </span>
                         ))}
                       </div>
@@ -531,7 +531,7 @@ const AllEvents = () => {
                         <span className="text-muted small">
                           <i className="bi bi-chat me-1"></i> {event.comments || 0} comments
                         </span>
-                        <span className="small" style={{ color: '#ff8c32' }}>
+                        <span className="small" style={{ color: brandColor }}>
                           Read More <i className="bi bi-arrow-right-short"></i>
                         </span>
                       </div>
@@ -550,7 +550,7 @@ const AllEvents = () => {
                       <button 
                         className="page-link" 
                         onClick={() => setCurrentPage(currentPage - 1)}
-                        style={{ color: '#ff8c32' }}
+                        style={{ color: brandColor }}
                       >
                         <i className="bi bi-chevron-left"></i> Previous
                       </button>
@@ -560,7 +560,7 @@ const AllEvents = () => {
                         <button 
                           className="page-link" 
                           onClick={() => setCurrentPage(index + 1)}
-                          style={currentPage === index + 1 ? { backgroundColor: '#ff8c32', borderColor: '#ff8c32', color: 'white' } : { color: '#ff8c32' }}
+                          style={currentPage === index + 1 ? { backgroundColor: brandColor, borderColor: brandColor, color: 'white' } : { color: brandColor }}
                         >
                           {index + 1}
                         </button>
@@ -570,7 +570,7 @@ const AllEvents = () => {
                       <button 
                         className="page-link" 
                         onClick={() => setCurrentPage(currentPage + 1)}
-                        style={{ color: '#ff8c32' }}
+                        style={{ color: brandColor }}
                       >
                         Next <i className="bi bi-chevron-right"></i>
                       </button>
@@ -618,13 +618,13 @@ const AllEvents = () => {
         
         .page-link:hover {
           transform: translateY(-2px);
-          background-color: #ff8c32;
+          background-color: ${brandColor};
           color: white !important;
         }
         
         .page-item.active .page-link {
-          background-color: #ff8c32 !important;
-          border-color: #ff8c32 !important;
+          background-color: ${brandColor} !important;
+          border-color: ${brandColor} !important;
         }
         
         @media (max-width: 768px) {

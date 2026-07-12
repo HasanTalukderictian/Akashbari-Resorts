@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 const Footer = () => {
+  const brandColor = '#5e2e10';
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   // Timer function to update current year
@@ -102,19 +103,11 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Add these styles to make p tag text size same as li tags */}
-      <style jsx>{`
+      <style>{`
         .footer .contact-info p {
-          font-size: 14px; /* Adjust this value to match your li tag font size */
+          font-size: 14px;
           line-height: 1.6;
         }
-        
-        /* If your li tags have different font size, you can uncomment and adjust below */
-        /*
-        .footer .quick-links ul li {
-          font-size: 14px;
-        }
-        */
       `}</style>
     </footer>
   );
