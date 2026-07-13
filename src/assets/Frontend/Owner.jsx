@@ -165,7 +165,7 @@ const Owner = () => {
             boxShadow: '0 4px 15px rgba(37, 211, 102, 0.3)',
         },
         callBtn: {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #5e2e10 0%, #928882 100%)',
             boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
         },
         benefitCard: {
