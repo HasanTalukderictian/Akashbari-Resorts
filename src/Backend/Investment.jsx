@@ -34,6 +34,9 @@ const Investment = ({ theme }) => {
 
     const API_BASE = import.meta.env.VITE_BASE_URL || 'https://backend.akashbariresort.com/api';
 
+    // Brand Color
+    const BRAND_COLOR = '#5e2e10';
+
     // Get authentication headers
     const getAuthHeaders = () => {
         const token = localStorage.getItem('token');
@@ -341,8 +344,8 @@ const Investment = ({ theme }) => {
         text: isDarkMode ? '#e9ecef' : '#2c3e50',
         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
         border: isDarkMode ? '#2d2d3d' : '#e9ecef',
-        primary: '#9a55ff',
-        primaryGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        primary: BRAND_COLOR,
+        primaryGradient: `linear-gradient(135deg, ${BRAND_COLOR} 0%, ${BRAND_COLOR}dd 100%)`,
         danger: '#ef4444',
         success: '#10b981',
         warning: '#f59e0b'
@@ -450,7 +453,7 @@ const Investment = ({ theme }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+            boxShadow: `0 4px 15px ${BRAND_COLOR}4D`
         },
         packagesGrid: {
             display: 'grid',
@@ -492,7 +495,7 @@ const Investment = ({ theme }) => {
             position: 'absolute',
             top: '20px',
             right: '20px',
-            backgroundColor: '#f59e0b',
+            backgroundColor: currentTheme.warning,
             color: 'white',
             padding: '5px 12px',
             borderRadius: '20px',
@@ -548,8 +551,8 @@ const Investment = ({ theme }) => {
             gap: '6px'
         },
         editBtn: {
-            backgroundColor: `${currentTheme.primary}15`,
-            color: currentTheme.primary
+            backgroundColor: `${BRAND_COLOR}15`,
+            color: BRAND_COLOR
         },
         deleteBtn: {
             backgroundColor: `${currentTheme.danger}20`,
@@ -683,21 +686,24 @@ const Investment = ({ theme }) => {
                     }
                     .stat-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+                        box-shadow: 0 8px 25px ${BRAND_COLOR}26;
                     }
                     .package-card:hover {
                         transform: translateY(-6px);
-                        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+                        box-shadow: 0 12px 35px ${BRAND_COLOR}33;
                     }
                     button:hover {
                         transform: translateY(-2px);
                     }
                     .search-box:focus {
-                        border-color: #667eea;
-                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                        border-color: ${BRAND_COLOR};
+                        box-shadow: 0 0 0 3px ${BRAND_COLOR}1A;
                     }
                     .package-card {
                         animation: slideUp 0.3s ease;
+                    }
+                    .modal-content {
+                        animation: fadeIn 0.3s ease;
                     }
                 `}
             </style>
@@ -771,7 +777,7 @@ const Investment = ({ theme }) => {
                         {/* Packages Grid */}
                         {loading && packages.length === 0 ? (
                             <div style={styles.loadingSpinner}>
-                                <div className="spinner-border text-primary" role="status">
+                                <div className="spinner-border" role="status" style={{ color: BRAND_COLOR }}>
                                     <span className="visually-hidden">Loading...</span>
                                 </div>
                                 <p style={{ marginTop: '16px' }}>Loading investment packages...</p>
@@ -835,10 +841,10 @@ const Investment = ({ theme }) => {
                                             <div style={styles.cardHeader}>
                                                 <h3 style={styles.packageTitle}>{item.title}</h3>
                                                 <div>
-                                                    <span style={styles.packagePrice}>${formatPrice(item.price)}</span>
+                                                    <span style={styles.packagePrice}>৳ {formatPrice(item.price)}</span>
                                                     {item.discount && item.discount > 0 && (
                                                         <span style={styles.originalPrice}>
-                                                            ${formatPrice(Math.floor(Number(item.price) * (1 + Number(item.discount) / 100)))}
+                                                            ৳ {formatPrice(Math.floor(Number(item.price) * (1 + Number(item.discount) / 100)))}
                                                         </span>
                                                     )}
                                                 </div>
@@ -983,7 +989,7 @@ const Investment = ({ theme }) => {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label style={styles.label}>Price *</label>
+                                        <label style={styles.label}>Price (BDT) *</label>
                                         <input
                                             type="number"
                                             style={styles.input}
@@ -995,46 +1001,46 @@ const Investment = ({ theme }) => {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label style={styles.label}>Discount (%)</label>
+                                        <label style={styles.label}>Discount (BDT)</label>
                                         <input
                                             type="number"
                                             style={styles.input}
                                             value={formData.discount}
                                             onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-                                            placeholder="e.g., 10"
+                                            placeholder="e.g., 10000"
                                             disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-4">
-                                        <label style={styles.label}>Land Size (sqft)</label>
+                                        <label style={styles.label}>Land Size</label>
                                         <input
                                             type="text"
                                             style={styles.input}
                                             value={formData.land}
                                             onChange={(e) => setFormData({ ...formData, land: e.target.value })}
-                                            placeholder="Land size"
+                                            placeholder="e.g., 25 sft"
                                             disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-4">
-                                        <label style={styles.label}>Building Size (sqft)</label>
+                                        <label style={styles.label}>Building Size</label>
                                         <input
                                             type="text"
                                             style={styles.input}
                                             value={formData.building}
                                             onChange={(e) => setFormData({ ...formData, building: e.target.value })}
-                                            placeholder="Building size"
+                                            placeholder="e.g., 25 sft"
                                             disabled={loading}
                                         />
                                     </div>
                                     <div className="col-md-4">
-                                        <label style={styles.label}>Total Size (sqft)</label>
+                                        <label style={styles.label}>Total Size</label>
                                         <input
                                             type="text"
                                             style={styles.input}
                                             value={formData.total_size}
                                             onChange={(e) => setFormData({ ...formData, total_size: e.target.value })}
-                                            placeholder="Total size"
+                                            placeholder="e.g., 378 sft"
                                             disabled={loading}
                                         />
                                     </div>
@@ -1145,7 +1151,7 @@ const Investment = ({ theme }) => {
                                 >
                                     {loading ? (
                                         <>
-                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            <span className="spinner-border spinner-border-sm me-2" style={{ color: 'white' }}></span>
                                             {isEditing ? 'Updating...' : 'Saving...'}
                                         </>
                                     ) : (
@@ -1183,7 +1189,7 @@ const Investment = ({ theme }) => {
                             </button>
                             <button 
                                 onClick={() => handleDelete(deleteConfirm.id)} 
-                                style={{ ...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px', ...(loading && styles.buttonDisabled) }}
+                                style={{ backgroundColor: currentTheme.danger, color: 'white', padding: '10px 24px', border: 'none', borderRadius: '10px', ...(loading && styles.buttonDisabled) }}
                                 disabled={loading}
                             >
                                 {loading ? 'Deleting...' : 'Delete Permanently'}
