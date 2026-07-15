@@ -161,7 +161,7 @@ const Partner = () => {
         {/* Header Section */}
         <section style={styles.headerSection}>
           <span style={{ ...styles.badge, backgroundColor: brandColor }}>OUR NETWORK</span>
-          <h1 style={styles.title}>Our Partners</h1>
+          <h1 style={styles.title}>OUR AFFILATES</h1>
           <p style={styles.subtitle}>
             Discover our partners dedicated to serving your travel, hospitality, 
             and lifestyle needs with excellence and integrity.

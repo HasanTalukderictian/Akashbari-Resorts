@@ -98,8 +98,15 @@ const Header = ({ scrollToOwner }) => {
                 EVENT
               </Nav.Link>
 
+
+               <Nav.Link onClick={() => navigate("/partner")}>
+                AFFILIATES
+              </Nav.Link>
+
               {/* AFFILIATES Dropdown Menu */}
-              <NavDropdown
+
+              
+              {/* <NavDropdown
                 title={<span style={{ color: "#5e2e10" }}>AFFILIATES</span>}
                 id="affiliates-dropdown"
               >
@@ -109,7 +116,7 @@ const Header = ({ scrollToOwner }) => {
                 <NavDropdown.Item onClick={() => navigate("/sister")}>
                   SISTER CONCERS
                 </NavDropdown.Item>
-              </NavDropdown>
+              </NavDropdown> */}
 
               <button
                 className="contact-btn"
