@@ -196,7 +196,7 @@ const Investment = () => {
                     <div className="row g-4 justify-content-center">
                         {packages.map((pkg, index) => {
                             const isSoldOut = pkg.is_sold_out == 1;
-                            const isPopular = pkg.title?.toUpperCase().includes('EXECUTIVE');
+                            const isPopular = pkg.title?.toUpperCase().includes('SUPERIOR');
                             const isVilla = pkg.title?.toUpperCase().trim() === 'VILLA';
                             
                             return (
@@ -210,7 +210,7 @@ const Investment = () => {
                                             overflow: 'visible'
                                         }}
                                     >
-                                        {/* Executive Suite Share Badge - Right Corner */}
+                                        {/* SUPERIOR DELUXE Badge - Right Corner */}
                                         {isPopular && !isSoldOut && (
                                             <div style={{
                                                 position: 'absolute',
@@ -228,7 +228,7 @@ const Investment = () => {
                                                 letterSpacing: '1px',
                                                 animation: 'slideInTop 0.5s ease-out'
                                             }}>
-                                                ⭐ POPULAR
+                                                ⭐ Popular
                                             </div>
                                         )}
 
@@ -262,7 +262,7 @@ const Investment = () => {
                                                 }}>
                                                     <div style={{
                                                         background: '#dc3545',
-                                                         color: 'white',
+                                                        color: 'white',
                                                         padding: '15px 35px',
                                                         borderRadius: '8px',
                                                         fontWeight: '800',
@@ -333,8 +333,6 @@ const Investment = () => {
                                                     
                                                     {/* Button */}
                                                     {isSoldOut ? (
-
-                                                        
                                                         <button className="inquire-btn sold-out-footer" disabled style={{
                                                             background: '#94a3b8',
                                                             cursor: 'not-allowed',

@@ -43,6 +43,7 @@ import Achievement from './Backend/Achievement'
 import InvestmentRecord from './Backend/InvestmentRecord'
 import ClubSettings from './Backend/ClubSettings'
 import Clubgallery from './Backend/Clubgallery'
+import ProjectState from './Backend/ProjectState'
 
 
 function App() {
@@ -150,6 +151,12 @@ function App() {
         <Route path="/admin-gallery" element={
           <PrivateRoute>
             <GallerySection />
+          </PrivateRoute>
+        } />
+
+         <Route path="/admin-project-view" element={
+          <PrivateRoute>
+            <ProjectState />
           </PrivateRoute>
         } />
 
