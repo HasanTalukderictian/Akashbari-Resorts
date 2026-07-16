@@ -96,7 +96,7 @@ const ProjectState = ({ theme: propsTheme }) => {
         
         try {
             const headers = getAuthHeaders();
-            const res = await axios.get(`${API_BASE_URL}/gallery`, { headers });
+            const res = await axios.get(`${API_BASE_URL}/peoject-view`, { headers });
             
             if (res.status === 401) {
                 localStorage.removeItem('token');
@@ -176,8 +176,8 @@ const ProjectState = ({ theme: propsTheme }) => {
         try {
             const headers = getMultipartHeaders();
             const url = editingItem 
-                ? `${API_BASE_URL}/gallery/${editingItem.id}` 
-                : `${API_BASE_URL}/gallery`;
+                ? `${API_BASE_URL}/peoject-view/${editingItem.id}` 
+                : `${API_BASE_URL}/peoject-view`;
 
             if (editingItem) {
                 data.append('_method', 'POST');
@@ -216,7 +216,7 @@ const ProjectState = ({ theme: propsTheme }) => {
         
         try {
             const headers = getAuthHeaders();
-            const response = await axios.delete(`${API_BASE_URL}/gallery/${id}`, { headers });
+            const response = await axios.delete(`${API_BASE_URL}/peoject-view/${id}`, { headers });
             
             if (response.status === 401) {
                 localStorage.removeItem('token');
