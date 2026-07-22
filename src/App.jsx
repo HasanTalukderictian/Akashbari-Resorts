@@ -44,6 +44,7 @@ import InvestmentRecord from './Backend/InvestmentRecord'
 import ClubSettings from './Backend/ClubSettings'
 import Clubgallery from './Backend/Clubgallery'
 import ProjectState from './Backend/ProjectState'
+import PackageQuery from './Backend/PackageQuery'
 
 
 function App() {
@@ -82,6 +83,8 @@ function App() {
           </PrivateRoute>
         } />
 
+        
+
         <Route path="/content" element={
           <PrivateRoute>
             <Content />
@@ -103,6 +106,13 @@ function App() {
         <Route path="/admin-club" element={
           <PrivateRoute>
             <ClubSettings />
+          </PrivateRoute>
+        } />
+
+
+         <Route path="/package-query" element={
+          <PrivateRoute>
+           <PackageQuery/>
           </PrivateRoute>
         } />
 
