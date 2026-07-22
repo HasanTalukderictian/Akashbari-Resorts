@@ -1,17 +1,34 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../css/Banner.css";
 
-const Banner = ({ onDiscoverClick }) => {
-  const [bannerData, setBannerData] = useState(null); // ডাটা অবজেক্ট স্টোর করার জন্য
+const Banner = ({ onDiscoverClick, onPackagesClick }) => { // নতুন prop যোগ করা হয়েছে
+  const [bannerData, setBannerData] = useState(null);
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Use environment variables for URLs
   const API_BASE_URL = import.meta.env.VITE_BASE_URL;
   const STORAGE_URL = import.meta.env.API_URL;
   const storageBaseUrl = `${STORAGE_URL}/storage/`;
 
-  // Helper function to get full image URL
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleInvestmentClick = () => {
+    if (location.pathname === "/") {
+      scrollToOwner?.();
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        const ownerSection = document.getElementById("invest-section");
+        ownerSection?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }, 500);
+    }
+  };
+
   const getFullImageUrl = (imagePath) => {
     if (!imagePath) return null;
     if (imagePath.startsWith('http')) return imagePath;
@@ -32,7 +49,6 @@ const Banner = ({ onDiscoverClick }) => {
 
         if (result.status === "success") {
           const data = result.data;
-          // Process images to get full URLs
           if (data && data.images) {
             const processedImages = data.images.map(img => getFullImageUrl(img));
             setBannerData({ ...data, images: processedImages });
@@ -49,7 +65,6 @@ const Banner = ({ onDiscoverClick }) => {
     fetchBanners();
   }, []);
 
-  // স্লাইডার ইন্টারভাল (ইমেজ অ্যারের ওপর ভিত্তি করে)
   useEffect(() => {
     if (bannerData && bannerData.images && bannerData.images.length > 0) {
       const interval = setInterval(() => {
@@ -64,7 +79,6 @@ const Banner = ({ onDiscoverClick }) => {
 
   return (
     <div className="banner">
-      {/* ইমেজগুলো ডাটাবেজের 'images' অ্যারে থেকে লুপ হচ্ছে */}
       {bannerData.images.map((imgUrl, index) => (
         <div
           key={index}
@@ -83,15 +97,23 @@ const Banner = ({ onDiscoverClick }) => {
         <p className="subtitle">{bannerData.subtitle}</p>
         <h1>{bannerData.title}</h1>
 
-        <button
-          className="discover-btn"
-          onClick={onDiscoverClick}
-        >
-          DISCOVER MORE
-        </button>
+        <div className="banner-buttons">
+          <button
+            className="discover-btn"
+            onClick={onDiscoverClick}
+          >
+            DISCOVER MORE
+          </button>
+
+          <button
+            className="discover-btn"
+            onClick={onPackagesClick} // Packages বাটনের জন্য আলাদা ফাংশন
+          >
+            PACKAGES
+          </button>
+        </div>
       </div>
 
-      {/* স্লাইড ইন্ডিকেটর (ডটস) */}
       <div className="banner-dots">
         {bannerData.images.map((_, index) => (
           <span

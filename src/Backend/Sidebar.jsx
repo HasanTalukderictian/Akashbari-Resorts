@@ -53,6 +53,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
     };
 
     // Auto-open submenu if any sub-item is active and sidebar is not collapsed
+    
     useEffect(() => {
         if (!isCollapsed) {
             if (isAnySubItemActive(landingSubItems)) {
