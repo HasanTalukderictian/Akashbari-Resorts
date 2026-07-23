@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
+import * as XLSX from 'xlsx'; // Add this import
 
 const PackageQuery = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -19,6 +20,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
+    const [downloading, setDownloading] = useState(false);
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -89,6 +91,113 @@ const PackageQuery = ({ theme: propsTheme }) => {
             setLoading(false);
         }
     }, [BASE_URL, currentPage, statusFilter, searchTerm, perPage, showToast]);
+
+    // Fetch all queries for download (without pagination)
+    const fetchAllQueriesForDownload = useCallback(async () => {
+        try {
+            const params = new URLSearchParams();
+            params.append('per_page', 10000); // Fetch all records
+            
+            if (statusFilter !== 'all') {
+                params.append('status', statusFilter);
+            }
+            
+            if (searchTerm.trim()) {
+                params.append('search', searchTerm.trim());
+            }
+
+            const url = `${BASE_URL}/package-queries?${params.toString()}`;
+            
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.success === true) {
+                return result.data.data || [];
+            } else {
+                throw new Error(result.message || 'Failed to fetch data for download');
+            }
+        } catch (error) {
+            console.error('Error fetching all queries:', error);
+            throw error;
+        }
+    }, [BASE_URL, statusFilter, searchTerm]);
+
+    // Download Excel function
+    const downloadExcel = useCallback(async () => {
+        setDownloading(true);
+        try {
+            // Get all data
+            const allData = await fetchAllQueriesForDownload();
+            
+            if (!allData || allData.length === 0) {
+                showToast('warning', 'No data available to download');
+                setDownloading(false);
+                return;
+            }
+
+            // Format data for Excel
+            const excelData = allData.map((query, index) => ({
+                'SL No': index + 1,
+                'Package Name': query.package_name || 'N/A',
+                'Name': query.name || 'N/A',
+                'Email': query.email || 'N/A',
+                'Phone': query.phone || 'N/A',
+                'Message': query.message || 'N/A',
+                'Status': (query.status || 'pending').toUpperCase(),
+                'Submitted Date': query.created_at ? new Date(query.created_at).toLocaleString() : 'N/A',
+                'Replied Date': query.replied_at ? new Date(query.replied_at).toLocaleString() : 'N/A',
+                'Admin Notes': query.admin_notes || 'N/A'
+            }));
+
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+
+            // Set column widths
+            const colWidths = [
+                { wch: 8 },   // SL No
+                { wch: 25 },  // Package Name
+                { wch: 20 },  // Name
+                { wch: 30 },  // Email
+                { wch: 15 },  // Phone
+                { wch: 40 },  // Message
+                { wch: 12 },  // Status
+                { wch: 22 },  // Submitted Date
+                { wch: 22 },  // Replied Date
+                { wch: 30 }   // Admin Notes
+            ];
+            ws['!cols'] = colWidths;
+
+            // Append sheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Package Queries');
+
+            // Generate filename with current date
+            const date = new Date();
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const filename = `Package_Queries_${dateStr}.xlsx`;
+
+            // Save file
+            XLSX.writeFile(wb, filename);
+            
+            showToast('success', `Downloaded ${excelData.length} queries successfully!`);
+        } catch (error) {
+            console.error('Error downloading Excel:', error);
+            showToast('error', 'Failed to download Excel: ' + error.message);
+        } finally {
+            setDownloading(false);
+        }
+    }, [fetchAllQueriesForDownload, showToast]);
 
     // Fetch on dependency change
     useEffect(() => {
@@ -175,7 +284,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    // Get status badge color - query থেকে status না থাকলে pending দেখাবে
+    // Get status badge color
     const getStatusBadge = (status) => {
         const colors = {
             pending: { bg: '#ffc107', text: '#856404' },
@@ -254,9 +363,9 @@ const PackageQuery = ({ theme: propsTheme }) => {
             {/* Toast */}
             {toast.show && (
                 <div className="position-fixed top-0 end-0 m-3" style={{ zIndex: 9999 }}>
-                    <div className={`alert alert-${toast.type === 'success' ? 'success' : 'danger'} shadow-lg border-0`} style={{ borderRadius: '12px' }}>
+                    <div className={`alert alert-${toast.type === 'success' ? 'success' : toast.type === 'warning' ? 'warning' : 'danger'} shadow-lg border-0`} style={{ borderRadius: '12px' }}>
                         <div className="d-flex align-items-center gap-2">
-                            <i className={`bi bi-${toast.type === 'success' ? 'check-circle-fill' : 'exclamation-circle-fill'}`}></i>
+                            <i className={`bi bi-${toast.type === 'success' ? 'check-circle-fill' : toast.type === 'warning' ? 'exclamation-triangle-fill' : 'exclamation-circle-fill'}`}></i>
                             <span>{toast.message}</span>
                             <button type="button" className="btn-close" onClick={() => setToast({ show: false, message: '', type: '' })}></button>
                         </div>
@@ -391,12 +500,29 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                 <div className="d-flex flex-wrap justify-content-between align-items-center mb-4">
                                     <div>
                                         <h4 className="fw-bold mb-1" style={{ color: theme.text }}>
-                                            <i className="bi bi-chat-dots-fill me-2" style={{ color: '#5e2e10' }}></i>
+                                          
                                             Package Queries
                                         </h4>
                                         <small className="text-muted">Manage all package inquiries from customers</small>
                                     </div>
                                     <div className="d-flex gap-2 mt-2 mt-sm-0">
+                                        <button 
+                                            className="btn btn-sm" 
+                                            style={{ background: '#28a745', color: '#fff' }}
+                                            onClick={downloadExcel}
+                                            disabled={downloading}
+                                        >
+                                            {downloading ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                                    Downloading...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="bi bi-file-excel me-1"></i> Download Excel
+                                                </>
+                                            )}
+                                        </button>
                                         <button 
                                             className="btn btn-sm" 
                                             style={{ background: '#5e2e10', color: '#fff' }}
