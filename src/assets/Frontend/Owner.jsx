@@ -283,7 +283,7 @@ const Owner = () => {
                                         style={{
                                             ...styles.dot,
                                             width: activeIndex === index ? '30px' : '10px',
-                                            backgroundColor: activeIndex === index ? '#d4af37' : 'rgba(255,255,255,0.7)'
+                                            backgroundColor: activeIndex === index ? '#5e2e10' : 'rgba(255,255,255,0.7)'
                                         }}
                                         onMouseEnter={(e) => e.target.style.transform = 'scale(1.2)'}
                                         onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}

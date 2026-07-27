@@ -160,7 +160,7 @@ const Welcome = () => {
 
           {/* Right Features Side - Dynamic Part - Icons Removed */}
           <div className="col-lg-5 offset-lg-1">
-            <div className="features-box p-4 p-md-5" style={{ border: `2px solid #5e2e10` }}>
+            <div className="features-box" style={{ border: `2px solid #5e2e10` }}>
               <h2 className="features-title text-center text-uppercase mb-4">Resort Features</h2>
 
               {loading ? (
