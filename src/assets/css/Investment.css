@@ -27,10 +27,11 @@
 .yellow-divider {
     width: 60px;
     height: 3px;
+    background-color: #5e2e10;
 }
 
 .sub-text {
-    color: 5e2e10;
+    color: #5e2e10;
     font-style: bold;
     letter-spacing: 3px;
     font-size: 1.5rem;
@@ -225,14 +226,28 @@
 }
 
 
-/* Benefits Section */
+/* ==================== BENEFITS SECTION - SQUARE BOX DESIGN ==================== */
 
 .benefits-container {
     border: 1px solid #ddd;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     border-radius: 8px;
     background: white;
+    margin-top: 30px !important;
+    margin-bottom: 30px !important;
+    padding: 40px 30px !important;
 }
+
+
+/* When only benefits is shown - remove extra margin */
+
+.benefits-container.benefits-only {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+
+/* Benefit Item - Square Box Design */
 
 .benefit-item {
     border: 1px solid #e0e0e0;
@@ -241,6 +256,8 @@
     background: #fff;
     transition: all 0.3s ease;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
 }
 
 .benefit-item:hover {
@@ -249,34 +266,47 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
+
+/* Square Box Number - Exactly like your image */
+
 .benefit-number {
     background-color: #5e2e10;
     color: white;
-    padding: 2px 10px;
-    font-size: 13px;
+    padding: 6px 12px;
+    font-size: 14px;
     font-weight: 700;
     margin-right: 15px;
-    min-width: 35px;
+    min-width: 40px;
     text-align: center;
-    border-radius: 3px;
+    border-radius: 0px !important;
+    /* This makes it square */
+    font-family: 'Arial', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .benefit-text {
     font-size: 14px;
     color: #333;
-    line-height: 1.4;
+    line-height: 1.5;
     flex: 1;
+    font-family: 'Arial', sans-serif;
 }
 
 .promo-question {
     color: #5e2e10;
     font-weight: 600;
+    font-size: 20px;
+    font-family: 'Times New Roman', serif;
 }
 
 .promo-text {
     color: #777;
     font-style: italic;
     font-size: 15px;
+    font-family: 'Arial', sans-serif;
 }
 
 
@@ -291,6 +321,21 @@
     }
     .pkg-price {
         font-size: 1.5rem;
+    }
+    .benefits-container {
+        padding: 30px 20px !important;
+    }
+    .benefit-number {
+        min-width: 35px;
+        font-size: 12px;
+        padding: 5px 10px;
+        margin-right: 12px;
+    }
+    .benefit-text {
+        font-size: 13px;
+    }
+    .promo-question {
+        font-size: 18px;
     }
 }
 
@@ -308,5 +353,23 @@
         font-size: 9px;
         padding: 4px 14px;
         top: -12px;
+    }
+    .benefits-container {
+        padding: 20px 15px !important;
+    }
+    .benefit-number {
+        min-width: 30px;
+        font-size: 11px;
+        padding: 4px 8px;
+        margin-right: 10px;
+    }
+    .benefit-text {
+        font-size: 12px;
+    }
+    .promo-question {
+        font-size: 16px;
+    }
+    .promo-text {
+        font-size: 13px;
     }
 }

@@ -29,7 +29,7 @@ const CountUpItem = ({ target, duration = 2000, suffix = "", prefix = "" }) => {
     );
 };
 
-const Investment = () => {
+const Investment = ({ showOnlyBenefits = false }) => {
     const navigate = useNavigate();
     const [packages, setPackages] = useState([]);
     const [benefits, setBenefits] = useState([]);
@@ -63,7 +63,6 @@ const Investment = () => {
             const result = await response.json();
             
             if (result.status) {
-                // Include VILLA and other packages
                 let allPackages = result.data;
 
                 const getOrderIndex = (title) => {
@@ -187,205 +186,204 @@ const Investment = () => {
         <>
             <section className="investment-section py-5">
                 <div className="container text-center">
-                    <div className="badge-opportunity mb-3">INVESTMENT OPPORTUNITIES</div>
-                    <h1 className="main-title mb-2">RESORT INVESTMENT PACKAGES</h1>
-                    <div className="mx-auto"></div>
-                    <p className="sub-text mb-5">Become a partner in Bangladesh's premier luxury resort destination</p>
+                    
+                    {/* Show only if not in benefits-only mode */}
+                    {!showOnlyBenefits && (
+                        <>
+                            <div className="badge-opportunity mb-3">INVESTMENT OPPORTUNITIES</div>
+                            <h1 className="main-title mb-2">RESORT INVESTMENT PACKAGES</h1>
+                            <div className="mx-auto"></div>
+                            <p className="sub-text mb-5">Become a partner in Bangladesh's premier luxury resort destination</p>
 
-                    {/* Investment Packages Grid */}
-                    <div className="row g-4 justify-content-center">
-                        {packages.map((pkg, index) => {
-                            const isSoldOut = pkg.is_sold_out == 1;
-                            const isPopular = pkg.title?.toUpperCase().includes('SUPERIOR');
-                            const isVilla = pkg.title?.toUpperCase().trim() === 'VILLA';
-                            
-                            return (
-                                <div className="col-lg-3 col-md-6" key={pkg.id || index}>
-                                    <div 
-                                        className={`investment-card ${isSoldOut ? 'sold-out-card' : 'clickable-card'}`}
-                                        onClick={() => !isSoldOut && handleCardClick(pkg)}
-                                        style={{ 
-                                            cursor: isSoldOut ? 'default' : 'pointer',
-                                            position: 'relative',
-                                            overflow: 'visible'
-                                        }}
-                                    >
-                                        {/* SUPERIOR DELUXE Badge - Right Corner */}
-                                        {isPopular && !isSoldOut && (
-                                            <div style={{
-                                                position: 'absolute',
-                                                right: '5px',
-                                                background: 'linear-gradient(135deg, #FFD700, #FFA500)',
-                                                color: '#5e2e10',
-                                                padding: '6px 16px',
-                                                borderRadius: '30px',
-                                                fontSize: '10px',
-                                                fontWeight: '700',
-                                                zIndex: 20,
-                                                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
-                                                border: '2px solid #fff',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '1px',
-                                                animation: 'slideInTop 0.5s ease-out'
-                                            }}>
-                                                ⭐ Popular
-                                            </div>
-                                        )}
-
-                                        {/* For Villa - Show SOLD OUT overlay in center with title visible */}
-                                        {isVilla && isSoldOut ? (
-                                            <div style={{
-                                                position: 'relative',
-                                                height: '100%',
-                                                minHeight: '400px',
-                                                display: 'flex',
-                                                flexDirection: 'column'
-                                            }}>
-                                                {/* Title - Always visible with same color as other packages */}
-                                                <div className="card-content d-flex flex-column h-100 p-4" style={{ position: 'relative', zIndex: 2 }}>
-                                                    <h3 className="pkg-title mb-2" style={{ color: '#333' }}>{pkg.title}</h3>
-                                                </div>
-                                                
-                                                {/* SOLD OUT Overlay */}
-                                                <div style={{
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    background: '#fff',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    zIndex: 1,
-                                                    borderRadius: '8px'
-                                                }}>
+                            {/* Investment Packages Grid */}
+                            <div className="row g-4 justify-content-center">
+                                {packages.map((pkg, index) => {
+                                    const isSoldOut = pkg.is_sold_out == 1;
+                                    const isPopular = pkg.title?.toUpperCase().includes('SUPERIOR');
+                                    const isVilla = pkg.title?.toUpperCase().trim() === 'VILLA';
+                                    
+                                    return (
+                                        <div className="col-lg-3 col-md-6" key={pkg.id || index}>
+                                            <div 
+                                                className={`investment-card ${isSoldOut ? 'sold-out-card' : 'clickable-card'}`}
+                                                onClick={() => !isSoldOut && handleCardClick(pkg)}
+                                                style={{ 
+                                                    cursor: isSoldOut ? 'default' : 'pointer',
+                                                    position: 'relative',
+                                                    overflow: 'visible'
+                                                }}
+                                            >
+                                                {/* SUPERIOR DELUXE Badge - Right Corner */}
+                                                {isPopular && !isSoldOut && (
                                                     <div style={{
-                                                        background: '#dc3545',
-                                                        color: 'white',
-                                                        padding: '15px 35px',
-                                                        borderRadius: '8px',
-                                                        fontWeight: '800',
-                                                        fontSize: '24px',
-                                                        letterSpacing: '2px',
+                                                        position: 'absolute',
+                                                        right: '5px',
+                                                        background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                                                        color: '#5e2e10',
+                                                        padding: '6px 16px',
+                                                        borderRadius: '30px',
+                                                        fontSize: '10px',
+                                                        fontWeight: '700',
+                                                        zIndex: 20,
+                                                        boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+                                                        border: '2px solid #fff',
                                                         textTransform: 'uppercase',
-                                                        boxShadow: '0 4px 20px rgba(220, 53, 69, 0.5)',
-                                                        border: '2px solid white'
+                                                        letterSpacing: '1px',
+                                                        animation: 'slideInTop 0.5s ease-out'
                                                     }}>
-                                                        SOLD OUT
+                                                        ⭐ Popular
                                                     </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                {/* Regular content for non-sold out or non-villa */}
-                                                <div className="card-content d-flex flex-column h-100 p-4">
-                                                    {/* Title - Same color for all packages */}
-                                                    <h3 className="pkg-title mb-2" style={{ color: '#333' }}>{pkg.title}</h3>
-                                                    
-                                                    {/* Price - Show for non-sold out items */}
-                                                    {!isSoldOut ? (
-                                                        <>
-                                                            <h2 className="pkg-price mb-1">
-                                                                ৳ {parseInt(pkg.price || 0).toLocaleString()}
-                                                            </h2>
-                                                            {/* Cashback */}
-                                                            {parseInt(pkg.discount || 0) > 0 && (
-                                                                <p className="pkg-cashback mb-2" style={{ color: '#198754', fontWeight: '600' }}>
-                                                                    Cashback: ৳ {parseInt(pkg.discount || 0).toLocaleString()}
+                                                )}
+
+                                                {/* For Villa - Show SOLD OUT overlay in center with title visible */}
+                                                {isVilla && isSoldOut ? (
+                                                    <div style={{
+                                                        position: 'relative',
+                                                        height: '100%',
+                                                        minHeight: '400px',
+                                                        display: 'flex',
+                                                        flexDirection: 'column'
+                                                    }}>
+                                                        <div className="card-content d-flex flex-column h-100 p-4" style={{ position: 'relative', zIndex: 2 }}>
+                                                            <h3 className="pkg-title mb-2" style={{ color: '#333' }}>{pkg.title}</h3>
+                                                        </div>
+                                                        
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: 0,
+                                                            left: 0,
+                                                            right: 0,
+                                                            bottom: 0,
+                                                            background: '#fff',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            zIndex: 1,
+                                                            borderRadius: '8px'
+                                                        }}>
+                                                            <div style={{
+                                                                background: '#dc3545',
+                                                                color: 'white',
+                                                                padding: '15px 35px',
+                                                                borderRadius: '8px',
+                                                                fontWeight: '800',
+                                                                fontSize: '24px',
+                                                                letterSpacing: '2px',
+                                                                textTransform: 'uppercase',
+                                                                boxShadow: '0 4px 20px rgba(220, 53, 69, 0.5)',
+                                                                border: '2px solid white'
+                                                            }}>
+                                                                SOLD OUT
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="card-content d-flex flex-column h-100 p-4">
+                                                            <h3 className="pkg-title mb-2" style={{ color: '#333' }}>{pkg.title}</h3>
+                                                            
+                                                            {!isSoldOut ? (
+                                                                <>
+                                                                    <h2 className="pkg-price mb-1">
+                                                                        ৳ {parseInt(pkg.price || 0).toLocaleString()}
+                                                                    </h2>
+                                                                    {parseInt(pkg.discount || 0) > 0 && (
+                                                                        <p className="pkg-cashback mb-2" style={{ color: '#198754', fontWeight: '600' }}>
+                                                                            Cashback: ৳ {parseInt(pkg.discount || 0).toLocaleString()}
+                                                                        </p>
+                                                                    )}
+                                                                </>
+                                                            ) : (
+                                                                <div style={{
+                                                                    background: '#dc3545',
+                                                                    color: 'white',
+                                                                    padding: '8px 15px',
+                                                                    borderRadius: '8px',
+                                                                    display: 'inline-block',
+                                                                    fontWeight: '700',
+                                                                    fontSize: '16px',
+                                                                    marginBottom: '10px'
+                                                                }}>
+                                                                    🎯 SOLD OUT
+                                                                </div>
+                                                            )}
+                                                            
+                                                            <p className="pkg-detail mb-1" style={{ fontSize: '14px', color: '#555' }}>
+                                                                <strong>Land & building —</strong> {pkg.land || 'N/A'}
+                                                            </p>
+                                                            
+                                                            <p className="pkg-detail mb-3" style={{ fontSize: '14px', color: '#555' }}>
+                                                                <strong>Room size —</strong> {pkg.total_size || 'N/A'} sft
+                                                            </p>
+                                                            
+                                                            {pkg.description && (
+                                                                <p className="pkg-desc mb-3" style={{ fontSize: '13px', color: '#666' }}>
+                                                                    {pkg.description.length > 80 
+                                                                        ? `${pkg.description.substring(0, 80)}...` 
+                                                                        : pkg.description}
                                                                 </p>
                                                             )}
-                                                        </>
-                                                    ) : (
-                                                        // For other sold out packages (not villa)
-                                                        <div style={{
-                                                            background: '#dc3545',
-                                                            color: 'white',
-                                                            padding: '8px 15px',
-                                                            borderRadius: '8px',
-                                                            display: 'inline-block',
-                                                            fontWeight: '700',
-                                                            fontSize: '16px',
-                                                            marginBottom: '10px'
-                                                        }}>
-                                                            🎯 SOLD OUT
+                                                            
+                                                            {isSoldOut ? (
+                                                                <button className="inquire-btn sold-out-footer" disabled style={{
+                                                                    background: '#94a3b8',
+                                                                    cursor: 'not-allowed',
+                                                                    opacity: '0.7'
+                                                                }}>
+                                                                    SOLD OUT
+                                                                </button>
+                                                            ) : (
+                                                                <button className="inquire-btn popular-btn">
+                                                                    INQUIRE NOW
+                                                                </button>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                    
-                                                    {/* Land & Building */}
-                                                    <p className="pkg-detail mb-1" style={{ fontSize: '14px', color: '#555' }}>
-                                                        <strong>Land & building —</strong> {pkg.land || 'N/A'}
-                                                    </p>
-                                                    
-                                                    {/* Room Size */}
-                                                    <p className="pkg-detail mb-3" style={{ fontSize: '14px', color: '#555' }}>
-                                                        <strong>Room size —</strong> {pkg.total_size || 'N/A'} sft
-                                                    </p>
-                                                    
-                                                    {/* Description */}
-                                                    {pkg.description && (
-                                                        <p className="pkg-desc mb-3" style={{ fontSize: '13px', color: '#666' }}>
-                                                            {pkg.description.length > 80 
-                                                                ? `${pkg.description.substring(0, 80)}...` 
-                                                                : pkg.description}
-                                                        </p>
-                                                    )}
-                                                    
-                                                    {/* Button */}
-                                                    {isSoldOut ? (
-                                                        <button className="inquire-btn sold-out-footer" disabled style={{
-                                                            background: '#94a3b8',
-                                                            cursor: 'not-allowed',
-                                                            opacity: '0.7'
-                                                        }}>
-                                                            SOLD OUT
-                                                        </button>
-                                                    ) : (
-                                                        <button className="inquire-btn popular-btn">
-                                                            INQUIRE NOW
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* STATS SECTION */}
-                <div className="container my-5" style={{ marginTop: '0', paddingTop: '20px' }}>
-                    <div className="row justify-content-center">
-                        <div className="col-lg-11">
-                            <div style={statsCardStyle} className="text-center">
-                                <div className="row g-4">
-                                    {statsData.map((stat, index) => (
-                                        <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`} style={{ borderColor: '#e2e8f0' }}>
-                                            {stat.target > 0 ? (
-                                                <CountUpItem
-                                                    target={stat.target}
-                                                    suffix={stat.suffix}
-                                                    prefix={stat.prefix}
-                                                />
-                                            ) : (
-                                                <h2 className="fw-bold" style={{ color: '#5e2e10' }}>
-                                                    {stat.prefix}0{stat.suffix}
-                                                </h2>
-                                            )}
-                                            <p className="fw-bold mb-0" style={{ color: '#718096' }}>{stat.label}</p>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
-                                    ))}
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+
+                    {/* STATS SECTION - Hide when showOnlyBenefits is true */}
+                    {!showOnlyBenefits && (
+                        <div className="container my-5" style={{ marginTop: '0', paddingTop: '20px' }}>
+                            <div className="row justify-content-center">
+                                <div className="col-lg-11">
+                                    <div style={statsCardStyle} className="text-center">
+                                        <div className="row g-4">
+                                            {statsData.map((stat, index) => (
+                                                <div key={stat.id} className={`col-md-3 ${index !== statsData.length - 1 ? 'border-end' : ''}`} style={{ borderColor: '#e2e8f0' }}>
+                                                    {stat.target > 0 ? (
+                                                        <CountUpItem
+                                                            target={stat.target}
+                                                            suffix={stat.suffix}
+                                                            prefix={stat.prefix}
+                                                        />
+                                                    ) : (
+                                                        <h2 className="fw-bold" style={{ color: '#5e2e10' }}>
+                                                            {stat.prefix}0{stat.suffix}
+                                                        </h2>
+                                                    )}
+                                                    <p className="fw-bold mb-0" style={{ color: '#718096' }}>{stat.label}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* BENEFITS SECTION */}
+                {/* BENEFITS SECTION - Always show */}
+
+
                 {benefits.length > 0 && (
-                    <div className="benefits-container container mt-5 p-5 bg-white">
+                    <div className="benefits-container container p-5 bg-white" id="investment-benefits">
                         <h2 className='display-4 fw-normal text-uppercase mb-2 text-center'>Investment Benefits</h2>
                         <div className="yellow-divider mx-auto mb-4"></div>
                         <div className="row g-3">
@@ -404,6 +402,8 @@ const Investment = () => {
                         </div>
                     </div>
                 )}
+
+                
             </section>
         </>
     );
