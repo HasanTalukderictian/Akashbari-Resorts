@@ -310,14 +310,43 @@
 }
 
 
-/* Responsive */
+/* ==================== RESPONSIVE STYLES ==================== */
+
+
+/* Tablet devices */
+
+@media (max-width: 992px) {
+    .investment-card {
+        min-height: 380px;
+    }
+    .pkg-price {
+        font-size: 1.6rem;
+    }
+    .pkg-title {
+        font-size: 1rem;
+    }
+}
+
+
+/* Mobile devices - Larger cards */
 
 @media (max-width: 768px) {
     .main-title {
         font-size: 2rem;
     }
+    /* Increase card height on mobile */
     .investment-card {
-        min-height: 350px;
+        min-height: 450px !important;
+        /* Increased from 350px */
+        height: 100%;
+    }
+    /* For sold out villa card on mobile */
+    .sold-out-card {
+        min-height: 450px !important;
+    }
+    /* Card content padding adjustment */
+    .card-content {
+        padding: 25px 18px !important;
     }
     .pkg-price {
         font-size: 1.5rem;
@@ -337,11 +366,62 @@
     .promo-question {
         font-size: 18px;
     }
+    /* Adjust grid gap for mobile */
+    .row.g-4 {
+        --bs-gutter-y: 1.5rem !important;
+    }
 }
 
+
+/* Investment.css - Responsive visibility classes */
+
+
+/* Desktop & Tablet - Visible by default */
+
+.desktop-only {
+    display: block;
+}
+
+
+/* Mobile - Hide desktop-only elements */
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+    /* Optional: Add mobile-specific heading if needed */
+    .mobile-heading {
+        display: block !important;
+    }
+}
+
+
+/* If you want to show a smaller heading on mobile, you can add this in your component */
+
+.mobile-heading {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-heading {
+        display: block;
+    }
+}
+
+
+/* Small mobile devices */
+
 @media (max-width: 576px) {
+    /* Further increase card height for small screens */
     .investment-card {
-        min-height: 320px;
+        min-height: 480px !important;
+        /* Even taller for small screens */
+    }
+    .sold-out-card {
+        min-height: 480px !important;
+    }
+    .card-content {
+        padding: 20px 15px !important;
     }
     .pkg-title {
         font-size: 1rem;
@@ -371,5 +451,40 @@
     }
     .promo-text {
         font-size: 13px;
+    }
+    /* Button size adjustment */
+    .inquire-btn {
+        padding: 14px 12px !important;
+        font-size: 13px !important;
+    }
+    /* Sold out overlay for mobile */
+    .sold-out-card div[style*="position: absolute"] {
+        padding: 12px 25px !important;
+        font-size: 18px !important;
+    }
+}
+
+
+/* Extra small devices */
+
+@media (max-width: 400px) {
+    .investment-card {
+        min-height: 340px !important;
+        margin: 10px !important;
+    }
+    .sold-out-card {
+        min-height: 400px !important;
+    }
+    .card-content {
+        padding: 18px 12px !important;
+    }
+    .pkg-title {
+        font-size: 0.95rem;
+    }
+    .pkg-price {
+        font-size: 1.2rem;
+    }
+    .pkg-detail {
+        font-size: 12px !important;
     }
 }
