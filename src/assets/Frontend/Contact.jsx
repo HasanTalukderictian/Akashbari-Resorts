@@ -212,7 +212,7 @@ const Contact = () => {
                         <div className="col-lg-6 text-start">
                             <div className="form-content">
                                 <span className="text-uppercase ls-2 small fw-bold d-block mb-2" style={{ color: brandColor }}>
-                                    <span className="dot-icon">●</span> Quick Enquiry
+                                     Quick Enquiry
                                 </span>
                                 <h2 className="serif display-6 mb-3 text-start">
                                     Send an <span className="text-italic" style={{ color: brandColor }}>Enquiry</span>
@@ -307,7 +307,7 @@ const Contact = () => {
                 <div className="container">
                     <div className="text-center mb-5">
                         <span className="text-uppercase ls-2 small fw-bold d-block mb-2" style={{ color: brandColor }}>
-                            <span className="dot-icon">●</span> Contact Us
+                             Contact Us
                         </span>
                         <h2 className="serif display-6">
                             Get in <span className="text-italic" style={{ color: brandColor }}>Touch</span>
@@ -346,7 +346,7 @@ const Contact = () => {
                 <div className="container">
                     <div className="text-center mb-5">
                         <span className="text-uppercase ls-2 small fw-bold d-block mb-2" style={{ color: brandColor }}>
-                            <span className="dot-icon">●</span> Our Location
+                            Our Location
                         </span>
                         <h2 className="serif display-6">
                             Find Us on <span className="text-italic" style={{ color: brandColor }}>Google Maps</span>
@@ -376,7 +376,7 @@ const Contact = () => {
                         {/* Location Details Column */}
                         <div className="col-lg-4 d-flex">
                             <div className="location-details w-100 p-4 rounded-4 shadow-sm d-flex flex-column" style={{ backgroundColor: '#fff' }}>
-                                <h4 className="serif mb-3" style={{ color: brandColor }}>📍 Address Details</h4>
+                                <h4 className="serif mb-3" style={{ color: brandColor }}> Address Details</h4>
                                 <div className="location-info mb-4">
                                     <p className="mb-2">
                                         <strong>Resort Name:</strong><br />
