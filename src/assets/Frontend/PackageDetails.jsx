@@ -694,9 +694,7 @@ const PackageDetails = () => {
             return;
         }
 
-        // এখানে আপনার API কল বা ডাটা সাবমিট করুন
         try {
-            // API কল করার জন্য কোড
             const response = await fetch(`${BASE_URL}/package-queries`, {
                 method: 'POST',
                 headers: {
@@ -708,15 +706,11 @@ const PackageDetails = () => {
                 }),
             });
             
-            // সফল হলে Toast দেখান
             setToastType('success');
             setToastMessage('✅ Your query has been submitted successfully! We will contact you soon.');
             setShowToast(true);
-            
-            // Modal বন্ধ করুন
             closeModal();
             
-            // Toast অটো হাইড
             setTimeout(() => {
                 setShowToast(false);
             }, 5000);
@@ -1061,26 +1055,41 @@ const PackageDetails = () => {
                     <div className="col-12 col-lg-6">
                         <div className="h-100 p-4 p-md-5 text-white rounded-4 shadow-lg d-flex flex-column justify-content-center"
                             style={{ background: `linear-gradient(135deg, ${brandColor} 0%, #3d1f0a 100%)` }}>
-                            <h6 className="text-uppercase opacity-75 mb-2 mb-md-3" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Investment Value</h6>
+                            <h6 className="text-uppercase opacity-75 mb-2 mb-md-3" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Investment Oppurnity</h6>
                             <h1 className="fw-bold mb-3 mb-md-4" style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}>Investment Package</h1>
+                            
+                            {/* Share Price - Added */}
+                            <div className="mb-3">
+                                <small className="text-white-50 d-block">Share Price</small>
+                                <h3 className="text-white mb-0" style={{ 
+                                    fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
+                                    textDecoration: 'line-through',
+                                    opacity: '0.7'
+                                }}>
+                                    ৳ {parseInt(packageData.share_price || 0).toLocaleString()}
+                                </h3>
+                            </div>
+                            
                             <div className="d-flex flex-wrap align-items-center gap-2 gap-md-3 mb-3">
                                 <div>
-                                    <small className="text-white-50 d-block">Original Price</small>
+                                    <small className="text-white-50 d-block">Discount Price</small>
                                     <h3 className="text-white mb-0" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>৳ {parseInt(packageData.price).toLocaleString()}</h3>
                                 </div>
                                 {packageData.discount > 0 && (
                                     <div>
-                                        <small className="text-white-50 d-block">Cash Back</small>
+                                        <small className="text-white-50 d-block">Full Payment Price</small>
                                         <h3 className="text-warning mb-0" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>- ৳ {parseInt(packageData.discount).toLocaleString()}</h3>
                                     </div>
                                 )}
                             </div>
-                            {packageData.discount > 0 && (
+
+                            {/* {packageData.discount > 0 && (
                                 <div className="mt-2">
                                     <small className="text-white-50 d-block">Final Price</small>
                                     <h2 className="text-warning fw-bold" style={{ fontSize: 'clamp(1.3rem, 5vw, 2rem)' }}>৳ {(parseInt(packageData.price) - parseInt(packageData.discount)).toLocaleString()}</h2>
                                 </div>
-                            )}
+                            )} */}
+
                         </div>
                     </div>
 
@@ -1091,15 +1100,29 @@ const PackageDetails = () => {
                                 Package Summary
                             </h2>
                             <div className="row g-2 g-md-3 mb-3 mb-md-4">
+                                {/* Share Price - Added */}
                                 <div className="col-6">
                                     <small className="text-muted d-block mb-1">
-                                        <i className="bi bi-currency-dollar me-1"></i>Investment Value
+                                       ৳ Share Price
+                                    </small>
+                                    <h4 className="fw-bold" style={{ 
+                                        fontSize: 'clamp(1rem, 3.5vw, 1.2rem)', 
+                                        color: brandColor,
+                                        textDecoration: 'line-through',
+                                        opacity: '0.6'
+                                    }}>
+                                        ৳ {parseInt(packageData.share_price || 0).toLocaleString()}
+                                    </h4>
+                                </div>
+                                <div className="col-6">
+                                    <small className="text-muted d-block mb-1">
+                                       ৳ Discount Price
                                     </small>
                                     <h4 className="fw-bold" style={{ fontSize: 'clamp(1rem, 3.5vw, 1.2rem)', color: brandColor }}>৳ {parseInt(packageData.price).toLocaleString()}</h4>
                                 </div>
                                 <div className="col-6">
                                     <small className="text-muted d-block mb-1">
-                                        <i className="bi bi-tag me-1"></i>CashBack
+                                        <i className="bi bi-tag me-1"></i>One Time Full Payment Price
                                     </small>
                                     <h4 className="fw-bold" style={{ fontSize: 'clamp(1rem, 3.5vw, 1.2rem)', color: brandColor }}>৳ {parseInt(packageData.discount).toLocaleString()}</h4>
                                 </div>
