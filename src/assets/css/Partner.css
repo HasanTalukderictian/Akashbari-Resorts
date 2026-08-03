@@ -1,0 +1,25 @@
+/* Add this to your style tag */
+
+@media (max-width: 768px) {
+    .partner-title {
+        font-size: 32px !important;
+    }
+    .partner-subtitle {
+        font-size: 15px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .partner-title {
+        font-size: 26px !important;
+    }
+    .partner-subtitle {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .partner-title {
+        font-size: 16px !important;
+    }
+}
