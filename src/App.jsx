@@ -202,7 +202,7 @@ function App() {
         } />
 
         <Route path="/admin-investrecord" element={
-          <PrivateRoute>
+          <PrivateRoute>  n  
             <InvestmentRecord />
           </PrivateRoute>
         } />
@@ -221,7 +221,7 @@ function App() {
           </PrivateRoute>
         } />
 
-        <Route path="/admin-team" element={
+        <Route path="/admin-team" element={   
           <PrivateRoute>
             <Teamate />
           </PrivateRoute>
