@@ -1,0 +1,159 @@
+/* sister.css - আপডেটেড */
+
+
+/* Affiliate Container - স্লাইডিং অ্যানিমেশন সহ */
+
+.affiliate-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.affiliate-slider {
+    display: flex;
+    flex-wrap: nowrap;
+    animation: slideLeft 20s linear infinite;
+    width: max-content;
+}
+
+.affiliate-slider:hover {
+    animation-play-state: paused;
+}
+
+
+/* স্লাইডিং অ্যানিমেশন */
+
+@keyframes slideLeft {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+
+/* Fixed Image Container - ছোট সাইজ */
+
+.affiliate-img-wrapper {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+
+/* Fixed Image */
+
+.affiliate-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transition: all 0.3s ease;
+}
+
+
+/* হোভারে ইফেক্ট */
+
+.affiliate-img:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
+
+/* Affiliate Box - #5e2e10 বর্ডার */
+
+.affiliate-box {
+    width: 180px;
+    height: 150px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+    border: 2px solid #5e2e10;
+    /* #5e2e10 বর্ডার */
+    border-radius: 8px;
+    margin: 0 8px;
+    padding: 12px;
+}
+
+.affiliate-box:hover {
+    border-color: #7a3d15 !important;
+    /* হোভারে একটু হালকা */
+    box-shadow: 0 4px 12px rgba(94, 46, 16, 0.2);
+    transform: translateY(-5px);
+}
+
+.affiliate-box:hover .affiliate-title {
+    color: #5e2e10 !important;
+}
+
+
+/* Affiliate Title */
+
+.affiliate-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4b5563;
+    text-align: center;
+    margin-top: 8px;
+    margin-bottom: 0;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+
+/* Header Style */
+
+.affiliate-header {
+    color: #5e2e10 !important;
+    text-align: center;
+    font-weight: 700;
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .affiliate-box {
+        width: 150px;
+        height: 130px;
+        padding: 8px;
+        border-width: 1.5px;
+    }
+    .affiliate-img-wrapper {
+        width: 60px;
+        height: 60px;
+        padding: 4px;
+    }
+    .affiliate-title {
+        font-size: 10px;
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 576px) {
+    .affiliate-box {
+        width: 120px;
+        height: 110px;
+        padding: 6px;
+        margin: 0 4px;
+        border-width: 1px;
+    }
+    .affiliate-img-wrapper {
+        width: 50px;
+        height: 50px;
+        padding: 4px;
+    }
+    .affiliate-title {
+        font-size: 9px;
+        max-width: 100px;
+        margin-top: 4px;
+    }
+}

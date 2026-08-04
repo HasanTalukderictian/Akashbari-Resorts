@@ -16,6 +16,7 @@ import Notice from "./Notice";
 import Member from "./Member";
 import ProjectView from "./ProjectView";
 import OngoingView from "./OngoingView";
+import Sister from "./Sister";
 
 const LandingPage = () => {
   const welcomeRef = useRef(null);
@@ -126,6 +127,7 @@ const LandingPage = () => {
       <ProjectView/>
        
       <OngoingView/>
+      <Sister/>
       
       <Testominal />
 
