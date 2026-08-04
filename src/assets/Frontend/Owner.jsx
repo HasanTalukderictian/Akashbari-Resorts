@@ -317,7 +317,7 @@ const Owner = () => {
                             {/* Features */}
                             <div className="mb-3">
                                 <h6 className="fw-bold mb-2" style={{ color: '#5e2e10', fontSize: '0.9rem' }}>
-                                    Key Features
+                                   Handover Key Feature
                                 </h6>
                                 {property.features && property.features.map((text, i) => (
                                     <div

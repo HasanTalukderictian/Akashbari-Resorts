@@ -54,6 +54,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
     // Form State
     const [formData, setFormData] = useState({
         name: '',
+        old_price: '',
         price: '',
         discount: '',
         color: '#5e2e10'
@@ -102,12 +103,32 @@ const Packagestatistics = ({ theme: propsTheme }) => {
 
     // Format price
     const formatPrice = (price) => {
+        const numPrice = parseFloat(price) || 0;
         return new Intl.NumberFormat('bn-BD', {
             style: 'currency',
             currency: 'BDT',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
-        }).format(price).replace('BDT', '৳');
+        }).format(numPrice).replace('BDT', '৳');
+    };
+
+    // Calculate Final Price: New Price - Discount
+    const calculateFinalPrice = () => {
+        const price = parseFloat(formData.price) || 0;
+        const discount = parseFloat(formData.discount) || 0;
+        return price - discount;
+    };
+
+    // Get Final Price from API data
+    const getFinalPrice = (pkg) => {
+        // First check if final_price exists in API response
+        if (pkg.final_price !== undefined && pkg.final_price !== null) {
+            return parseFloat(pkg.final_price);
+        }
+        // If not, calculate from price and discount
+        const price = parseFloat(pkg.price) || 0;
+        const discount = parseFloat(pkg.discount) || 0;
+        return price - discount;
     };
 
     // Fetch all packages with authentication
@@ -129,6 +150,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
             }
 
             if (response.data.success === true) {
+                console.log('API Response Data:', response.data.data); // Debug log
                 setPackageData(prev => ({
                     ...prev,
                     current: response.data.data
@@ -195,13 +217,20 @@ const Packagestatistics = ({ theme: propsTheme }) => {
             return;
         }
 
+        const price = parseFloat(formData.price) || 0;
+        const oldPrice = parseFloat(formData.old_price) || 0;
+        const discount = parseFloat(formData.discount) || 0;
+        const finalPrice = price - discount; // Final Price = New Price - Discount
+
         setLoading(true);
         try {
             const headers = getAuthHeaders();
             const response = await axios.post(`${API_BASE_URL}/packages`, {
                 name: formData.name,
-                price: parseInt(formData.price),
-                discount: parseInt(formData.discount) || 0,
+                old_price: oldPrice,
+                price: price,
+                discount: discount,
+                final_price: finalPrice,
                 color: formData.color
             }, { headers });
 
@@ -216,7 +245,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
             if (response.data.success === true) {
                 showToast('Package added successfully!', 'success');
                 setShowModal(false);
-                setFormData({ name: '', price: '', discount: '', color: '#5e2e10' });
+                setFormData({ name: '', old_price: '', price: '', discount: '', color: '#5e2e10' });
                 await fetchPackages();
             } else {
                 showToast(response.data.message || 'Failed to add package', 'error');
@@ -245,13 +274,20 @@ const Packagestatistics = ({ theme: propsTheme }) => {
             return;
         }
 
+        const price = parseFloat(formData.price) || 0;
+        const oldPrice = parseFloat(formData.old_price) || 0;
+        const discount = parseFloat(formData.discount) || 0;
+        const finalPrice = price - discount; // Final Price = New Price - Discount
+
         setLoading(true);
         try {
             const headers = getAuthHeaders();
             const response = await axios.put(`${API_BASE_URL}/packages/${editingPackage.id}`, {
                 name: formData.name,
-                price: parseInt(formData.price),
-                discount: parseInt(formData.discount) || 0,
+                old_price: oldPrice,
+                price: price,
+                discount: discount,
+                final_price: finalPrice,
                 color: formData.color
             }, { headers });
 
@@ -267,7 +303,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                 showToast('Package updated successfully!', 'success');
                 setShowModal(false);
                 setEditingPackage(null);
-                setFormData({ name: '', price: '', discount: '', color: '#5e2e10' });
+                setFormData({ name: '', old_price: '', price: '', discount: '', color: '#5e2e10' });
                 await fetchPackages();
             } else {
                 showToast(response.data.message || 'Failed to update package', 'error');
@@ -329,7 +365,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
     // Open Add Modal
     const openAddModal = () => {
         setModalMode('add');
-        setFormData({ name: '', price: '', discount: '', color: '#5e2e10' });
+        setFormData({ name: '', old_price: '', price: '', discount: '', color: '#5e2e10' });
         setShowModal(true);
     };
 
@@ -339,9 +375,10 @@ const Packagestatistics = ({ theme: propsTheme }) => {
         setEditingPackage(pkg);
         setFormData({
             name: pkg.name,
+            old_price: pkg.old_price || '',
             price: pkg.price,
-            discount: pkg.discount,
-            color: pkg.color
+            discount: pkg.discount || '',
+            color: pkg.color || '#5e2e10'
         });
         setShowModal(true);
     };
@@ -523,10 +560,12 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                     .modal-content {
                         background: ${theme.card};
                         border-radius: 20px;
-                        width: 500px;
-                        max-width: 90%;
-                        padding: 28px;
+                        width: 550px;
+                        max-width: 92%;
+                        padding: 32px;
                         animation: slideUp 0.3s ease;
+                        max-height: 90vh;
+                        overflow-y: auto;
                     }
                     @keyframes slideUp {
                         from {
@@ -549,6 +588,52 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                     .btn-secondary:hover {
                         background: ${theme.border};
                         transform: translateY(-2px);
+                    }
+                    .form-label {
+                        font-weight: 600;
+                        margin-bottom: 6px;
+                        display: block;
+                        font-size: 13px;
+                    }
+                    .form-label .required {
+                        color: #ef4444;
+                        margin-left: 2px;
+                    }
+                    .price-preview {
+                        background: ${theme.bg};
+                        border-radius: 12px;
+                        padding: 16px;
+                        margin-top: 8px;
+                    }
+                    .price-preview-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 4px 0;
+                    }
+                    .form-group {
+                        margin-bottom: 18px;
+                    }
+                    .form-row {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 16px;
+                    }
+                    .final-price-display {
+                        background: ${theme.primary}10;
+                        border: 2px solid ${theme.primary};
+                        border-radius: 8px;
+                        padding: 8px 16px;
+                        text-align: center;
+                        font-weight: 700;
+                        font-size: 18px;
+                        color: ${theme.primary};
+                    }
+                    @media (max-width: 576px) {
+                        .form-row {
+                            grid-template-columns: 1fr;
+                            gap: 0;
+                        }
                     }
                 `}
             </style>
@@ -623,38 +708,56 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                                         </div>
                                     ) : (
                                         <div className="row g-4">
-                                            {packageData.current.map((pkg) => (
-                                                <div className="col-md-6 col-lg-3" key={pkg.id}>
-                                                    <div className="package-card" style={styles.card}>
-                                                        <div className="d-flex justify-content-between align-items-start mb-3">
-                                                            <div style={{ width: '45px', height: '45px', borderRadius: '12px', backgroundColor: pkg.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                <i className="bi bi-gem" style={{ color: pkg.color, fontSize: '22px' }}></i>
+                                            {packageData.current.map((pkg) => {
+                                                const finalPrice = getFinalPrice(pkg);
+                                                return (
+                                                    <div className="col-md-6 col-lg-3" key={pkg.id}>
+                                                        <div className="package-card" style={styles.card}>
+                                                            <div className="d-flex justify-content-between align-items-start mb-3">
+                                                                <div style={{ width: '45px', height: '45px', borderRadius: '12px', backgroundColor: pkg.color + '20', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <i className="bi bi-gem" style={{ color: pkg.color, fontSize: '22px' }}></i>
+                                                                </div>
+                                                                <div className="dropdown">
+                                                                    <button className="btn btn-sm" style={{ color: theme.text, fontSize: '20px' }} data-bs-toggle="dropdown">⋯</button>
+                                                                    <ul className="dropdown-menu">
+                                                                        <li><button className="dropdown-item" onClick={() => openEditModal(pkg)} disabled={loading}>✏️ Edit</button></li>
+                                                                        <li><button className="dropdown-item text-danger" onClick={() => deletePackage(pkg.id)} disabled={loading}>🗑️ Delete</button></li>
+                                                                    </ul>
+                                                                </div>
                                                             </div>
-                                                            <div className="dropdown">
-                                                                <button className="btn btn-sm" style={{ color: theme.text, fontSize: '20px' }} data-bs-toggle="dropdown">⋯</button>
-                                                                <ul className="dropdown-menu">
-                                                                    <li><button className="dropdown-item" onClick={() => openEditModal(pkg)} disabled={loading}>✏️ Edit</button></li>
-                                                                    <li><button className="dropdown-item text-danger" onClick={() => deletePackage(pkg.id)} disabled={loading}>🗑️ Delete</button></li>
-                                                                </ul>
+                                                            <h6 style={{ color: theme.text, fontWeight: '600', marginBottom: '8px', fontSize: '16px' }}>{pkg.name}</h6>
+                                                            <div className="mb-2">
+                                                                {/* Final Price from API */}
+                                                                <span style={{ fontSize: '22px', fontWeight: '700', color: pkg.color }}>
+                                                                    {formatPrice(finalPrice)}
+                                                                </span>
+                                                                {/* New Price (with strike-through if discount exists) */}
+                                                                {parseFloat(pkg.discount) > 0 && (
+                                                                    <span style={{ fontSize: '13px', color: theme.textLight, textDecoration: 'line-through', marginLeft: '10px' }}>
+                                                                        {formatPrice(pkg.price)}
+                                                                    </span>
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                        <h6 style={{ color: theme.text, fontWeight: '600', marginBottom: '8px', fontSize: '16px' }}>{pkg.name}</h6>
-                                                        <div className="mb-2">
-                                                            <span style={{ fontSize: '22px', fontWeight: '700', color: pkg.color }}>{formatPrice(pkg.final_price || pkg.price - (pkg.price * pkg.discount / 100))}</span>
-                                                            {pkg.discount > 0 && (
-                                                                <span style={{ fontSize: '13px', color: theme.textLight, textDecoration: 'line-through', marginLeft: '10px' }}>
-                                                                    {formatPrice(pkg.price)}
+                                                            {/* Discount Badge */}
+                                                            {parseFloat(pkg.discount) > 0 && (
+                                                                <span className="badge mt-2" style={{ backgroundColor: theme.success, color: '#fff', padding: '5px 12px' }}>
+                                                                    Save {formatPrice(pkg.discount)}
                                                                 </span>
                                                             )}
+                                                            {/* Old Price Display */}
+                                                            {parseFloat(pkg.old_price) > 0 && (
+                                                                <div style={{ fontSize: '11px', color: theme.textLight, marginTop: '4px' }}>
+                                                                    Old Price: {formatPrice(pkg.old_price)}
+                                                                </div>
+                                                            )}
+                                                            {/* Final Price Label */}
+                                                            <div style={{ fontSize: '10px', color: theme.primary, marginTop: '2px', fontWeight: '600' }}>
+                                                                Final Price (API)
+                                                            </div>
                                                         </div>
-                                                        {pkg.discount > 0 && (
-                                                            <span className="badge mt-2" style={{ backgroundColor: theme.success, color: '#fff', padding: '5px 12px' }}>
-                                                                Save {formatPrice(pkg.price * pkg.discount / 100)}
-                                                            </span>
-                                                        )}
                                                     </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </>
@@ -703,27 +806,39 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                                     <div className="col-md-6">
                                         <div style={styles.card}>
                                             <h5 className="mb-3"><i className="bi bi-trending-up me-2" style={{ color: theme.success }}></i>Price Trends</h5>
-                                            {packageData.current.map((pkg, index) => (
-                                                <div className="mb-3" key={pkg.id}>
-                                                    <div className="d-flex justify-content-between mb-2">
-                                                        <span>{pkg.name}</span>
-                                                        <span style={{ color: theme.success }}>+{Math.floor(Math.random() * 30) + 5}% ↑</span>
+                                            {packageData.current.map((pkg) => {
+                                                const finalPrice = getFinalPrice(pkg);
+                                                return (
+                                                    <div className="mb-3" key={pkg.id}>
+                                                        <div className="d-flex justify-content-between mb-2">
+                                                            <span>{pkg.name}</span>
+                                                            <span style={{ color: theme.success }}>
+                                                                {parseFloat(pkg.discount) > 0 ? `-${formatPrice(pkg.discount)}` : 'No Discount'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
+                                                            <div className="progress-bar" style={{ 
+                                                                width: `${Math.min((parseFloat(pkg.discount) / parseFloat(pkg.price)) * 100, 100)}%`, 
+                                                                backgroundColor: pkg.color 
+                                                            }}></div>
+                                                        </div>
+                                                        <div className="d-flex justify-content-between mt-1">
+                                                            <span style={{ fontSize: '11px', color: theme.textLight }}>Final: {formatPrice(finalPrice)}</span>
+                                                            <span style={{ fontSize: '11px', color: theme.textLight }}>Discount: {formatPrice(pkg.discount)}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
-                                                        <div className="progress-bar" style={{ width: `${Math.floor(Math.random() * 30) + 5}%`, backgroundColor: pkg.color }}></div>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
                                     <div className="col-md-6">
                                         <div style={styles.card}>
                                             <h5 className="mb-3"><i className="bi bi-star me-2" style={{ color: theme.warning }}></i>Recommendations</h5>
-                                            {packageData.current.filter(p => p.discount > 0).length > 0 && (
+                                            {packageData.current.filter(p => parseFloat(p.discount) > 0).length > 0 && (
                                                 <div className="mb-3 p-3 rounded" style={{ backgroundColor: theme.bg }}>
                                                     <i className="bi bi-lightbulb me-2" style={{ color: theme.warning }}></i>
-                                                    <strong>Best Value:</strong> {packageData.current.find(p => p.discount > 0)?.name} with {packageData.current.find(p => p.discount > 0)?.discount}% discount
+                                                    <strong>Best Value:</strong> {packageData.current.find(p => parseFloat(p.discount) > 0)?.name} with {formatPrice(packageData.current.find(p => parseFloat(p.discount) > 0)?.discount)} discount
                                                 </div>
                                             )}
                                             <div className="mb-3 p-3 rounded" style={{ backgroundColor: theme.bg }}>
@@ -732,7 +847,7 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                                             </div>
                                             <div className="p-3 rounded" style={{ backgroundColor: theme.bg }}>
                                                 <i className="bi bi-bar-chart me-2" style={{ color: theme.primary }}></i>
-                                                <strong>Average Price:</strong> {formatPrice(packageData.current.reduce((sum, p) => sum + p.price, 0) / (packageData.current.length || 1))}
+                                                <strong>Average Price:</strong> {formatPrice(packageData.current.reduce((sum, p) => sum + parseFloat(p.price), 0) / (packageData.current.length || 1))}
                                             </div>
                                         </div>
                                     </div>
@@ -777,64 +892,80 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                             </button>
                         </div>
 
-                        <div className="mb-3">
-                            <label style={{ color: theme.text, display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                                Package Name <span style={{ color: theme.danger }}>*</span>
+                        {/* Package Name */}
+                        <div className="form-group">
+                            <label className="form-label" style={{ color: theme.text }}>
+                                Package Name <span className="required">*</span>
                             </label>
                             <input 
                                 type="text" 
                                 className="form-input"
                                 style={styles.input} 
-                                placeholder="Enter package name"
+                                placeholder="Enter package name (e.g., Premium Package)"
                                 value={formData.name} 
                                 onChange={(e) => setFormData({...formData, name: e.target.value})} 
                                 disabled={loading}
                             />
                         </div>
 
-                        <div className="mb-3">
-                            <label style={{ color: theme.text, display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                                Price (৳) <span style={{ color: theme.danger }}>*</span>
-                            </label>
-                            <input 
-                                type="number" 
-                                className="form-input"
-                                style={styles.input} 
-                                placeholder="Enter price"
-                                value={formData.price} 
-                                onChange={(e) => setFormData({...formData, price: e.target.value})} 
-                                disabled={loading}
-                            />
+                        {/* Price Row: Old Price & New Price */}
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label" style={{ color: theme.text }}>
+                                    Old Price <span style={{ color: theme.textLight, fontSize: '12px' }}>(Optional)</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    className="form-input"
+                                    style={styles.input} 
+                                    placeholder="0"
+                                    value={formData.old_price} 
+                                    onChange={(e) => setFormData({...formData, old_price: e.target.value})} 
+                                    disabled={loading}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label" style={{ color: theme.text }}>
+                                    New Price <span className="required">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    className="form-input"
+                                    style={styles.input} 
+                                    placeholder="Enter price"
+                                    value={formData.price} 
+                                    onChange={(e) => setFormData({...formData, price: e.target.value})} 
+                                    disabled={loading}
+                                />
+                            </div>
                         </div>
 
-                        <div className="mb-3">
-                            <label style={{ color: theme.text, display: 'block', marginBottom: '8px', fontWeight: '500' }}>
-                                Discount (%) 
+                        {/* Discount */}
+                        <div className="form-group">
+                            <label className="form-label" style={{ color: theme.text }}>
+                                Discount (Amount) <span style={{ color: theme.textLight, fontSize: '12px' }}>(Optional)</span>
                             </label>
                             <input 
                                 type="number" 
                                 className="form-input"
                                 style={styles.input} 
-                                placeholder="Enter discount percentage"
+                                placeholder="Enter discount amount"
                                 value={formData.discount} 
                                 onChange={(e) => setFormData({...formData, discount: e.target.value})} 
                                 disabled={loading}
+                                min="0"
                             />
-                            {formData.price && formData.discount && (
-                                <small style={{ color: theme.success, marginTop: '5px', display: 'block' }}>
-                                    Final Price: {formatPrice(parseInt(formData.price) - (parseInt(formData.price) * parseInt(formData.discount) / 100))}
-                                </small>
-                            )}
                         </div>
 
-                        <div className="mb-4">
-                            <label style={{ color: theme.text, display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                        {/* Color Picker */}
+                        <div className="form-group">
+                            <label className="form-label" style={{ color: theme.text }}>
                                 Package Color
                             </label>
                             <div className="d-flex align-items-center gap-3">
                                 <input 
                                     type="color" 
-                                    style={{ width: '50px', height: '50px', borderRadius: '10px', border: `1px solid ${theme.border}`, cursor: 'pointer' }}
+                                    style={{ width: '50px', height: '50px', borderRadius: '10px', border: `1px solid ${theme.border}`, cursor: 'pointer', padding: '2px' }}
                                     value={formData.color} 
                                     onChange={(e) => setFormData({...formData, color: e.target.value})} 
                                     disabled={loading}
@@ -844,14 +975,65 @@ const Packagestatistics = ({ theme: propsTheme }) => {
                                     backgroundColor: formData.color + '20', 
                                     borderRadius: '8px',
                                     color: formData.color,
-                                    fontWeight: '500'
+                                    fontWeight: '500',
+                                    fontSize: '14px'
                                 }}>
-                                    Preview Color
+                                    Color Preview
                                 </div>
                             </div>
                         </div>
 
-                        <div className="d-flex gap-3">
+                        {/* Price Preview */}
+                        {formData.price && (
+                            <div className="price-preview">
+                                <div className="price-preview-item">
+                                    <span style={{ color: theme.text, fontSize: '13px' }}>Old Price</span>
+                                    <span style={{ color: theme.textLight, textDecoration: 'line-through', fontSize: '14px' }}>
+                                        {formatPrice(parseFloat(formData.old_price) || 0)}
+                                    </span>
+                                </div>
+                                <div className="price-preview-item">
+                                    <span style={{ color: theme.text, fontSize: '13px' }}>New Price</span>
+                                    <span style={{ color: theme.text, fontSize: '14px', fontWeight: '600' }}>
+                                        {formatPrice(parseFloat(formData.price) || 0)}
+                                    </span>
+                                </div>
+                                {formData.discount && parseFloat(formData.discount) > 0 && (
+                                    <>
+                                        <div className="price-preview-item">
+                                            <span style={{ color: theme.text, fontSize: '13px' }}>Discount</span>
+                                            <span style={{ color: theme.success, fontSize: '14px', fontWeight: '600' }}>
+                                                -{formatPrice(parseFloat(formData.discount))}
+                                            </span>
+                                        </div>
+                                        <div className="price-preview-item" style={{ borderTop: `1px solid ${theme.border}`, paddingTop: '8px', marginTop: '4px' }}>
+                                            <span style={{ color: theme.text, fontSize: '14px', fontWeight: '700' }}>Final Price</span>
+                                            <span className="final-price-display" style={{ fontSize: '20px' }}>
+                                                {formatPrice(calculateFinalPrice())}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
+                                {(!formData.discount || parseFloat(formData.discount) === 0) && (
+                                    <div className="price-preview-item" style={{ borderTop: `1px solid ${theme.border}`, paddingTop: '8px', marginTop: '4px' }}>
+                                        <span style={{ color: theme.text, fontSize: '14px', fontWeight: '700' }}>Final Price</span>
+                                        <span className="final-price-display" style={{ fontSize: '20px' }}>
+                                            {formatPrice(parseFloat(formData.price) || 0)}
+                                        </span>
+                                    </div>
+                                )}
+                                {formData.old_price && parseFloat(formData.old_price) > 0 && parseFloat(formData.price) < parseFloat(formData.old_price) && (
+                                    <div className="price-preview-item" style={{ marginTop: '4px' }}>
+                                        <span style={{ color: theme.success, fontSize: '12px' }}>
+                                            <i className="bi bi-arrow-down"></i> You saved {formatPrice(parseFloat(formData.old_price) - parseFloat(formData.price))}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="d-flex gap-3 mt-4">
                             <button 
                                 onClick={handleSubmit} 
                                 style={{ flex: 1, ...styles.primaryBtn }}
