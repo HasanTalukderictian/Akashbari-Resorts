@@ -856,15 +856,14 @@ const Investment = ({ showOnlyBenefits = false }) => {
                                                             </p>
                                                         )}
 
-                                                        {/* Button - Left Aligned */}
+
                                                         {/* Button - Left Aligned */}
                                                         <button
                                                             className="inquire-btn popular-btn"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                if (pkg.is_sold_out != 1) {
-                                                                    navigate(`/package-details/${pkg.id}`, { state: { packageData: pkg } });
-                                                                }
+                                                                // Sold Out status ignore kore direct navigate korbe
+                                                                navigate(`/package-details/${pkg.id}`, { state: { packageData: pkg } });
                                                             }}
                                                             style={{
                                                                 textAlign: 'center'
@@ -1008,7 +1007,7 @@ const Investment = ({ showOnlyBenefits = false }) => {
 
                                                             {/* Button - Left Aligned */}
 
-                                                            
+
 
                                                             {isSoldOut ? (
                                                                 <button className="inquire-btn sold-out-footer" disabled style={{
