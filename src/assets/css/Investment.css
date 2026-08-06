@@ -61,9 +61,10 @@
 }
 
 .sold-out-card {
-    opacity: 0.7;
-    background: #f8f9fa;
+    background: white !important;
     position: relative;
+    /* Add a subtle border to indicate sold out */
+    border-color: #dc3545 !important;
 }
 
 .sold-out-card:hover {
@@ -71,8 +72,11 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
-.clickable-card {
-    cursor: pointer;
+
+/* Optional: Add a subtle overlay */
+
+.sold-out-card .card-content {
+    opacity: 0.85;
 }
 
 .card-content {
