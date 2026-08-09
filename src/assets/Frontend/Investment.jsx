@@ -1070,7 +1070,7 @@ const Investment = ({ showOnlyBenefits = false }) => {
                 {/* BENEFITS SECTION - Always show */}
                 {benefits.length > 0 && (
                     <div className="benefits-container container p-5 bg-white" id="investment-benefits">
-                        <h2 className='display-4 fw-normal text-uppercase mb-2 text-center'>Investment Benefits</h2>
+                        <h2 className='display-4 fw-normal mb-2 text-center' style={{ fontSize: '1.8rem', fontWeight: '500', color: '#5e2e10' , fontFamily: 'serif'}}>Investment Benefits</h2>
                         <div className="yellow-divider mx-auto mb-4"></div>
                         <div className="row g-3">
                             {benefits.map((benefit, index) => (

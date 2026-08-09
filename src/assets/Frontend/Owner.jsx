@@ -394,7 +394,7 @@ const Owner = () => {
                         <span className="badge  bg-opacity-10  px-5 py-1 rounded-pill mb-2" style={{ fontSize: '20px', background: '#5e2e10' }}>
                             Why Choose Us
                         </span>
-                        <h2 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '1.8rem' }}>
+                        <h2 className="fw-bold mb-2" style={{ color: '#2c3e50', fontSize: '1.8rem' , fontFamily: 'serif'}}>
                             Invest with Us?
                         </h2>
                         <div className="mx-auto" style={{ width: '220px', height: '3px', background: '#5e2e10', borderRadius: '2px' }}></div>

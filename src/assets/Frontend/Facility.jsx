@@ -281,16 +281,19 @@ const Facility = () => {
       <div className="container">
         {/* Header Section */}
         <div className="text-center mb-5">
-          <h6 className="text-uppercase mb-2" style={{ 
+          <h6 className=" mb-2" style={{ 
             letterSpacing: '2px', 
             color: '#5e2e10', 
-            fontWeight: '700' 
+            fontWeight: '700',
+            fontFamily: 'serif'
+
           }}>
             Amenities
           </h6>
-          <h2 className="display-4 fw-normal text-uppercase mb-2" style={{ 
+          <h2 className="display-4 fw-normal  mb-2" style={{ 
             letterSpacing: '2px',
-            color: '#5e2e10'
+            color: '#5e2e10', 
+            fontFamily: 'serif'
           }}>
             World-Class Facilities Include
           </h2>

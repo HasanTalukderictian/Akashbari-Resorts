@@ -362,7 +362,6 @@
 // export default ProjectView;
 
 
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -576,9 +575,9 @@ const ProjectView = () => {
 
   return (
     <div className="container my-5 project-view-container">
-      <h4 className='display-4 text-uppercase mb-2 text-center' style={{ color: brandColor }}>
+      <h2 className='display-4  mb-2 text-center' style={{ color: brandColor,   fontFamily: 'serif' }}>
         Our Achievement
-      </h4>
+      </h2>
       <p className='text-center' style={{ color: brandColor, opacity: 0.8 }}>
         Some of our Customers
       </p>
@@ -608,7 +607,7 @@ const ProjectView = () => {
       </div>
 
       {/* 1st Div/Row: Left 50% Big, Right 50% Two Small */}
-      <div className="row g-3 custom-project-row">
+      <div className="row g-2 custom-project-row">
         
         {/* Left Side: 50% Width (col-md-6) - Big Image */}
         <div className="col-md-6 big-img-col">
@@ -626,8 +625,8 @@ const ProjectView = () => {
         </div>
         
         {/* Right Side: 50% Width, 2 Images Stacked */}
-        <div className="col-md-6 stacked-img-col d-flex flex-column justify-content-between">
-          <div className="small-img-wrapper pb-md-2">
+        <div className="col-md-6 stacked-img-col d-flex flex-column justify-content-between gap-2">
+          <div className="small-img-wrapper flex-grow-1">
             <img 
               src={getImageAtIndex(1)} 
               alt={getTitleAtIndex(1)} 
@@ -640,7 +639,7 @@ const ProjectView = () => {
               }}
             />
           </div>
-          <div className="small-img-wrapper pt-md-2">
+          <div className="small-img-wrapper flex-grow-1">
             <img 
               src={getImageAtIndex(2)} 
               alt={getTitleAtIndex(2)} 
@@ -658,11 +657,11 @@ const ProjectView = () => {
       </div>
 
       {/* 2nd Div/Row */}
-      <div className="row g-3 mt-4 mt-md-5 custom-project-row">
+      <div className="row g-2 mt-2 custom-project-row">
         
         {/* Left Side: 50% Width, 2 Images Stacked */}
-        <div className="col-md-6 stacked-img-col d-flex flex-column justify-content-between">
-          <div className="small-img-wrapper pb-md-2">
+        <div className="col-md-6 stacked-img-col d-flex flex-column justify-content-between gap-2">
+          <div className="small-img-wrapper flex-grow-1">
             <img 
               src={getImageAtIndex(3)} 
               alt={getTitleAtIndex(3)} 
@@ -675,7 +674,7 @@ const ProjectView = () => {
               }}
             />
           </div>
-          <div className="small-img-wrapper pt-md-2">
+          <div className="small-img-wrapper flex-grow-1">
             <img 
               src={getImageAtIndex(4)} 
               alt={getTitleAtIndex(4)} 
@@ -943,11 +942,11 @@ const ProjectView = () => {
           }
 
           .custom-fit-img {
-            object-fit: contain !important;
+            object-fit: cover !important; /* CHANGED: contain to cover for full fit */
             width: 100%;
             height: 100%;
             transition: transform 0.3s ease;
-            border: 2px solid ${brandColor};
+            border: none; /* CHANGED: removed border for cleaner collage look */
             box-shadow: none !important;
             background-color: #f5f5f5;
           }
@@ -955,7 +954,7 @@ const ProjectView = () => {
           .big-img-col, .small-img-wrapper {
             overflow: hidden;
             position: relative;
-            border-radius: 12px;
+            border-radius: 8px; /* CHANGED: 12px to 8px for tighter fit */
             box-shadow: none !important;
             background-color: #f5f5f5;
           }
@@ -973,9 +972,12 @@ const ProjectView = () => {
             box-shadow: none !important;
           }
 
+          /* FIXED ROW HEIGHT */
           .custom-project-row {
-            height: 500px;
+            height: auto !important;
+            aspect-ratio: 2 / 1; /* Fixes the 2:1 collage ratio */
           }
+
           .big-img-col {
             height: 100%;
           }
@@ -984,6 +986,7 @@ const ProjectView = () => {
           }
           .small-img-wrapper {
             height: 50%;
+            width: 100%;
           }
 
           /* Hover overlay effect with brand color */
@@ -1014,7 +1017,7 @@ const ProjectView = () => {
           /* Image border on hover */
           .big-img-col:hover .custom-fit-img,
           .small-img-wrapper:hover .custom-fit-img {
-            border-color: ${brandColor};
+            border-color: transparent !important; /* No border needed */
             box-shadow: none !important;
           }
 
@@ -1053,6 +1056,7 @@ const ProjectView = () => {
             }
 
             .custom-project-row {
+              aspect-ratio: auto !important; /* FIXED mobile layout */
               height: auto !important;
             }
             
@@ -1064,6 +1068,7 @@ const ProjectView = () => {
             
             .stacked-img-col {
               height: auto !important;
+              gap: 8px !important;
             }
 
             .pb-md-2, .pt-md-2 {
@@ -1118,7 +1123,8 @@ const ProjectView = () => {
           
           @media (min-width: 769px) and (max-width: 1024px) {
             .custom-project-row {
-              height: 400px;
+              aspect-ratio: auto !important;
+              height: 450px;
             }
           }
         `}

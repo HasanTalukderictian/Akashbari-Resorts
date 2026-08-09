@@ -324,9 +324,9 @@ const OngoingView = () => {
         }
       `}</style>
       <div className="container my-5 project-view-container">
-        <h3 className='text-center fw-bold mt-4 mb-2' style={{ color: brandColor }}>
+        <h2 className='text-center fw-bold mt-4 mb-2' style={{ color: brandColor ,   fontFamily: 'serif'}}>
           Going Project View
-        </h3>
+        </h2>
         
         {/* Decorative Line */}
         <div style={{

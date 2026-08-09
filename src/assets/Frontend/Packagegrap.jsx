@@ -1975,14 +1975,15 @@ const PackageGraph = () => {
       }}>
         {/* Title */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{
+          <h2 style={{
             fontSize: '28px',
             fontWeight: '700',
-            color: '#333',
-            marginBottom: '5px'
+            color: '#5e2e10',
+            marginBottom: '5px', 
+            fontFamily: 'serif'
           }}>
             Package Price History
-          </h1>
+          </h2>
           <p style={{ fontSize: '14px', color: '#777' }}>
             Track monthly price trends for all investment packages
           </p>

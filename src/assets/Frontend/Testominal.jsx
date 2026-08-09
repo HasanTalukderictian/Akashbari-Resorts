@@ -67,7 +67,7 @@ const Testominal = () => {
           <h2
             className="fw-bold display-5"
             style={{
-              color: '#3A4350',
+              color: '#5e2e10',
               fontFamily: 'serif'
             }}
           >

@@ -58,7 +58,8 @@ const Sister = () => {
           style={{ 
             color: brandColor,
             textAlign: 'center',
-            fontWeight: 700
+            fontWeight: 700, 
+              fontFamily: 'serif'
           }}
         >
           Our Sister Concerns

@@ -53,13 +53,13 @@ const Video = () => {
                         <div className="col-lg-8">
                             <div className="mx-auto mb-3"></div>
                             {/* ডাইনামিক টাইটেল */}
-                            <p className="gateway-text mb-2" style={{ fontSize: '1.8rem', fontWeight: '500', color: '#5e2e10' }}>{videoData.title}</p>
+                            <h2 className="gateway-text mb-2" style={{ fontSize: '1.8rem', fontWeight: '500', color: '#5e2e10' , fontFamily: 'serif'}}>{videoData.title}</h2>
                             {/* ডাইনামিক ডেসক্রিপশন */}
-                            <h5 className="video-subtext text-muted" style={{ fontSize: '1rem', lineHeight: '1.6', color: '#666' }}>
+                            {/* <h5 className="video-subtext text-muted" style={{ fontSize: '1rem', lineHeight: '1.6', color: '#666' , fontWeight: '500', fontFamily: 'serif'}}>
                                 {videoData.description.length > 200 
                                     ? `${videoData.description.substring(0, 200)}...` 
                                     : videoData.description}
-                            </h5>
+                            </h5> */}
                         </div>
                     </div>
                 </div>
