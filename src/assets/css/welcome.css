@@ -160,3 +160,58 @@
         font-size: 14px;
     }
 }
+
+@media screen and (max-width: 1024px) and (min-width: 768px) {
+    .welcome-title,
+    .welcome-subtitle {
+        font-size: 2rem;
+    }
+    .welcome-logo {
+        width: 80px;
+    }
+    .features-box {
+        padding: 20px;
+        min-height: 300px;
+    }
+    .features-title {
+        font-size: 1.2rem;
+    }
+    .feature-item {
+        font-size: 0.8rem;
+        padding: 5px 0;
+    }
+    .call-box {
+        padding: 10px 18px;
+        max-width: 380px;
+        gap: 15px;
+    }
+    .call-text {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+    .call-icon-wrapper {
+        width: 35px;
+        height: 35px;
+    }
+    .call-icon {
+        width: 18px;
+        height: 18px;
+    }
+    .more-btn {
+        padding: 8px 25px;
+        font-size: 13px;
+    }
+    .line-divider {
+        width: 180px;
+    }
+    .welcome-text p {
+        font-size: 0.85rem;
+    }
+    .visit-club-btn {
+        padding: 8px 25px;
+        font-size: 14px;
+    }
+    .d-flex.align-items-center.gap-3 {
+        gap: 15px !important;
+    }
+}

@@ -242,6 +242,17 @@
     padding: 40px 30px !important;
 }
 
+.stat-container {
+    border: 1px solid #ddd;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    background: white;
+    margin-top: 30px !important;
+    max-width: 1350px !important;
+    margin-bottom: 30px !important;
+    padding: 40px 30px !important;
+}
+
 
 /* When only benefits is shown - remove extra margin */
 
@@ -418,11 +429,11 @@
 @media (max-width: 576px) {
     /* Further increase card height for small screens */
     .investment-card {
-        min-height: 480px !important;
+        min-height: 400px !important;
         /* Even taller for small screens */
     }
     .sold-out-card {
-        min-height: 480px !important;
+        min-height: 400px !important;
     }
     .card-content {
         padding: 20px 15px !important;
@@ -463,8 +474,8 @@
     }
     /* Sold out overlay for mobile */
     .sold-out-card div[style*="position: absolute"] {
-        padding: 12px 25px !important;
-        font-size: 18px !important;
+        padding: 5px 10px !important;
+        font-size: 10px !important;
     }
 }
 

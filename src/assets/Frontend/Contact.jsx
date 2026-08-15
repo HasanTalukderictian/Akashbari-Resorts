@@ -191,7 +191,7 @@ const Contact = () => {
             <section className="blog-banner text-center d-flex flex-column justify-content-center">
                 <div className="container">
                     <h1 className="blog-title serif mb-2 text-white">Contact</h1>
-                    <h1 className="blog-title serif mb-2 text-white">Akashbari Resort</h1>
+                    <h1 className="blog-title serif mb-2 text-white">Akashbari Hotel & Resorts</h1>
                 </div>
             </section>
 

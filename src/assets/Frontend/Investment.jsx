@@ -1038,7 +1038,7 @@ const Investment = ({ showOnlyBenefits = false }) => {
 
                     {/* STATS SECTION - Hide when showOnlyBenefits is true */}
                     {!showOnlyBenefits && (
-                        <div className="container my-5" style={{ marginTop: '0', paddingTop: '20px' }}>
+                        <div className="stat-container my-5" style={{ marginTop: '0', paddingTop: '20px' }}>
                             <div className="row justify-content-center">
                                 <div className="col-lg-11">
                                     <div style={statsCardStyle} className="text-center">

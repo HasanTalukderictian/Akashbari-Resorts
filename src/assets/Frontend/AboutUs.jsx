@@ -613,7 +613,7 @@ const AboutUs = () => {
                                 </div>
                                 <h2 className="modern-title mb-4">
                                     Experience Luxury At
-                                    <span className="text-gradient" style={{ color: '#5e2e10' }}> Akashbari Hotel & Resort</span>
+                                    <span className="text-gradient" style={{ color: '#5e2e10' ,fontSize: '50px'}}> Akashbari Hotel & Resorts</span>
                                 </h2>
                                 <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4" style={{ borderColor: brandColor }}>
                                     <p className="mb-2">

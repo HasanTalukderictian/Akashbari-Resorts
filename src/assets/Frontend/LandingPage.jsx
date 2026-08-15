@@ -120,8 +120,6 @@ const LandingPage = () => {
 
     
 
-     
-
       <Facility />
       
       <ProjectView/>

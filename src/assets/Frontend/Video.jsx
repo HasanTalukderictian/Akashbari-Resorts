@@ -46,7 +46,7 @@ const Video = () => {
 
     return (
         <section className="video-section py-5" style={{ backgroundColor: 'rgb(248, 249, 252)' }}>
-            <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+            <div className="container" style={{ maxWidth: '1350px', margin: '0 auto', padding: '0 20px' }}>
                 {/* Top Header Section */}
                 <div className="text-center mb-5">
                     <div className="row justify-content-center">

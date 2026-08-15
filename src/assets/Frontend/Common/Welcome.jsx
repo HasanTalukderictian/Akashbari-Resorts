@@ -214,6 +214,8 @@
 
 // export default Welcome;
 
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -279,7 +281,7 @@ const Welcome = ({ scrollToInvestment }) => {  // Added prop for scrolling
                   {welcomeData ? welcomeData.title.split(' ').slice(0, 2).join(' ') : "Welcome To"}
                 </h3>
                 <h3 className="welcome-subtitle text-uppercase mb-0">
-                  {welcomeData ? welcomeData.title.split(' ').slice(2).join(' ') : "Akashbari Resort"}
+                  {welcomeData ? welcomeData.title.split(' ').slice(2).join(' ') : "Akashbari Hotel & Resorts"}
                 </h3>
               </div>
 
