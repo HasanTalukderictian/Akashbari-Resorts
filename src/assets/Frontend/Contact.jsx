@@ -358,7 +358,7 @@ const Contact = () => {
 
                     <div className="row g-4">
                         {/* Map Column */}
-                        <div className="col-lg-8 d-flex">
+                        <div className="col-lg-7 d-flex">
                             <div className="map-wrapper rounded-4 overflow-hidden shadow-lg w-100">
                                 <iframe
                                     src={googleMapEmbedUrl}
@@ -374,7 +374,7 @@ const Contact = () => {
                         </div>
 
                         {/* Location Details Column */}
-                        <div className="col-lg-4 d-flex">
+                        <div className="col-lg-5 d-flex">
                             <div className="location-details w-100 p-4 rounded-4 shadow-sm d-flex flex-column" style={{ backgroundColor: '#fff' }}>
                                 <h4 className="serif mb-3" style={{ color: brandColor }}> Address Details</h4>
                                 <div className="location-info mb-4">

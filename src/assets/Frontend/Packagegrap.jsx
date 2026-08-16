@@ -2032,7 +2032,7 @@ const PackageGraph = () => {
                 key={pkg.id || idx}
                 onClick={() => setSelectedPackage(pkg.id?.toString() || pkgName)}
                 style={{
-                  padding: '6px 18px',
+                  padding: '4px 15px',
                   background: isActive ? color : '#f0f0f0',
                   color: isActive ? 'white' : '#555',
                   border: 'none',
