@@ -215,7 +215,7 @@ const Contact = () => {
                                      Quick Enquiry
                                 </span>
                                 <h2 className="serif display-6 mb-3 text-start">
-                                    Send an <span className="text-italic" style={{ color: brandColor }}>Enquiry</span>
+                                    Send an <span  style={{ color: brandColor }}>Enquiry</span>
                                 </h2>
                                 <p className="text-muted mb-4 text-start">
                                     Have a question or special request? Leave us a message and we'll
@@ -310,7 +310,7 @@ const Contact = () => {
                              Contact Us
                         </span>
                         <h2 className="serif display-6">
-                            Get in <span className="text-italic" style={{ color: brandColor }}>Touch</span>
+                            Get in <span  style={{ color: brandColor }}>Touch</span>
                         </h2>
                         <p className="text-muted mt-3">
                             Prefer a quick call or a message? Use the option that suits you.
@@ -349,7 +349,7 @@ const Contact = () => {
                             Our Location
                         </span>
                         <h2 className="serif display-6">
-                            Find Us on <span className="text-italic" style={{ color: brandColor }}>Google Maps</span>
+                            Find Us on <span  style={{ color: brandColor }}>Google Maps</span>
                         </h2>
                         <p className="text-muted mt-3">
                             Visit us at Akashbari Resort, Sreepur, Gazipur - where nature meets luxury
@@ -454,7 +454,7 @@ const Contact = () => {
                     <div className="nearby-attractions-wrapper mt-5 pt-4">
                         <div className="text-center mb-4">
                             <h3 className="serif display-6 fs-2">
-                                <span className="text-italic" style={{ color: brandColor }}>Nearby Attractions</span>
+                                <span  style={{ color: brandColor }}>Nearby Attractions</span>
                             </h3>
                             <p className="text-muted">Explore the beauty around Akashbari Resort</p>
                         </div>

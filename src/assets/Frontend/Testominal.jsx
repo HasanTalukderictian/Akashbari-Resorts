@@ -167,7 +167,7 @@ const Testominal = () => {
 
                   {/* --- Slide Content Card --- */}
                   <div
-                    className="card border-0 shadow-sm mx-auto position-relative pt-5 px-4 pb-4"
+                    className="card border-0 shadow-sm mx-auto position-relative pt-5 px-4 pb-4 "
                     style={{
                       maxWidth: '360px',
                       borderRadius: '15px',
