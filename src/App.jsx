@@ -45,9 +45,18 @@ import ClubSettings from './Backend/ClubSettings'
 import Clubgallery from './Backend/Clubgallery'
 import ProjectState from './Backend/ProjectState'
 import PackageQuery from './Backend/PackageQuery'
+import ReactGA from 'react-ga';
+import { useEffect } from 'react'
 
 
 function App() {
+    
+  ReactGA.initialize('G-FBHHGLQ9KQ');
+
+  useEffect(()=>{
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }, [])
+
   return (
     <BrowserRouter>
       <Routes>
