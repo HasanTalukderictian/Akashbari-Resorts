@@ -22,7 +22,7 @@ const Footer = () => {
       <div className="container footer-top">
         {/* Left Section - Address & Contact */}
         <div className="footer-col brand">
-          <h2>AKASHBARI<br />HOTEL & RESORTS</h2>
+          <h2>AKASHBARI<br />HOTELS & RESORTS</h2>
           <div className="contact-info">
             <p className="address">
               <FaMapMarkerAlt className="contact-icon" />
@@ -61,7 +61,7 @@ const Footer = () => {
       {/* Copyright Section */}
       <div className="container text-center mb-3">
         <p className="footer-copyright-text">
-          &copy; {currentYear} AkashBari Resorts. Design and Development By{" "}
+          &copy; {currentYear} AkashBari Hotels & Resorts. Design and Development By{" "}
           <a
             href="https://hasan-portfilo.netlify.app/"
             target="_blank"

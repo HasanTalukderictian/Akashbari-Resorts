@@ -132,7 +132,7 @@ const AboutUs = () => {
                                 </div>
                                 <h2 className="modern-title mb-4">
                                     Experience Luxury At
-                                    <span  style={{ color: brandColor, fontSize: '50px'}}> Akashbari Hotel & Resorts</span>
+                                    <span  style={{ color: brandColor, fontSize: '50px'}}> Akashbari Hotels & Resorts</span>
                                 </h2>
                                 <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4" style={{ borderColor: brandColor }}>
                                     <p className="mb-2">
@@ -143,7 +143,7 @@ const AboutUs = () => {
                                     </p>
                                 </div>
                                 <p className="modern-description text-muted mb-4" style={{ fontFamily: 'inherit', fontSize: '1rem', lineHeight: '1.6' }}>
-                                    Akashbari Hotel & Resort is a premier getaway destination blending nature with world-class hospitality.
+                                    Akashbari Hotels & Resort is a premier getaway destination blending nature with world-class hospitality.
                                     Designed for families, couples, and corporate events, we offer a tranquil environment away from the hustle of daily life.
                                 </p>
                                 <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600', color: brandColor }}>

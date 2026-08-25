@@ -50,7 +50,7 @@ const Contact = () => {
         {
             id: 3,
             title: "Location",
-            detail: "Akashbari Hotel & Resort",
+            detail: "Akashbari Hoteld & Resorts",
             detail2: "Sreepur, Gazipur, Bangladesh",
             icon: "bi bi-geo-alt",
             action: "https://www.google.com/maps/place/24%C2%B007'12.2%22N+90%C2%B030'27.8%22E/@24.1200554,90.5051585,17z"
@@ -191,7 +191,7 @@ const Contact = () => {
             <section className="blog-banner text-center d-flex flex-column justify-content-center">
                 <div className="container">
                     <h1 className="blog-title serif mb-2 text-white">Contact</h1>
-                    <h1 className="blog-title serif mb-2 text-white">Akashbari Hotel & Resorts</h1>
+                    <h1 className="blog-title serif mb-2 text-white">Akashbari Hotels & Resorts</h1>
                 </div>
             </section>
 
@@ -380,7 +380,7 @@ const Contact = () => {
                                 <div className="location-info mb-4">
                                     <p className="mb-2">
                                         <strong>Resort Name:</strong><br />
-                                        Akashbari Resort
+                                        Akashbari Hotels & Resorts
                                     </p>
                                     <p className="mb-2">
                                         <strong>Exact Location:</strong><br />
@@ -456,7 +456,7 @@ const Contact = () => {
                             <h3 className="serif display-6 fs-2">
                                 <span  style={{ color: brandColor }}>Nearby Attractions</span>
                             </h3>
-                            <p className="text-muted">Explore the beauty around Akashbari Resort</p>
+                            <p className="text-muted">Explore the beauty around Akashbari Hotels & Resorts</p>
                         </div>
                         <div className="row g-4">
                             <div className="col-md-3 col-sm-6">

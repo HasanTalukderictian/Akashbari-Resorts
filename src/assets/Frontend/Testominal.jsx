@@ -406,7 +406,7 @@ const Testominal = () => {
           <p
             className="fst-italic mb-1"
             style={{
-              color: '#9c0606',
+              color: '#5e2e10',
               fontSize: '1.1rem',
               fontFamily: 'serif'
             }}
@@ -416,7 +416,7 @@ const Testominal = () => {
           <h2
             className="fw-bold display-5"
             style={{
-              color: '#3A4350',
+              color: '#5e2e10',
               fontFamily: 'serif'
             }}
           >
@@ -433,17 +433,17 @@ const Testominal = () => {
             style={{
               width: '40px',
               height: '40px',
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#5e2e10',
               color: '#fff',
               zIndex: 10,
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#9c0606';
+              e.currentTarget.style.backgroundColor = '#6b9e3e';
               e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#1A1A1A';
+              e.currentTarget.style.backgroundColor = '#5e2e10';
               e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
             }}
           >
@@ -455,17 +455,17 @@ const Testominal = () => {
             style={{
               width: '40px',
               height: '40px',
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#5e2e10',
               color: '#fff',
               zIndex: 10,
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#9c0606';
+              e.currentTarget.style.backgroundColor = '#6b9e3e';
               e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#1A1A1A';
+              e.currentTarget.style.backgroundColor = '#5e2e10';
               e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
             }}
           >
@@ -518,11 +518,11 @@ const Testominal = () => {
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-8px)';
-                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(156, 6, 6, 0.1)';
+                      e.currentTarget.style.boxShadow = '0 12px 40px #5e2e10';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+                      e.currentTarget.style.boxShadow = '0 1px 3px  #5e2e10';
                     }}
                   >
 
@@ -549,7 +549,7 @@ const Testominal = () => {
                       <FaQuoteLeft
                         className="mb-3"
                         style={{
-                          color: '#9c0606',
+                          color: '#5e2e10',
                           fontSize: '1.2rem'
                         }}
                       />
@@ -557,7 +557,7 @@ const Testominal = () => {
                       <h4
                         className="fw-bold mb-1"
                         style={{
-                          color: '#3A4350',
+                          color: '#5e2e10',
                           fontFamily: 'serif'
                         }}
                       >
@@ -573,7 +573,7 @@ const Testominal = () => {
                             style={{
                               color:
                                 idx < testimonial.stars
-                                  ? '#9c0606'
+                                  ? '#5e2e10'
                                   : '#DCDCDC',
                               fontSize: '0.7rem'
                             }}
@@ -617,7 +617,7 @@ const Testominal = () => {
                         <span
                           className="position-absolute start-50 top-0 translate-middle bg-white px-2 fw-bold text-uppercase"
                           style={{
-                            color: '#9c0606',
+                            color: '#5e2e10',
                             fontSize: '0.65rem',
                             letterSpacing: '1px'
                           }}
@@ -629,7 +629,7 @@ const Testominal = () => {
                           className="position-absolute end-0 top-0 translate-middle-y"
                           style={{
                             opacity: 0.3,
-                            color: '#9c0606'
+                            color: '#5e2e10'
                           }}
                         >
                           <FaQuoteLeft
@@ -671,15 +671,15 @@ const Testominal = () => {
         }
 
         .testimonial-swiper .swiper-custom-bullet-active {
-          background-color: #9c0606;
-          border-color: #9c0606;
+          background-color: #6b9e3e;
+          border-color: #6b9e3e;
           transform: scale(1.2);
           box-shadow: 0 0 15px rgba(156, 6, 6, 0.3);
         }
 
         .swiper-prev-btn:hover,
         .swiper-next-btn:hover {
-          background-color: #9c0606 !important;
+          background-color: #6b9e3e !important;
           transform: translateY(-50%) scale(1.1) !important;
           box-shadow: 0 4px 15px rgba(156, 6, 6, 0.3) !important;
         }
