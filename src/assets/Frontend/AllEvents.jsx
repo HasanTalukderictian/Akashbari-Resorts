@@ -1304,11 +1304,12 @@ import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AllEvents = () => {
   const brandColor = '#5e2e10';
   const navigate = useNavigate();
+  const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1367,6 +1368,15 @@ const AllEvents = () => {
     fetchEvents();
   }, []);
 
+  // Always start this page from the top when navigating to it
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    });
+  }, [location.pathname]);
+
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1381,6 +1391,15 @@ const AllEvents = () => {
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+
+  // Keep the event list at the top when changing pagination
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
+  }, [currentPage]);
 
   const handleEventClick = (eventId, slug) => {
     navigate(`/event/${slug || eventId}`);

@@ -237,7 +237,7 @@ const HappyClient = () => {
                             }}>
                                 <h4 className="fw-light mb-3" style={{ color: '#5e2e10' }}>Your Investment, Your Future</h4>
                                 <p className="lead mb-2" style={{ color: '#2d3748' }}>
-                                    Become a proud <strong>Property Owner</strong> by investing various projects of Akashbari Hotels & Resorts' projects.
+                                    Become a proud <strong>property owner </strong> by investing in various projects of Akashbari Hotels & Resorts.
                                 </p>
                                 
                                 <div className="mt-4">
