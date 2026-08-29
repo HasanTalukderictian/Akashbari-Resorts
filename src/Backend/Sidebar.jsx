@@ -21,6 +21,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
         { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
+        { id: 'FAQ', label: 'FAQ',  icon: 'bi bi-question-circle-fill',  path: '/admin-faq' },
     ];
 
     // Club এর সাব-মেনু আইটেম

@@ -47,6 +47,7 @@ import ProjectState from './Backend/ProjectState'
 import PackageQuery from './Backend/PackageQuery'
 import ReactGA from 'react-ga';
 import { useEffect } from 'react'
+import FqaSettings from './Backend/FqaSettings'
 
 
 function App() {
@@ -97,6 +98,12 @@ function App() {
         <Route path="/content" element={
           <PrivateRoute>
             <Content />
+          </PrivateRoute>
+        } />
+
+          <Route path="/admin-faq" element={
+          <PrivateRoute>
+            <FqaSettings />
           </PrivateRoute>
         } />
 
