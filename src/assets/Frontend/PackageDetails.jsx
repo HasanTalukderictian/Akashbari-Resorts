@@ -3,6 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import Footer from './Common/Footer';
 import Header from './Common/Header';
 import Terms from '../../Backend/Terms';
+import Faqpage from './Faqpage';
 
 const PackageDetails = () => {
     const brandColor = '#5e2e10';
@@ -771,7 +772,11 @@ const PackageDetails = () => {
                 )}
             </div>
 
+            <Faqpage/>
+
             <Terms />
+
+
             <Footer />
 
             <style>{`

@@ -119,6 +119,21 @@
     display: inline-block;
 }
 
+
+/* .badge-sold-out-pill {
+    background-color: #dc3545;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    font-style: italic;
+} */
+
+
+/* Option 1: Pulsing Animation */
+
 .badge-sold-out-pill {
     background-color: #dc3545;
     color: #ffffff;
@@ -128,6 +143,23 @@
     border-radius: 50px;
     text-transform: uppercase;
     font-style: italic;
+    animation: pulse 2s ease-in-out infinite;
+    display: inline-block;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 
@@ -182,6 +214,20 @@
     letter-spacing: 0.5px;
 }
 
+
+/* .badge-sold-out {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #dc3545;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+} */
+
 .badge-sold-out {
     position: absolute;
     top: 15px;
@@ -193,6 +239,25 @@
     text-transform: uppercase;
     padding: 4px 10px;
     border-radius: 20px;
+    /* Animation */
+    animation: soldOutPulse 2s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+    z-index: 10;
+}
+
+
+/* Option 1: Pulse Animation */
+
+@keyframes soldOutPulse {
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(220, 53, 69, 0.6);
+    }
 }
 
 
