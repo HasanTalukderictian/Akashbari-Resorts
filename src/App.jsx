@@ -48,6 +48,8 @@ import PackageQuery from './Backend/PackageQuery'
 import ReactGA from 'react-ga';
 import { useEffect } from 'react'
 import FqaSettings from './Backend/FqaSettings'
+import Career from './assets/Frontend/Career'
+import CareerDetails from './assets/Frontend/CareerDetails'
 
 
 function App() {
@@ -66,6 +68,8 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
+        <Route path='/career' element={<Career />} />
+        <Route path="/career/:id" element={<CareerDetails />} />
         <Route path='/sister' element={<Affliates />} />
         <Route path='/partner' element={<Partner />} />
         <Route path='/blog' element={<Blog />} />

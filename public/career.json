@@ -1,0 +1,241 @@
+{
+    "careerPage": {
+        "header": {
+            "mainTitle": "JOIN OUR TEAM",
+            "subTitle": "CAREER OPPORTUNITIES",
+            "description": "Be part of a team that creates unforgettable travel experiences and makes dreams come true"
+        },
+        "jobs": [{
+                "id": 1,
+                "title": "TOUR GUIDE",
+                "category": "TOUR",
+                "description": "Lead tours and create memorable experiences for travelers. We're seeking multilingual guides with extensive knowledge of popular destinations and excellent interpersonal skills.",
+                "locations": "Multiple Locations",
+                "type": "Contract",
+                "posted": "Posted 8 months ago",
+                "buttonText": "VIEW DETAILS"
+            },
+            {
+                "id": 2,
+                "title": "CUSTOMER SERVICE REPRESENTATIVE",
+                "category": "CUSTOMER",
+                "description": "Provide exceptional customer support and assist clients with their travel inquiries. Strong problem-solving skills and a customer-first attitude are essential.",
+                "locations": "Dhaka, Bangladesh",
+                "type": "Full-time",
+                "posted": "Posted 8 months ago",
+                "buttonText": "VIEW DETAILS"
+            },
+            {
+                "id": 3,
+                "title": "DIGITAL MARKETING SPECIALIST",
+                "category": "DIGITAL",
+                "description": "Drive our digital presence and create compelling marketing campaigns. We need a creative thinker with expertise in social media, content creation, and digital advertising.",
+                "locations": "Dhaka, Bangladesh",
+                "type": "Full-time",
+                "posted": "Posted 8 months ago",
+                "buttonText": "VIEW DETAILS"
+            }
+        ],
+        "footer": {
+            "copyright": "© 2026 TravelDreams. All rights reserved."
+        }
+    },
+    "jobDetails": {
+        "1": {
+            "id": 1,
+            "title": "TOUR GUIDE",
+            "metaInfo": {
+                "duration": "1 day",
+                "price": "$1000",
+                "type": "Guided",
+                "startTime": "9:00 AM",
+                "endTime": "5:00 PM"
+            },
+            "overview": {
+                "title": "JOB OVERVIEW",
+                "description": "As a tour guide with Ambitious, you'll be responsible for leading groups of travelers through fascinating destinations, sharing your knowledge and experience for each trip. With our team of experienced guides, you'll have the opportunity to meet new clients and make lasting memories. The tour is open to all ages and abilities. We welcome everyone who wants to explore the world. Whether you're looking for adventure or relaxation, we've got something for everyone. Join us on this unforgettable journey!"
+            },
+            "responsibilities": {
+                "title": "KEY RESPONSIBILITIES",
+                "items": [
+                    "Lead tours and provide information about local attractions.",
+                    "Ensure that all guests are safe and comfortable during the tour.",
+                    "Manage the tour schedule and ensure that all guests are accommodated.",
+                    "Provide a high level of customer service to all guests.",
+                    "Maintain accurate records of guest information.",
+                    "Assist in the preparation of meals and snacks for the tour.",
+                    "Ensure that all safety regulations are followed at all times."
+                ]
+            },
+            "aboutCompany": {
+                "title": "ABOUT AKASHBARI",
+                "description": "Akashbari is an award-winning travel agency specializing in luxury travel experiences. Our mission is to create unforgettable journeys for our clients. Join us on this exciting journey as we explore the world together. Let us help you create memories that will last a lifetime."
+            },
+            "requirements": {
+                "title": "REQUIREMENTS",
+                "items": [
+                    "Proven experience in a similar role (at least 2 years).",
+                    "Ability to work independently and as part of a team.",
+                    "Strong communication skills and the ability to interact with people from different backgrounds.",
+                    "A passion for travel and a love of exploring new places.",
+                    "Excellent organizational and time management skills.",
+                    "A valid driver's license and access to a reliable vehicle.",
+                    "A clean driving record and a valid driver's license.",
+                    "A willingness to learn and adapt to new situations.",
+                    "A positive attitude and a desire to make a difference."
+                ]
+            },
+            "benefits": {
+                "title": "BENEFITS & PERKS",
+                "items": [
+                    "Competitive salary based on experience",
+                    "Flexible hours to suit individual needs",
+                    "Access to exclusive discounts and perks",
+                    "Health insurance and retirement plans",
+                    "Paid time off for vacation and holidays",
+                    "Opportunities for professional development"
+                ]
+            },
+            "apply": {
+                "title": "APPLY NOW",
+                "description": "Interested in becoming a tour guide? Fill out the form below and submit your application.",
+                "buttonText": "APPLY NOW",
+                "newsletterText": "SIGN UP FOR OUR NEWSLETTER",
+                "getStartedText": "GET STARTED TODAY!"
+            },
+            "footer": {
+                "copyright": "© 2026 TravelDreams. All rights reserved."
+            }
+        },
+        "2": {
+            "id": 2,
+            "title": "CUSTOMER SERVICE REPRESENTATIVE",
+            "metaInfo": {
+                "duration": "Full-time",
+                "price": "Competitive",
+                "type": "On-site",
+                "startTime": "9:00 AM",
+                "endTime": "6:00 PM"
+            },
+            "overview": {
+                "title": "JOB OVERVIEW",
+                "description": "As a Customer Service Representative at Ambitious, you will be the first point of contact for our valued clients. You'll handle inquiries, resolve issues, and ensure every customer has a positive experience with our travel services. Your empathy and problem-solving skills will help build lasting relationships with our clients."
+            },
+            "responsibilities": {
+                "title": "KEY RESPONSIBILITIES",
+                "items": [
+                    "Respond to customer inquiries via phone, email, and chat in a timely manner.",
+                    "Resolve customer complaints and issues with professionalism and empathy.",
+                    "Process bookings, cancellations, and modifications accurately.",
+                    "Maintain detailed records of customer interactions and transactions.",
+                    "Collaborate with other departments to ensure customer satisfaction.",
+                    "Provide recommendations and information about travel destinations and packages.",
+                    "Follow up with customers to ensure their concerns are fully addressed."
+                ]
+            },
+            "aboutCompany": {
+                "title": "ABOUT AKASHBARI",
+                "description": "Akashbari is an award-winning travel agency specializing in luxury travel experiences. Our mission is to create unforgettable journeys for our clients. We pride ourselves on exceptional customer service and attention to detail."
+            },
+            "requirements": {
+                "title": "REQUIREMENTS",
+                "items": [
+                    "Proven experience in customer service (at least 2 years).",
+                    "Excellent verbal and written communication skills.",
+                    "Strong problem-solving abilities and attention to detail.",
+                    "Ability to handle difficult situations with patience and professionalism.",
+                    "Experience with CRM software and Microsoft Office Suite.",
+                    "A positive attitude and a passion for helping others.",
+                    "Ability to work in a fast-paced environment.",
+                    "Flexibility to work different shifts, including weekends."
+                ]
+            },
+            "benefits": {
+                "title": "BENEFITS & PERKS",
+                "items": [
+                    "Competitive salary with performance bonuses",
+                    "Health, dental, and vision insurance",
+                    "Paid time off and holiday pay",
+                    "Opportunities for career advancement",
+                    "Employee travel discounts",
+                    "Professional development programs"
+                ]
+            },
+            "apply": {
+                "title": "APPLY NOW",
+                "description": "Ready to join our customer service team? Submit your application today and start your journey with us!",
+                "buttonText": "APPLY NOW",
+                "newsletterText": "SIGN UP FOR OUR NEWSLETTER",
+                "getStartedText": "GET STARTED TODAY!"
+            },
+            "footer": {
+                "copyright": "© 2026 TravelDreams. All rights reserved."
+            }
+        },
+        "3": {
+            "id": 3,
+            "title": "DIGITAL MARKETING SPECIALIST",
+            "metaInfo": {
+                "duration": "Full-time",
+                "price": "Competitive",
+                "type": "Remote",
+                "startTime": "9:00 AM",
+                "endTime": "5:00 PM"
+            },
+            "overview": {
+                "title": "JOB OVERVIEW",
+                "description": "As a Digital Marketing Specialist at Ambitious, you'll drive our online presence and create compelling campaigns that inspire travelers. You'll work with a creative team to develop innovative marketing strategies that showcase our luxury travel experiences and attract new clients."
+            },
+            "responsibilities": {
+                "title": "KEY RESPONSIBILITIES",
+                "items": [
+                    "Develop and execute digital marketing campaigns across multiple channels.",
+                    "Create engaging content for social media, blogs, and email newsletters.",
+                    "Manage and optimize paid advertising campaigns (Google Ads, Facebook, Instagram).",
+                    "Analyze marketing data and provide actionable insights for improvement.",
+                    "Collaborate with the design team to create visual assets.",
+                    "Monitor and respond to social media engagement.",
+                    "Stay up-to-date with digital marketing trends and best practices."
+                ]
+            },
+            "aboutCompany": {
+                "title": "ABOUT AKASHBARI",
+                "description": "Akashbari is an award-winning travel agency specializing in luxury travel experiences. Our mission is to create unforgettable journeys for our clients. We're looking for creative thinkers who can help us share our story with the world."
+            },
+            "requirements": {
+                "title": "REQUIREMENTS",
+                "items": [
+                    "Proven experience in digital marketing (at least 3 years).",
+                    "Expertise in social media management and content creation.",
+                    "Experience with SEO, SEM, and Google Analytics.",
+                    "Strong writing and communication skills.",
+                    "Creative thinking and problem-solving abilities.",
+                    "Experience with marketing automation tools and CRM systems.",
+                    "Ability to work independently and remotely.",
+                    "A passion for travel and storytelling."
+                ]
+            },
+            "benefits": {
+                "title": "BENEFITS & PERKS",
+                "items": [
+                    "Competitive salary based on experience",
+                    "Remote work flexibility",
+                    "Health insurance and retirement plans",
+                    "Paid time off and holidays",
+                    "Professional development opportunities",
+                    "Travel perks and discounts"
+                ]
+            },
+            "apply": {
+                "title": "APPLY NOW",
+                "description": "Join our marketing team and help us inspire travelers around the world. Submit your application today!",
+                "buttonText": "APPLY NOW",
+                "newsletterText": "SIGN UP FOR OUR NEWSLETTER",
+                "getStartedText": "GET STARTED TODAY!"
+            },
+            "footer": {
+                "copyright": "© 2026 TravelDreams. All rights reserved."
+            }
+        }
+    }
+}

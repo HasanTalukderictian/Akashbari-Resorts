@@ -94,6 +94,11 @@ const Header = ({ scrollToOwner }) => {
               <Nav.Link onClick={() => navigate("/blog")}>
                 BLOG
               </Nav.Link>
+              
+              <Nav.Link onClick={() => navigate("/career")}>
+                CAREER
+              </Nav.Link>
+
               <Nav.Link onClick={() => navigate("/all-events")}>
                 EVENT
               </Nav.Link>

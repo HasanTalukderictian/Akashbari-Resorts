@@ -1,0 +1,401 @@
+/* Career.css — "Departure Board" concept, white/paper edition
+   Careers framed as a journey: jobs are flights, each with a gate (location),
+   boarding class (type), and departure time (posted date). Tabular mono
+   numerals do real work here — they're not decoration, they're data. */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+.career-container {
+    --cc-bg: #ffffff;
+    --cc-panel: #ffffff;
+    --cc-panel-raised: #fdfaf6;
+    --cc-ink: #2a1608;
+    --cc-amber: #c9740e;
+    --cc-teal: #0f8a7a;
+    --cc-muted: #7a6b5d;
+    --cc-line: #5e2e10;
+    --cc-line-soft: rgba(94, 46, 16, 0.28);
+    min-height: 100vh;
+    background: var(--cc-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.career-wrapper {
+    max-width: 1200px;
+    width: 100%;
+    background: var(--cc-panel);
+    border-radius: 0.5rem;
+    border: 1px solid var(--cc-line);
+    box-shadow: 0 20px 50px rgba(94, 46, 16, 0.1);
+    padding: 3rem 4rem;
+}
+
+
+/* ===== HEADER SECTION ===== */
+
+.career-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px dashed var(--cc-line-soft);
+    position: relative;
+}
+
+.career-header::before {
+    content: "NOW BOARDING";
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: var(--cc-amber);
+    margin-bottom: 1rem;
+}
+
+.career-main-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--cc-ink);
+    letter-spacing: 6px;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+}
+
+.career-sub-title {
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--cc-teal);
+    margin-top: 0;
+    letter-spacing: 0.5px;
+}
+
+.career-description {
+    color: var(--cc-muted);
+    font-size: 1rem;
+    max-width: 560px;
+    margin: 1rem auto 0;
+    line-height: 1.7;
+}
+
+
+/* ===== JOB CARDS GRID ===== */
+
+.career-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+
+/* ===== INDIVIDUAL CARD (styled as a boarding pass) ===== */
+
+.career-card {
+    background: var(--cc-panel-raised);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--cc-line);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.career-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 34px rgba(94, 46, 16, 0.16);
+}
+
+
+/* Perforated tear-line, like a ticket stub, above the apply button */
+
+.career-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 4.15rem;
+    height: 0;
+    border-top: 2px dashed var(--cc-line-soft);
+}
+
+.career-card-content {
+    padding: 1.5rem 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+
+/* ===== TOP ROW: flight code + category ===== */
+
+.career-badge-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.1rem;
+}
+
+.career-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--cc-muted);
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.career-badge {
+    display: inline-block;
+    background: rgba(201, 116, 14, 0.1);
+    color: var(--cc-amber);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(201, 116, 14, 0.35);
+}
+
+
+/* ===== JOB TITLE ===== */
+
+.career-job-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cc-ink);
+    margin-bottom: 0.6rem;
+    line-height: 1.35;
+}
+
+
+/* ===== DESCRIPTION ===== */
+
+.career-job-description {
+    color: var(--cc-muted);
+    font-size: 0.875rem;
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
+    flex: 1;
+}
+
+
+/* ===== DETAILS — styled like a boarding pass info strip ===== */
+
+.career-job-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--cc-line-soft);
+}
+
+.career-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--cc-ink);
+    font-weight: 500;
+    margin: 0;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.career-detail-item::before {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--cc-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.career-detail-item:nth-of-type(1)::before {
+    content: "Gate";
+}
+
+.career-detail-item:nth-of-type(2)::before {
+    content: "Class";
+}
+
+.career-detail-item:nth-of-type(3)::before {
+    content: "Posted";
+}
+
+.career-detail-icon {
+    display: none;
+    /* replaced by the ::before labels above */
+}
+
+
+/* ===== APPLY BUTTON (boarding-pass tear-off) ===== */
+
+.career-view-btn {
+    background: var(--cc-line);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0.85rem 1.5rem;
+    border: 1px solid var(--cc-line);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.15s ease;
+    letter-spacing: 0.8px;
+    width: 100%;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.career-view-btn::after {
+    content: "→";
+    transition: transform 0.2s ease;
+}
+
+.career-view-btn:hover {
+    background: #7a3c15;
+}
+
+.career-view-btn:hover::after {
+    transform: translateX(3px);
+}
+
+.career-view-btn:active {
+    transform: scale(0.97);
+}
+
+.career-view-btn:focus-visible {
+    outline: 2px solid var(--cc-teal);
+    outline-offset: 2px;
+}
+
+
+/* ===== FOOTER ===== */
+
+.career-footer {
+    margin-top: 3rem;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--cc-muted);
+    border-top: 1px dashed var(--cc-line-soft);
+    padding-top: 1.75rem;
+    letter-spacing: 0.5px;
+}
+
+
+/* ===== LOADING / ERROR STATES ===== */
+
+.loading-spinner,
+.error-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--cc-muted, #7a6b5d);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.error-message button {
+    margin-top: 1rem;
+    background: var(--cc-line, #5e2e10);
+    color: #ffffff;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+    .career-wrapper {
+        padding: 2.5rem 2rem;
+    }
+    .career-grid {
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .career-container {
+        padding: 1rem;
+    }
+    .career-wrapper {
+        padding: 2rem 1.5rem;
+        border-radius: 0.5rem;
+    }
+    .career-main-title {
+        font-size: 2.1rem;
+        letter-spacing: 3px;
+    }
+    .career-sub-title {
+        font-size: 1.15rem;
+    }
+    .career-description {
+        font-size: 0.9rem;
+        padding: 0 0.5rem;
+    }
+    .career-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.1rem;
+    }
+    .career-card-content {
+        padding: 1.35rem;
+    }
+    .career-job-title {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .career-wrapper {
+        padding: 1.5rem 1rem;
+    }
+    .career-grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+    }
+    .career-main-title {
+        font-size: 1.7rem;
+        letter-spacing: 2px;
+    }
+    .career-sub-title {
+        font-size: 1rem;
+    }
+    .career-header {
+        margin-bottom: 2rem;
+    }
+    .career-job-details {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 0.75rem;
+    }
+    .career-view-btn {
+        font-size: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .career-card,
+    .career-view-btn,
+    .career-view-btn::after {
+        transition: none;
+    }
+    .career-card:hover {
+        transform: none;
+    }
+}
