@@ -22,6 +22,7 @@ const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
         { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
         { id: 'FAQ', label: 'FAQ',  icon: 'bi bi-question-circle-fill',  path: '/admin-faq' },
+        { id: 'JOB', label: 'JOB',    icon: 'bi bi-pencil-square',   path: '/admin-job' },
     ];
 
     // Club এর সাব-মেনু আইটেম

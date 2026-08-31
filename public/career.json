@@ -1,10 +1,6 @@
 {
     "careerPage": {
-        "header": {
-            "mainTitle": "JOIN OUR TEAM",
-            "subTitle": "CAREER OPPORTUNITIES",
-            "description": "Be part of a team that creates unforgettable travel experiences and makes dreams come true"
-        },
+
         "jobs": [{
                 "id": 1,
                 "title": "TOUR GUIDE",
@@ -12,8 +8,8 @@
                 "description": "Lead tours and create memorable experiences for travelers. We're seeking multilingual guides with extensive knowledge of popular destinations and excellent interpersonal skills.",
                 "locations": "Multiple Locations",
                 "type": "Contract",
-                "posted": "Posted 8 months ago",
-                "buttonText": "VIEW DETAILS"
+                "posted": "Posted 8 months ago"
+
             },
             {
                 "id": 2,
@@ -22,8 +18,8 @@
                 "description": "Provide exceptional customer support and assist clients with their travel inquiries. Strong problem-solving skills and a customer-first attitude are essential.",
                 "locations": "Dhaka, Bangladesh",
                 "type": "Full-time",
-                "posted": "Posted 8 months ago",
-                "buttonText": "VIEW DETAILS"
+                "posted": "Posted 8 months ago"
+
             },
             {
                 "id": 3,
@@ -32,22 +28,20 @@
                 "description": "Drive our digital presence and create compelling marketing campaigns. We need a creative thinker with expertise in social media, content creation, and digital advertising.",
                 "locations": "Dhaka, Bangladesh",
                 "type": "Full-time",
-                "posted": "Posted 8 months ago",
-                "buttonText": "VIEW DETAILS"
+                "posted": "Posted 8 months ago"
+
             }
-        ],
-        "footer": {
-            "copyright": "© 2026 TravelDreams. All rights reserved."
-        }
+        ]
+
     },
     "jobDetails": {
         "1": {
             "id": 1,
             "title": "TOUR GUIDE",
             "metaInfo": {
-                "duration": "1 day",
-                "price": "$1000",
-                "type": "Guided",
+                "duration": "Full-time",
+                "salary": "Competitive",
+                "type": "On Site",
                 "startTime": "9:00 AM",
                 "endTime": "5:00 PM"
             },
@@ -67,10 +61,7 @@
                     "Ensure that all safety regulations are followed at all times."
                 ]
             },
-            "aboutCompany": {
-                "title": "ABOUT AKASHBARI",
-                "description": "Akashbari is an award-winning travel agency specializing in luxury travel experiences. Our mission is to create unforgettable journeys for our clients. Join us on this exciting journey as we explore the world together. Let us help you create memories that will last a lifetime."
-            },
+
             "requirements": {
                 "title": "REQUIREMENTS",
                 "items": [
@@ -95,24 +86,15 @@
                     "Paid time off for vacation and holidays",
                     "Opportunities for professional development"
                 ]
-            },
-            "apply": {
-                "title": "APPLY NOW",
-                "description": "Interested in becoming a tour guide? Fill out the form below and submit your application.",
-                "buttonText": "APPLY NOW",
-                "newsletterText": "SIGN UP FOR OUR NEWSLETTER",
-                "getStartedText": "GET STARTED TODAY!"
-            },
-            "footer": {
-                "copyright": "© 2026 TravelDreams. All rights reserved."
             }
+
         },
         "2": {
             "id": 2,
             "title": "CUSTOMER SERVICE REPRESENTATIVE",
             "metaInfo": {
                 "duration": "Full-time",
-                "price": "Competitive",
+                "salary": "Competitive",
                 "type": "On-site",
                 "startTime": "9:00 AM",
                 "endTime": "6:00 PM"
@@ -133,10 +115,7 @@
                     "Follow up with customers to ensure their concerns are fully addressed."
                 ]
             },
-            "aboutCompany": {
-                "title": "ABOUT AKASHBARI",
-                "description": "Akashbari is an award-winning travel agency specializing in luxury travel experiences. Our mission is to create unforgettable journeys for our clients. We pride ourselves on exceptional customer service and attention to detail."
-            },
+
             "requirements": {
                 "title": "REQUIREMENTS",
                 "items": [
@@ -160,24 +139,15 @@
                     "Employee travel discounts",
                     "Professional development programs"
                 ]
-            },
-            "apply": {
-                "title": "APPLY NOW",
-                "description": "Ready to join our customer service team? Submit your application today and start your journey with us!",
-                "buttonText": "APPLY NOW",
-                "newsletterText": "SIGN UP FOR OUR NEWSLETTER",
-                "getStartedText": "GET STARTED TODAY!"
-            },
-            "footer": {
-                "copyright": "© 2026 TravelDreams. All rights reserved."
             }
+
         },
         "3": {
             "id": 3,
             "title": "DIGITAL MARKETING SPECIALIST",
             "metaInfo": {
                 "duration": "Full-time",
-                "price": "Competitive",
+                "salary": "Competitive",
                 "type": "Remote",
                 "startTime": "9:00 AM",
                 "endTime": "5:00 PM"
@@ -198,10 +168,7 @@
                     "Stay up-to-date with digital marketing trends and best practices."
                 ]
             },
-            "aboutCompany": {
-                "title": "ABOUT AKASHBARI",
-                "description": "Akashbari is an award-winning travel agency specializing in luxury travel experiences. Our mission is to create unforgettable journeys for our clients. We're looking for creative thinkers who can help us share our story with the world."
-            },
+
             "requirements": {
                 "title": "REQUIREMENTS",
                 "items": [
@@ -225,17 +192,9 @@
                     "Professional development opportunities",
                     "Travel perks and discounts"
                 ]
-            },
-            "apply": {
-                "title": "APPLY NOW",
-                "description": "Join our marketing team and help us inspire travelers around the world. Submit your application today!",
-                "buttonText": "APPLY NOW",
-                "newsletterText": "SIGN UP FOR OUR NEWSLETTER",
-                "getStartedText": "GET STARTED TODAY!"
-            },
-            "footer": {
-                "copyright": "© 2026 TravelDreams. All rights reserved."
             }
+
+
         }
     }
 }

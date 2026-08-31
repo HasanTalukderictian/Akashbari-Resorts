@@ -50,6 +50,7 @@ import { useEffect } from 'react'
 import FqaSettings from './Backend/FqaSettings'
 import Career from './assets/Frontend/Career'
 import CareerDetails from './assets/Frontend/CareerDetails'
+import JobSettings from './Backend/JobSettings'
 
 
 function App() {
@@ -114,6 +115,13 @@ function App() {
         <Route path="/welcome" element={
           <PrivateRoute>
             <Welcome />
+          </PrivateRoute>
+        } />
+
+
+            <Route path="/admin-job" element={
+          <PrivateRoute>
+            <JobSettings />
           </PrivateRoute>
         } />
 
