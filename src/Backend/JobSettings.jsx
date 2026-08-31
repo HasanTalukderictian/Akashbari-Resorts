@@ -63,7 +63,8 @@ const JobSettings = ({ theme: propsTheme }) => {
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
     };
 
-    const API_URL = 'http://127.0.0.1:8000/api';
+    // const API_URL = 'http://127.0.0.1:8000/api';
+    const API_URL = 'https://backend.akashbariresort.com/api';
 
     // Fetch all jobs
     const fetchJobs = async () => {

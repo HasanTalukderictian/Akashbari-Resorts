@@ -148,7 +148,8 @@ const Career = () => {
     const fetchCareerData = async () => {
       try {
         // Updated API endpoint to match your backend
-        const response = await fetch("http://127.0.0.1:8000/api/jobs");
+        // const response = await fetch("http://127.0.0.1:8000/api/jobs");
+           const response = await fetch("https://backend.akashbariresort.com/api/jobs");
 
         if (!response.ok) {
           throw new Error(`Failed to fetch career data: ${response.status}`);

@@ -51,6 +51,7 @@ import FqaSettings from './Backend/FqaSettings'
 import Career from './assets/Frontend/Career'
 import CareerDetails from './assets/Frontend/CareerDetails'
 import JobSettings from './Backend/JobSettings'
+import JobQuery from './Backend/JobQuery'
 
 
 function App() {
@@ -124,6 +125,13 @@ function App() {
             <JobSettings />
           </PrivateRoute>
         } />
+
+          <Route path="/admin-jobquery" element={
+          <PrivateRoute>
+            <JobQuery />
+          </PrivateRoute>
+        } />
+
 
         <Route path="/video" element={
           <PrivateRoute>

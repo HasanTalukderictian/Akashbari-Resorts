@@ -11,7 +11,7 @@
 //   position: "",
 //   experience: "",
 //   coverLetter: "",
-// };
+// }; 
 
 // const POSITION_OPTIONS = [
 //   "Software Developer",
@@ -600,7 +600,8 @@ const CareerDetails = () => {
     const fetchJobDetails = async () => {
       try {
         // Fetch from Laravel API with ID
-        const response = await fetch(`http://127.0.0.1:8000/api/get-jobs/${id}`);
+        // const response = await fetch(`http://127.0.0.1:8000/api/get-jobs/${id}`);
+              const response = await fetch(`https://backend.akashbariresort.com/api/get-jobs/${id}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch job details: ${response.status}`);
@@ -710,54 +711,55 @@ const CareerDetails = () => {
     setResumeError("");
   };
 
-  const handleFormSubmit = async (e) => {
+ const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     if (!resumeFile) {
-      setResumeError("Please attach your CV/resume.");
-      return;
+        setResumeError("Please attach your CV/resume.");
+        return;
     }
 
     setSubmitting(true);
     try {
-      // Create FormData for file upload
-      const formPayload = new FormData();
-      formPayload.append("job_id", id);
-      formPayload.append("full_name", formData.fullName);
-      formPayload.append("email", formData.email);
-      formPayload.append("phone", formData.phone);
-      formPayload.append("position", formData.position);
-      formPayload.append("experience", formData.experience);
-      formPayload.append("cover_letter", formData.coverLetter || "");
-      formPayload.append("resume", resumeFile);
+        // Create FormData for file upload
+        const formPayload = new FormData();
+        formPayload.append("job_id", id);
+        formPayload.append("full_name", formData.fullName);
+        formPayload.append("email", formData.email);
+        formPayload.append("phone", formData.phone);
+        formPayload.append("position", formData.position);
+        formPayload.append("experience", formData.experience);
+        formPayload.append("cover_letter", formData.coverLetter || "");
+        formPayload.append("resume", resumeFile);
 
-      // Send to Laravel API
-      const response = await fetch("http://127.0.0.1:8000/api/applications", {
-        method: "POST",
-        body: formPayload,
-      });
+        // Send to Laravel API - Correct endpoint
+        const response = await fetch("https://backend.akashbariresort.com/api/applications", {
+            method: "POST",
+            body: formPayload,
+            // Don't set Content-Type header - browser will set it with boundary for FormData
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to submit application");
-      }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to submit application");
+        }
 
-      const result = await response.json();
-      console.log("Application submitted:", result);
-      
-      // Close modal on success
-      closeApplyModal();
-      
-      // Show success message
-      alert("Application submitted successfully!");
-      
+        const result = await response.json();
+        console.log("Application submitted:", result);
+        
+        // Close modal on success
+        closeApplyModal();
+        
+        // Show success message
+        alert("Application submitted successfully!");
+        
     } catch (err) {
-      console.error("Error submitting application:", err);
-      setResumeError(err.message || "Failed to submit application. Please try again.");
+        console.error("Error submitting application:", err);
+        setResumeError(err.message || "Failed to submit application. Please try again.");
     } finally {
-      setSubmitting(false);
+        setSubmitting(false);
     }
-  };
+};
 
   // Loading state
   if (loading) {
