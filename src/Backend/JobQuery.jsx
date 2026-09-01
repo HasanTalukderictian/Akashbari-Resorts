@@ -26,13 +26,15 @@ const JobQuery = ({ theme: propsTheme }) => {
     const [showPdfModal, setShowPdfModal] = useState(false);
     const [pdfUrl, setPdfUrl] = useState('');
     
-    // Edit form state
+    // Edit form state - UPDATED with new fields
     const [editFormData, setEditFormData] = useState({
         full_name: '',
         email: '',
         phone: '',
-        position: '',
         experience: '',
+        current_company: '',
+        designation: '',
+        notice_period: '',
         cover_letter: '',
         status: 'pending',
         admin_note: ''
@@ -47,8 +49,9 @@ const JobQuery = ({ theme: propsTheme }) => {
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
     };
 
-    const API_URL = 'https://backend.akashbariresort.com/api';
-    const STORAGE_URL = 'https://backend.akashbariresort.com/storage';
+    // const API_URL = 'https://backend.akashbariresort.com/api';
+    const API_URL = 'http://127.0.0.1:8000/api';
+    const STORAGE_URL = 'http://127.0.0.1:8000/storage';
 
     // Status options
     const statusOptions = [
@@ -58,6 +61,31 @@ const JobQuery = ({ theme: propsTheme }) => {
         { value: 'rejected', label: 'Rejected', color: '#dc3545' },
         { value: 'hired', label: 'Hired', color: '#6f42c1' }
     ];
+
+    // Experience label mapping
+    const getExperienceLabel = (experience) => {
+        const labels = {
+            'entry': 'Fresh Graduate / Entry Level',
+            '1-2': '1–2 years',
+            '3-5': '3–5 years',
+            '5-10': '5–10 years',
+            '10+': '10+ years'
+        };
+        return labels[experience] || experience || 'Not specified';
+    };
+
+    // Notice period label mapping
+    const getNoticePeriodLabel = (period) => {
+        const labels = {
+            'immediate': 'Immediate',
+            '15-days': '15 days',
+            '30-days': '30 days',
+            '45-days': '45 days',
+            '60-days': '60 days',
+            '90-days': '90 days'
+        };
+        return labels[period] || period || 'Not specified';
+    };
 
     // Fetch all applications
     const fetchApplications = async () => {
@@ -78,7 +106,14 @@ const JobQuery = ({ theme: propsTheme }) => {
             }
             const data = await response.json();
             const applicationsData = data.data?.data || data.data || [];
-            setApplications(applicationsData);
+            
+            // Transform data to ensure job_title is available
+            const transformedData = applicationsData.map(app => ({
+                ...app,
+                job_title: app.job_title || app.job?.title || 'N/A'
+            }));
+            
+            setApplications(transformedData);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -130,22 +165,27 @@ const JobQuery = ({ theme: propsTheme }) => {
                 throw new Error('Failed to fetch application details');
             }
             const data = await response.json();
-            setSelectedApplication(data.data);
+            const applicationData = data.data;
+            // Ensure job_title is available
+            applicationData.job_title = applicationData.job_title || applicationData.job?.title || 'N/A';
+            setSelectedApplication(applicationData);
             setShowDetailModal(true);
         } catch (err) {
             setError(err.message);
         }
     };
 
-    // Open edit modal
+    // Open edit modal - UPDATED
     const openEditModal = (application) => {
         setSelectedApplication(application);
         setEditFormData({
             full_name: application.full_name || '',
             email: application.email || '',
             phone: application.phone || '',
-            position: application.position || '',
             experience: application.experience || '',
+            current_company: application.current_company || '',
+            designation: application.designation || '',
+            notice_period: application.notice_period || '',
             cover_letter: application.cover_letter || '',
             status: application.status || 'pending',
             admin_note: application.admin_note || ''
@@ -169,7 +209,7 @@ const JobQuery = ({ theme: propsTheme }) => {
         setEditFormData({ ...editFormData, [name]: value });
     };
 
-    // Update application - FIXED
+    // Update application - UPDATED
     const handleUpdateApplication = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -195,7 +235,7 @@ const JobQuery = ({ theme: propsTheme }) => {
             setSuccessMessage('Application updated successfully!');
             setShowEditModal(false);
             setSelectedApplication(null);
-            fetchApplications(); // Refresh the list
+            fetchApplications();
         } catch (err) {
             console.error('Update error:', err);
             setError(err.message);
@@ -204,7 +244,7 @@ const JobQuery = ({ theme: propsTheme }) => {
         }
     };
 
-    // Update status only - FIXED
+    // Update status only
     const handleUpdateStatus = async () => {
         setLoading(true);
         setError(null);
@@ -229,7 +269,7 @@ const JobQuery = ({ theme: propsTheme }) => {
             setSuccessMessage('Status updated successfully!');
             setShowStatusModal(false);
             setSelectedApplication(null);
-            fetchApplications(); // Refresh the list
+            fetchApplications();
         } catch (err) {
             console.error('Status update error:', err);
             setError(err.message);
@@ -238,7 +278,7 @@ const JobQuery = ({ theme: propsTheme }) => {
         }
     };
 
-    // Delete application - FIXED
+    // Delete application
     const handleDeleteApplication = async () => {
         setLoading(true);
         setError(null);
@@ -261,7 +301,7 @@ const JobQuery = ({ theme: propsTheme }) => {
             setSuccessMessage('Application deleted successfully!');
             setShowDeleteModal(false);
             setSelectedApplication(null);
-            fetchApplications(); // Refresh the list
+            fetchApplications();
         } catch (err) {
             console.error('Delete error:', err);
             setError(err.message);
@@ -500,7 +540,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                                         <input
                                             type="text"
                                             className="form-control"
-                                            placeholder="Search by name, email, phone, position..."
+                                            placeholder="Search by name, email, phone, company, designation..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             style={{
@@ -542,21 +582,10 @@ const JobQuery = ({ theme: propsTheme }) => {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="col-md-2">
-                                    <button
-                                        className="btn btn-outline-primary w-100"
-                                        onClick={() => {
-                                            setSearchTerm('');
-                                            setStatusFilter('');
-                                        }}
-                                    >
-                                        <i className="bi bi-arrow-counterclockwise me-1"></i>
-                                        Reset
-                                    </button>
-                                </div>
+                              
                             </div>
 
-                            {/* Applications Table */}
+                            {/* Applications Table - UPDATED with new columns */}
                             <div className="table-responsive">
                                 <table className="table table-hover" style={{
                                     backgroundColor: theme.card,
@@ -568,10 +597,11 @@ const JobQuery = ({ theme: propsTheme }) => {
                                         <tr>
                                             <th style={{ padding: '14px 16px' }}>#</th>
                                             <th style={{ padding: '14px 16px' }}>Name</th>
-                                            <th style={{ padding: '14px 16px' }}>Position</th>
-                                            <th style={{ padding: '14px 16px' }}>Email</th>
+                                            <th style={{ padding: '14px 16px' }}>Applied Position</th>
+                                            <th style={{ padding: '14px 16px' }}>Company</th>
+                                            <th style={{ padding: '14px 16px' }}>Designation</th>
+                                            <th style={{ padding: '14px 16px' }}>Experience</th>
                                             <th style={{ padding: '14px 16px' }}>Status</th>
-                                            <th style={{ padding: '14px 16px' }}>Resume</th>
                                             <th style={{ padding: '14px 16px' }}>Applied</th>
                                             <th style={{ padding: '14px 16px' }}>Actions</th>
                                         </tr>
@@ -579,7 +609,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan="8" className="text-center py-5">
+                                                <td colSpan="9" className="text-center py-5">
                                                     <div className="spinner-border text-primary" role="status">
                                                         <span className="visually-hidden">Loading...</span>
                                                     </div>
@@ -588,7 +618,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                                             </tr>
                                         ) : applications.length === 0 ? (
                                             <tr>
-                                                <td colSpan="8" className="text-center py-5" style={{ color: theme.text }}>
+                                                <td colSpan="9" className="text-center py-5" style={{ color: theme.text }}>
                                                     <i className="bi bi-inbox display-4 d-block mb-3" style={{ opacity: 0.5 }}></i>
                                                     <h5>No applications found</h5>
                                                     <p style={{ opacity: 0.7 }}>
@@ -609,38 +639,24 @@ const JobQuery = ({ theme: propsTheme }) => {
                                                     <td style={{ padding: '12px 16px' }}>
                                                         <strong>{app.full_name}</strong>
                                                     </td>
-                                                    <td style={{ padding: '12px 16px' }}>{app.position}</td>
                                                     <td style={{ padding: '12px 16px' }}>
-                                                        <a href={`mailto:${app.email}`} style={{ color: '#0d6efd', textDecoration: 'none' }}>
-                                                            {app.email}
-                                                        </a>
+                                                        <span className="badge bg-info text-dark">{app.job_title || 'N/A'}</span>
+                                                    </td>
+                                                    <td style={{ padding: '12px 16px' }}>
+                                                        {app.current_company || 'N/A'}
+                                                    </td>
+                                                    <td style={{ padding: '12px 16px' }}>
+                                                        {app.designation || 'N/A'}
+                                                    </td>
+                                                    <td style={{ padding: '12px 16px' }}>
+                                                        <span className="badge bg-secondary">
+                                                            {getExperienceLabel(app.experience)}
+                                                        </span>
                                                     </td>
                                                     <td style={{ padding: '12px 16px' }}>
                                                         <span style={getStatusStyle(app.status)}>
                                                             {statusOptions.find(s => s.value === app.status)?.label || app.status}
                                                         </span>
-                                                    </td>
-                                                    <td style={{ padding: '12px 16px' }}>
-                                                        {app.resume ? (
-                                                            <div className="btn-group btn-group-sm">
-                                                                <button
-                                                                    className="btn btn-outline-info"
-                                                                    onClick={() => viewPdf(app.resume)}
-                                                                    title="View Resume"
-                                                                >
-                                                                    <i className="bi bi-eye"></i>
-                                                                </button>
-                                                                <button
-                                                                    className="btn btn-outline-success"
-                                                                    onClick={() => downloadResume(app.resume, app.resume_original_name || `${app.full_name}_resume.pdf`)}
-                                                                    title="Download Resume"
-                                                                >
-                                                                    <i className="bi bi-download"></i>
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            <span className="text-muted">No file</span>
-                                                        )}
                                                     </td>
                                                     <td style={{ padding: '12px 16px', fontSize: '13px' }}>
                                                         {new Date(app.created_at).toLocaleDateString('en-US', {
@@ -692,7 +708,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                 </div>
             </div>
 
-            {/* ===== DETAIL VIEW MODAL ===== */}
+            {/* ===== DETAIL VIEW MODAL - UPDATED ===== */}
             {showDetailModal && selectedApplication && (
                 <div style={modalStyles.overlay} onClick={(e) => {
                     if (e.target === e.currentTarget) setShowDetailModal(false);
@@ -718,8 +734,10 @@ const JobQuery = ({ theme: propsTheme }) => {
                                     <div style={{ color: theme.text, fontWeight: 500 }}>{selectedApplication.full_name}</div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Position</div>
-                                    <div style={{ color: theme.text, fontWeight: 500 }}>{selectedApplication.position}</div>
+                                    <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Applied Position</div>
+                                    <div style={{ color: theme.text, fontWeight: 500 }}>
+                                        <span className="badge bg-info text-dark">{selectedApplication.job_title || 'N/A'}</span>
+                                    </div>
                                 </div>
                                 <div className="col-md-6">
                                     <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Email</div>
@@ -740,7 +758,9 @@ const JobQuery = ({ theme: propsTheme }) => {
                                 <div className="col-md-6">
                                     <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Experience</div>
                                     <div style={{ color: theme.text }}>
-                                        {selectedApplication.experience || 'Not specified'}
+                                        <span className="badge bg-secondary">
+                                            {getExperienceLabel(selectedApplication.experience)}
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
@@ -749,6 +769,24 @@ const JobQuery = ({ theme: propsTheme }) => {
                                         <span style={getStatusStyle(selectedApplication.status)}>
                                             {statusOptions.find(s => s.value === selectedApplication.status)?.label || selectedApplication.status}
                                         </span>
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Current Company</div>
+                                    <div style={{ color: theme.text, fontWeight: 500 }}>
+                                        {selectedApplication.current_company || 'N/A'}
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Designation</div>
+                                    <div style={{ color: theme.text, fontWeight: 500 }}>
+                                        {selectedApplication.designation || 'N/A'}
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <div style={{ ...modalStyles.label, color: theme.text, opacity: 0.7 }}>Notice Period</div>
+                                    <div style={{ color: theme.text }}>
+                                        {getNoticePeriodLabel(selectedApplication.notice_period)}
                                     </div>
                                 </div>
                                 <div className="col-12">
@@ -895,7 +933,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                 </div>
             )}
 
-            {/* ===== EDIT MODAL - FIXED ===== */}
+            {/* ===== EDIT MODAL - UPDATED ===== */}
             {showEditModal && selectedApplication && (
                 <div style={modalStyles.overlay} onClick={(e) => {
                     if (e.target === e.currentTarget) setShowEditModal(false);
@@ -930,18 +968,6 @@ const JobQuery = ({ theme: propsTheme }) => {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label style={modalStyles.label}>Position <span className="text-danger">*</span></label>
-                                        <input
-                                            type="text"
-                                            name="position"
-                                            className="form-control"
-                                            value={editFormData.position}
-                                            onChange={handleEditChange}
-                                            style={modalStyles.input}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="col-md-6">
                                         <label style={modalStyles.label}>Email <span className="text-danger">*</span></label>
                                         <input
                                             type="email"
@@ -965,19 +991,66 @@ const JobQuery = ({ theme: propsTheme }) => {
                                             required
                                         />
                                     </div>
-                                    <div className="col-md-12">
+                                    <div className="col-md-6">
                                         <label style={modalStyles.label}>Experience</label>
-                                        <input
-                                            type="text"
+                                        <select
                                             name="experience"
-                                            className="form-control"
+                                            className="form-select"
                                             value={editFormData.experience}
                                             onChange={handleEditChange}
+                                            style={modalStyles.select}
+                                        >
+                                            <option value="">Select Experience</option>
+                                            <option value="entry">Fresh Graduate / Entry Level</option>
+                                            <option value="1-2">1–2 years</option>
+                                            <option value="3-5">3–5 years</option>
+                                            <option value="5-10">5–10 years</option>
+                                            <option value="10+">10+ years</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label style={modalStyles.label}>Current Company</label>
+                                        <input
+                                            type="text"
+                                            name="current_company"
+                                            className="form-control"
+                                            value={editFormData.current_company}
+                                            onChange={handleEditChange}
                                             style={modalStyles.input}
-                                            placeholder="e.g., 3-5 years"
+                                            placeholder="Current company name"
                                         />
                                     </div>
-                                    <div className="col-md-12">
+                                    <div className="col-md-6">
+                                        <label style={modalStyles.label}>Designation</label>
+                                        <input
+                                            type="text"
+                                            name="designation"
+                                            className="form-control"
+                                            value={editFormData.designation}
+                                            onChange={handleEditChange}
+                                            style={modalStyles.input}
+                                            placeholder="Current designation"
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label style={modalStyles.label}>Notice Period</label>
+                                        <select
+                                            name="notice_period"
+                                            className="form-select"
+                                            value={editFormData.notice_period}
+                                            onChange={handleEditChange}
+                                            style={modalStyles.select}
+                                        >
+                                            <option value="">Select Notice Period</option>
+                                            <option value="immediate">Immediate</option>
+                                            <option value="15-days">15 days</option>
+                                            <option value="30-days">30 days</option>
+                                            <option value="45-days">45 days</option>
+                                            <option value="60-days">60 days</option>
+                                            <option value="90-days">90 days</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-md-6">
                                         <label style={modalStyles.label}>Status</label>
                                         <select
                                             name="status"
@@ -1002,6 +1075,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                                             value={editFormData.cover_letter}
                                             onChange={handleEditChange}
                                             style={modalStyles.textarea}
+                                            placeholder="Cover letter or additional information..."
                                         />
                                     </div>
                                     <div className="col-12">
@@ -1164,7 +1238,7 @@ const JobQuery = ({ theme: propsTheme }) => {
                             }}>
                                 <h6 style={{ color: theme.text, margin: 0 }}>{selectedApplication.full_name}</h6>
                                 <p style={{ color: theme.text, opacity: 0.7, margin: '4px 0 0 0', fontSize: '13px' }}>
-                                    {selectedApplication.position} • {selectedApplication.email}
+                                    {selectedApplication.job_title || 'N/A'} • {selectedApplication.email}
                                 </p>
                             </div>
                             <div className="alert alert-danger" style={{ borderRadius: '10px' }}>

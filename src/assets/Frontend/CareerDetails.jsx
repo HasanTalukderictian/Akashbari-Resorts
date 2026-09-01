@@ -711,7 +711,7 @@ const CareerDetails = () => {
     setResumeError("");
   };
 
- const handleFormSubmit = async (e) => {
+const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     if (!resumeFile) {
@@ -727,16 +727,21 @@ const CareerDetails = () => {
         formPayload.append("full_name", formData.fullName);
         formPayload.append("email", formData.email);
         formPayload.append("phone", formData.phone);
-        formPayload.append("position", formData.position);
         formPayload.append("experience", formData.experience);
         formPayload.append("cover_letter", formData.coverLetter || "");
         formPayload.append("resume", resumeFile);
 
-        // Send to Laravel API - Correct endpoint
-        const response = await fetch("https://backend.akashbariresort.com/api/applications", {
+        // Add conditional fields only if not fresh graduate
+        if (formData.experience && formData.experience !== "entry") {
+            formPayload.append("current_company", formData.currentCompany || "");
+            formPayload.append("designation", formData.designation || "");
+            formPayload.append("notice_period", formData.noticePeriod || "");
+        }
+
+        // Send to Laravel API
+        const response = await fetch("http://127.0.0.1:8000/api/applications", {
             method: "POST",
             body: formPayload,
-            // Don't set Content-Type header - browser will set it with boundary for FormData
         });
 
         if (!response.ok) {
@@ -911,226 +916,266 @@ const CareerDetails = () => {
       </div>
       <Footer />
 
+    
       {/* Apply For Position Modal */}
-      {isApplyModalOpen && (
-        <div
-          className="apply-modal-overlay"
-          onClick={handleOverlayClick}
-          role="presentation"
+{isApplyModalOpen && (
+  <div
+    className="apply-modal-overlay"
+    onClick={handleOverlayClick}
+    role="presentation"
+  >
+    <div
+      className="apply-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="apply-modal-title"
+    >
+      <div className="apply-modal-header">
+        <div className="apply-modal-eyebrow">APPLICATION FORM</div>
+        <h2 id="apply-modal-title" className="apply-modal-title">
+          Apply for Position
+        </h2>
+        <p className="apply-modal-position">Position: {job.title}</p>
+        <button
+          type="button"
+          className="apply-modal-close"
+          onClick={closeApplyModal}
+          aria-label="Close application form"
         >
-          <div
-            className="apply-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="apply-modal-title"
-          >
-            <div className="apply-modal-header">
-              <div className="apply-modal-eyebrow">APPLICATION FORM</div>
-              <h2 id="apply-modal-title" className="apply-modal-title">
-                Apply for Position
-              </h2>
-              <p className="apply-modal-position">Position: {job.title}</p>
-              <button
-                type="button"
-                className="apply-modal-close"
-                onClick={closeApplyModal}
-                aria-label="Close application form"
-              >
-                ✕
-              </button>
-            </div>
+          ✕
+        </button>
+      </div>
 
-            <form className="apply-modal-body" onSubmit={handleFormSubmit}>
-              <div className="apply-form-row">
-                <div className="apply-form-group">
-                  <label className="apply-form-label" htmlFor="fullName">
-                    Full Name<span className="required">*</span>
-                  </label>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    className="apply-form-input"
-                    placeholder="John Doe"
-                    value={formData.fullName}
-                    onChange={handleFormChange}
-                    required
-                  />
-                </div>
-                <div className="apply-form-group">
-                  <label className="apply-form-label" htmlFor="email">
-                    Email Address<span className="required">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="apply-form-input"
-                    placeholder="john@example.com"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="apply-form-row">
-                <div className="apply-form-group full-width">
-                  <label className="apply-form-label" htmlFor="position">
-                    Position<span className="required">*</span>
-                  </label>
-                  <select
-                    id="position"
-                    name="position"
-                    className="apply-form-select"
-                    value={formData.position}
-                    onChange={handleFormChange}
-                    required
-                  >
-                    <option value="" disabled>
-                      Select a position
-                    </option>
-                    {POSITION_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="apply-form-row">
-                <div className="apply-form-group">
-                  <label className="apply-form-label" htmlFor="phone">
-                    Phone Number<span className="required">*</span>
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    className="apply-form-input"
-                    placeholder="+1 (555) 123-4567"
-                    value={formData.phone}
-                    onChange={handleFormChange}
-                    required
-                  />
-                </div>
-                <div className="apply-form-group">
-                  <label className="apply-form-label" htmlFor="experience">
-                    Years of Experience<span className="required">*</span>
-                  </label>
-                  <select
-                    id="experience"
-                    name="experience"
-                    className="apply-form-select"
-                    value={formData.experience}
-                    onChange={handleFormChange}
-                    required
-                  >
-                    <option value="" disabled>
-                      Select experience
-                    </option>
-                    <option value="entry">Fresh Graduate / Entry Level</option>
-                    <option value="1-2">1–2 years</option>
-                    <option value="3-5">3–5 years</option>
-                    <option value="5-10">5–10 years</option>
-                    <option value="10+">10+ years</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="apply-form-row">
-                <div className="apply-form-group full-width">
-                  <label className="apply-form-label" htmlFor="resume">
-                    CV / Resume<span className="required">*</span>
-                  </label>
-
-                  {!resumeFile ? (
-                    <label htmlFor="resume" className="apply-resume-dropzone">
-                      <span className="apply-resume-dropzone-icon">⤒</span>
-                      <span className="apply-resume-dropzone-text">
-                        Click to upload your CV/resume
-                      </span>
-                      <span className="apply-resume-dropzone-hint">
-                        PDF or Word · Max {MAX_RESUME_SIZE_MB}MB
-                      </span>
-                      <input
-                        id="resume"
-                        name="resume"
-                        type="file"
-                        className="apply-resume-input"
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleResumeChange}
-                      />
-                    </label>
-                  ) : (
-                    <div className="apply-resume-file">
-                      <span className="apply-resume-file-icon">📄</span>
-                      <div className="apply-resume-file-info">
-                        <span className="apply-resume-file-name">{resumeFile.name}</span>
-                        <span className="apply-resume-file-size">
-                          {(resumeFile.size / 1024 / 1024).toFixed(2)} MB
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className="apply-resume-remove"
-                        onClick={removeResume}
-                        aria-label="Remove uploaded file"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-
-                  {resumeError && (
-                    <span className="apply-resume-error">{resumeError}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="apply-form-row">
-                <div className="apply-form-group full-width">
-                  <label className="apply-form-label" htmlFor="coverLetter">
-                    Cover Letter / Additional Information
-                  </label>
-                  <textarea
-                    id="coverLetter"
-                    name="coverLetter"
-                    className="apply-form-textarea"
-                    placeholder="Tell us why you're interested in this position..."
-                    value={formData.coverLetter}
-                    onChange={handleFormChange}
-                  />
-                </div>
-              </div>
-
-              <p className="apply-form-note">
-                By submitting this form, you agree to be contacted for
-                recruitment purposes. We respect your privacy and never share your
-                information.
-              </p>
-
-              <div className="apply-modal-actions">
-                <button
-                  type="button"
-                  className="apply-cancel-btn"
-                  onClick={closeApplyModal}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="apply-submit-btn"
-                  disabled={submitting}
-                >
-                  {submitting ? "Submitting..." : "Submit Application"}
-                </button>
-              </div>
-            </form>
+      <form className="apply-modal-body" onSubmit={handleFormSubmit}>
+        <div className="apply-form-row">
+          <div className="apply-form-group">
+            <label className="apply-form-label" htmlFor="fullName">
+              Full Name<span className="required">*</span>
+            </label>
+            <input
+              id="fullName"
+              name="fullName"
+              type="text"
+              className="apply-form-input"
+              placeholder="John Doe"
+              value={formData.fullName}
+              onChange={handleFormChange}
+              required
+            />
+          </div>
+          <div className="apply-form-group">
+            <label className="apply-form-label" htmlFor="email">
+              Email Address<span className="required">*</span>
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              className="apply-form-input"
+              placeholder="john@example.com"
+              value={formData.email}
+              onChange={handleFormChange}
+              required
+            />
           </div>
         </div>
-      )}
+
+        <div className="apply-form-row">
+          <div className="apply-form-group">
+            <label className="apply-form-label" htmlFor="phone">
+              Phone Number<span className="required">*</span>
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              className="apply-form-input"
+              placeholder="+1 (555) 123-4567"
+              value={formData.phone}
+              onChange={handleFormChange}
+              required
+            />
+          </div>
+          <div className="apply-form-group">
+            <label className="apply-form-label" htmlFor="experience">
+              Years of Experience<span className="required">*</span>
+            </label>
+            <select
+              id="experience"
+              name="experience"
+              className="apply-form-select"
+              value={formData.experience}
+              onChange={handleFormChange}
+              required
+            >
+              <option value="" disabled>
+                Select experience
+              </option>
+              <option value="entry">Fresh Graduate / Entry Level</option>
+              <option value="1-2">1–2 years</option>
+              <option value="3-5">3–5 years</option>
+              <option value="5-10">5–10 years</option>
+              <option value="10+">10+ years</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Conditional fields for experienced candidates */}
+        {formData.experience && formData.experience !== "entry" && (
+          <>
+            <div className="apply-form-row">
+              <div className="apply-form-group">
+                <label className="apply-form-label" htmlFor="currentCompany">
+                  Current Company Name<span className="required">*</span>
+                </label>
+                <input
+                  id="currentCompany"
+                  name="currentCompany"
+                  type="text"
+                  className="apply-form-input"
+                  placeholder="Company name"
+                  value={formData.currentCompany || ""}
+                  onChange={handleFormChange}
+                  required
+                />
+              </div>
+              <div className="apply-form-group">
+                <label className="apply-form-label" htmlFor="designation">
+                  Designation<span className="required">*</span>
+                </label>
+                <input
+                  id="designation"
+                  name="designation"
+                  type="text"
+                  className="apply-form-input"
+                  placeholder="Your designation"
+                  value={formData.designation || ""}
+                  onChange={handleFormChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="apply-form-row">
+              <div className="apply-form-group full-width">
+                <label className="apply-form-label" htmlFor="noticePeriod">
+                  Notice Period<span className="required">*</span>
+                </label>
+                <select
+                  id="noticePeriod"
+                  name="noticePeriod"
+                  className="apply-form-select"
+                  value={formData.noticePeriod || ""}
+                  onChange={handleFormChange}
+                  required
+                >
+                  <option value="" disabled>
+                    Select notice period
+                  </option>
+                  <option value="immediate">Immediate</option>
+                  <option value="15-days">15 days</option>
+                  <option value="30-days">30 days</option>
+                  <option value="45-days">45 days</option>
+                  <option value="60-days">60 days</option>
+                  <option value="90-days">90 days</option>
+                </select>
+              </div>
+            </div>
+          </>
+        )}
+
+        <div className="apply-form-row">
+          <div className="apply-form-group full-width">
+            <label className="apply-form-label" htmlFor="resume">
+              CV / Resume<span className="required">*</span>
+            </label>
+
+            {!resumeFile ? (
+              <label htmlFor="resume" className="apply-resume-dropzone">
+                <span className="apply-resume-dropzone-icon">⤒</span>
+                <span className="apply-resume-dropzone-text">
+                  Click to upload your CV/resume
+                </span>
+                <span className="apply-resume-dropzone-hint">
+                  PDF or Word · Max {MAX_RESUME_SIZE_MB}MB
+                </span>
+                <input
+                  id="resume"
+                  name="resume"
+                  type="file"
+                  className="apply-resume-input"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleResumeChange}
+                />
+              </label>
+            ) : (
+              <div className="apply-resume-file">
+                <span className="apply-resume-file-icon">📄</span>
+                <div className="apply-resume-file-info">
+                  <span className="apply-resume-file-name">{resumeFile.name}</span>
+                  <span className="apply-resume-file-size">
+                    {(resumeFile.size / 1024 / 1024).toFixed(2)} MB
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="apply-resume-remove"
+                  onClick={removeResume}
+                  aria-label="Remove uploaded file"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {resumeError && (
+              <span className="apply-resume-error">{resumeError}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="apply-form-row">
+          <div className="apply-form-group full-width">
+            <label className="apply-form-label" htmlFor="coverLetter">
+              Cover Letter / Additional Information
+            </label>
+            <textarea
+              id="coverLetter"
+              name="coverLetter"
+              className="apply-form-textarea"
+              placeholder="Tell us why you're interested in this position..."
+              value={formData.coverLetter}
+              onChange={handleFormChange}
+            />
+          </div>
+        </div>
+
+        <p className="apply-form-note">
+          By submitting this form, you agree to be contacted for
+          recruitment purposes. We respect your privacy and never share your
+          information.
+        </p>
+
+        <div className="apply-modal-actions">
+          <button
+            type="button"
+            className="apply-cancel-btn"
+            onClick={closeApplyModal}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="apply-submit-btn"
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Submit Application"}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
     </>
   );
 };
