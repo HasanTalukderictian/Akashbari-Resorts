@@ -842,7 +842,6 @@
 
 // export default PackageQuery;
 
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -1101,24 +1100,25 @@ const PackageQuery = ({ theme: propsTheme }) => {
 
     const theme = propsTheme || {
         isDarkMode,
-        bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-        card: isDarkMode ? '#16213e' : '#ffffff',
-        text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-        border: isDarkMode ? '#2d3436' : '#ebedf2',
+        bg: isDarkMode ? '#0a0a0a' : '#f5f5f5',
+        card: isDarkMode ? '#141414' : '#ffffff',
+        text: isDarkMode ? '#f5f5f5' : '#111111',
+        textLight: isDarkMode ? '#a3a3a3' : '#6b6b6b',
+        border: isDarkMode ? '#2b2b2b' : '#dcdcdc',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
     };
+
+    // Single black/white accent (inverts automatically with dark mode)
+    const accent = theme.text;
+    const accentOn = theme.card;
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    // Get status badge color for the filter dropdown styling
+    // Status badge now uses a neutral black/white/outline style instead of colors
     const getStatusBadge = (status) => {
-        const colors = {
-            New: { bg: '#17a2b8', text: '#fff' },      // Blue for New
-            Contact: { bg: '#ffc107', text: '#856404' }, // Yellow for Contact
-            Reply: { bg: '#28a745', text: '#fff' }     // Green for Reply
-        };
-        return colors[status] || colors.New;
+        if (status === 'New') return { bg: accent, text: accentOn, border: accent };
+        return { bg: 'transparent', text: accent, border: accent };
     };
 
     const styles = {
@@ -1130,7 +1130,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
         card: {
             background: theme.card,
             borderRadius: '12px',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            border: `1px solid ${theme.border}`,
             padding: '24px',
             transition: 'all 0.3s ease'
         },
@@ -1159,7 +1159,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
             padding: '8px 16px',
             borderRadius: '8px',
             border: `1px solid ${theme.border}`,
-            background: theme.isDarkMode ? '#2d3436' : '#fff',
+            background: theme.bg,
             color: theme.text,
             outline: 'none',
             width: '250px',
@@ -1169,7 +1169,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
             padding: '8px 16px',
             borderRadius: '8px',
             border: `1px solid ${theme.border}`,
-            background: theme.isDarkMode ? '#2d3436' : '#fff',
+            background: theme.bg,
             color: theme.text,
             outline: 'none',
             fontSize: '14px'
@@ -1177,24 +1177,42 @@ const PackageQuery = ({ theme: propsTheme }) => {
         actionBtn: {
             padding: '6px 12px',
             borderRadius: '6px',
-            border: 'none',
+            border: `1px solid ${theme.text}`,
             fontSize: '12px',
             cursor: 'pointer',
             marginRight: '6px',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
+            background: 'transparent',
+            color: theme.text
         },
         statusSelect: (isUpdating) => ({
             padding: '4px 8px',
             borderRadius: '6px',
-            border: `1px solid #ced4da`,
+            border: `1px solid ${theme.border}`,
             outline: 'none',
             fontSize: '12px',
             fontWeight: '500',
             cursor: 'pointer',
-            background: isUpdating ? '#e9ecef' : '#fff',
+            background: isUpdating ? theme.border : theme.bg,
+            color: theme.text,
             opacity: isUpdating ? 0.7 : 1,
             pointerEvents: isUpdating ? 'none' : 'auto'
         })
+    };
+
+    // Build a compact page-number list (max 5 numbers with ellipses)
+    const getPageNumbers = () => {
+        const pages = [];
+        if (totalPages <= 5) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else if (currentPage <= 3) {
+            pages.push(1, 2, 3, 4, '...', totalPages);
+        } else if (currentPage >= totalPages - 2) {
+            pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        } else {
+            pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+        }
+        return pages;
     };
 
     return (
@@ -1202,7 +1220,16 @@ const PackageQuery = ({ theme: propsTheme }) => {
             {/* Toast */}
             {toast.show && (
                 <div className="position-fixed top-0 end-0 m-3" style={{ zIndex: 9999 }}>
-                    <div className={`alert alert-${toast.type === 'success' ? 'success' : toast.type === 'warning' ? 'warning' : 'danger'} shadow-lg border-0`} style={{ borderRadius: '12px' }}>
+                    <div
+                        className="shadow-lg"
+                        style={{
+                            borderRadius: '12px',
+                            padding: '12px 18px',
+                            background: theme.card,
+                            color: theme.text,
+                            border: `1px solid ${theme.border}`
+                        }}
+                    >
                         <div className="d-flex align-items-center gap-2">
                             <i className={`bi bi-${toast.type === 'success' ? 'check-circle-fill' : toast.type === 'warning' ? 'exclamation-triangle-fill' : 'exclamation-circle-fill'}`}></i>
                             <span>{toast.message}</span>
@@ -1215,20 +1242,20 @@ const PackageQuery = ({ theme: propsTheme }) => {
             {/* Delete Modal */}
             {showDeleteModal && (
                 <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
-                    <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h5 className="modal-title fw-bold" style={{ color: '#dc3545' }}>
+                    <div className="modal-container" onClick={(e) => e.stopPropagation()} style={{ background: theme.card, color: theme.text }}>
+                        <div className="modal-header" style={{ borderBottom: `1px solid ${theme.border}`, background: theme.card }}>
+                            <h5 className="modal-title fw-bold" style={{ color: theme.text }}>
                                 <i className="bi bi-exclamation-triangle-fill me-2"></i>
                                 Confirm Delete
                             </h5>
                             <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
                         </div>
                         <div className="modal-body">
-                            <p>Are you sure you want to delete this query? This action cannot be undone.</p>
+                            <p style={{ color: theme.text }}>Are you sure you want to delete this query? This action cannot be undone.</p>
                         </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                            <button className="btn btn-danger" onClick={deleteQuery}>Delete</button>
+                        <div className="modal-footer" style={{ borderTop: `1px solid ${theme.border}` }}>
+                            <button className="btn btn-outline-dark" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                            <button className="btn" style={{ background: accent, color: accentOn }} onClick={deleteQuery}>Delete</button>
                         </div>
                     </div>
                 </div>
@@ -1237,9 +1264,9 @@ const PackageQuery = ({ theme: propsTheme }) => {
             {/* Details Modal */}
             {showDetailsModal && selectedQuery && (
                 <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
-                    <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h5 className="modal-title fw-bold" style={{ color: '#5e2e10' }}>
+                    <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()} style={{ background: theme.card, color: theme.text }}>
+                        <div className="modal-header" style={{ borderBottom: `1px solid ${theme.border}`, background: theme.card }}>
+                            <h5 className="modal-title fw-bold" style={{ color: theme.text }}>
                                 <i className="bi bi-info-circle-fill me-2"></i>
                                 Query Details
                             </h5>
@@ -1248,17 +1275,18 @@ const PackageQuery = ({ theme: propsTheme }) => {
                         <div className="modal-body">
                             <div className="row g-3">
                                 <div className="col-md-6">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Package Name</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Package Name</small>
                                         <strong>{selectedQuery.package_name}</strong>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Status</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Status</small>
                                         <span className="badge" style={{
                                             background: getStatusBadge(selectedQuery.status || 'New').bg,
                                             color: getStatusBadge(selectedQuery.status || 'New').text,
+                                            border: `1px solid ${getStatusBadge(selectedQuery.status || 'New').border}`,
                                             padding: '6px 12px',
                                             borderRadius: '20px'
                                         }}>
@@ -1267,55 +1295,55 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Name</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Name</small>
                                         <strong>{selectedQuery.name}</strong>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Phone</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Phone</small>
                                         <strong>{selectedQuery.phone}</strong>
                                     </div>
                                 </div>
                                 <div className="col-12">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Email</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Email</small>
                                         <strong>{selectedQuery.email}</strong>
                                     </div>
                                 </div>
                                 <div className="col-12">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Message</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Message</small>
                                         <p className="mb-0 mt-1" style={{ whiteSpace: 'pre-wrap' }}>{selectedQuery.message}</p>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="bg-light p-3 rounded-3">
-                                        <small className="text-muted d-block">Submitted At</small>
+                                    <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                        <small style={{ color: theme.textLight }} className="d-block">Submitted At</small>
                                         <strong>{new Date(selectedQuery.created_at).toLocaleString()}</strong>
                                     </div>
                                 </div>
                                 {selectedQuery.replied_at && (
                                     <div className="col-md-6">
-                                        <div className="bg-light p-3 rounded-3">
-                                            <small className="text-muted d-block">Replied At</small>
+                                        <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                            <small style={{ color: theme.textLight }} className="d-block">Replied At</small>
                                             <strong>{new Date(selectedQuery.replied_at).toLocaleString()}</strong>
                                         </div>
                                     </div>
                                 )}
                                 {selectedQuery.admin_notes && (
                                     <div className="col-12">
-                                        <div className="bg-light p-3 rounded-3">
-                                            <small className="text-muted d-block">Admin Notes</small>
+                                        <div className="p-3 rounded-3" style={{ background: theme.bg }}>
+                                            <small style={{ color: theme.textLight }} className="d-block">Admin Notes</small>
                                             <p className="mb-0 mt-1">{selectedQuery.admin_notes}</p>
                                         </div>
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <div className="modal-footer">
-                            <button className="btn btn-secondary" onClick={() => setShowDetailsModal(false)}>Close</button>
+                        <div className="modal-footer" style={{ borderTop: `1px solid ${theme.border}` }}>
+                            <button className="btn btn-outline-dark" onClick={() => setShowDetailsModal(false)}>Close</button>
                         </div>
                     </div>
                 </div>
@@ -1341,12 +1369,11 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                         <h4 className="fw-bold mb-1" style={{ color: theme.text }}>
                                             Package Queries
                                         </h4>
-                                        <small className="text-muted">Manage all package inquiries from customers</small>
+                                        <small style={{ color: theme.textLight }}>Manage all package inquiries from customers</small>
                                     </div>
                                     <div className="d-flex gap-2 mt-2 mt-sm-0">
                                         <button
-                                            className="btn btn-sm"
-                                            style={{ background: '#28a745', color: '#fff' }}
+                                            className="btn btn-sm btn-outline-dark"
                                             onClick={downloadExcel}
                                             disabled={downloading}
                                         >
@@ -1363,7 +1390,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                         </button>
                                         <button
                                             className="btn btn-sm"
-                                            style={{ background: '#5e2e10', color: '#fff' }}
+                                            style={{ background: accent, color: accentOn }}
                                             onClick={fetchQueries}
                                         >
                                             <i className="bi bi-arrow-clockwise me-1"></i> Refresh
@@ -1398,7 +1425,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                         </select>
                                     </div>
                                     <div className="ms-auto">
-                                        <span className="text-muted">
+                                        <span style={{ color: theme.textLight }}>
                                             Total: {totalItems} queries
                                         </span>
                                     </div>
@@ -1407,16 +1434,16 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                 {/* Table */}
                                 {loading ? (
                                     <div className="text-center py-5">
-                                        <div className="spinner-border" style={{ color: '#5e2e10' }} role="status">
+                                        <div className="spinner-border" style={{ color: accent }} role="status">
                                             <span className="visually-hidden">Loading...</span>
                                         </div>
-                                        <p className="mt-2 text-muted">Loading queries...</p>
+                                        <p className="mt-2" style={{ color: theme.textLight }}>Loading queries...</p>
                                     </div>
                                 ) : queries.length === 0 ? (
                                     <div className="text-center py-5">
-                                        <i className="bi bi-inbox" style={{ fontSize: '48px', color: '#ccc' }}></i>
-                                        <p className="mt-3 text-muted">No queries found</p>
-                                        <small className="text-muted">Try adjusting your search or filter</small>
+                                        <i className="bi bi-inbox" style={{ fontSize: '48px', color: theme.border }}></i>
+                                        <p className="mt-3" style={{ color: theme.textLight }}>No queries found</p>
+                                        <small style={{ color: theme.textLight }}>Try adjusting your search or filter</small>
                                     </div>
                                 ) : (
                                     <div className="table-responsive">
@@ -1442,13 +1469,13 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                                         <tr key={query.id}>
                                                             <td style={styles.td}>{(currentPage - 1) * perPage + index + 1}</td>
                                                             <td style={styles.td}>
-                                                                <span className="fw-medium" style={{ color: '#5e2e10' }}>
+                                                                <span className="fw-medium" style={{ color: theme.text }}>
                                                                     {query.package_name}
                                                                 </span>
                                                             </td>
                                                             <td style={styles.td}>{query.name}</td>
                                                             <td style={styles.td}>
-                                                                <a href={`mailto:${query.email}`} style={{ color: '#5e2e10', textDecoration: 'none' }}>
+                                                                <a href={`mailto:${query.email}`} style={{ color: theme.text, textDecoration: 'underline' }}>
                                                                     {query.email}
                                                                 </a>
                                                             </td>
@@ -1471,7 +1498,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                                                     <option value="Reply">Reply</option>
                                                                 </select>
                                                                 {isUpdating && (
-                                                                    <small className="ms-2 text-muted" style={{ fontSize: '10px' }}>
+                                                                    <small className="ms-2" style={{ fontSize: '10px', color: theme.textLight }}>
                                                                         <span className="spinner-border spinner-border-sm" role="status"></span>
                                                                     </small>
                                                                 )}
@@ -1483,11 +1510,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                                             <td style={styles.td}>
                                                                 <div className="d-flex flex-wrap gap-1">
                                                                     <button
-                                                                        style={{
-                                                                            ...styles.actionBtn,
-                                                                            background: '#17a2b8',
-                                                                            color: '#fff'
-                                                                        }}
+                                                                        style={styles.actionBtn}
                                                                         onClick={() => {
                                                                             setSelectedQuery(query);
                                                                             setShowDetailsModal(true);
@@ -1498,11 +1521,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
                                                                     </button>
 
                                                                     <button
-                                                                        style={{
-                                                                            ...styles.actionBtn,
-                                                                            background: '#dc3545',
-                                                                            color: '#fff'
-                                                                        }}
+                                                                        style={styles.actionBtn}
                                                                         onClick={() => {
                                                                             setDeleteId(query.id);
                                                                             setShowDeleteModal(true);
@@ -1523,25 +1542,51 @@ const PackageQuery = ({ theme: propsTheme }) => {
 
                                 {/* Pagination */}
                                 {totalPages > 1 && (
-                                    <div className="d-flex justify-content-between align-items-center mt-4">
-                                        <small className="text-muted">
-                                            Page {currentPage} of {totalPages}
+                                    <div className="d-flex flex-wrap justify-content-between align-items-center mt-4 gap-2">
+                                        <small style={{ color: theme.textLight }}>
+                                            Page {currentPage} of {totalPages} &middot; {totalItems} total
                                         </small>
-                                        <div className="d-flex gap-2">
+                                        <div className="d-flex align-items-center gap-2">
                                             <button
-                                                className="btn btn-sm btn-outline-secondary"
                                                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                                 disabled={currentPage === 1}
+                                                style={{
+                                                    width: '34px', height: '34px', borderRadius: '8px',
+                                                    border: `1px solid ${theme.border}`, background: theme.card,
+                                                    color: theme.text, opacity: currentPage === 1 ? 0.4 : 1, cursor: 'pointer'
+                                                }}
                                             >
                                                 <i className="bi bi-chevron-left"></i>
                                             </button>
-                                            <span className="px-3 py-1 bg-light rounded" style={{ lineHeight: '2' }}>
-                                                {currentPage}
-                                            </span>
+
+                                            {getPageNumbers().map((page, i) =>
+                                                page === '...' ? (
+                                                    <span key={`ellipsis-${i}`} style={{ color: theme.textLight, padding: '0 4px' }}>…</span>
+                                                ) : (
+                                                    <button
+                                                        key={page}
+                                                        onClick={() => setCurrentPage(page)}
+                                                        style={{
+                                                            width: '34px', height: '34px', borderRadius: '8px', cursor: 'pointer',
+                                                            border: `1px solid ${theme.border}`,
+                                                            background: currentPage === page ? accent : theme.card,
+                                                            color: currentPage === page ? accentOn : theme.text,
+                                                            fontWeight: currentPage === page ? 700 : 400
+                                                        }}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                )
+                                            )}
+
                                             <button
-                                                className="btn btn-sm btn-outline-secondary"
                                                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                                 disabled={currentPage === totalPages}
+                                                style={{
+                                                    width: '34px', height: '34px', borderRadius: '8px',
+                                                    border: `1px solid ${theme.border}`, background: theme.card,
+                                                    color: theme.text, opacity: currentPage === totalPages ? 0.4 : 1, cursor: 'pointer'
+                                                }}
                                             >
                                                 <i className="bi bi-chevron-right"></i>
                                             </button>
@@ -1565,7 +1610,7 @@ const PackageQuery = ({ theme: propsTheme }) => {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.6);
+                    background: rgba(0, 0, 0, 0.65);
                     backdrop-filter: blur(4px);
                     display: flex;
                     align-items: center;
@@ -1576,7 +1621,6 @@ const PackageQuery = ({ theme: propsTheme }) => {
                 }
                 
                 .modal-container {
-                    background: white;
                     border-radius: 16px;
                     max-width: 600px;
                     width: 100%;
@@ -1592,13 +1636,11 @@ const PackageQuery = ({ theme: propsTheme }) => {
                 
                 .modal-header {
                     padding: 20px 24px 16px;
-                    border-bottom: 1px solid #e9ecef;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     position: sticky;
                     top: 0;
-                    background: white;
                     border-radius: 16px 16px 0 0;
                     z-index: 1;
                 }
@@ -1614,7 +1656,6 @@ const PackageQuery = ({ theme: propsTheme }) => {
                 
                 .modal-footer {
                     padding: 16px 24px 20px;
-                    border-top: 1px solid #e9ecef;
                     display: flex;
                     justify-content: flex-end;
                     gap: 10px;

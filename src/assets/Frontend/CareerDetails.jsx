@@ -739,7 +739,12 @@ const handleFormSubmit = async (e) => {
         }
 
         // Send to Laravel API
-        const response = await fetch("http://127.0.0.1:8000/api/applications", {
+        // const response = await fetch("http://127.0.0.1:8000/api/applications", {
+        //     method: "POST",
+        //     body: formPayload,
+        // });
+
+          const response = await fetch("https://backend.akashbariresort.com/api/applications", {
             method: "POST",
             body: formPayload,
         });
