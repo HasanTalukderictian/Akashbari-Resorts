@@ -30,7 +30,7 @@
 }
 
 
-/* ইয়েলো ডিভাইডার বড় এবং বাম পাশে সেট করা */
+/* ইয়েলো ডিভাইডার বড় এবং বাম পাশে সেট করা */
 
 .line-divider {
     width: 260px;
@@ -213,5 +213,46 @@
     }
     .d-flex.align-items-center.gap-3 {
         gap: 15px !important;
+    }
+}
+
+
+/* ==========================================================
+   Scroll-triggered animations: left column slides in from the
+   left, right column slides in from the right, whenever the
+   section scrolls into view (JS toggles the .in-view class).
+   ========================================================== */
+
+.anim-slide-left,
+.anim-slide-right {
+    opacity: 0;
+    transition: opacity 1.8s ease-out, transform 1.8s ease-out;
+    will-change: opacity, transform;
+}
+
+.anim-slide-left {
+    transform: translateX(-60px);
+}
+
+.anim-slide-right {
+    transform: translateX(60px);
+    transition-delay: 0.3s;
+}
+
+.anim-slide-left.in-view,
+.anim-slide-right.in-view {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+
+/* Respect users who prefer reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .anim-slide-left,
+    .anim-slide-right {
+        opacity: 1;
+        transform: none;
+        transition: none;
     }
 }
