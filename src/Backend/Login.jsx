@@ -12,33 +12,40 @@ const Login = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const response = await axios.post(`${BASE_URL}/login`, {
-        email: email,
-        password: password
-      });
+  try {
+    const response = await axios.post(`${BASE_URL}/login`, {
+      email: email,
+      password: password
+    });
 
-      if (response.data.status === 'success') {
-        // টোকেন এবং রোল সেভ করা
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('Role', response.data.role || 'admin'); // role সঠিকভাবে সেভ করা
-        console.log(response.data.token);
-        // ড্যাশবোর্ডে পাঠানো
-        navigate('/dashboard');
-      } else {
-        setError(response.data.message || 'Login failed');
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+    console.log('API Response:', response.data); // এই লাইন যোগ করুন
+
+    if (response.data.status === 'success') {
+      const token = response.data.token;
+      const role = response.data.role || 'admin';
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('Role', role);
+      
+      console.log('Saved Token:', localStorage.getItem('token'));
+      console.log('Saved Role:', localStorage.getItem('Role'));
+      
+      navigate('/dashboard');
+    } else {
+      setError(response.data.message || 'Login failed');
     }
-  };
+  } catch (err) {
+    console.error('Login Error:', err);
+    setError(err.response?.data?.message || 'Login failed. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="login-container">

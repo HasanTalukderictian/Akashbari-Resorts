@@ -238,7 +238,7 @@ function App() {
         } />
 
         <Route path="/admin-investrecord" element={
-          <PrivateRoute>  n  
+          <PrivateRoute>  
             <InvestmentRecord />
           </PrivateRoute>
         } />

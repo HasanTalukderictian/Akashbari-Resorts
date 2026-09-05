@@ -1,198 +1,1182 @@
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import Header from './Header';
+// import Footer from './Footer';
+// import Sidebar from './Sidebar';
+
+// const OwnerSection = ({ theme: dashboardTheme }) => {
+//     const [isCollapsed, setIsCollapsed] = useState(false);
+//     const [isDarkMode, setIsDarkMode] = useState(false);
+//     const [showModal, setShowModal] = useState(false);
+//     const [properties, setProperties] = useState([]);
+//     const [loading, setLoading] = useState(false);
+//     const [searchTerm, setSearchTerm] = useState('');
+//     const [currentPage, setCurrentPage] = useState(1);
+//     const [deleteConfirm, setDeleteConfirm] = useState(null);
+//     const [authError, setAuthError] = useState(null);
+//     const itemsPerPage = 6;
+    
+//     const [isEditing, setIsEditing] = useState(false);
+//     const [editId, setEditId] = useState(null);
+
+//     const initialFormState = {
+//         title: '',
+//         brand_name: '',
+//         whatsapp_number: '',
+//         description: '',
+//         features: [''], 
+//     };
+
+//     // Use environment variables with fallbacks
+//     const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://backend.akashbariresort.com/api';
+//     const API_URL = import.meta.env.VITE_API_URL || 'https://backend.akashbariresort.com';
+
+//     const [formData, setFormData] = useState(initialFormState);
+//     const [selectedImages, setSelectedImages] = useState([]);
+//     const [previews, setPreviews] = useState([]);
+//     const [existingImages, setExistingImages] = useState([]);
+//     const [imageErrors, setImageErrors] = useState({});
+
+//     const theme = {
+//         isDarkMode,
+//         bg: isDarkMode ? '#0f0f1a' : (dashboardTheme?.bg || '#f8f9fc'),
+//         card: isDarkMode ? '#1a1a2e' : (dashboardTheme?.card || '#ffffff'),
+//         text: isDarkMode ? '#e9ecef' : (dashboardTheme?.text || '#2c3e50'),
+//         textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
+//         border: isDarkMode ? '#2d2d3d' : (dashboardTheme?.border || '#e9ecef'),
+//         accent: '#5e2e10',
+//         accentGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
+//         danger: '#ef4444',
+//         success: '#10b981',
+//         warning: '#f59e0b'
+//     };
+
+//     // Get authentication headers
+//     const getAuthHeaders = () => {
+//         const token = localStorage.getItem('token');
+//         const role = localStorage.getItem('Role') || 'admin';
+        
+//         return {
+//             'Authorization': `Bearer ${token}`,
+//             'Role': role,
+//             'Content-Type': 'application/json'
+//         };
+//     };
+
+//     // Get multipart form headers (for file uploads)
+//     const getMultipartHeaders = () => {
+//         const token = localStorage.getItem('token');
+//         const role = localStorage.getItem('Role') || 'admin';
+        
+//         return {
+//             'Authorization': `Bearer ${token}`,
+//             'Role': role,
+//             'Content-Type': 'multipart/form-data'
+//         };
+//     };
+
+//     // Check authentication
+//     const checkAuth = () => {
+//         const token = localStorage.getItem('token');
+//         if (!token) {
+//             setAuthError("Please login to access this page");
+//             setTimeout(() => window.location.href = '/login', 2000);
+//             return false;
+//         }
+//         return true;
+//     };
+
+//     // Helper function to get image URL - FIXED
+//     const getImageUrl = (imagePath) => {
+//         if (!imagePath) return null;
+        
+//         // If already a full URL, return as is
+//         if (imagePath.startsWith('http')) return imagePath;
+        
+//         // Clean the path - remove 'property/' prefix if present
+//         let cleanPath = imagePath;
+//         if (cleanPath.startsWith('property/')) {
+//             cleanPath = cleanPath.replace('property/', '');
+//         }
+//         if (cleanPath.startsWith('/property/')) {
+//             cleanPath = cleanPath.replace('/property/', '');
+//         }
+        
+//         // Remove any leading slashes
+//         cleanPath = cleanPath.replace(/^\/+/, '');
+        
+//         // Remove query parameters if any
+//         if (cleanPath.includes('?')) {
+//             cleanPath = cleanPath.split('?')[0];
+//         }
+        
+//         const baseUrl = API_URL.replace(/\/$/, '');
+//         return `${baseUrl}/storage/property/${cleanPath}`;
+//     };
+
+//     const handleImageError = (propertyId, imageIndex = null) => {
+//         const key = imageIndex !== null ? `${propertyId}-${imageIndex}` : propertyId;
+//         if (!imageErrors[key]) {
+//             setImageErrors(prev => ({ ...prev, [key]: true }));
+//         }
+//     };
+
+//     const getFinalImageUrl = (property, imagePath, index = 0) => {
+//         const key = index !== null ? `${property.id}-${index}` : property.id;
+//         if (imageErrors[key]) {
+//             return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+//         }
+//         const url = getImageUrl(imagePath);
+//         if (!url) {
+//             return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+//         }
+//         return url;
+//     };
+
+//     const fetchProperties = async () => {
+//         if (!checkAuth()) return;
+        
+//         setLoading(true);
+//         setAuthError(null);
+        
+//         try {
+//             const headers = getAuthHeaders();
+//             const res = await axios.get(`${BASE_URL}/get-property-offers`, { headers });
+            
+//             if (res.data.status && res.data.data.data) {
+//                 setProperties(res.data.data.data);
+//             } else {
+//                 setProperties([]);
+//             }
+//         } catch (err) { 
+//             console.error("Fetch Error:", err);
+//             if (err.response?.status === 401) {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('Role');
+//                 setAuthError("Session expired. Please login again.");
+//                 setTimeout(() => window.location.href = '/login', 2000);
+//             } else {
+//                 setAuthError("Failed to fetch properties. Please try again.");
+//             }
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     useEffect(() => { 
+//         fetchProperties(); 
+//     }, []);
+
+//     const handleEditClick = (item) => {
+//         setIsEditing(true);
+//         setEditId(item.id);
+//         setFormData({
+//             title: item.title || '',
+//             brand_name: item.brand_name || '',
+//             whatsapp_number: item.whatsapp_number || '',
+//             description: item.description || '',
+//             features: item.features && item.features.length > 0 ? item.features : [''],
+//         });
+        
+//         // Set existing images for preview
+//         if (item.slider_images && item.slider_images.length > 0) {
+//             const imageUrls = item.slider_images.map(img => getImageUrl(img));
+//             setExistingImages(imageUrls);
+//             setPreviews(imageUrls);
+//         } else {
+//             setExistingImages([]);
+//             setPreviews([]);
+//         }
+//         setSelectedImages([]);
+//         setShowModal(true);
+//     };
+
+//     const closeModal = () => {
+//         setFormData(initialFormState);
+//         setPreviews([]);
+//         setExistingImages([]);
+//         setSelectedImages([]);
+//         setIsEditing(false);
+//         setEditId(null);
+//         setShowModal(false);
+//     };
+
+//     const handleFeatureChange = (index, value) => {
+//         const newFeatures = [...formData.features];
+//         newFeatures[index] = value;
+//         setFormData({ ...formData, features: newFeatures });
+//     };
+
+//     const addFeatureField = () => setFormData({ ...formData, features: [...formData.features, ''] });
+    
+//     const removeFeatureField = (index) => {
+//         const newFeatures = formData.features.filter((_, i) => i !== index);
+//         setFormData({ ...formData, features: newFeatures });
+//     };
+
+//     const handleImageChange = (e) => {
+//         const files = Array.from(e.target.files);
+//         const oversized = files.find(file => file.size > 5 * 1024 * 1024);
+//         if (oversized) {
+//             alert(`File "${oversized.name}" is too large! Max 5MB.`);
+//             return;
+//         }
+//         setSelectedImages(files);
+//         const newPreviews = files.map(file => URL.createObjectURL(file));
+//         setPreviews([...existingImages, ...newPreviews]);
+//     };
+
+//     const handleSave = async (e) => {
+//         e.preventDefault();
+        
+//         if (!checkAuth()) return;
+        
+//         setLoading(true);
+        
+//         const data = new FormData();
+//         data.append('title', formData.title);
+//         data.append('brand_name', formData.brand_name);
+//         data.append('whatsapp_number', formData.whatsapp_number);
+//         data.append('description', formData.description);
+        
+//         formData.features.forEach((feature, index) => {
+//             if (feature.trim() !== '') data.append(`features[${index}]`, feature);
+//         });
+
+//         if (selectedImages.length > 0) {
+//             selectedImages.forEach(img => data.append('slider_images[]', img));
+//         }
+
+//         try {
+//             const headers = getMultipartHeaders();
+//             const url = isEditing 
+//                 ? `${BASE_URL}/edit-property-offers/${editId}`
+//                 : `${BASE_URL}/add-property-offers`;
+
+//             await axios.post(url, data, { headers });
+            
+//             fetchProperties();
+//             closeModal();
+//         } catch (err) { 
+//             console.error("Save Error:", err);
+//             if (err.response?.status === 401) {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('Role');
+//                 setAuthError("Session expired. Please login again.");
+//                 setTimeout(() => window.location.href = '/login', 2000);
+//             } else {
+//                 alert(err.response?.data?.message || "Something went wrong!");
+//             }
+//         } finally { 
+//             setLoading(false); 
+//         }
+//     };
+
+//     const handleDelete = async (id) => {
+//         if (!checkAuth()) return;
+        
+//         try {
+//             const headers = getAuthHeaders();
+//             await axios.delete(`${BASE_URL}/del-property-offers/${id}`, { headers });
+//             fetchProperties();
+//             setDeleteConfirm(null);
+//         } catch (err) { 
+//             console.error(err);
+//             if (err.response?.status === 401) {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('Role');
+//                 setAuthError("Session expired. Please login again.");
+//                 setTimeout(() => window.location.href = '/login', 2000);
+//             } else {
+//                 alert("Failed to delete property");
+//             }
+//         }
+//     };
+
+//     // Filter and Pagination
+//     const filteredProperties = properties.filter(item =>
+//         item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//         item.brand_name?.toLowerCase().includes(searchTerm.toLowerCase())
+//     );
+
+//     const indexOfLastItem = currentPage * itemsPerPage;
+//     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+//     const currentItems = filteredProperties.slice(indexOfFirstItem, indexOfLastItem);
+//     const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+
+//     // Statistics
+//     const totalProperties = properties.length;
+
+//     const styles = {
+//         container: {
+//             backgroundColor: theme.bg,
+//             minHeight: '100vh',
+//             transition: 'all 0.3s ease'
+//         },
+//         mainContent: {
+//             flex: 1,
+//             overflowY: 'auto',
+//             padding: '30px'
+//         },
+//         pageHeader: {
+//             marginBottom: '30px'
+//         },
+//         pageTitle: {
+//             fontSize: '28px',
+//             fontWeight: '700',
+//             background: theme.accentGradient,
+//             WebkitBackgroundClip: 'text',
+//             WebkitTextFillColor: 'transparent',
+//             marginBottom: '8px'
+//         },
+//         pageSubtitle: {
+//             color: theme.textLight,
+//             fontSize: '14px'
+//         },
+//         alert: {
+//             padding: '12px 20px',
+//             backgroundColor: 'rgba(94, 46, 16, 0.15)',
+//             color: '#5e2e10',
+//             borderRadius: '8px',
+//             marginBottom: '20px',
+//             fontWeight: '500'
+//         },
+//         statCards: {
+//             display: 'grid',
+//             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+//             gap: '20px',
+//             marginBottom: '30px'
+//         },
+//         statCard: {
+//             backgroundColor: theme.card,
+//             borderRadius: '16px',
+//             padding: '20px',
+//             border: `1px solid ${theme.border}`,
+//             transition: 'all 0.3s ease',
+//             cursor: 'pointer'
+//         },
+//         statIcon: {
+//             width: '50px',
+//             height: '50px',
+//             borderRadius: '12px',
+//             background: theme.accentGradient,
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//             fontSize: '24px',
+//             marginBottom: '16px'
+//         },
+//         statValue: {
+//             fontSize: '28px',
+//             fontWeight: '700',
+//             color: theme.text,
+//             marginBottom: '4px'
+//         },
+//         statLabel: {
+//             fontSize: '13px',
+//             color: theme.textLight,
+//             fontWeight: '500'
+//         },
+//         toolbar: {
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             alignItems: 'center',
+//             marginBottom: '24px',
+//             flexWrap: 'wrap',
+//             gap: '16px'
+//         },
+//         searchBox: {
+//             padding: '12px 20px',
+//             borderRadius: '12px',
+//             border: `1px solid ${theme.border}`,
+//             backgroundColor: theme.card,
+//             color: theme.text,
+//             width: '300px',
+//             fontSize: '14px',
+//             outline: 'none',
+//             transition: 'all 0.3s'
+//         },
+//         addBtn: {
+//             background: theme.accentGradient,
+//             color: 'white',
+//             border: 'none',
+//             padding: '12px 28px',
+//             borderRadius: '12px',
+//             cursor: 'pointer',
+//             fontSize: '14px',
+//             fontWeight: '600',
+//             transition: 'all 0.3s',
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: '8px',
+//             boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
+//         },
+//         propertiesGrid: {
+//             display: 'grid',
+//             gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+//             gap: '24px',
+//             marginBottom: '30px'
+//         },
+//         propertyCard: {
+//             backgroundColor: theme.card,
+//             borderRadius: '20px',
+//             overflow: 'hidden',
+//             border: `1px solid ${theme.border}`,
+//             transition: 'all 0.3s ease',
+//             position: 'relative'
+//         },
+//         cardImage: {
+//             width: '100%',
+//             height: '200px',
+//             objectFit: 'cover',
+//             transition: 'transform 0.5s ease'
+//         },
+//         cardContent: {
+//             padding: '20px'
+//         },
+//         propertyTitle: {
+//             fontSize: '18px',
+//             fontWeight: '700',
+//             color: theme.text,
+//             marginBottom: '8px'
+//         },
+//         brandName: {
+//             fontSize: '13px',
+//             color: theme.accent,
+//             marginBottom: '8px',
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: '5px'
+//         },
+//         whatsapp: {
+//             fontSize: '13px',
+//             color: theme.success,
+//             marginBottom: '12px',
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: '5px'
+//         },
+//         description: {
+//             fontSize: '13px',
+//             color: theme.textLight,
+//             lineHeight: '1.5',
+//             marginBottom: '12px'
+//         },
+//         featureList: {
+//             display: 'flex',
+//             flexWrap: 'wrap',
+//             gap: '8px',
+//             marginBottom: '16px'
+//         },
+//         featureBadge: {
+//             background: `${theme.accent}15`,
+//             color: theme.accent,
+//             padding: '4px 10px',
+//             borderRadius: '20px',
+//             fontSize: '11px',
+//             fontWeight: '500'
+//         },
+//         cardActions: {
+//             display: 'flex',
+//             gap: '10px',
+//             paddingTop: '16px',
+//             borderTop: `1px solid ${theme.border}`
+//         },
+//         actionBtn: {
+//             flex: 1,
+//             padding: '8px',
+//             borderRadius: '10px',
+//             border: 'none',
+//             cursor: 'pointer',
+//             transition: 'all 0.3s',
+//             fontSize: '13px',
+//             fontWeight: '500',
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//             gap: '6px'
+//         },
+//         editBtn: {
+//             backgroundColor: `${theme.accent}15`,
+//             color: theme.accent
+//         },
+//         deleteBtn: {
+//             backgroundColor: `${theme.danger}20`,
+//             color: theme.danger
+//         },
+//         pagination: {
+//             display: 'flex',
+//             justifyContent: 'center',
+//             alignItems: 'center',
+//             gap: '8px',
+//             marginTop: '20px'
+//         },
+//         pageBtn: {
+//             width: '40px',
+//             height: '40px',
+//             borderRadius: '10px',
+//             border: `1px solid ${theme.border}`,
+//             backgroundColor: theme.card,
+//             color: theme.text,
+//             cursor: 'pointer',
+//             transition: 'all 0.3s',
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center'
+//         },
+//         activePage: {
+//             background: theme.accentGradient,
+//             color: 'white',
+//             border: 'none'
+//         },
+//         emptyState: {
+//             textAlign: 'center',
+//             padding: '60px',
+//             color: theme.textLight
+//         },
+//         loadingSpinner: {
+//             textAlign: 'center',
+//             padding: '60px',
+//             color: theme.textLight
+//         },
+//         modalOverlay: {
+//             position: 'fixed',
+//             inset: 0,
+//             backgroundColor: 'rgba(0,0,0,0.8)',
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//             zIndex: 2000,
+//             backdropFilter: 'blur(8px)'
+//         },
+//         modal: {
+//             backgroundColor: theme.card,
+//             borderRadius: '24px',
+//             width: '700px',
+//             maxWidth: '90%',
+//             maxHeight: '90vh',
+//             overflowY: 'auto'
+//         },
+//         modalHeader: {
+//             padding: '24px',
+//             borderBottom: `1px solid ${theme.border}`,
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             alignItems: 'center',
+//             position: 'sticky',
+//             top: 0,
+//             backgroundColor: theme.card,
+//             zIndex: 1
+//         },
+//         modalBody: {
+//             padding: '24px'
+//         },
+//         modalFooter: {
+//             padding: '20px 24px',
+//             borderTop: `1px solid ${theme.border}`,
+//             display: 'flex',
+//             justifyContent: 'flex-end',
+//             gap: '12px'
+//         },
+//         input: {
+//             width: '100%',
+//             padding: '10px 14px',
+//             borderRadius: '10px',
+//             border: `1px solid ${theme.border}`,
+//             backgroundColor: theme.bg,
+//             color: theme.text,
+//             fontSize: '14px',
+//             outline: 'none',
+//             transition: 'all 0.3s'
+//         },
+//         label: {
+//             display: 'block',
+//             marginBottom: '8px',
+//             fontWeight: '600',
+//             fontSize: '13px',
+//             color: theme.text
+//         },
+//         imagePreviewContainer: {
+//             display: 'flex',
+//             flexWrap: 'wrap',
+//             gap: '12px',
+//             marginTop: '12px'
+//         },
+//         previewImage: {
+//             width: '80px',
+//             height: '80px',
+//             borderRadius: '10px',
+//             objectFit: 'cover',
+//             border: `2px solid ${theme.accent}`,
+//             padding: '2px'
+//         }
+//     };
+
+//     return (
+//         <div style={styles.container}>
+//             <style>
+//                 {`
+//                     @keyframes fadeIn {
+//                         from { opacity: 0; }
+//                         to { opacity: 1; }
+//                     }
+//                     @keyframes slideUp {
+//                         from { transform: translateY(30px); opacity: 0; }
+//                         to { transform: translateY(0); opacity: 1; }
+//                     }
+//                     .stat-card:hover {
+//                         transform: translateY(-4px);
+//                         box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
+//                     }
+//                     .property-card:hover {
+//                         transform: translateY(-6px);
+//                         box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+//                     }
+//                     .property-card:hover img {
+//                         transform: scale(1.05);
+//                     }
+//                     button:hover {
+//                         transform: translateY(-2px);
+//                     }
+//                     .search-box:focus {
+//                         border-color: #5e2e10;
+//                         box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
+//                     }
+//                     .property-card {
+//                         animation: slideUp 0.3s ease;
+//                     }
+//                 `}
+//             </style>
+
+//             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
+//                 <Sidebar theme={theme} isCollapsed={isCollapsed} />
+
+//                 <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
+//                     <Header 
+//                         theme={theme}
+//                         isDarkMode={isDarkMode}
+//                         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+//                         toggleSidebar={() => setIsCollapsed(!isCollapsed)}
+//                     />
+
+//                     <div style={styles.mainContent}>
+//                         {/* Header Section */}
+//                         <div style={styles.pageHeader}>
+//                             <h1 style={styles.pageTitle}>Property Inventory</h1>
+//                             <p style={styles.pageSubtitle}>Manage your property listings and offers</p>
+//                         </div>
+
+//                         {/* Auth Error Display */}
+//                         {authError && (
+//                             <div style={styles.alert}>
+//                                 <i className="bi bi-exclamation-triangle-fill me-2"></i>
+//                                 {authError}
+//                             </div>
+//                         )}
+
+//                         {/* Statistics Cards */}
+//                         <div style={styles.statCards}>
+//                             <div className="stat-card" style={styles.statCard}>
+//                                 <div style={styles.statIcon}>🏘️</div>
+//                                 <div style={styles.statValue}>{totalProperties}</div>
+//                                 <div style={styles.statLabel}>Total Properties</div>
+//                             </div>
+//                             <div className="stat-card" style={styles.statCard}>
+//                                 <div style={styles.statIcon}>🏢</div>
+//                                 <div style={styles.statValue}>Active</div>
+//                                 <div style={styles.statLabel}>Status</div>
+//                             </div>
+//                             <div className="stat-card" style={styles.statCard}>
+//                                 <div style={styles.statIcon}>📞</div>
+//                                 <div style={styles.statValue}>24/7</div>
+//                                 <div style={styles.statLabel}>Support</div>
+//                             </div>
+//                         </div>
+
+//                         {/* Toolbar */}
+//                         <div style={styles.toolbar}>
+//                             <input
+//                                 type="text"
+//                                 placeholder="🔍 Search by title or brand..."
+//                                 style={styles.searchBox}
+//                                 className="search-box"
+//                                 value={searchTerm}
+//                                 onChange={(e) => {
+//                                     setSearchTerm(e.target.value);
+//                                     setCurrentPage(1);
+//                                 }}
+//                             />
+//                             <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+//                                 <i className="bi bi-plus-circle"></i> Add Property
+//                             </button>
+//                         </div>
+
+//                         {/* Properties Grid */}
+//                         {loading ? (
+//                             <div style={styles.loadingSpinner}>
+//                                 <div className="spinner-border text-primary" role="status">
+//                                     <span className="visually-hidden">Loading...</span>
+//                                 </div>
+//                                 <p style={{ marginTop: '16px' }}>Loading properties...</p>
+//                             </div>
+//                         ) : currentItems.length > 0 ? (
+//                             <>
+//                                 <div style={styles.propertiesGrid}>
+//                                     {currentItems.map((item) => (
+//                                         <div key={item.id} className="property-card" style={styles.propertyCard}>
+//                                             <img 
+//                                                 src={item.slider_images?.[0] ? getFinalImageUrl(item, item.slider_images[0], 0) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E"} 
+//                                                 alt={item.title}
+//                                                 style={styles.cardImage}
+//                                                 onError={() => handleImageError(item.id, 0)}
+//                                             />
+//                                             <div style={styles.cardContent}>
+//                                                 <h3 style={styles.propertyTitle}>{item.title}</h3>
+//                                                 <div style={styles.brandName}>
+//                                                     <i className="bi bi-tag"></i> {item.brand_name}
+//                                                 </div>
+//                                                 <div style={styles.whatsapp}>
+//                                                     <i className="bi bi-whatsapp"></i> {item.whatsapp_number}
+//                                                 </div>
+//                                                 <p style={styles.description}>
+//                                                     {item.description?.substring(0, 100)}...
+//                                                 </p>
+//                                                 {item.features && item.features.length > 0 && (
+//                                                     <div style={styles.featureList}>
+//                                                         {item.features.slice(0, 3).map((feature, idx) => (
+//                                                             <span key={idx} style={styles.featureBadge}>
+//                                                                 {feature}
+//                                                             </span>
+//                                                         ))}
+//                                                         {item.features.length > 3 && (
+//                                                             <span style={styles.featureBadge}>
+//                                                                 +{item.features.length - 3} more
+//                                                             </span>
+//                                                         )}
+//                                                     </div>
+//                                                 )}
+//                                                 <div style={styles.cardActions}>
+//                                                     <button 
+//                                                         style={{...styles.actionBtn, ...styles.editBtn}}
+//                                                         onClick={() => handleEditClick(item)}
+//                                                     >
+//                                                         <i className="bi bi-pencil"></i> Edit
+//                                                     </button>
+//                                                     <button 
+//                                                         style={{...styles.actionBtn, ...styles.deleteBtn}}
+//                                                         onClick={() => setDeleteConfirm(item)}
+//                                                     >
+//                                                         <i className="bi bi-trash"></i> Delete
+//                                                     </button>
+//                                                 </div>
+//                                             </div>
+//                                         </div>
+//                                     ))}
+//                                 </div>
+
+//                                 {/* Pagination */}
+//                                 {totalPages > 1 && (
+//                                     <div style={styles.pagination}>
+//                                         <button
+//                                             style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
+//                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+//                                             disabled={currentPage === 1}
+//                                         >
+//                                             ←
+//                                         </button>
+//                                         {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+//                                             let pageNum;
+//                                             if (totalPages <= 5) {
+//                                                 pageNum = i + 1;
+//                                             } else if (currentPage <= 3) {
+//                                                 pageNum = i + 1;
+//                                             } else if (currentPage >= totalPages - 2) {
+//                                                 pageNum = totalPages - 4 + i;
+//                                             } else {
+//                                                 pageNum = currentPage - 2 + i;
+//                                             }
+//                                             return (
+//                                                 <button
+//                                                     key={i}
+//                                                     style={{
+//                                                         ...styles.pageBtn,
+//                                                         ...(currentPage === pageNum && styles.activePage)
+//                                                     }}
+//                                                     onClick={() => setCurrentPage(pageNum)}
+//                                                 >
+//                                                     {pageNum}
+//                                                 </button>
+//                                             );
+//                                         })}
+//                                         <button
+//                                             style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
+//                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+//                                             disabled={currentPage === totalPages}
+//                                         >
+//                                             →
+//                                         </button>
+//                                     </div>
+//                                 )}
+//                             </>
+//                         ) : (
+//                             <div style={styles.emptyState}>
+//                                 <div style={{ fontSize: '64px', marginBottom: '16px' }}>🏘️</div>
+//                                 <h4>No Properties Found</h4>
+//                                 <p style={{ color: theme.textLight, marginBottom: '20px' }}>
+//                                     {searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first property'}
+//                                 </p>
+//                                 {!searchTerm && (
+//                                     <button style={styles.addBtn} onClick={() => setShowModal(true)}>
+//                                         <i className="bi bi-plus-circle"></i> Add Property
+//                                     </button>
+//                                 )}
+//                             </div>
+//                         )}
+//                     </div>
+
+//                     <Footer theme={theme} />
+//                 </div>
+//             </div>
+
+//             {/* Add/Edit Modal */}
+//             {showModal && (
+//                 <div style={styles.modalOverlay} onClick={closeModal}>
+//                     <div style={styles.modal} onClick={e => e.stopPropagation()}>
+//                         <div style={styles.modalHeader}>
+//                             <h5 style={{ margin: 0, fontWeight: '600' }}>
+//                                 {isEditing ? '✏️ Edit Property' : '✨ Add New Property'}
+//                             </h5>
+//                             <button 
+//                                 onClick={closeModal}
+//                                 style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: theme.text }}
+//                             >
+//                                 ×
+//                             </button>
+//                         </div>
+//                         <form onSubmit={handleSave}>
+//                             <div style={styles.modalBody}>
+//                                 <div className="row g-3">
+//                                     <div className="col-12">
+//                                         <label style={styles.label}>Property Title *</label>
+//                                         <input 
+//                                             type="text" 
+//                                             required 
+//                                             style={styles.input}
+//                                             value={formData.title} 
+//                                             onChange={e => setFormData({...formData, title: e.target.value})}
+//                                             placeholder="Enter property title"
+//                                         />
+//                                     </div>
+//                                     <div className="col-md-6">
+//                                         <label style={styles.label}>Brand Name *</label>
+//                                         <input 
+//                                             type="text" 
+//                                             required 
+//                                             style={styles.input}
+//                                             value={formData.brand_name} 
+//                                             onChange={e => setFormData({...formData, brand_name: e.target.value})}
+//                                             placeholder="Enter brand name"
+//                                         />
+//                                     </div>
+//                                     <div className="col-md-6">
+//                                         <label style={styles.label}>WhatsApp Number *</label>
+//                                         <input 
+//                                             type="text" 
+//                                             required 
+//                                             style={styles.input}
+//                                             value={formData.whatsapp_number} 
+//                                             onChange={e => setFormData({...formData, whatsapp_number: e.target.value})}
+//                                             placeholder="+880XXXXXXXXX"
+//                                         />
+//                                     </div>
+//                                     <div className="col-12">
+//                                         <label style={styles.label}>Description</label>
+//                                         <textarea 
+//                                             style={{...styles.input, resize: 'vertical', minHeight: '80px'}}
+//                                             rows="2" 
+//                                             value={formData.description} 
+//                                             onChange={e => setFormData({...formData, description: e.target.value})}
+//                                             placeholder="Describe the property..."
+//                                         />
+//                                     </div>
+//                                     <div className="col-12">
+//                                         <label style={styles.label} className="d-flex justify-content-between">
+//                                             Features
+//                                             <button 
+//                                                 type="button" 
+//                                                 onClick={addFeatureField}
+//                                                 style={{ color: theme.accent, background: 'none', border: 'none', cursor: 'pointer' }}
+//                                             >
+//                                                 + Add More
+//                                             </button>
+//                                         </label>
+//                                         {formData.features.map((f, i) => (
+//                                             <div key={i} className="d-flex gap-2 mb-2">
+//                                                 <input 
+//                                                     type="text" 
+//                                                     style={styles.input}
+//                                                     value={f} 
+//                                                     onChange={e => handleFeatureChange(i, e.target.value)}
+//                                                     placeholder={`Feature ${i + 1}`}
+//                                                 />
+//                                                 {formData.features.length > 1 && (
+//                                                     <button 
+//                                                         type="button"
+//                                                         onClick={() => removeFeatureField(i)}
+//                                                         style={{...styles.deleteBtn, padding: '0 15px', border: 'none', borderRadius: '10px'}}
+//                                                     >
+//                                                         <i className="bi bi-trash"></i>
+//                                                     </button>
+//                                                 )}
+//                                             </div>
+//                                         ))}
+//                                     </div>
+//                                     <div className="col-12">
+//                                         <label style={styles.label}>Property Images</label>
+//                                         <input 
+//                                             type="file" 
+//                                             multiple 
+//                                             style={styles.input}
+//                                             accept="image/*" 
+//                                             onChange={handleImageChange}
+//                                         />
+//                                         {previews.length > 0 && (
+//                                             <div style={styles.imagePreviewContainer}>
+//                                                 {previews.map((src, i) => (
+//                                                     <img 
+//                                                         key={i} 
+//                                                         src={src} 
+//                                                         alt="preview" 
+//                                                         style={styles.previewImage}
+//                                                         onError={(e) => {
+//                                                             e.target.onerror = null;
+//                                                             e.target.src = 'https://via.placeholder.com/80?text=No+Img';
+//                                                         }}
+//                                                     />
+//                                                 ))}
+//                                             </div>
+//                                         )}
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                             <div style={styles.modalFooter}>
+//                                 <button 
+//                                     type="button" 
+//                                     onClick={closeModal}
+//                                     style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
+//                                 >
+//                                     Cancel
+//                                 </button>
+//                                 <button 
+//                                     type="submit" 
+//                                     disabled={loading}
+//                                     style={{...styles.addBtn, padding: '10px 32px'}}
+//                                 >
+//                                     {loading ? (
+//                                         <>
+//                                             <span className="spinner-border spinner-border-sm me-2"></span>
+//                                             Processing...
+//                                         </>
+//                                     ) : (
+//                                         isEditing ? 'Update Property' : 'Save Property'
+//                                     )}
+//                                 </button>
+//                             </div>
+//                         </form>
+//                     </div>
+//                 </div>
+//             )}
+
+//             {/* Delete Confirmation Modal */}
+//             {deleteConfirm && (
+//                 <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
+//                     <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
+//                         <div style={styles.modalHeader}>
+//                             <h5 style={{ margin: 0, fontWeight: '600' }}>Confirm Delete</h5>
+//                             <button onClick={() => setDeleteConfirm(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+//                         </div>
+//                         <div style={styles.modalBody}>
+//                             <div style={{ textAlign: 'center' }}>
+//                                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+//                                 <p>Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?</p>
+//                                 <p style={{ fontSize: '13px', color: theme.textLight }}>This action cannot be undone.</p>
+//                             </div>
+//                         </div>
+//                         <div style={styles.modalFooter}>
+//                             <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
+//                             <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
+
+// export default OwnerSection;
+
+
+
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 
+const ITEMS_PER_PAGE = 6;
+const NO_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+const EMPTY_FORM = { title: '', brand_name: '', whatsapp_number: '', description: '', features: [''] };
+
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://backend.akashbariresort.com/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend.akashbariresort.com';
+
+const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    const cleanPath = imagePath.replace(/^\/?property\//, '').replace(/^\/+/, '').split('?')[0];
+    return `${API_URL.replace(/\/$/, '')}/storage/property/${cleanPath}`;
+};
+
+const getAuthHeaders = () => ({
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+    Role: localStorage.getItem('Role') || 'admin',
+    'Content-Type': 'application/json'
+});
+const getMultipartHeaders = () => ({ ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' });
+
+const Modal = ({ theme, title, onClose, children, footer, width }) => (
+    <div
+        style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 2000, padding: '20px', animation: 'fadeIn .2s ease'
+        }}
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+        <div style={{
+            backgroundColor: theme.card, color: theme.text,
+            border: `1px solid ${theme.border}`, borderRadius: '18px',
+            width: '100%', maxWidth: width || '700px', maxHeight: '90vh',
+            display: 'flex', flexDirection: 'column', animation: 'slideUp .2s ease'
+        }}>
+            <div style={{
+                padding: '18px 24px', borderBottom: `1px solid ${theme.border}`,
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                position: 'sticky', top: 0, backgroundColor: theme.card, borderRadius: '18px 18px 0 0'
+            }}>
+                <h5 style={{ margin: 0, fontWeight: 600 }}>{title}</h5>
+                <button onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '22px', color: theme.text, opacity: 0.6, cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ padding: '24px', overflowY: 'auto' }}>{children}</div>
+            {footer && (
+                <div style={{ padding: '16px 24px', borderTop: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                    {footer}
+                </div>
+            )}
+        </div>
+    </div>
+);
+
 const OwnerSection = ({ theme: dashboardTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [authError, setAuthError] = useState(null);
+    const [imageErrors, setImageErrors] = useState({});
+
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [deleteConfirm, setDeleteConfirm] = useState(null);
-    const [authError, setAuthError] = useState(null);
-    const itemsPerPage = 6;
-    
+
+    const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-    const initialFormState = {
-        title: '',
-        brand_name: '',
-        whatsapp_number: '',
-        description: '',
-        features: [''], 
-    };
-
-    // Use environment variables with fallbacks
-    const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://backend.akashbariresort.com/api';
-    const API_URL = import.meta.env.VITE_API_URL || 'https://backend.akashbariresort.com';
-
-    const [formData, setFormData] = useState(initialFormState);
+    const [formData, setFormData] = useState(EMPTY_FORM);
     const [selectedImages, setSelectedImages] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
-    const [imageErrors, setImageErrors] = useState({});
 
     const theme = {
         isDarkMode,
-        bg: isDarkMode ? '#0f0f1a' : (dashboardTheme?.bg || '#f8f9fc'),
-        card: isDarkMode ? '#1a1a2e' : (dashboardTheme?.card || '#ffffff'),
-        text: isDarkMode ? '#e9ecef' : (dashboardTheme?.text || '#2c3e50'),
-        textLight: isDarkMode ? '#a0a0a0' : '#6c757d',
-        border: isDarkMode ? '#2d2d3d' : (dashboardTheme?.border || '#e9ecef'),
-        accent: '#5e2e10',
-        accentGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
-        danger: '#ef4444',
-        success: '#10b981',
-        warning: '#f59e0b'
+        bg: isDarkMode ? '#0a0a0a' : (dashboardTheme?.bg || '#f5f5f5'),
+        card: isDarkMode ? '#141414' : (dashboardTheme?.card || '#ffffff'),
+        text: isDarkMode ? '#f5f5f5' : (dashboardTheme?.text || '#111111'),
+        textLight: isDarkMode ? '#a3a3a3' : '#6b6b6b',
+        border: isDarkMode ? '#2b2b2b' : (dashboardTheme?.border || '#dcdcdc')
+    };
+    const accent = theme.text;
+    const accentOn = theme.card;
+
+    const fieldStyle = {
+        width: '100%', padding: '10px 14px', borderRadius: '10px',
+        border: `1px solid ${theme.border}`, backgroundColor: theme.bg,
+        color: theme.text, fontSize: '14px', outline: 'none'
     };
 
-    // Get authentication headers
-    const getAuthHeaders = () => {
-        const token = localStorage.getItem('token');
-        const role = localStorage.getItem('Role') || 'admin';
-        
-        return {
-            'Authorization': `Bearer ${token}`,
-            'Role': role,
-            'Content-Type': 'application/json'
-        };
-    };
-
-    // Get multipart form headers (for file uploads)
-    const getMultipartHeaders = () => {
-        const token = localStorage.getItem('token');
-        const role = localStorage.getItem('Role') || 'admin';
-        
-        return {
-            'Authorization': `Bearer ${token}`,
-            'Role': role,
-            'Content-Type': 'multipart/form-data'
-        };
-    };
-
-    // Check authentication
     const checkAuth = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setAuthError("Please login to access this page");
-            setTimeout(() => window.location.href = '/login', 2000);
+        if (!localStorage.getItem('token')) {
+            setAuthError('Please login to access this page');
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
             return false;
         }
         return true;
     };
 
-    // Helper function to get image URL - FIXED
-    const getImageUrl = (imagePath) => {
-        if (!imagePath) return null;
-        
-        // If already a full URL, return as is
-        if (imagePath.startsWith('http')) return imagePath;
-        
-        // Clean the path - remove 'property/' prefix if present
-        let cleanPath = imagePath;
-        if (cleanPath.startsWith('property/')) {
-            cleanPath = cleanPath.replace('property/', '');
-        }
-        if (cleanPath.startsWith('/property/')) {
-            cleanPath = cleanPath.replace('/property/', '');
-        }
-        
-        // Remove any leading slashes
-        cleanPath = cleanPath.replace(/^\/+/, '');
-        
-        // Remove query parameters if any
-        if (cleanPath.includes('?')) {
-            cleanPath = cleanPath.split('?')[0];
-        }
-        
-        const baseUrl = API_URL.replace(/\/$/, '');
-        return `${baseUrl}/storage/property/${cleanPath}`;
-    };
-
-    const handleImageError = (propertyId, imageIndex = null) => {
-        const key = imageIndex !== null ? `${propertyId}-${imageIndex}` : propertyId;
-        if (!imageErrors[key]) {
-            setImageErrors(prev => ({ ...prev, [key]: true }));
-        }
+    const handleAuthFailure = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('Role');
+        setAuthError('Session expired. Please login again.');
+        setTimeout(() => { window.location.href = '/login'; }, 2000);
     };
 
     const getFinalImageUrl = (property, imagePath, index = 0) => {
-        const key = index !== null ? `${property.id}-${index}` : property.id;
-        if (imageErrors[key]) {
-            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
-        }
-        const url = getImageUrl(imagePath);
-        if (!url) {
-            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
-        }
-        return url;
+        const key = `${property.id}-${index}`;
+        if (imageErrors[key]) return NO_IMAGE;
+        return getImageUrl(imagePath) || NO_IMAGE;
     };
 
     const fetchProperties = async () => {
         if (!checkAuth()) return;
-        
         setLoading(true);
         setAuthError(null);
-        
         try {
-            const headers = getAuthHeaders();
-            const res = await axios.get(`${BASE_URL}/get-property-offers`, { headers });
-            
-            if (res.data.status && res.data.data.data) {
-                setProperties(res.data.data.data);
-            } else {
-                setProperties([]);
-            }
-        } catch (err) { 
-            console.error("Fetch Error:", err);
-            if (err.response?.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('Role');
-                setAuthError("Session expired. Please login again.");
-                setTimeout(() => window.location.href = '/login', 2000);
-            } else {
-                setAuthError("Failed to fetch properties. Please try again.");
-            }
+            const res = await axios.get(`${BASE_URL}/get-property-offers`, { headers: getAuthHeaders() });
+            setProperties(res.data.status && res.data.data.data ? res.data.data.data : []);
+        } catch (err) {
+            console.error('Fetch Error:', err);
+            if (err.response?.status === 401) handleAuthFailure();
+            else setAuthError('Failed to fetch properties. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => { 
-        fetchProperties(); 
-    }, []);
+    useEffect(() => { fetchProperties(); }, []);
+
+    const openAddModal = () => { setIsEditing(false); setEditId(null); setFormData(EMPTY_FORM); setPreviews([]); setExistingImages([]); setSelectedImages([]); setShowModal(true); };
 
     const handleEditClick = (item) => {
         setIsEditing(true);
         setEditId(item.id);
         setFormData({
-            title: item.title || '',
-            brand_name: item.brand_name || '',
-            whatsapp_number: item.whatsapp_number || '',
-            description: item.description || '',
-            features: item.features && item.features.length > 0 ? item.features : [''],
+            title: item.title || '', brand_name: item.brand_name || '',
+            whatsapp_number: item.whatsapp_number || '', description: item.description || '',
+            features: item.features?.length ? item.features : ['']
         });
-        
-        // Set existing images for preview
-        if (item.slider_images && item.slider_images.length > 0) {
-            const imageUrls = item.slider_images.map(img => getImageUrl(img));
-            setExistingImages(imageUrls);
-            setPreviews(imageUrls);
-        } else {
-            setExistingImages([]);
-            setPreviews([]);
-        }
+        const imageUrls = item.slider_images?.length ? item.slider_images.map(getImageUrl) : [];
+        setExistingImages(imageUrls);
+        setPreviews(imageUrls);
         setSelectedImages([]);
         setShowModal(true);
     };
 
     const closeModal = () => {
-        setFormData(initialFormState);
+        setFormData(EMPTY_FORM);
         setPreviews([]);
         setExistingImages([]);
         setSelectedImages([]);
@@ -202,616 +1186,203 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
     };
 
     const handleFeatureChange = (index, value) => {
-        const newFeatures = [...formData.features];
-        newFeatures[index] = value;
-        setFormData({ ...formData, features: newFeatures });
+        const features = [...formData.features];
+        features[index] = value;
+        setFormData({ ...formData, features });
     };
-
     const addFeatureField = () => setFormData({ ...formData, features: [...formData.features, ''] });
-    
-    const removeFeatureField = (index) => {
-        const newFeatures = formData.features.filter((_, i) => i !== index);
-        setFormData({ ...formData, features: newFeatures });
-    };
+    const removeFeatureField = (index) => setFormData({ ...formData, features: formData.features.filter((_, i) => i !== index) });
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        const oversized = files.find(file => file.size > 5 * 1024 * 1024);
-        if (oversized) {
-            alert(`File "${oversized.name}" is too large! Max 5MB.`);
-            return;
-        }
+        const oversized = files.find(f => f.size > 5 * 1024 * 1024);
+        if (oversized) return alert(`File "${oversized.name}" is too large! Max 5MB.`);
         setSelectedImages(files);
-        const newPreviews = files.map(file => URL.createObjectURL(file));
-        setPreviews([...existingImages, ...newPreviews]);
+        setPreviews([...existingImages, ...files.map(f => URL.createObjectURL(f))]);
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
-        
         if (!checkAuth()) return;
-        
         setLoading(true);
-        
+
         const data = new FormData();
         data.append('title', formData.title);
         data.append('brand_name', formData.brand_name);
         data.append('whatsapp_number', formData.whatsapp_number);
         data.append('description', formData.description);
-        
-        formData.features.forEach((feature, index) => {
-            if (feature.trim() !== '') data.append(`features[${index}]`, feature);
-        });
-
-        if (selectedImages.length > 0) {
-            selectedImages.forEach(img => data.append('slider_images[]', img));
-        }
+        formData.features.forEach((f, i) => { if (f.trim()) data.append(`features[${i}]`, f); });
+        selectedImages.forEach(img => data.append('slider_images[]', img));
 
         try {
-            const headers = getMultipartHeaders();
-            const url = isEditing 
-                ? `${BASE_URL}/edit-property-offers/${editId}`
-                : `${BASE_URL}/add-property-offers`;
-
-            await axios.post(url, data, { headers });
-            
+            const url = isEditing ? `${BASE_URL}/edit-property-offers/${editId}` : `${BASE_URL}/add-property-offers`;
+            await axios.post(url, data, { headers: getMultipartHeaders() });
             fetchProperties();
             closeModal();
-        } catch (err) { 
-            console.error("Save Error:", err);
-            if (err.response?.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('Role');
-                setAuthError("Session expired. Please login again.");
-                setTimeout(() => window.location.href = '/login', 2000);
-            } else {
-                alert(err.response?.data?.message || "Something went wrong!");
-            }
-        } finally { 
-            setLoading(false); 
+        } catch (err) {
+            console.error('Save Error:', err);
+            if (err.response?.status === 401) handleAuthFailure();
+            else alert(err.response?.data?.message || 'Something went wrong!');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
         if (!checkAuth()) return;
-        
         try {
-            const headers = getAuthHeaders();
-            await axios.delete(`${BASE_URL}/del-property-offers/${id}`, { headers });
+            await axios.delete(`${BASE_URL}/del-property-offers/${id}`, { headers: getAuthHeaders() });
             fetchProperties();
             setDeleteConfirm(null);
-        } catch (err) { 
+        } catch (err) {
             console.error(err);
-            if (err.response?.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('Role');
-                setAuthError("Session expired. Please login again.");
-                setTimeout(() => window.location.href = '/login', 2000);
-            } else {
-                alert("Failed to delete property");
-            }
+            if (err.response?.status === 401) handleAuthFailure();
+            else alert('Failed to delete property');
         }
     };
 
-    // Filter and Pagination
     const filteredProperties = properties.filter(item =>
         item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.brand_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredProperties.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
-
-    // Statistics
-    const totalProperties = properties.length;
-
-    const styles = {
-        container: {
-            backgroundColor: theme.bg,
-            minHeight: '100vh',
-            transition: 'all 0.3s ease'
-        },
-        mainContent: {
-            flex: 1,
-            overflowY: 'auto',
-            padding: '30px'
-        },
-        pageHeader: {
-            marginBottom: '30px'
-        },
-        pageTitle: {
-            fontSize: '28px',
-            fontWeight: '700',
-            background: theme.accentGradient,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '8px'
-        },
-        pageSubtitle: {
-            color: theme.textLight,
-            fontSize: '14px'
-        },
-        alert: {
-            padding: '12px 20px',
-            backgroundColor: 'rgba(94, 46, 16, 0.15)',
-            color: '#5e2e10',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontWeight: '500'
-        },
-        statCards: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '20px',
-            marginBottom: '30px'
-        },
-        statCard: {
-            backgroundColor: theme.card,
-            borderRadius: '16px',
-            padding: '20px',
-            border: `1px solid ${theme.border}`,
-            transition: 'all 0.3s ease',
-            cursor: 'pointer'
-        },
-        statIcon: {
-            width: '50px',
-            height: '50px',
-            borderRadius: '12px',
-            background: theme.accentGradient,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            marginBottom: '16px'
-        },
-        statValue: {
-            fontSize: '28px',
-            fontWeight: '700',
-            color: theme.text,
-            marginBottom: '4px'
-        },
-        statLabel: {
-            fontSize: '13px',
-            color: theme.textLight,
-            fontWeight: '500'
-        },
-        toolbar: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px',
-            flexWrap: 'wrap',
-            gap: '16px'
-        },
-        searchBox: {
-            padding: '12px 20px',
-            borderRadius: '12px',
-            border: `1px solid ${theme.border}`,
-            backgroundColor: theme.card,
-            color: theme.text,
-            width: '300px',
-            fontSize: '14px',
-            outline: 'none',
-            transition: 'all 0.3s'
-        },
-        addBtn: {
-            background: theme.accentGradient,
-            color: 'white',
-            border: 'none',
-            padding: '12px 28px',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '600',
-            transition: 'all 0.3s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
-        },
-        propertiesGrid: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-            gap: '24px',
-            marginBottom: '30px'
-        },
-        propertyCard: {
-            backgroundColor: theme.card,
-            borderRadius: '20px',
-            overflow: 'hidden',
-            border: `1px solid ${theme.border}`,
-            transition: 'all 0.3s ease',
-            position: 'relative'
-        },
-        cardImage: {
-            width: '100%',
-            height: '200px',
-            objectFit: 'cover',
-            transition: 'transform 0.5s ease'
-        },
-        cardContent: {
-            padding: '20px'
-        },
-        propertyTitle: {
-            fontSize: '18px',
-            fontWeight: '700',
-            color: theme.text,
-            marginBottom: '8px'
-        },
-        brandName: {
-            fontSize: '13px',
-            color: theme.accent,
-            marginBottom: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px'
-        },
-        whatsapp: {
-            fontSize: '13px',
-            color: theme.success,
-            marginBottom: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px'
-        },
-        description: {
-            fontSize: '13px',
-            color: theme.textLight,
-            lineHeight: '1.5',
-            marginBottom: '12px'
-        },
-        featureList: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px',
-            marginBottom: '16px'
-        },
-        featureBadge: {
-            background: `${theme.accent}15`,
-            color: theme.accent,
-            padding: '4px 10px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: '500'
-        },
-        cardActions: {
-            display: 'flex',
-            gap: '10px',
-            paddingTop: '16px',
-            borderTop: `1px solid ${theme.border}`
-        },
-        actionBtn: {
-            flex: 1,
-            padding: '8px',
-            borderRadius: '10px',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.3s',
-            fontSize: '13px',
-            fontWeight: '500',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px'
-        },
-        editBtn: {
-            backgroundColor: `${theme.accent}15`,
-            color: theme.accent
-        },
-        deleteBtn: {
-            backgroundColor: `${theme.danger}20`,
-            color: theme.danger
-        },
-        pagination: {
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '8px',
-            marginTop: '20px'
-        },
-        pageBtn: {
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            border: `1px solid ${theme.border}`,
-            backgroundColor: theme.card,
-            color: theme.text,
-            cursor: 'pointer',
-            transition: 'all 0.3s',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        activePage: {
-            background: theme.accentGradient,
-            color: 'white',
-            border: 'none'
-        },
-        emptyState: {
-            textAlign: 'center',
-            padding: '60px',
-            color: theme.textLight
-        },
-        loadingSpinner: {
-            textAlign: 'center',
-            padding: '60px',
-            color: theme.textLight
-        },
-        modalOverlay: {
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 2000,
-            backdropFilter: 'blur(8px)'
-        },
-        modal: {
-            backgroundColor: theme.card,
-            borderRadius: '24px',
-            width: '700px',
-            maxWidth: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto'
-        },
-        modalHeader: {
-            padding: '24px',
-            borderBottom: `1px solid ${theme.border}`,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            position: 'sticky',
-            top: 0,
-            backgroundColor: theme.card,
-            zIndex: 1
-        },
-        modalBody: {
-            padding: '24px'
-        },
-        modalFooter: {
-            padding: '20px 24px',
-            borderTop: `1px solid ${theme.border}`,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '12px'
-        },
-        input: {
-            width: '100%',
-            padding: '10px 14px',
-            borderRadius: '10px',
-            border: `1px solid ${theme.border}`,
-            backgroundColor: theme.bg,
-            color: theme.text,
-            fontSize: '14px',
-            outline: 'none',
-            transition: 'all 0.3s'
-        },
-        label: {
-            display: 'block',
-            marginBottom: '8px',
-            fontWeight: '600',
-            fontSize: '13px',
-            color: theme.text
-        },
-        imagePreviewContainer: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px',
-            marginTop: '12px'
-        },
-        previewImage: {
-            width: '80px',
-            height: '80px',
-            borderRadius: '10px',
-            objectFit: 'cover',
-            border: `2px solid ${theme.accent}`,
-            padding: '2px'
-        }
-    };
+    const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
+    const indexOfFirstItem = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentItems = filteredProperties.slice(indexOfFirstItem, indexOfFirstItem + ITEMS_PER_PAGE);
 
     return (
-        <div style={styles.container}>
-            <style>
-                {`
-                    @keyframes fadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                    }
-                    @keyframes slideUp {
-                        from { transform: translateY(30px); opacity: 0; }
-                        to { transform: translateY(0); opacity: 1; }
-                    }
-                    .stat-card:hover {
-                        transform: translateY(-4px);
-                        box-shadow: 0 8px 25px rgba(94, 46, 16, 0.15);
-                    }
-                    .property-card:hover {
-                        transform: translateY(-6px);
-                        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
-                    }
-                    .property-card:hover img {
-                        transform: scale(1.05);
-                    }
-                    button:hover {
-                        transform: translateY(-2px);
-                    }
-                    .search-box:focus {
-                        border-color: #5e2e10;
-                        box-shadow: 0 0 0 3px rgba(94, 46, 16, 0.1);
-                    }
-                    .property-card {
-                        animation: slideUp 0.3s ease;
-                    }
-                `}
-            </style>
-
+        <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
                 <Sidebar theme={theme} isCollapsed={isCollapsed} />
 
                 <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
-                    <Header 
-                        theme={theme}
-                        isDarkMode={isDarkMode}
-                        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-                        toggleSidebar={() => setIsCollapsed(!isCollapsed)}
-                    />
+                    <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} toggleSidebar={() => setIsCollapsed(!isCollapsed)} />
 
-                    <div style={styles.mainContent}>
-                        {/* Header Section */}
-                        <div style={styles.pageHeader}>
-                            <h1 style={styles.pageTitle}>Property Inventory</h1>
-                            <p style={styles.pageSubtitle}>Manage your property listings and offers</p>
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
+                        <div style={{ marginBottom: '26px' }}>
+                            <h1 style={{ fontSize: '26px', fontWeight: 700, color: theme.text, margin: 0 }}>Property Inventory</h1>
+                            <p style={{ color: theme.textLight, margin: '4px 0 0' }}>Manage your property listings and offers</p>
                         </div>
 
-                        {/* Auth Error Display */}
                         {authError && (
-                            <div style={styles.alert}>
-                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                                {authError}
+                            <div className="alert" role="alert" style={{ border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text }}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>{authError}
                             </div>
                         )}
 
-                        {/* Statistics Cards */}
-                        <div style={styles.statCards}>
-                            <div className="stat-card" style={styles.statCard}>
-                                <div style={styles.statIcon}>🏘️</div>
-                                <div style={styles.statValue}>{totalProperties}</div>
-                                <div style={styles.statLabel}>Total Properties</div>
-                            </div>
-                            <div className="stat-card" style={styles.statCard}>
-                                <div style={styles.statIcon}>🏢</div>
-                                <div style={styles.statValue}>Active</div>
-                                <div style={styles.statLabel}>Status</div>
-                            </div>
-                            <div className="stat-card" style={styles.statCard}>
-                                <div style={styles.statIcon}>📞</div>
-                                <div style={styles.statValue}>24/7</div>
-                                <div style={styles.statLabel}>Support</div>
-                            </div>
+                        {/* Stats */}
+                        <div className="row g-3 mb-4">
+                            {[
+                                { label: 'Total Properties', value: properties.length },
+                                { label: 'Status', value: 'Active' },
+                                { label: 'Support', value: '24/7' }
+                            ].map(stat => (
+                                <div className="col-6 col-md-4" key={stat.label}>
+                                    <div style={{ backgroundColor: theme.card, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '18px' }}>
+                                        <div style={{ fontSize: '22px', fontWeight: 700, color: theme.text }}>{stat.value}</div>
+                                        <div style={{ fontSize: '13px', color: theme.textLight, fontWeight: 500 }}>{stat.label}</div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         {/* Toolbar */}
-                        <div style={styles.toolbar}>
+                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
                             <input
                                 type="text"
-                                placeholder="🔍 Search by title or brand..."
-                                style={styles.searchBox}
-                                className="search-box"
+                                placeholder="Search by title or brand..."
                                 value={searchTerm}
-                                onChange={(e) => {
-                                    setSearchTerm(e.target.value);
-                                    setCurrentPage(1);
-                                }}
+                                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                                style={{ ...fieldStyle, width: '300px', backgroundColor: theme.card }}
                             />
-                            <button style={styles.addBtn} onClick={() => setShowModal(true)}>
-                                <i className="bi bi-plus-circle"></i> Add Property
+                            <button onClick={openAddModal} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 22px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+                                <i className="bi bi-plus-circle me-2"></i>Add Property
                             </button>
                         </div>
 
                         {/* Properties Grid */}
                         {loading ? (
-                            <div style={styles.loadingSpinner}>
-                                <div className="spinner-border text-primary" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                                <p style={{ marginTop: '16px' }}>Loading properties...</p>
+                            <div className="text-center py-5">
+                                <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                                <p className="mt-3" style={{ color: theme.textLight }}>Loading properties...</p>
                             </div>
                         ) : currentItems.length > 0 ? (
                             <>
-                                <div style={styles.propertiesGrid}>
-                                    {currentItems.map((item) => (
-                                        <div key={item.id} className="property-card" style={styles.propertyCard}>
-                                            <img 
-                                                src={item.slider_images?.[0] ? getFinalImageUrl(item, item.slider_images[0], 0) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E"} 
-                                                alt={item.title}
-                                                style={styles.cardImage}
-                                                onError={() => handleImageError(item.id, 0)}
-                                            />
-                                            <div style={styles.cardContent}>
-                                                <h3 style={styles.propertyTitle}>{item.title}</h3>
-                                                <div style={styles.brandName}>
-                                                    <i className="bi bi-tag"></i> {item.brand_name}
-                                                </div>
-                                                <div style={styles.whatsapp}>
-                                                    <i className="bi bi-whatsapp"></i> {item.whatsapp_number}
-                                                </div>
-                                                <p style={styles.description}>
-                                                    {item.description?.substring(0, 100)}...
-                                                </p>
-                                                {item.features && item.features.length > 0 && (
-                                                    <div style={styles.featureList}>
-                                                        {item.features.slice(0, 3).map((feature, idx) => (
-                                                            <span key={idx} style={styles.featureBadge}>
-                                                                {feature}
-                                                            </span>
-                                                        ))}
-                                                        {item.features.length > 3 && (
-                                                            <span style={styles.featureBadge}>
-                                                                +{item.features.length - 3} more
-                                                            </span>
-                                                        )}
+                                <div className="row g-3">
+                                    {currentItems.map(item => (
+                                        <div className="col-md-6 col-lg-4" key={item.id}>
+                                            <div style={{ backgroundColor: theme.card, border: `1px solid ${theme.border}`, borderRadius: '16px', overflow: 'hidden', height: '100%' }}>
+                                                <img
+                                                    src={item.slider_images?.[0] ? getFinalImageUrl(item, item.slider_images[0], 0) : NO_IMAGE}
+                                                    alt={item.title}
+                                                    style={{ width: '100%', height: '160px', objectFit: 'cover' }}
+                                                    onError={() => setImageErrors(prev => ({ ...prev, [`${item.id}-0`]: true }))}
+                                                />
+                                                <div style={{ padding: '16px' }}>
+                                                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: theme.text, marginBottom: '6px' }}>{item.title}</h3>
+                                                    <div style={{ fontSize: '12px', color: theme.textLight, marginBottom: '4px' }}>
+                                                        <i className="bi bi-tag me-1"></i>{item.brand_name}
                                                     </div>
-                                                )}
-                                                <div style={styles.cardActions}>
-                                                    <button 
-                                                        style={{...styles.actionBtn, ...styles.editBtn}}
-                                                        onClick={() => handleEditClick(item)}
-                                                    >
-                                                        <i className="bi bi-pencil"></i> Edit
-                                                    </button>
-                                                    <button 
-                                                        style={{...styles.actionBtn, ...styles.deleteBtn}}
-                                                        onClick={() => setDeleteConfirm(item)}
-                                                    >
-                                                        <i className="bi bi-trash"></i> Delete
-                                                    </button>
+                                                    <div style={{ fontSize: '12px', color: theme.textLight, marginBottom: '10px' }}>
+                                                        <i className="bi bi-whatsapp me-1"></i>{item.whatsapp_number}
+                                                    </div>
+                                                    <p style={{ fontSize: '13px', color: theme.textLight, lineHeight: 1.5, marginBottom: '12px' }}>
+                                                        {item.description?.substring(0, 100)}...
+                                                    </p>
+                                                    {item.features?.length > 0 && (
+                                                        <div className="d-flex flex-wrap gap-2 mb-3">
+                                                            {item.features.slice(0, 3).map((feature, idx) => (
+                                                                <span key={idx} style={{ border: `1px solid ${theme.border}`, color: theme.text, padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 500 }}>
+                                                                    {feature}
+                                                                </span>
+                                                            ))}
+                                                            {item.features.length > 3 && (
+                                                                <span style={{ border: `1px solid ${theme.border}`, color: theme.textLight, padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 500 }}>
+                                                                    +{item.features.length - 3} more
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <div className="d-flex gap-2" style={{ borderTop: `1px solid ${theme.border}`, paddingTop: '12px' }}>
+                                                        <button className="btn btn-sm btn-outline-dark flex-fill" onClick={() => handleEditClick(item)}>
+                                                            <i className="bi bi-pencil"></i> Edit
+                                                        </button>
+                                                        <button className="btn btn-sm btn-outline-dark flex-fill" onClick={() => setDeleteConfirm(item)}>
+                                                            <i className="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
-                                {/* Pagination */}
                                 {totalPages > 1 && (
-                                    <div style={styles.pagination}>
+                                    <div className="d-flex justify-content-center gap-2 mt-4">
                                         <button
-                                            style={{...styles.pageBtn, ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })}}
                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                             disabled={currentPage === 1}
+                                            style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text, opacity: currentPage === 1 ? 0.4 : 1, cursor: 'pointer' }}
                                         >
                                             ←
                                         </button>
-                                        {[...Array(Math.min(totalPages, 5))].map((_, i) => {
-                                            let pageNum;
-                                            if (totalPages <= 5) {
-                                                pageNum = i + 1;
-                                            } else if (currentPage <= 3) {
-                                                pageNum = i + 1;
-                                            } else if (currentPage >= totalPages - 2) {
-                                                pageNum = totalPages - 4 + i;
-                                            } else {
-                                                pageNum = currentPage - 2 + i;
-                                            }
-                                            return (
-                                                <button
-                                                    key={i}
-                                                    style={{
-                                                        ...styles.pageBtn,
-                                                        ...(currentPage === pageNum && styles.activePage)
-                                                    }}
-                                                    onClick={() => setCurrentPage(pageNum)}
-                                                >
-                                                    {pageNum}
-                                                </button>
-                                            );
-                                        })}
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(num => (
+                                            <button
+                                                key={num}
+                                                onClick={() => setCurrentPage(num)}
+                                                style={{
+                                                    width: '36px', height: '36px', borderRadius: '8px', cursor: 'pointer',
+                                                    border: `1px solid ${theme.border}`,
+                                                    backgroundColor: currentPage === num ? accent : theme.card,
+                                                    color: currentPage === num ? accentOn : theme.text
+                                                }}
+                                            >
+                                                {num}
+                                            </button>
+                                        ))}
                                         <button
-                                            style={{...styles.pageBtn, ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })}}
                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                             disabled={currentPage === totalPages}
+                                            style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text, opacity: currentPage === totalPages ? 0.4 : 1, cursor: 'pointer' }}
                                         >
                                             →
                                         </button>
@@ -819,15 +1390,13 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
                                 )}
                             </>
                         ) : (
-                            <div style={styles.emptyState}>
-                                <div style={{ fontSize: '64px', marginBottom: '16px' }}>🏘️</div>
-                                <h4>No Properties Found</h4>
-                                <p style={{ color: theme.textLight, marginBottom: '20px' }}>
-                                    {searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first property'}
-                                </p>
+                            <div className="text-center py-5" style={{ color: theme.textLight }}>
+                                <i className="bi bi-buildings display-4 d-block mb-3" style={{ opacity: 0.4 }}></i>
+                                <h5 style={{ color: theme.text }}>No Properties Found</h5>
+                                <p className="mb-3">{searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first property'}</p>
                                 {!searchTerm && (
-                                    <button style={styles.addBtn} onClick={() => setShowModal(true)}>
-                                        <i className="bi bi-plus-circle"></i> Add Property
+                                    <button onClick={openAddModal} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 22px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+                                        <i className="bi bi-plus-circle me-2"></i>Add Property
                                     </button>
                                 )}
                             </div>
@@ -840,175 +1409,118 @@ const OwnerSection = ({ theme: dashboardTheme }) => {
 
             {/* Add/Edit Modal */}
             {showModal && (
-                <div style={styles.modalOverlay} onClick={closeModal}>
-                    <div style={styles.modal} onClick={e => e.stopPropagation()}>
-                        <div style={styles.modalHeader}>
-                            <h5 style={{ margin: 0, fontWeight: '600' }}>
-                                {isEditing ? '✏️ Edit Property' : '✨ Add New Property'}
-                            </h5>
-                            <button 
-                                onClick={closeModal}
-                                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: theme.text }}
-                            >
-                                ×
+                <form onSubmit={handleSave}>
+                    <Modal
+                        theme={theme}
+                        title={isEditing ? 'Edit Property' : 'Add New Property'}
+                        onClose={closeModal}
+                        footer={<>
+                            <button type="button" className="btn btn-outline-dark" onClick={closeModal}>Cancel</button>
+                            <button type="submit" disabled={loading} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 600, cursor: 'pointer' }}>
+                                {loading ? (<><span className="spinner-border spinner-border-sm me-2"></span>Processing...</>) : (isEditing ? 'Update Property' : 'Save Property')}
                             </button>
-                        </div>
-                        <form onSubmit={handleSave}>
-                            <div style={styles.modalBody}>
-                                <div className="row g-3">
-                                    <div className="col-12">
-                                        <label style={styles.label}>Property Title *</label>
-                                        <input 
-                                            type="text" 
-                                            required 
-                                            style={styles.input}
-                                            value={formData.title} 
-                                            onChange={e => setFormData({...formData, title: e.target.value})}
-                                            placeholder="Enter property title"
-                                        />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label style={styles.label}>Brand Name *</label>
-                                        <input 
-                                            type="text" 
-                                            required 
-                                            style={styles.input}
-                                            value={formData.brand_name} 
-                                            onChange={e => setFormData({...formData, brand_name: e.target.value})}
-                                            placeholder="Enter brand name"
-                                        />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label style={styles.label}>WhatsApp Number *</label>
-                                        <input 
-                                            type="text" 
-                                            required 
-                                            style={styles.input}
-                                            value={formData.whatsapp_number} 
-                                            onChange={e => setFormData({...formData, whatsapp_number: e.target.value})}
-                                            placeholder="+880XXXXXXXXX"
-                                        />
-                                    </div>
-                                    <div className="col-12">
-                                        <label style={styles.label}>Description</label>
-                                        <textarea 
-                                            style={{...styles.input, resize: 'vertical', minHeight: '80px'}}
-                                            rows="2" 
-                                            value={formData.description} 
-                                            onChange={e => setFormData({...formData, description: e.target.value})}
-                                            placeholder="Describe the property..."
-                                        />
-                                    </div>
-                                    <div className="col-12">
-                                        <label style={styles.label} className="d-flex justify-content-between">
-                                            Features
-                                            <button 
-                                                type="button" 
-                                                onClick={addFeatureField}
-                                                style={{ color: theme.accent, background: 'none', border: 'none', cursor: 'pointer' }}
-                                            >
-                                                + Add More
+                        </>}
+                    >
+                        <div className="row g-3">
+                            <div className="col-12">
+                                <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>Property Title *</label>
+                                <input type="text" required style={fieldStyle} value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Enter property title" />
+                            </div>
+                            <div className="col-md-6">
+                                <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>Brand Name *</label>
+                                <input type="text" required style={fieldStyle} value={formData.brand_name} onChange={(e) => setFormData({ ...formData, brand_name: e.target.value })} placeholder="Enter brand name" />
+                            </div>
+                            <div className="col-md-6">
+                                <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>WhatsApp Number *</label>
+                                <input type="text" required style={fieldStyle} value={formData.whatsapp_number} onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })} placeholder="+880XXXXXXXXX" />
+                            </div>
+                            <div className="col-12">
+                                <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>Description</label>
+                                <textarea rows="2" style={{ ...fieldStyle, minHeight: '80px' }} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Describe the property..." />
+                            </div>
+                            <div className="col-12">
+                                <div className="d-flex justify-content-between mb-2">
+                                    <label style={{ fontWeight: 600, fontSize: '13px' }}>Features</label>
+                                    <button type="button" onClick={addFeatureField} style={{ color: theme.text, background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+                                        + Add More
+                                    </button>
+                                </div>
+                                {formData.features.map((f, i) => (
+                                    <div key={i} className="d-flex gap-2 mb-2">
+                                        <input type="text" style={fieldStyle} value={f} onChange={(e) => handleFeatureChange(i, e.target.value)} placeholder={`Feature ${i + 1}`} />
+                                        {formData.features.length > 1 && (
+                                            <button type="button" onClick={() => removeFeatureField(i)} className="btn btn-outline-dark" style={{ padding: '0 15px' }}>
+                                                <i className="bi bi-trash"></i>
                                             </button>
-                                        </label>
-                                        {formData.features.map((f, i) => (
-                                            <div key={i} className="d-flex gap-2 mb-2">
-                                                <input 
-                                                    type="text" 
-                                                    style={styles.input}
-                                                    value={f} 
-                                                    onChange={e => handleFeatureChange(i, e.target.value)}
-                                                    placeholder={`Feature ${i + 1}`}
-                                                />
-                                                {formData.features.length > 1 && (
-                                                    <button 
-                                                        type="button"
-                                                        onClick={() => removeFeatureField(i)}
-                                                        style={{...styles.deleteBtn, padding: '0 15px', border: 'none', borderRadius: '10px'}}
-                                                    >
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="col-12">
-                                        <label style={styles.label}>Property Images</label>
-                                        <input 
-                                            type="file" 
-                                            multiple 
-                                            style={styles.input}
-                                            accept="image/*" 
-                                            onChange={handleImageChange}
-                                        />
-                                        {previews.length > 0 && (
-                                            <div style={styles.imagePreviewContainer}>
-                                                {previews.map((src, i) => (
-                                                    <img 
-                                                        key={i} 
-                                                        src={src} 
-                                                        alt="preview" 
-                                                        style={styles.previewImage}
-                                                        onError={(e) => {
-                                                            e.target.onerror = null;
-                                                            e.target.src = 'https://via.placeholder.com/80?text=No+Img';
-                                                        }}
-                                                    />
-                                                ))}
-                                            </div>
                                         )}
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                            <div style={styles.modalFooter}>
-                                <button 
-                                    type="button" 
-                                    onClick={closeModal}
-                                    style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    type="submit" 
-                                    disabled={loading}
-                                    style={{...styles.addBtn, padding: '10px 32px'}}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="spinner-border spinner-border-sm me-2"></span>
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        isEditing ? 'Update Property' : 'Save Property'
-                                    )}
-                                </button>
+                            <div className="col-12">
+                                <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>Property Images</label>
+                                <input type="file" multiple style={fieldStyle} accept="image/*" onChange={handleImageChange} />
+                                {previews.length > 0 && (
+                                    <div className="d-flex flex-wrap gap-2 mt-2">
+                                        {previews.map((src, i) => (
+                                            <img
+                                                key={i}
+                                                src={src}
+                                                alt="preview"
+                                                style={{ width: '76px', height: '76px', borderRadius: '10px', objectFit: 'cover', border: `1px solid ${theme.border}` }}
+                                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/80?text=No+Img'; }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                        </form>
-                    </div>
-                </div>
+                        </div>
+                    </Modal>
+                </form>
             )}
 
             {/* Delete Confirmation Modal */}
             {deleteConfirm && (
-                <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
-                    <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
-                        <div style={styles.modalHeader}>
-                            <h5 style={{ margin: 0, fontWeight: '600' }}>Confirm Delete</h5>
-                            <button onClick={() => setDeleteConfirm(null)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                <div
+                    style={{
+                        position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 2000, padding: '20px', animation: 'fadeIn .2s ease'
+                    }}
+                    onClick={(e) => e.target === e.currentTarget && setDeleteConfirm(null)}
+                >
+                    <div style={{
+                        backgroundColor: theme.card, color: theme.text,
+                        border: `1px solid ${theme.border}`, borderRadius: '16px',
+                        width: '100%', maxWidth: '380px', padding: '28px 26px', textAlign: 'center',
+                        animation: 'slideUp .2s ease'
+                    }}>
+                        <div style={{
+                            width: '48px', height: '48px', borderRadius: '50%',
+                            border: `1.5px solid ${theme.text}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            margin: '0 auto 16px', fontSize: '20px'
+                        }}>
+                            <i className="bi bi-trash"></i>
                         </div>
-                        <div style={styles.modalBody}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
-                                <p>Are you sure you want to delete <strong>{deleteConfirm.title}</strong>?</p>
-                                <p style={{ fontSize: '13px', color: theme.textLight }}>This action cannot be undone.</p>
-                            </div>
-                        </div>
-                        <div style={styles.modalFooter}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{...styles.actionBtn, backgroundColor: theme.border, color: theme.text, padding: '10px 24px'}}>Cancel</button>
-                            <button onClick={() => handleDelete(deleteConfirm.id)} style={{...styles.deleteBtn, padding: '10px 24px', border: 'none', borderRadius: '10px'}}>Delete</button>
+                        <h5 style={{ margin: '0 0 8px', fontWeight: 600 }}>Delete this property?</h5>
+                        <p style={{ margin: '0 0 22px', color: theme.textLight, fontSize: '14px' }}>
+                            "<strong>{deleteConfirm.title}</strong>" will be permanently removed. This can't be undone.
+                        </p>
+                        <div className="d-flex gap-2">
+                            <button onClick={() => setDeleteConfirm(null)} className="btn btn-outline-dark flex-fill">Cancel</button>
+                            <button onClick={() => handleDelete(deleteConfirm.id)} className="btn flex-fill" style={{ backgroundColor: accent, color: accentOn, border: 'none' }}>Delete</button>
                         </div>
                     </div>
                 </div>
             )}
+
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                ::-webkit-scrollbar { width: 6px; height: 6px; }
+                ::-webkit-scrollbar-track { background: ${theme.bg}; }
+                ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 10px; }
+            `}</style>
         </div>
     );
 };

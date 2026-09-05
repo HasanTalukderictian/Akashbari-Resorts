@@ -264,10 +264,10 @@ const MENU_ITEMS = [
 const CLUB_SUB_ITEMS = [
     { id: 'club-info', label: 'Club Info', icon: 'bi-info-circle-fill', path: '/admin-club' },
     { id: 'club-gallery', label: 'Club Gallery', icon: 'bi-images', path: '/admin-club-gallery' },
-    { id: 'club-rules', label: 'Club Rules', icon: 'bi-file-text-fill', path: '/admin-club-rules' },
-    { id: 'club-facilities', label: 'Facilities', icon: 'bi-building', path: '/admin-club-facilities' },
-    { id: 'club-committee', label: 'Committee', icon: 'bi-person-badge-fill', path: '/admin-club-committee' },
-    { id: 'club-notice', label: 'Club Notice', icon: 'bi-megaphone-fill', path: '/admin-club-notice' },
+    // { id: 'club-rules', label: 'Club Rules', icon: 'bi-file-text-fill', path: '/admin-club-rules' },
+    // { id: 'club-facilities', label: 'Facilities', icon: 'bi-building', path: '/admin-club-facilities' },
+    // { id: 'club-committee', label: 'Committee', icon: 'bi-person-badge-fill', path: '/admin-club-committee' },
+    // { id: 'club-notice', label: 'Club Notice', icon: 'bi-megaphone-fill', path: '/admin-club-notice' },
 ];
 
 const LANDING_SUB_ITEMS = [
