@@ -749,3 +749,129 @@
         transition: none;
     }
 }
+
+
+/* ==========================================================================
+   SUCCESS TOAST / MODAL
+   ========================================================================== */
+
+.success-toast {
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 22, 8, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 2000;
+    animation: cd-fade-in 0.3s ease;
+}
+
+.success-toast-content {
+    background: #ffffff;
+    border: 1px solid var(--cd-line);
+    border-radius: 0.75rem;
+    padding: 40px 45px 35px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(42, 22, 8, 0.4);
+    animation: cd-scale-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.success-toast-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: var(--cd-teal);
+    border-radius: 50%;
+    margin-bottom: 18px;
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+    animation: success-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.success-toast-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cd-ink);
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.success-toast-message {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--cd-muted);
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.success-toast-sub {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(42, 22, 8, 0.5);
+    margin-top: 8px;
+}
+
+.success-toast-loader {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.success-toast-loader span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--cd-teal);
+    border-radius: 50%;
+    animation: dots-bounce 1.4s ease-in-out infinite both;
+}
+
+.success-toast-loader span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.success-toast-loader span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.success-toast-loader span:nth-child(3) {
+    animation-delay: 0;
+}
+
+@keyframes success-pop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes dots-bounce {
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.4;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

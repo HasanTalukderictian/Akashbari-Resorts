@@ -448,7 +448,7 @@
 }
 
 .benefit-card:hover {
-    animation: vibrate 0.3s linear infinite;
+    /* animation: vibrate 0.3s linear infinite; */
     box-shadow: 0 4px 12px rgba(99, 156, 78, 0.2);
     background: #ffffff;
 }
@@ -465,6 +465,14 @@
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-dark);
+}
+
+.benefit-description:hover {
+    /* Override any existing hover styles */
+    transform: none !important;
+    color: var(--text-dark) !important;
+    background: none !important;
+    /* Add any other properties that might be changing on hover */
 }
 
 .footer-promo-box {

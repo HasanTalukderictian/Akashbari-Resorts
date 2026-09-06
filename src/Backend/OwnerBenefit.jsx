@@ -1029,129 +1029,1055 @@
 // export default OwnerBenefit;
 
 
+// import React, { useState, useEffect } from 'react';
+// import Header from './Header';
+// import Footer from './Footer';
+// import Sidebar from './Sidebar';
+
+// const OwnerBenefit = ({ theme }) => {
+//     const [isCollapsed, setIsCollapsed] = useState(false);
+//     const [isDarkMode, setIsDarkMode] = useState(false);
+//     const [showModal, setShowModal] = useState(false);
+//     const [loading, setLoading] = useState(true);
+//     const [searchTerm, setSearchTerm] = useState('');
+//     const [currentPage, setCurrentPage] = useState(1);
+//     const [deleteConfirm, setDeleteConfirm] = useState(null);
+//     const [authError, setAuthError] = useState(null);
+//     const itemsPerPage = 6;
+
+//     const [benefits, setBenefits] = useState([]);
+//     const [formData, setFormData] = useState({ id: '', title: '', desc: '' });
+//     const [isEditing, setIsEditing] = useState(false);
+
+//     const API_BASE = import.meta.env.VITE_BASE_URL;
+
+//     const getAuthHeaders = () => {
+//         const token = localStorage.getItem('token');
+//         return {
+//             'Authorization': `Bearer ${token}`,
+//             'Content-Type': 'application/json',
+//             'Role': localStorage.getItem('Role') || 'admin'
+//         };
+//     };
+
+//     const checkAuth = () => {
+//         const token = localStorage.getItem('token');
+//         if (!token) {
+//             setAuthError("Please login to access this page");
+//             setTimeout(() => window.location.href = '/login', 2000);
+//             return false;
+//         }
+//         return true;
+//     };
+
+//     const fetchBenefits = async () => {
+//         if (!checkAuth()) return;
+
+//         try {
+//             setLoading(true);
+//             setAuthError(null);
+
+//             const headers = getAuthHeaders();
+//             const response = await fetch(`${API_BASE}/get-property-benifit`, {
+//                 method: 'GET',
+//                 headers: headers
+//             });
+
+//             if (response.status === 401) {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('Role');
+//                 setAuthError("Session expired. Please login again.");
+//                 setTimeout(() => window.location.href = '/login', 2000);
+//                 return;
+//             }
+
+//             const result = await response.json();
+
+//             if (result.status && result.data && Array.isArray(result.data.data)) {
+//                 setBenefits(result.data.data);
+//             } else {
+//                 setBenefits([]);
+//             }
+//         } catch (error) {
+//             console.error("Fetch error:", error);
+//             setBenefits([]);
+//             setAuthError("Failed to fetch benefits. Please try again.");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     useEffect(() => {
+//         fetchBenefits();
+//     }, []);
+
+//     const handleSave = async (e) => {
+//         e.preventDefault();
+
+//         if (!checkAuth()) return;
+
+//         const url = isEditing
+//             ? `${API_BASE}/edit-property-benifit/${formData.id}`
+//             : `${API_BASE}/add-property-benifit`;
+
+//         try {
+//             setLoading(true);
+//             const headers = getAuthHeaders();
+
+//             const response = await fetch(url, {
+//                 method: 'POST',
+//                 headers: headers,
+//                 body: JSON.stringify({
+//                     title: formData.title,
+//                     desc: formData.desc
+//                 }),
+//             });
+
+//             if (response.status === 401) {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('Role');
+//                 setAuthError("Session expired. Please login again.");
+//                 setTimeout(() => window.location.href = '/login', 2000);
+//                 return;
+//             }
+
+//             const result = await response.json();
+
+//             if (result.status) {
+//                 await fetchBenefits();
+//                 closeModal();
+//             } else {
+//                 alert(result.message || result.error || "Error saving data");
+//             }
+//         } catch (error) {
+//             console.error("Save error:", error);
+//             alert(error.message || "Network error. Please try again.");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const handleDelete = async (id) => {
+//         if (!checkAuth()) return;
+
+//         try {
+//             setLoading(true);
+//             const headers = getAuthHeaders();
+
+//             const response = await fetch(`${API_BASE}/delete-property-benifit/${id}`, {
+//                 method: 'DELETE',
+//                 headers: headers
+//             });
+
+//             if (response.status === 401) {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('Role');
+//                 setAuthError("Session expired. Please login again.");
+//                 setTimeout(() => window.location.href = '/login', 2000);
+//                 return;
+//             }
+
+//             const result = await response.json();
+//             if (result.status) {
+//                 await fetchBenefits();
+//                 setDeleteConfirm(null);
+//             } else {
+//                 alert(result.message || "Error deleting benefit");
+//             }
+//         } catch (error) {
+//             console.error("Delete error:", error);
+//             alert("Failed to delete benefit. Please try again.");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const openModal = (item = null) => {
+//         if (item) {
+//             setFormData({ id: item.id, title: item.title, desc: item.desc });
+//             setIsEditing(true);
+//         } else {
+//             setFormData({ id: '', title: '', desc: '' });
+//             setIsEditing(false);
+//         }
+//         setShowModal(true);
+//     };
+
+//     const closeModal = () => {
+//         setShowModal(false);
+//         setFormData({ id: '', title: '', desc: '' });
+//         setIsEditing(false);
+//     };
+
+//     const filteredBenefits = benefits.filter(item =>
+//         item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//         item.desc?.toLowerCase().includes(searchTerm.toLowerCase())
+//     );
+
+//     const indexOfLastItem = currentPage * itemsPerPage;
+//     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+//     const currentItems = filteredBenefits.slice(indexOfFirstItem, indexOfLastItem);
+//     const totalPages = Math.ceil(filteredBenefits.length / itemsPerPage);
+//     const totalBenefits = benefits.length;
+
+//     // ---- Editorial monochrome theme ----
+//     const currentTheme = theme || {
+//         isDarkMode,
+//         bg: isDarkMode ? '#080808' : '#fdfdfc',
+//         card: isDarkMode ? '#111111' : '#ffffff',
+//         ink: isDarkMode ? '#f5f5f3' : '#0d0d0c',
+//         muted: isDarkMode ? '#9c9c98' : '#6f6f6b',
+//         line: isDarkMode ? '#262624' : '#e4e2dd',
+//         lineStrong: isDarkMode ? '#3a3a37' : '#0d0d0c',
+//         danger: '#8c2f24',
+//     };
+
+//     const serif = "'Playfair Display', Georgia, 'Times New Roman', serif";
+//     const sans = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+//     const styles = {
+//         container: {
+//             backgroundColor: currentTheme.bg,
+//             minHeight: '100vh',
+//             fontFamily: sans,
+//             transition: 'background-color 0.3s ease'
+//         },
+//         mainContent: {
+//             flex: 1,
+//             overflowY: 'auto',
+//             padding: '44px 56px'
+//         },
+//         masthead: {
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             alignItems: 'flex-end',
+//             paddingBottom: '22px',
+//             borderBottom: `2px solid ${currentTheme.lineStrong}`,
+//             marginBottom: '20px',
+//             flexWrap: 'wrap',
+//             gap: '20px'
+//         },
+//         pageTitle: {
+//             fontFamily: serif,
+//             fontSize: '40px',
+//             fontWeight: '700',
+//             color: currentTheme.ink,
+//             letterSpacing: '-0.5px',
+//             lineHeight: 1.1,
+//             margin: 0
+//         },
+//         pageSubtitle: {
+//             color: currentTheme.muted,
+//             fontSize: '14.5px',
+//             marginTop: '8px',
+//             fontStyle: 'italic',
+//             fontFamily: serif
+//         },
+//         metrics: {
+//             display: 'flex',
+//             gap: '36px'
+//         },
+//         metricItem: {
+//             textAlign: 'right'
+//         },
+//         metricValue: {
+//             fontFamily: serif,
+//             fontSize: '26px',
+//             fontWeight: '700',
+//             color: currentTheme.ink,
+//             lineHeight: 1
+//         },
+//         metricLabel: {
+//             fontSize: '12px',
+//             color: currentTheme.muted,
+//             marginTop: '4px'
+//         },
+//         alert: {
+//             padding: '13px 18px',
+//             backgroundColor: 'transparent',
+//             borderLeft: `3px solid ${currentTheme.danger}`,
+//             color: currentTheme.ink,
+//             marginBottom: '24px',
+//             fontSize: '14px'
+//         },
+//         toolbar: {
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             alignItems: 'center',
+//             marginBottom: '8px',
+//             flexWrap: 'wrap',
+//             gap: '16px'
+//         },
+//         searchWrap: {
+//             position: 'relative',
+//             width: '280px'
+//         },
+//         searchBox: {
+//             width: '100%',
+//             padding: '9px 4px 9px 26px',
+//             border: 'none',
+//             borderBottom: `1.5px solid ${currentTheme.line}`,
+//             backgroundColor: 'transparent',
+//             color: currentTheme.ink,
+//             fontSize: '14px',
+//             outline: 'none',
+//             transition: 'border-color 0.25s ease'
+//         },
+//         searchIcon: {
+//             position: 'absolute',
+//             left: 0,
+//             top: '50%',
+//             transform: 'translateY(-50%)',
+//             color: currentTheme.muted,
+//             fontSize: '13px',
+//             pointerEvents: 'none'
+//         },
+//         addBtn: {
+//             backgroundColor: currentTheme.ink,
+//             color: currentTheme.bg,
+//             border: `1.5px solid ${currentTheme.ink}`,
+//             padding: '11px 26px',
+//             borderRadius: '2px',
+//             cursor: 'pointer',
+//             fontSize: '13.5px',
+//             fontWeight: '600',
+//             letterSpacing: '0.2px',
+//             transition: 'transform 0.15s ease, opacity 0.15s ease',
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: '8px'
+//         },
+//         list: {
+//             marginTop: '18px',
+//             borderTop: `1px solid ${currentTheme.line}`
+//         },
+//         row: {
+//             display: 'flex',
+//             gap: '28px',
+//             padding: '26px 4px',
+//             borderBottom: `1px solid ${currentTheme.line}`,
+//             transition: 'background-color 0.2s ease',
+//             alignItems: 'flex-start'
+//         },
+//         rowIndex: {
+//             fontFamily: serif,
+//             fontSize: '28px',
+//             color: currentTheme.line,
+//             fontWeight: '700',
+//             minWidth: '52px',
+//             transition: 'color 0.2s ease'
+//         },
+//         rowBody: {
+//             flex: 1,
+//             minWidth: 0
+//         },
+//         rowTop: {
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             alignItems: 'flex-start',
+//             gap: '16px'
+//         },
+//         rowTitle: {
+//             fontFamily: serif,
+//             fontSize: '20px',
+//             fontWeight: '700',
+//             color: currentTheme.ink,
+//             margin: 0
+//         },
+//         rowDesc: {
+//             fontSize: '14px',
+//             color: currentTheme.muted,
+//             lineHeight: '1.65',
+//             marginTop: '8px',
+//             maxWidth: '620px'
+//         },
+//         rowActions: {
+//             display: 'flex',
+//             gap: '18px',
+//             flexShrink: 0
+//         },
+//         linkBtn: {
+//             background: 'none',
+//             border: 'none',
+//             padding: 0,
+//             fontSize: '13px',
+//             fontWeight: '600',
+//             cursor: 'pointer',
+//             color: currentTheme.ink,
+//             borderBottom: '1px solid transparent',
+//             transition: 'border-color 0.2s ease',
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: '6px'
+//         },
+//         deleteLink: {
+//             color: currentTheme.danger
+//         },
+//         pagination: {
+//             display: 'flex',
+//             justifyContent: 'center',
+//             alignItems: 'center',
+//             gap: '22px',
+//             marginTop: '36px'
+//         },
+//         pageNum: {
+//             background: 'none',
+//             border: 'none',
+//             fontFamily: serif,
+//             fontSize: '15px',
+//             color: currentTheme.muted,
+//             cursor: 'pointer',
+//             padding: '4px 2px',
+//             borderBottom: '1.5px solid transparent',
+//             transition: 'all 0.2s ease'
+//         },
+//         pageNumActive: {
+//             color: currentTheme.ink,
+//             borderBottom: `1.5px solid ${currentTheme.ink}`
+//         },
+//         pageArrow: {
+//             background: 'none',
+//             border: 'none',
+//             fontSize: '18px',
+//             color: currentTheme.ink,
+//             cursor: 'pointer',
+//             transition: 'opacity 0.2s ease'
+//         },
+//         emptyState: {
+//             textAlign: 'center',
+//             padding: '90px 20px',
+//             borderTop: `1px solid ${currentTheme.line}`,
+//             borderBottom: `1px solid ${currentTheme.line}`
+//         },
+//         emptyTitle: {
+//             fontFamily: serif,
+//             fontSize: '26px',
+//             fontWeight: '700',
+//             color: currentTheme.ink
+//         },
+//         loadingState: {
+//             textAlign: 'center',
+//             padding: '90px 20px',
+//             color: currentTheme.muted,
+//             fontFamily: serif,
+//             fontStyle: 'italic',
+//             fontSize: '16px'
+//         },
+//         modalOverlay: {
+//             position: 'fixed',
+//             inset: 0,
+//             backgroundColor: 'rgba(10,10,10,0.55)',
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//             zIndex: 2000,
+//             animation: 'fadeIn 0.2s ease'
+//         },
+//         modal: {
+//             backgroundColor: currentTheme.card,
+//             borderRadius: '2px',
+//             width: '480px',
+//             maxWidth: '92%',
+//             maxHeight: '90vh',
+//             overflowY: 'auto',
+//             border: `1px solid ${currentTheme.lineStrong}`,
+//             animation: 'slideUp 0.25s ease'
+//         },
+//         modalHeader: {
+//             padding: '26px 30px 18px',
+//             display: 'flex',
+//             justifyContent: 'space-between',
+//             alignItems: 'flex-start',
+//             position: 'sticky',
+//             top: 0,
+//             backgroundColor: currentTheme.card,
+//             zIndex: 1
+//         },
+//         modalTitle: {
+//             margin: 0,
+//             fontFamily: serif,
+//             fontWeight: '700',
+//             fontSize: '22px',
+//             color: currentTheme.ink
+//         },
+//         modalBody: {
+//             padding: '4px 30px 26px'
+//         },
+//         modalFooter: {
+//             padding: '20px 30px',
+//             borderTop: `1px solid ${currentTheme.line}`,
+//             display: 'flex',
+//             justifyContent: 'flex-end',
+//             gap: '14px'
+//         },
+//         input: {
+//             width: '100%',
+//             padding: '10px 2px',
+//             border: 'none',
+//             borderBottom: `1.5px solid ${currentTheme.line}`,
+//             backgroundColor: 'transparent',
+//             color: currentTheme.ink,
+//             fontSize: '15px',
+//             outline: 'none',
+//             transition: 'border-color 0.2s ease'
+//         },
+//         textarea: {
+//             width: '100%',
+//             padding: '10px 2px',
+//             border: 'none',
+//             borderBottom: `1.5px solid ${currentTheme.line}`,
+//             backgroundColor: 'transparent',
+//             color: currentTheme.ink,
+//             fontSize: '15px',
+//             outline: 'none',
+//             resize: 'vertical',
+//             minHeight: '90px',
+//             fontFamily: sans,
+//             transition: 'border-color 0.2s ease'
+//         },
+//         label: {
+//             display: 'block',
+//             marginBottom: '8px',
+//             fontWeight: '600',
+//             fontSize: '12px',
+//             color: currentTheme.muted
+//         },
+//         cancelBtn: {
+//             padding: '9px 4px',
+//             border: 'none',
+//             backgroundColor: 'transparent',
+//             color: currentTheme.muted,
+//             cursor: 'pointer',
+//             fontWeight: '600',
+//             fontSize: '13.5px',
+//             transition: 'color 0.2s ease'
+//         },
+//         deleteConfirmBtn: {
+//             padding: '10px 26px',
+//             borderRadius: '2px',
+//             border: `1.5px solid ${currentTheme.danger}`,
+//             backgroundColor: currentTheme.danger,
+//             color: '#fdfdfc',
+//             cursor: 'pointer',
+//             fontWeight: '600',
+//             fontSize: '13.5px',
+//             transition: 'opacity 0.2s ease'
+//         },
+//         buttonDisabled: {
+//             opacity: 0.5,
+//             cursor: 'not-allowed'
+//         }
+//     };
+
+//     return (
+//         <div style={styles.container}>
+//             <style>
+//                 {`
+//                     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+//                     @keyframes fadeIn {
+//                         from { opacity: 0; }
+//                         to { opacity: 1; }
+//                     }
+//                     @keyframes slideUp {
+//                         from { transform: translateY(14px); opacity: 0; }
+//                         to { transform: translateY(0); opacity: 1; }
+//                     }
+//                     .benefit-row {
+//                         cursor: default;
+//                     }
+//                     .benefit-row:hover {
+//                         background-color: ${currentTheme.isDarkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)'};
+//                     }
+//                     .benefit-row:hover .row-index {
+//                         color: ${currentTheme.ink} !important;
+//                     }
+//                     .link-btn:hover {
+//                         border-bottom-color: currentColor !important;
+//                     }
+//                     .add-btn:hover:not(:disabled) {
+//                         transform: translateY(-1px);
+//                         opacity: 0.88;
+//                     }
+//                     .cancel-btn:hover:not(:disabled) {
+//                         color: ${currentTheme.ink} !important;
+//                     }
+//                     .search-box:focus {
+//                         border-bottom-color: ${currentTheme.ink} !important;
+//                     }
+//                     .page-arrow:hover:not(:disabled) {
+//                         opacity: 0.6;
+//                     }
+//                     input:focus, textarea:focus {
+//                         border-bottom-color: ${currentTheme.ink} !important;
+//                     }
+//                     ::-webkit-scrollbar {
+//                         width: 6px;
+//                     }
+//                     ::-webkit-scrollbar-track {
+//                         background: ${currentTheme.bg};
+//                     }
+//                     ::-webkit-scrollbar-thumb {
+//                         background: ${currentTheme.line};
+//                         border-radius: 10px;
+//                     }
+//                 `}
+//             </style>
+
+//             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
+//                 <Sidebar theme={currentTheme} isCollapsed={isCollapsed} />
+
+//                 <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
+//                     <Header
+//                         theme={currentTheme}
+//                         isDarkMode={isDarkMode}
+//                         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+//                         toggleSidebar={() => setIsCollapsed(!isCollapsed)}
+//                     />
+
+//                     <div style={styles.mainContent}>
+//                         <div style={styles.masthead}>
+//                             <div>
+//                                 <h1 style={styles.pageTitle}>Owner Benefits</h1>
+//                                 <p style={styles.pageSubtitle}>Incentives & privileges extended to property owners</p>
+//                             </div>
+//                             <div style={styles.metrics}>
+//                                 <div style={styles.metricItem}>
+//                                     <div style={styles.metricValue}>{totalBenefits}</div>
+//                                     <div style={styles.metricLabel}>Total</div>
+//                                 </div>
+//                                 <div style={styles.metricItem}>
+//                                     <div style={styles.metricValue}>Premium</div>
+//                                     <div style={styles.metricLabel}>Tier</div>
+//                                 </div>
+//                                 <div style={styles.metricItem}>
+//                                     <div style={styles.metricValue}>Exclusive</div>
+//                                     <div style={styles.metricLabel}>Access</div>
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         {authError && (
+//                             <div style={styles.alert}>{authError}</div>
+//                         )}
+
+//                         <div style={styles.toolbar}>
+//                             <div style={styles.searchWrap}>
+//                                 <i className="bi bi-search" style={styles.searchIcon}></i>
+//                                 <input
+//                                     type="text"
+//                                     placeholder="Search benefits"
+//                                     style={styles.searchBox}
+//                                     className="search-box"
+//                                     value={searchTerm}
+//                                     onChange={(e) => {
+//                                         setSearchTerm(e.target.value);
+//                                         setCurrentPage(1);
+//                                     }}
+//                                 />
+//                             </div>
+//                             <button
+//                                 style={styles.addBtn}
+//                                 className="add-btn"
+//                                 onClick={() => openModal()}
+//                                 disabled={loading}
+//                             >
+//                                 <i className="bi bi-plus"></i>
+//                                 Add new benefit
+//                             </button>
+//                         </div>
+
+//                         {loading && benefits.length === 0 ? (
+//                             <div style={styles.loadingState}>Loading benefits…</div>
+//                         ) : currentItems.length > 0 ? (
+//                             <>
+//                                 <div style={styles.list}>
+//                                     {currentItems.map((item, i) => (
+//                                         <div key={item.id} className="benefit-row" style={styles.row}>
+//                                             <div className="row-index" style={styles.rowIndex}>
+//                                                 {String(indexOfFirstItem + i + 1).padStart(2, '0')}
+//                                             </div>
+//                                             <div style={styles.rowBody}>
+//                                                 <div style={styles.rowTop}>
+//                                                     <h3 style={styles.rowTitle}>{item.title}</h3>
+//                                                     <div style={styles.rowActions}>
+//                                                         <button
+//                                                             style={styles.linkBtn}
+//                                                             className="link-btn"
+//                                                             onClick={() => openModal(item)}
+//                                                             disabled={loading}
+//                                                         >
+//                                                             <i className="bi bi-pencil"></i> Edit
+//                                                         </button>
+//                                                         <button
+//                                                             style={{...styles.linkBtn, ...styles.deleteLink}}
+//                                                             className="link-btn"
+//                                                             onClick={() => setDeleteConfirm(item)}
+//                                                             disabled={loading}
+//                                                         >
+//                                                             <i className="bi bi-trash"></i> Delete
+//                                                         </button>
+//                                                     </div>
+//                                                 </div>
+//                                                 <p style={styles.rowDesc}>{item.desc}</p>
+//                                             </div>
+//                                         </div>
+//                                     ))}
+//                                 </div>
+
+//                                 {totalPages > 1 && (
+//                                     <div style={styles.pagination}>
+//                                         <button
+//                                             style={styles.pageArrow}
+//                                             className="page-arrow"
+//                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+//                                             disabled={currentPage === 1}
+//                                         >
+//                                             ←
+//                                         </button>
+//                                         {[...Array(Math.min(totalPages, 5))].map((_, i) => {
+//                                             let pageNum;
+//                                             if (totalPages <= 5) {
+//                                                 pageNum = i + 1;
+//                                             } else if (currentPage <= 3) {
+//                                                 pageNum = i + 1;
+//                                             } else if (currentPage >= totalPages - 2) {
+//                                                 pageNum = totalPages - 4 + i;
+//                                             } else {
+//                                                 pageNum = currentPage - 2 + i;
+//                                             }
+//                                             return (
+//                                                 <button
+//                                                     key={i}
+//                                                     style={{
+//                                                         ...styles.pageNum,
+//                                                         ...(currentPage === pageNum && styles.pageNumActive)
+//                                                     }}
+//                                                     onClick={() => setCurrentPage(pageNum)}
+//                                                 >
+//                                                     {pageNum}
+//                                                 </button>
+//                                             );
+//                                         })}
+//                                         <button
+//                                             style={styles.pageArrow}
+//                                             className="page-arrow"
+//                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+//                                             disabled={currentPage === totalPages}
+//                                         >
+//                                             →
+//                                         </button>
+//                                     </div>
+//                                 )}
+//                             </>
+//                         ) : (
+//                             <div style={styles.emptyState}>
+//                                 <h4 style={styles.emptyTitle}>No benefits found</h4>
+//                                 <p style={{ color: currentTheme.muted, marginTop: '10px', marginBottom: '22px' }}>
+//                                     {searchTerm ? `Nothing matches "${searchTerm}"` : 'Start by adding the first benefit'}
+//                                 </p>
+//                                 {!searchTerm && (
+//                                     <button style={styles.addBtn} className="add-btn" onClick={() => openModal()}>
+//                                         <i className="bi bi-plus"></i> Add new benefit
+//                                     </button>
+//                                 )}
+//                             </div>
+//                         )}
+//                     </div>
+
+//                     <Footer theme={currentTheme} />
+//                 </div>
+//             </div>
+
+//             {showModal && (
+//                 <div style={styles.modalOverlay} onClick={closeModal}>
+//                     <div style={styles.modal} onClick={e => e.stopPropagation()}>
+//                         <div style={styles.modalHeader}>
+//                             <h5 style={styles.modalTitle}>
+//                                 {isEditing ? 'Edit benefit' : 'Add a new benefit'}
+//                             </h5>
+//                             <button
+//                                 onClick={closeModal}
+//                                 style={{
+//                                     background: 'none',
+//                                     border: 'none',
+//                                     fontSize: '22px',
+//                                     lineHeight: 1,
+//                                     cursor: 'pointer',
+//                                     color: currentTheme.muted
+//                                 }}
+//                             >
+//                                 ×
+//                             </button>
+//                         </div>
+//                         <form onSubmit={handleSave}>
+//                             <div style={styles.modalBody}>
+//                                 <div className="mb-4">
+//                                     <label style={styles.label}>Benefit title</label>
+//                                     <input
+//                                         type="text"
+//                                         style={styles.input}
+//                                         value={formData.title}
+//                                         required
+//                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
+//                                         placeholder="e.g. Airport pickup service"
+//                                         disabled={loading}
+//                                     />
+//                                 </div>
+//                                 <div className="mb-3">
+//                                     <label style={styles.label}>Description</label>
+//                                     <textarea
+//                                         style={styles.textarea}
+//                                         value={formData.desc}
+//                                         required
+//                                         onChange={(e) => setFormData({...formData, desc: e.target.value})}
+//                                         placeholder="Describe what this benefit includes"
+//                                         disabled={loading}
+//                                     />
+//                                 </div>
+//                             </div>
+//                             <div style={styles.modalFooter}>
+//                                 <button
+//                                     type="button"
+//                                     onClick={closeModal}
+//                                     style={styles.cancelBtn}
+//                                     className="cancel-btn"
+//                                     disabled={loading}
+//                                 >
+//                                     Cancel
+//                                 </button>
+//                                 <button
+//                                     type="submit"
+//                                     style={{...styles.addBtn, padding: '10px 28px', ...(loading && styles.buttonDisabled)}}
+//                                     className="add-btn"
+//                                     disabled={loading}
+//                                 >
+//                                     {loading ? (
+//                                         <>
+//                                             <span className="spinner-border spinner-border-sm me-2"></span>
+//                                             {isEditing ? 'Updating…' : 'Saving…'}
+//                                         </>
+//                                     ) : (
+//                                         isEditing ? 'Update benefit' : 'Save benefit'
+//                                     )}
+//                                 </button>
+//                             </div>
+//                         </form>
+//                     </div>
+//                 </div>
+//             )}
+
+//             {deleteConfirm && (
+//                 <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
+//                     <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
+//                         <div style={styles.modalHeader}>
+//                             <h5 style={styles.modalTitle}>Confirm deletion</h5>
+//                             <button
+//                                 onClick={() => setDeleteConfirm(null)}
+//                                 style={{
+//                                     background: 'none',
+//                                     border: 'none',
+//                                     fontSize: '22px',
+//                                     lineHeight: 1,
+//                                     cursor: 'pointer',
+//                                     color: currentTheme.muted
+//                                 }}
+//                             >
+//                                 ×
+//                             </button>
+//                         </div>
+//                         <div style={styles.modalBody}>
+//                             <p style={{ fontSize: '15px', color: currentTheme.ink, lineHeight: 1.6 }}>
+//                                 Remove <strong>"{deleteConfirm.title}"</strong> from the benefits list? This action cannot be undone.
+//                             </p>
+//                         </div>
+//                         <div style={styles.modalFooter}>
+//                             <button
+//                                 onClick={() => setDeleteConfirm(null)}
+//                                 style={styles.cancelBtn}
+//                                 className="cancel-btn"
+//                                 disabled={loading}
+//                             >
+//                                 Cancel
+//                             </button>
+//                             <button
+//                                 onClick={() => handleDelete(deleteConfirm.id)}
+//                                 style={{...styles.deleteConfirmBtn, ...(loading && styles.buttonDisabled)}}
+//                                 disabled={loading}
+//                             >
+//                                 {loading ? (
+//                                     <>
+//                                         <span className="spinner-border spinner-border-sm me-2"></span>
+//                                         Deleting…
+//                                     </>
+//                                 ) : (
+//                                     'Delete permanently'
+//                                 )}
+//                             </button>
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
+
+// export default OwnerBenefit;
+
+
+
 import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
 
-const OwnerBenefit = ({ theme }) => {
+const ITEMS_PER_PAGE = 6;
+const EMPTY_FORM = { id: '', title: '', desc: '' };
+
+const Modal = ({ theme, title, onClose, children, footer, width }) => (
+    <div
+        style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 2000, padding: '20px', animation: 'fadeIn .2s ease'
+        }}
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+        <div style={{
+            backgroundColor: theme.card, color: theme.text,
+            border: `1px solid ${theme.border}`, borderRadius: '18px',
+            width: '100%', maxWidth: width || '480px', maxHeight: '90vh',
+            display: 'flex', flexDirection: 'column', animation: 'slideUp .2s ease'
+        }}>
+            <div style={{
+                padding: '18px 22px', borderBottom: `1px solid ${theme.border}`,
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+            }}>
+                <h5 style={{ margin: 0, fontWeight: 600 }}>{title}</h5>
+                <button onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '22px', color: theme.text, opacity: 0.6, cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ padding: '22px', overflowY: 'auto' }}>{children}</div>
+            {footer && (
+                <div style={{ padding: '16px 22px', borderTop: `1px solid ${theme.border}`, display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                    {footer}
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+const OwnerBenefit = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [deleteConfirm, setDeleteConfirm] = useState(null);
-    const [authError, setAuthError] = useState(null);
-    const itemsPerPage = 6;
 
     const [benefits, setBenefits] = useState([]);
-    const [formData, setFormData] = useState({ id: '', title: '', desc: '' });
+    const [loading, setLoading] = useState(true);
+    const [authError, setAuthError] = useState(null);
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState(EMPTY_FORM);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
     const API_BASE = import.meta.env.VITE_BASE_URL;
 
-    const getAuthHeaders = () => {
-        const token = localStorage.getItem('token');
-        return {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Role': localStorage.getItem('Role') || 'admin'
-        };
+    const theme = propsTheme || {
+        isDarkMode,
+        bg: isDarkMode ? '#0a0a0a' : '#f5f5f5',
+        card: isDarkMode ? '#141414' : '#ffffff',
+        text: isDarkMode ? '#f5f5f5' : '#111111',
+        textLight: isDarkMode ? '#a3a3a3' : '#6b6b6b',
+        border: isDarkMode ? '#2b2b2b' : '#dcdcdc'
+    };
+    const accent = theme.text;
+    const accentOn = theme.card;
+
+    const fieldStyle = {
+        width: '100%', padding: '10px 14px', borderRadius: '10px',
+        border: `1px solid ${theme.border}`, backgroundColor: theme.bg,
+        color: theme.text, fontSize: '14px', outline: 'none'
     };
 
+    const getAuthHeaders = () => ({
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+        Role: localStorage.getItem('Role') || 'admin'
+    });
+
     const checkAuth = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setAuthError("Please login to access this page");
-            setTimeout(() => window.location.href = '/login', 2000);
+        if (!localStorage.getItem('token')) {
+            setAuthError('Please login to access this page');
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
             return false;
         }
         return true;
     };
 
+    const handleAuthFailure = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('Role');
+        setAuthError('Session expired. Please login again.');
+        setTimeout(() => { window.location.href = '/login'; }, 2000);
+    };
+
     const fetchBenefits = async () => {
         if (!checkAuth()) return;
-
+        setLoading(true);
+        setAuthError(null);
         try {
-            setLoading(true);
-            setAuthError(null);
-
-            const headers = getAuthHeaders();
-            const response = await fetch(`${API_BASE}/get-property-benifit`, {
-                method: 'GET',
-                headers: headers
-            });
-
-            if (response.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('Role');
-                setAuthError("Session expired. Please login again.");
-                setTimeout(() => window.location.href = '/login', 2000);
-                return;
-            }
-
-            const result = await response.json();
-
-            if (result.status && result.data && Array.isArray(result.data.data)) {
-                setBenefits(result.data.data);
-            } else {
-                setBenefits([]);
-            }
-        } catch (error) {
-            console.error("Fetch error:", error);
+            const res = await fetch(`${API_BASE}/get-property-benifit`, { headers: getAuthHeaders() });
+            if (res.status === 401) return handleAuthFailure();
+            const result = await res.json();
+            setBenefits(result.status && Array.isArray(result.data?.data) ? result.data.data : []);
+        } catch (err) {
+            console.error('Fetch error:', err);
             setBenefits([]);
-            setAuthError("Failed to fetch benefits. Please try again.");
+            setAuthError('Failed to fetch benefits. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchBenefits();
-    }, []);
+    useEffect(() => { fetchBenefits(); }, []);
+
+    const openModal = (item = null) => {
+        if (item) {
+            setFormData({ id: item.id, title: item.title, desc: item.desc });
+            setIsEditing(true);
+        } else {
+            setFormData(EMPTY_FORM);
+            setIsEditing(false);
+        }
+        setShowModal(true);
+    };
+
+    const closeModal = () => { setShowModal(false); setFormData(EMPTY_FORM); setIsEditing(false); };
 
     const handleSave = async (e) => {
         e.preventDefault();
-
         if (!checkAuth()) return;
-
-        const url = isEditing
-            ? `${API_BASE}/edit-property-benifit/${formData.id}`
-            : `${API_BASE}/add-property-benifit`;
-
+        setLoading(true);
         try {
-            setLoading(true);
-            const headers = getAuthHeaders();
-
-            const response = await fetch(url, {
+            const url = isEditing ? `${API_BASE}/edit-property-benifit/${formData.id}` : `${API_BASE}/add-property-benifit`;
+            const res = await fetch(url, {
                 method: 'POST',
-                headers: headers,
-                body: JSON.stringify({
-                    title: formData.title,
-                    desc: formData.desc
-                }),
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ title: formData.title, desc: formData.desc })
             });
-
-            if (response.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('Role');
-                setAuthError("Session expired. Please login again.");
-                setTimeout(() => window.location.href = '/login', 2000);
-                return;
-            }
-
-            const result = await response.json();
-
+            if (res.status === 401) return handleAuthFailure();
+            const result = await res.json();
             if (result.status) {
                 await fetchBenefits();
                 closeModal();
             } else {
-                alert(result.message || result.error || "Error saving data");
+                alert(result.message || result.error || 'Error saving data');
             }
-        } catch (error) {
-            console.error("Save error:", error);
-            alert(error.message || "Network error. Please try again.");
+        } catch (err) {
+            console.error('Save error:', err);
+            alert(err.message || 'Network error. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -1159,611 +2085,150 @@ const OwnerBenefit = ({ theme }) => {
 
     const handleDelete = async (id) => {
         if (!checkAuth()) return;
-
+        setLoading(true);
         try {
-            setLoading(true);
-            const headers = getAuthHeaders();
-
-            const response = await fetch(`${API_BASE}/delete-property-benifit/${id}`, {
-                method: 'DELETE',
-                headers: headers
-            });
-
-            if (response.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('Role');
-                setAuthError("Session expired. Please login again.");
-                setTimeout(() => window.location.href = '/login', 2000);
-                return;
-            }
-
-            const result = await response.json();
+            const res = await fetch(`${API_BASE}/delete-property-benifit/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+            if (res.status === 401) return handleAuthFailure();
+            const result = await res.json();
             if (result.status) {
                 await fetchBenefits();
                 setDeleteConfirm(null);
             } else {
-                alert(result.message || "Error deleting benefit");
+                alert(result.message || 'Error deleting benefit');
             }
-        } catch (error) {
-            console.error("Delete error:", error);
-            alert("Failed to delete benefit. Please try again.");
+        } catch (err) {
+            console.error('Delete error:', err);
+            alert('Failed to delete benefit. Please try again.');
         } finally {
             setLoading(false);
         }
-    };
-
-    const openModal = (item = null) => {
-        if (item) {
-            setFormData({ id: item.id, title: item.title, desc: item.desc });
-            setIsEditing(true);
-        } else {
-            setFormData({ id: '', title: '', desc: '' });
-            setIsEditing(false);
-        }
-        setShowModal(true);
-    };
-
-    const closeModal = () => {
-        setShowModal(false);
-        setFormData({ id: '', title: '', desc: '' });
-        setIsEditing(false);
     };
 
     const filteredBenefits = benefits.filter(item =>
         item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.desc?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredBenefits.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredBenefits.length / itemsPerPage);
-    const totalBenefits = benefits.length;
-
-    // ---- Editorial monochrome theme ----
-    const currentTheme = theme || {
-        isDarkMode,
-        bg: isDarkMode ? '#080808' : '#fdfdfc',
-        card: isDarkMode ? '#111111' : '#ffffff',
-        ink: isDarkMode ? '#f5f5f3' : '#0d0d0c',
-        muted: isDarkMode ? '#9c9c98' : '#6f6f6b',
-        line: isDarkMode ? '#262624' : '#e4e2dd',
-        lineStrong: isDarkMode ? '#3a3a37' : '#0d0d0c',
-        danger: '#8c2f24',
-    };
-
-    const serif = "'Playfair Display', Georgia, 'Times New Roman', serif";
-    const sans = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-
-    const styles = {
-        container: {
-            backgroundColor: currentTheme.bg,
-            minHeight: '100vh',
-            fontFamily: sans,
-            transition: 'background-color 0.3s ease'
-        },
-        mainContent: {
-            flex: 1,
-            overflowY: 'auto',
-            padding: '44px 56px'
-        },
-        masthead: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            paddingBottom: '22px',
-            borderBottom: `2px solid ${currentTheme.lineStrong}`,
-            marginBottom: '20px',
-            flexWrap: 'wrap',
-            gap: '20px'
-        },
-        pageTitle: {
-            fontFamily: serif,
-            fontSize: '40px',
-            fontWeight: '700',
-            color: currentTheme.ink,
-            letterSpacing: '-0.5px',
-            lineHeight: 1.1,
-            margin: 0
-        },
-        pageSubtitle: {
-            color: currentTheme.muted,
-            fontSize: '14.5px',
-            marginTop: '8px',
-            fontStyle: 'italic',
-            fontFamily: serif
-        },
-        metrics: {
-            display: 'flex',
-            gap: '36px'
-        },
-        metricItem: {
-            textAlign: 'right'
-        },
-        metricValue: {
-            fontFamily: serif,
-            fontSize: '26px',
-            fontWeight: '700',
-            color: currentTheme.ink,
-            lineHeight: 1
-        },
-        metricLabel: {
-            fontSize: '12px',
-            color: currentTheme.muted,
-            marginTop: '4px'
-        },
-        alert: {
-            padding: '13px 18px',
-            backgroundColor: 'transparent',
-            borderLeft: `3px solid ${currentTheme.danger}`,
-            color: currentTheme.ink,
-            marginBottom: '24px',
-            fontSize: '14px'
-        },
-        toolbar: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '8px',
-            flexWrap: 'wrap',
-            gap: '16px'
-        },
-        searchWrap: {
-            position: 'relative',
-            width: '280px'
-        },
-        searchBox: {
-            width: '100%',
-            padding: '9px 4px 9px 26px',
-            border: 'none',
-            borderBottom: `1.5px solid ${currentTheme.line}`,
-            backgroundColor: 'transparent',
-            color: currentTheme.ink,
-            fontSize: '14px',
-            outline: 'none',
-            transition: 'border-color 0.25s ease'
-        },
-        searchIcon: {
-            position: 'absolute',
-            left: 0,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: currentTheme.muted,
-            fontSize: '13px',
-            pointerEvents: 'none'
-        },
-        addBtn: {
-            backgroundColor: currentTheme.ink,
-            color: currentTheme.bg,
-            border: `1.5px solid ${currentTheme.ink}`,
-            padding: '11px 26px',
-            borderRadius: '2px',
-            cursor: 'pointer',
-            fontSize: '13.5px',
-            fontWeight: '600',
-            letterSpacing: '0.2px',
-            transition: 'transform 0.15s ease, opacity 0.15s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-        },
-        list: {
-            marginTop: '18px',
-            borderTop: `1px solid ${currentTheme.line}`
-        },
-        row: {
-            display: 'flex',
-            gap: '28px',
-            padding: '26px 4px',
-            borderBottom: `1px solid ${currentTheme.line}`,
-            transition: 'background-color 0.2s ease',
-            alignItems: 'flex-start'
-        },
-        rowIndex: {
-            fontFamily: serif,
-            fontSize: '28px',
-            color: currentTheme.line,
-            fontWeight: '700',
-            minWidth: '52px',
-            transition: 'color 0.2s ease'
-        },
-        rowBody: {
-            flex: 1,
-            minWidth: 0
-        },
-        rowTop: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '16px'
-        },
-        rowTitle: {
-            fontFamily: serif,
-            fontSize: '20px',
-            fontWeight: '700',
-            color: currentTheme.ink,
-            margin: 0
-        },
-        rowDesc: {
-            fontSize: '14px',
-            color: currentTheme.muted,
-            lineHeight: '1.65',
-            marginTop: '8px',
-            maxWidth: '620px'
-        },
-        rowActions: {
-            display: 'flex',
-            gap: '18px',
-            flexShrink: 0
-        },
-        linkBtn: {
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            fontSize: '13px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            color: currentTheme.ink,
-            borderBottom: '1px solid transparent',
-            transition: 'border-color 0.2s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-        },
-        deleteLink: {
-            color: currentTheme.danger
-        },
-        pagination: {
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '22px',
-            marginTop: '36px'
-        },
-        pageNum: {
-            background: 'none',
-            border: 'none',
-            fontFamily: serif,
-            fontSize: '15px',
-            color: currentTheme.muted,
-            cursor: 'pointer',
-            padding: '4px 2px',
-            borderBottom: '1.5px solid transparent',
-            transition: 'all 0.2s ease'
-        },
-        pageNumActive: {
-            color: currentTheme.ink,
-            borderBottom: `1.5px solid ${currentTheme.ink}`
-        },
-        pageArrow: {
-            background: 'none',
-            border: 'none',
-            fontSize: '18px',
-            color: currentTheme.ink,
-            cursor: 'pointer',
-            transition: 'opacity 0.2s ease'
-        },
-        emptyState: {
-            textAlign: 'center',
-            padding: '90px 20px',
-            borderTop: `1px solid ${currentTheme.line}`,
-            borderBottom: `1px solid ${currentTheme.line}`
-        },
-        emptyTitle: {
-            fontFamily: serif,
-            fontSize: '26px',
-            fontWeight: '700',
-            color: currentTheme.ink
-        },
-        loadingState: {
-            textAlign: 'center',
-            padding: '90px 20px',
-            color: currentTheme.muted,
-            fontFamily: serif,
-            fontStyle: 'italic',
-            fontSize: '16px'
-        },
-        modalOverlay: {
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(10,10,10,0.55)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 2000,
-            animation: 'fadeIn 0.2s ease'
-        },
-        modal: {
-            backgroundColor: currentTheme.card,
-            borderRadius: '2px',
-            width: '480px',
-            maxWidth: '92%',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            border: `1px solid ${currentTheme.lineStrong}`,
-            animation: 'slideUp 0.25s ease'
-        },
-        modalHeader: {
-            padding: '26px 30px 18px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            position: 'sticky',
-            top: 0,
-            backgroundColor: currentTheme.card,
-            zIndex: 1
-        },
-        modalTitle: {
-            margin: 0,
-            fontFamily: serif,
-            fontWeight: '700',
-            fontSize: '22px',
-            color: currentTheme.ink
-        },
-        modalBody: {
-            padding: '4px 30px 26px'
-        },
-        modalFooter: {
-            padding: '20px 30px',
-            borderTop: `1px solid ${currentTheme.line}`,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '14px'
-        },
-        input: {
-            width: '100%',
-            padding: '10px 2px',
-            border: 'none',
-            borderBottom: `1.5px solid ${currentTheme.line}`,
-            backgroundColor: 'transparent',
-            color: currentTheme.ink,
-            fontSize: '15px',
-            outline: 'none',
-            transition: 'border-color 0.2s ease'
-        },
-        textarea: {
-            width: '100%',
-            padding: '10px 2px',
-            border: 'none',
-            borderBottom: `1.5px solid ${currentTheme.line}`,
-            backgroundColor: 'transparent',
-            color: currentTheme.ink,
-            fontSize: '15px',
-            outline: 'none',
-            resize: 'vertical',
-            minHeight: '90px',
-            fontFamily: sans,
-            transition: 'border-color 0.2s ease'
-        },
-        label: {
-            display: 'block',
-            marginBottom: '8px',
-            fontWeight: '600',
-            fontSize: '12px',
-            color: currentTheme.muted
-        },
-        cancelBtn: {
-            padding: '9px 4px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: currentTheme.muted,
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '13.5px',
-            transition: 'color 0.2s ease'
-        },
-        deleteConfirmBtn: {
-            padding: '10px 26px',
-            borderRadius: '2px',
-            border: `1.5px solid ${currentTheme.danger}`,
-            backgroundColor: currentTheme.danger,
-            color: '#fdfdfc',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '13.5px',
-            transition: 'opacity 0.2s ease'
-        },
-        buttonDisabled: {
-            opacity: 0.5,
-            cursor: 'not-allowed'
-        }
-    };
+    const totalPages = Math.ceil(filteredBenefits.length / ITEMS_PER_PAGE);
+    const indexOfFirstItem = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentItems = filteredBenefits.slice(indexOfFirstItem, indexOfFirstItem + ITEMS_PER_PAGE);
 
     return (
-        <div style={styles.container}>
-            <style>
-                {`
-                    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
-
-                    @keyframes fadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                    }
-                    @keyframes slideUp {
-                        from { transform: translateY(14px); opacity: 0; }
-                        to { transform: translateY(0); opacity: 1; }
-                    }
-                    .benefit-row {
-                        cursor: default;
-                    }
-                    .benefit-row:hover {
-                        background-color: ${currentTheme.isDarkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)'};
-                    }
-                    .benefit-row:hover .row-index {
-                        color: ${currentTheme.ink} !important;
-                    }
-                    .link-btn:hover {
-                        border-bottom-color: currentColor !important;
-                    }
-                    .add-btn:hover:not(:disabled) {
-                        transform: translateY(-1px);
-                        opacity: 0.88;
-                    }
-                    .cancel-btn:hover:not(:disabled) {
-                        color: ${currentTheme.ink} !important;
-                    }
-                    .search-box:focus {
-                        border-bottom-color: ${currentTheme.ink} !important;
-                    }
-                    .page-arrow:hover:not(:disabled) {
-                        opacity: 0.6;
-                    }
-                    input:focus, textarea:focus {
-                        border-bottom-color: ${currentTheme.ink} !important;
-                    }
-                    ::-webkit-scrollbar {
-                        width: 6px;
-                    }
-                    ::-webkit-scrollbar-track {
-                        background: ${currentTheme.bg};
-                    }
-                    ::-webkit-scrollbar-thumb {
-                        background: ${currentTheme.line};
-                        border-radius: 10px;
-                    }
-                `}
-            </style>
-
+        <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
             <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
-                <Sidebar theme={currentTheme} isCollapsed={isCollapsed} />
+                <Sidebar theme={theme} isCollapsed={isCollapsed} />
 
                 <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
-                    <Header
-                        theme={currentTheme}
-                        isDarkMode={isDarkMode}
-                        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-                        toggleSidebar={() => setIsCollapsed(!isCollapsed)}
-                    />
+                    <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} toggleSidebar={() => setIsCollapsed(!isCollapsed)} />
 
-                    <div style={styles.mainContent}>
-                        <div style={styles.masthead}>
-                            <div>
-                                <h1 style={styles.pageTitle}>Owner Benefits</h1>
-                                <p style={styles.pageSubtitle}>Incentives & privileges extended to property owners</p>
-                            </div>
-                            <div style={styles.metrics}>
-                                <div style={styles.metricItem}>
-                                    <div style={styles.metricValue}>{totalBenefits}</div>
-                                    <div style={styles.metricLabel}>Total</div>
-                                </div>
-                                <div style={styles.metricItem}>
-                                    <div style={styles.metricValue}>Premium</div>
-                                    <div style={styles.metricLabel}>Tier</div>
-                                </div>
-                                <div style={styles.metricItem}>
-                                    <div style={styles.metricValue}>Exclusive</div>
-                                    <div style={styles.metricLabel}>Access</div>
-                                </div>
-                            </div>
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }}>
+                        <div style={{ marginBottom: '26px' }}>
+                            <h1 style={{ fontSize: '26px', fontWeight: 700, color: theme.text, margin: 0 }}>Owner Benefits</h1>
+                            <p style={{ color: theme.textLight, margin: '4px 0 0' }}>Manage and organize property owner benefits & incentives</p>
                         </div>
 
                         {authError && (
-                            <div style={styles.alert}>{authError}</div>
+                            <div className="alert" role="alert" style={{ border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text }}>
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>{authError}
+                            </div>
                         )}
 
-                        <div style={styles.toolbar}>
-                            <div style={styles.searchWrap}>
-                                <i className="bi bi-search" style={styles.searchIcon}></i>
-                                <input
-                                    type="text"
-                                    placeholder="Search benefits"
-                                    style={styles.searchBox}
-                                    className="search-box"
-                                    value={searchTerm}
-                                    onChange={(e) => {
-                                        setSearchTerm(e.target.value);
-                                        setCurrentPage(1);
-                                    }}
-                                />
-                            </div>
+                        {/* Stats */}
+                        <div className="row g-3 mb-4">
+                            {[
+                                { label: 'Total Benefits', value: benefits.length },
+                                { label: 'Quality Tier', value: 'Premium' },
+                                { label: 'Special Offers', value: 'Exclusive' }
+                            ].map(stat => (
+                                <div className="col-6 col-md-4" key={stat.label}>
+                                    <div style={{ backgroundColor: theme.card, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '18px' }}>
+                                        <div style={{ fontSize: '22px', fontWeight: 700, color: theme.text }}>{stat.value}</div>
+                                        <div style={{ fontSize: '13px', color: theme.textLight, fontWeight: 500 }}>{stat.label}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Toolbar */}
+                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                            <input
+                                type="text"
+                                placeholder="Search benefits..."
+                                value={searchTerm}
+                                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                                style={{ ...fieldStyle, width: '300px', backgroundColor: theme.card }}
+                            />
                             <button
-                                style={styles.addBtn}
-                                className="add-btn"
                                 onClick={() => openModal()}
                                 disabled={loading}
+                                style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 22px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}
                             >
-                                <i className="bi bi-plus"></i>
-                                Add new benefit
+                                <i className="bi bi-plus-circle me-2"></i>Add New Benefit
                             </button>
                         </div>
 
+                        {/* Benefits Grid */}
                         {loading && benefits.length === 0 ? (
-                            <div style={styles.loadingState}>Loading benefits…</div>
+                            <div className="text-center py-5">
+                                <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                                <p className="mt-3" style={{ color: theme.textLight }}>Loading benefits...</p>
+                            </div>
                         ) : currentItems.length > 0 ? (
                             <>
-                                <div style={styles.list}>
-                                    {currentItems.map((item, i) => (
-                                        <div key={item.id} className="benefit-row" style={styles.row}>
-                                            <div className="row-index" style={styles.rowIndex}>
-                                                {String(indexOfFirstItem + i + 1).padStart(2, '0')}
-                                            </div>
-                                            <div style={styles.rowBody}>
-                                                <div style={styles.rowTop}>
-                                                    <h3 style={styles.rowTitle}>{item.title}</h3>
-                                                    <div style={styles.rowActions}>
-                                                        <button
-                                                            style={styles.linkBtn}
-                                                            className="link-btn"
-                                                            onClick={() => openModal(item)}
-                                                            disabled={loading}
-                                                        >
+                                <div className="row g-3">
+                                    {currentItems.map(item => (
+                                        <div className="col-md-6 col-lg-4" key={item.id}>
+                                            <div style={{ backgroundColor: theme.card, border: `1px solid ${theme.border}`, borderRadius: '16px', overflow: 'hidden', height: '100%' }}>
+                                                <div style={{ padding: '16px 18px', borderBottom: `1px solid ${theme.border}` }}>
+                                                    <div className="d-flex align-items-center gap-2" style={{ color: theme.text, fontWeight: 700, fontSize: '16px' }}>
+                                                        <i className="bi bi-gift-fill"></i>
+                                                        {item.title}
+                                                    </div>
+                                                </div>
+                                                <div style={{ padding: '18px' }}>
+                                                    <p style={{ fontSize: '13px', color: theme.textLight, lineHeight: 1.6, minHeight: '50px' }}>
+                                                        {item.desc}
+                                                    </p>
+                                                    <div className="d-flex gap-2" style={{ borderTop: `1px solid ${theme.border}`, paddingTop: '12px' }}>
+                                                        <button className="btn btn-sm btn-outline-dark flex-fill" onClick={() => openModal(item)} disabled={loading}>
                                                             <i className="bi bi-pencil"></i> Edit
                                                         </button>
-                                                        <button
-                                                            style={{...styles.linkBtn, ...styles.deleteLink}}
-                                                            className="link-btn"
-                                                            onClick={() => setDeleteConfirm(item)}
-                                                            disabled={loading}
-                                                        >
+                                                        <button className="btn btn-sm btn-outline-dark flex-fill" onClick={() => setDeleteConfirm(item)} disabled={loading}>
                                                             <i className="bi bi-trash"></i> Delete
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <p style={styles.rowDesc}>{item.desc}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 {totalPages > 1 && (
-                                    <div style={styles.pagination}>
+                                    <div className="d-flex justify-content-center gap-2 mt-4">
                                         <button
-                                            style={styles.pageArrow}
-                                            className="page-arrow"
                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                             disabled={currentPage === 1}
+                                            style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text, opacity: currentPage === 1 ? 0.4 : 1, cursor: 'pointer' }}
                                         >
                                             ←
                                         </button>
-                                        {[...Array(Math.min(totalPages, 5))].map((_, i) => {
-                                            let pageNum;
-                                            if (totalPages <= 5) {
-                                                pageNum = i + 1;
-                                            } else if (currentPage <= 3) {
-                                                pageNum = i + 1;
-                                            } else if (currentPage >= totalPages - 2) {
-                                                pageNum = totalPages - 4 + i;
-                                            } else {
-                                                pageNum = currentPage - 2 + i;
-                                            }
-                                            return (
-                                                <button
-                                                    key={i}
-                                                    style={{
-                                                        ...styles.pageNum,
-                                                        ...(currentPage === pageNum && styles.pageNumActive)
-                                                    }}
-                                                    onClick={() => setCurrentPage(pageNum)}
-                                                >
-                                                    {pageNum}
-                                                </button>
-                                            );
-                                        })}
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(num => (
+                                            <button
+                                                key={num}
+                                                onClick={() => setCurrentPage(num)}
+                                                style={{
+                                                    width: '36px', height: '36px', borderRadius: '8px', cursor: 'pointer',
+                                                    border: `1px solid ${theme.border}`,
+                                                    backgroundColor: currentPage === num ? accent : theme.card,
+                                                    color: currentPage === num ? accentOn : theme.text
+                                                }}
+                                            >
+                                                {num}
+                                            </button>
+                                        ))}
                                         <button
-                                            style={styles.pageArrow}
-                                            className="page-arrow"
                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                             disabled={currentPage === totalPages}
+                                            style={{ width: '36px', height: '36px', borderRadius: '8px', border: `1px solid ${theme.border}`, backgroundColor: theme.card, color: theme.text, opacity: currentPage === totalPages ? 0.4 : 1, cursor: 'pointer' }}
                                         >
                                             →
                                         </button>
@@ -1771,153 +2236,96 @@ const OwnerBenefit = ({ theme }) => {
                                 )}
                             </>
                         ) : (
-                            <div style={styles.emptyState}>
-                                <h4 style={styles.emptyTitle}>No benefits found</h4>
-                                <p style={{ color: currentTheme.muted, marginTop: '10px', marginBottom: '22px' }}>
-                                    {searchTerm ? `Nothing matches "${searchTerm}"` : 'Start by adding the first benefit'}
-                                </p>
+                            <div className="text-center py-5" style={{ color: theme.textLight }}>
+                                <i className="bi bi-gift display-4 d-block mb-3" style={{ opacity: 0.4 }}></i>
+                                <h5 style={{ color: theme.text }}>No Benefits Found</h5>
+                                <p className="mb-3">{searchTerm ? `No results found for "${searchTerm}"` : 'Start by adding your first benefit'}</p>
                                 {!searchTerm && (
-                                    <button style={styles.addBtn} className="add-btn" onClick={() => openModal()}>
-                                        <i className="bi bi-plus"></i> Add new benefit
+                                    <button onClick={() => openModal()} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 22px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+                                        <i className="bi bi-plus-circle me-2"></i>Add New Benefit
                                     </button>
                                 )}
                             </div>
                         )}
                     </div>
 
-                    <Footer theme={currentTheme} />
+                    <Footer theme={theme} />
                 </div>
             </div>
 
+            {/* Add/Edit Modal */}
             {showModal && (
-                <div style={styles.modalOverlay} onClick={closeModal}>
-                    <div style={styles.modal} onClick={e => e.stopPropagation()}>
-                        <div style={styles.modalHeader}>
-                            <h5 style={styles.modalTitle}>
-                                {isEditing ? 'Edit benefit' : 'Add a new benefit'}
-                            </h5>
-                            <button
-                                onClick={closeModal}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '22px',
-                                    lineHeight: 1,
-                                    cursor: 'pointer',
-                                    color: currentTheme.muted
-                                }}
-                            >
-                                ×
+                <form onSubmit={handleSave}>
+                    <Modal
+                        theme={theme}
+                        title={isEditing ? 'Edit Benefit' : 'Add New Benefit'}
+                        onClose={closeModal}
+                        footer={<>
+                            <button type="button" onClick={closeModal} disabled={loading} className="btn btn-outline-dark">Cancel</button>
+                            <button type="submit" disabled={loading} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 28px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+                                {loading
+                                    ? (<><span className="spinner-border spinner-border-sm me-2"></span>{isEditing ? 'Updating...' : 'Saving...'}</>)
+                                    : (<><i className={`bi ${isEditing ? 'bi-pencil' : 'bi-plus-circle'} me-1`}></i>{isEditing ? 'Update Benefit' : 'Save Benefit'}</>)}
+                            </button>
+                        </>}
+                    >
+                        <div className="mb-3">
+                            <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>Benefit Title *</label>
+                            <input type="text" style={fieldStyle} value={formData.title} required onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Enter benefit title" disabled={loading} />
+                        </div>
+                        <div>
+                            <label style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px', display: 'block' }}>Description *</label>
+                            <textarea style={{ ...fieldStyle, minHeight: '100px' }} value={formData.desc} required onChange={(e) => setFormData({ ...formData, desc: e.target.value })} placeholder="Enter benefit description" disabled={loading} />
+                        </div>
+                    </Modal>
+                </form>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div
+                    style={{
+                        position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.65)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 2000, padding: '20px', animation: 'fadeIn .2s ease'
+                    }}
+                    onClick={(e) => e.target === e.currentTarget && !loading && setDeleteConfirm(null)}
+                >
+                    <div style={{
+                        backgroundColor: theme.card, color: theme.text,
+                        border: `1px solid ${theme.border}`, borderRadius: '16px',
+                        width: '100%', maxWidth: '380px', padding: '28px 26px', textAlign: 'center',
+                        animation: 'slideUp .2s ease'
+                    }}>
+                        <div style={{
+                            width: '48px', height: '48px', borderRadius: '50%',
+                            border: `1.5px solid ${theme.text}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            margin: '0 auto 16px', fontSize: '20px'
+                        }}>
+                            <i className="bi bi-trash"></i>
+                        </div>
+                        <h5 style={{ margin: '0 0 8px', fontWeight: 600 }}>Delete this benefit?</h5>
+                        <p style={{ margin: '0 0 22px', color: theme.textLight, fontSize: '14px' }}>
+                            "<strong>{deleteConfirm.title}</strong>" will be permanently removed. This can't be undone.
+                        </p>
+                        <div className="d-flex gap-2">
+                            <button onClick={() => setDeleteConfirm(null)} disabled={loading} className="btn btn-outline-dark flex-fill">Cancel</button>
+                            <button onClick={() => handleDelete(deleteConfirm.id)} disabled={loading} className="btn flex-fill" style={{ backgroundColor: accent, color: accentOn, border: 'none' }}>
+                                {loading ? 'Deleting...' : 'Delete'}
                             </button>
                         </div>
-                        <form onSubmit={handleSave}>
-                            <div style={styles.modalBody}>
-                                <div className="mb-4">
-                                    <label style={styles.label}>Benefit title</label>
-                                    <input
-                                        type="text"
-                                        style={styles.input}
-                                        value={formData.title}
-                                        required
-                                        onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                        placeholder="e.g. Airport pickup service"
-                                        disabled={loading}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label style={styles.label}>Description</label>
-                                    <textarea
-                                        style={styles.textarea}
-                                        value={formData.desc}
-                                        required
-                                        onChange={(e) => setFormData({...formData, desc: e.target.value})}
-                                        placeholder="Describe what this benefit includes"
-                                        disabled={loading}
-                                    />
-                                </div>
-                            </div>
-                            <div style={styles.modalFooter}>
-                                <button
-                                    type="button"
-                                    onClick={closeModal}
-                                    style={styles.cancelBtn}
-                                    className="cancel-btn"
-                                    disabled={loading}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    style={{...styles.addBtn, padding: '10px 28px', ...(loading && styles.buttonDisabled)}}
-                                    className="add-btn"
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <span className="spinner-border spinner-border-sm me-2"></span>
-                                            {isEditing ? 'Updating…' : 'Saving…'}
-                                        </>
-                                    ) : (
-                                        isEditing ? 'Update benefit' : 'Save benefit'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             )}
 
-            {deleteConfirm && (
-                <div style={styles.modalOverlay} onClick={() => setDeleteConfirm(null)}>
-                    <div style={{...styles.modal, width: '400px'}} onClick={e => e.stopPropagation()}>
-                        <div style={styles.modalHeader}>
-                            <h5 style={styles.modalTitle}>Confirm deletion</h5>
-                            <button
-                                onClick={() => setDeleteConfirm(null)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '22px',
-                                    lineHeight: 1,
-                                    cursor: 'pointer',
-                                    color: currentTheme.muted
-                                }}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <div style={styles.modalBody}>
-                            <p style={{ fontSize: '15px', color: currentTheme.ink, lineHeight: 1.6 }}>
-                                Remove <strong>"{deleteConfirm.title}"</strong> from the benefits list? This action cannot be undone.
-                            </p>
-                        </div>
-                        <div style={styles.modalFooter}>
-                            <button
-                                onClick={() => setDeleteConfirm(null)}
-                                style={styles.cancelBtn}
-                                className="cancel-btn"
-                                disabled={loading}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => handleDelete(deleteConfirm.id)}
-                                style={{...styles.deleteConfirmBtn, ...(loading && styles.buttonDisabled)}}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <>
-                                        <span className="spinner-border spinner-border-sm me-2"></span>
-                                        Deleting…
-                                    </>
-                                ) : (
-                                    'Delete permanently'
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                ::-webkit-scrollbar { width: 6px; height: 6px; }
+                ::-webkit-scrollbar-track { background: ${theme.bg}; }
+                ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 10px; }
+            `}</style>
         </div>
     );
 };
