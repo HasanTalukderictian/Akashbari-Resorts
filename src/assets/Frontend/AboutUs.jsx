@@ -404,7 +404,7 @@ const AboutUs = () => {
             `}</style>
 
             {/* Team Section - Dynamic from API */}
-            <section className="team-section-modern py-5">
+            {/* <section className="team-section-modern py-5">
                 <div className="container">
                     <div className="team-header-modern text-center">
 
@@ -483,7 +483,264 @@ const AboutUs = () => {
                         </div>
                     )}
                 </div>
-            </section>
+            </section> */}
+
+
+            <section className="team-section-modern py-5">
+    <div className="container">
+        <div className="team-header-modern text-center">
+            <div className="section-tag centered" style={{ color: brandColor }}>
+                MEET OUR EXPERTS
+            </div>
+            <h2 className="team-title" style={{ fontFamily: 'inherit' }}>
+                The Passionate <span style={{ color: brandColor }}>People Behind</span><br />
+                Your Perfect Stay
+            </h2>
+            <p className="team-subtitle" style={{ fontFamily: 'inherit', fontSize: '0.95rem' }}>
+                Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment.
+                From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
+            </p>
+        </div>
+
+        {loading ? (
+            <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status" style={{ color: brandColor }}>
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3 text-muted">Loading team members...</p>
+            </div>
+        ) : error ? (
+            <div className="text-center py-5">
+                <p className="text-danger">⚠️ {error}</p>
+                <button
+                    className="btn btn-primary mt-3"
+                    onClick={() => window.location.reload()}
+                    style={{ backgroundColor: brandColor, borderColor: brandColor }}
+                >
+                    Retry
+                </button>
+            </div>
+        ) : teamMembers.length > 0 ? (
+            <div className="team-grid-modern">
+                {teamMembers.map((member) => (
+                    <div className="team-card-modern" key={member.id}>
+                        <div className="team-card-inner">
+                            <div className="team-image-wrapper">
+                                <img
+                                    src={member.image}
+                                    alt={member.name}
+                                    className="team-image"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'contain', // Shows full image without cropping
+                                        objectPosition: 'center',
+                                        backgroundColor: '#f8f9fa',
+                                        display: 'block'
+                                    }}
+                                    onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
+                                    }}
+                                />
+                                <div className="team-social-overlay">
+                                    <a href={`mailto:${member.email || 'info@akashbari.com'}`} className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
+                                        <FontAwesomeIcon icon={faEnvelope} />
+                                    </a>
+                                    <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
+                                        <FontAwesomeIcon icon={faLinkedin} />
+                                    </a>
+                                    <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
+                                        <FontAwesomeIcon icon={faTwitter} />
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="team-info">
+                                <h3 className="team-member-name" style={{ fontFamily: 'inherit', color: brandColor }}>{member.name}</h3>
+                                <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
+                                <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
+                                <div className="team-divider" style={{ backgroundColor: brandColor }}></div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        ) : (
+            <div className="text-center py-5">
+                <p className="text-muted">No team members found.</p>
+            </div>
+        )}
+    </div>
+</section>
+
+{/* Add this CSS to your stylesheet or in a <style> tag */}
+<style>{`
+    .team-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+        padding: 20px 0;
+    }
+
+    .team-card-modern {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #ffffff;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .team-card-modern:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .team-card-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .team-image-wrapper {
+        position: relative;
+        width: 100%;
+        padding-top: 100%; /* 1:1 Square aspect ratio */
+        overflow: hidden;
+        background: #f8f9fa;
+        flex-shrink: 0;
+    }
+
+    .team-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Shows full image without cropping */
+        object-position: center;
+        background-color: #f8f9fa;
+        padding: 10px; /* Optional: Adds some breathing room */
+    }
+
+    /* Alternative: If you want the image to fill the container but show fully */
+    /* Use this if you prefer the image to stretch to fill without cropping */
+    /*
+    .team-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+    */
+
+    .team-social-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding: 15px;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .team-image-wrapper:hover .team-social-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: white !important;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .social-link:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-info {
+        padding: 20px 20px 25px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+    }
+
+    .team-member-name {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        letter-spacing: -0.01em;
+    }
+
+    .team-member-role {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .team-member-bio {
+        font-size: 0.88rem;
+        color: #495057;
+        line-height: 1.6;
+        margin-bottom: 12px;
+        flex: 1;
+    }
+
+    .team-divider {
+        width: 40px;
+        height: 3px;
+        border-radius: 2px;
+        margin-top: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .team-grid-modern {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .team-image-wrapper {
+            padding-top: 100%;
+        }
+
+        .team-info {
+            padding: 16px 16px 20px;
+        }
+
+        .team-member-name {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .team-grid-modern {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+    }
+`}</style>
 
             <Footer />
         </>
