@@ -151,6 +151,7 @@ import Testominal from "./Testominal";
 import Video from "./Video";
 import Owner from "./Owner";
 import Packagegrap from "./Packagegrap";
+import Faqpage from "./Faqpage";
 import Luxury from "./Luxury";
 import HappyClient from "./HappyClient";
 import Notice from "./Notice";
@@ -198,6 +199,7 @@ const LandingPage = () => {
         videos: [],
         luxury: [],
         packages: [],
+        faqpage: []
     });
 
     // ============================================
@@ -537,6 +539,9 @@ const LandingPage = () => {
             <OngoingView
                 data={landingData.ongoing}
             />
+
+
+            <Faqpage data ={landingData.faqpage}/>
 
             {/* Sister */}
             <Sister
