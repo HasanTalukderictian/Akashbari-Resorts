@@ -1905,7 +1905,9 @@ const CareerDetails = () => {
   useEffect(() => {
     const fetchJobDetails = async () => {
       try {
-        const response = await fetch(`https://backend.akashbariresort.com/api/get-jobs/${id}`);
+        // const response = await fetch(`https://backend.akashbariresort.com/api/get-jobs/${id}`);
+
+         const response = await fetch(`http://127.0.0.1:8000/api/get-jobs/${id}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch job details: ${response.status}`);
@@ -2045,7 +2047,13 @@ const CareerDetails = () => {
         formPayload.append("notice_period", formData.noticePeriod || "");
       }
 
-      const response = await fetch("https://backend.akashbariresort.com/api/applications", {
+      // const response = await fetch("https://backend.akashbariresort.com/api/applications", {
+      //   method: "POST",
+      //   body: formPayload,
+      // });
+
+
+        const response = await fetch("http://127.0.0.1:8000/api/applications", {
         method: "POST",
         body: formPayload,
       });
