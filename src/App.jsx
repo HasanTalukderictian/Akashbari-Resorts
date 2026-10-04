@@ -52,13 +52,16 @@ import Career from './assets/Frontend/Career'
 import CareerDetails from './assets/Frontend/CareerDetails'
 import JobSettings from './Backend/JobSettings'
 import JobQuery from './Backend/JobQuery'
+import Register from './assets/Frontend/Register'
+import UserLogin from './assets/Frontend/UserLogin'
+import WriteBlog from './assets/Frontend/Writeblog'
 
 
 function App() {
-    
+
   ReactGA.initialize('G-FBHHGLQ9KQ');
 
-  useEffect(()=>{
+  useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
   }, [])
 
@@ -83,8 +86,13 @@ function App() {
         <Route path="/event/:id" element={<EventsDetails />} />
         <Route path="*" element={<NotFound />} />
 
+        <Route path="/write-blog" element={<WriteBlog />} />
+
         {/* লগইন রুট - পাবলিক */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/visitor-login" element={<UserLogin />} />
+
 
         {/* অ্যাডমিন রুটসমূহ - প্রাইভেট (লগইন প্রয়োজন) */}
         <Route path="/dashboard" element={
@@ -99,7 +107,7 @@ function App() {
           </PrivateRoute>
         } />
 
-        
+
 
         <Route path="/content" element={
           <PrivateRoute>
@@ -107,7 +115,7 @@ function App() {
           </PrivateRoute>
         } />
 
-          <Route path="/admin-faq" element={
+        <Route path="/admin-faq" element={
           <PrivateRoute>
             <FqaSettings />
           </PrivateRoute>
@@ -120,13 +128,13 @@ function App() {
         } />
 
 
-            <Route path="/admin-job" element={
+        <Route path="/admin-job" element={
           <PrivateRoute>
             <JobSettings />
           </PrivateRoute>
         } />
 
-          <Route path="/admin-jobquery" element={
+        <Route path="/admin-jobquery" element={
           <PrivateRoute>
             <JobQuery />
           </PrivateRoute>
@@ -146,9 +154,9 @@ function App() {
         } />
 
 
-         <Route path="/package-query" element={
+        <Route path="/package-query" element={
           <PrivateRoute>
-           <PackageQuery/>
+            <PackageQuery />
           </PrivateRoute>
         } />
 
@@ -200,7 +208,7 @@ function App() {
           </PrivateRoute>
         } />
 
-         <Route path="/admin-project-view" element={
+        <Route path="/admin-project-view" element={
           <PrivateRoute>
             <ProjectState />
           </PrivateRoute>
@@ -238,7 +246,7 @@ function App() {
         } />
 
         <Route path="/admin-investrecord" element={
-          <PrivateRoute>  
+          <PrivateRoute>
             <InvestmentRecord />
           </PrivateRoute>
         } />
@@ -257,7 +265,7 @@ function App() {
           </PrivateRoute>
         } />
 
-        <Route path="/admin-team" element={   
+        <Route path="/admin-team" element={
           <PrivateRoute>
             <Teamate />
           </PrivateRoute>
