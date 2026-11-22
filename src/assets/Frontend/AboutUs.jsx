@@ -139,7 +139,7 @@ const AboutUs = () => {
                                         <strong> Business Type:</strong> Luxury Hospitality & Eco Resort
                                     </p>
                                     <p className="mb-0">
-                                        <strong> Established Since:</strong> 2015
+                                        <strong> Established Since:</strong> 2023
                                     </p>
                                 </div>
                                 <p className="modern-description text-muted mb-4" style={{ fontFamily: 'inherit', fontSize: '1rem', lineHeight: '1.6' }}>
@@ -155,6 +155,17 @@ const AboutUs = () => {
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Multi-Cuisine Fine Dining Restaurant</li>
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Guided Nature Trails & Kids Zone</li>
                                     <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Corporate Conference Hall & Event Spaces</li>
+                                </ul>
+
+                                <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600', color: brandColor }}>
+                                    We Offer Investment Opportunity:
+                                </h4>
+                                <ul className="list-unstyled mb-4">
+                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Became a Property Owner</li>
+                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Yearly Profit </li>
+                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Free Membership</li>
+                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Investment Guildeline </li>
+                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Socail Networking</li>
                                 </ul>
 
                             </div>
