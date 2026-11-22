@@ -13,7 +13,7 @@ const Footer = () => {
     const timer = setInterval(() => {
       setCurrentYear(new Date().getFullYear());
     }, 1000); // Updates every second (though year only changes once per year)
-    
+
     return () => clearInterval(timer); // Cleanup timer on component unmount
   }, []);
 
@@ -62,18 +62,11 @@ const Footer = () => {
       {/* Copyright Section */}
       <div className="container text-center mb-3">
         <p className="footer-copyright-text">
-          &copy; {currentYear} AkashBari Hotels & Resorts. Design and Development By{" "}
-          <a
-            href="https://hasan-portfilo.netlify.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="developer-link"
-          >
-            Hasan Talukder
-          </a>
+          &copy; {currentYear} AkashBari Hotels & Resorts.
+
         </p>
       </div>
-      
+
       {/* Divider */}
       <div className="footer-divider"></div>
 
@@ -99,8 +92,17 @@ const Footer = () => {
         </div>
 
         <div className="footer-links">
-          <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
+          <span className="footer-copyright-text">
+            Create By :{' '}
+            <a
+              href="https://hasan-portfilo.netlify.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="developer-link"
+            >
+              Hasan Talukder
+            </a>
+          </span>
         </div>
       </div>
 
