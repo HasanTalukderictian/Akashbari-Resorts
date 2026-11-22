@@ -1,1314 +1,70 @@
-// import Header from "./Common/Header";
-// import Footer from "./Common/Footer";
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
-
-// const AllEvents = () => {
-//   const brandColor = '#5e2e10';
-//   const navigate = useNavigate();
-//   const [isDarkMode, setIsDarkMode] = useState(false);
-//   const [events, setEvents] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [selectedCategory, setSelectedCategory] = useState('all');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const eventsPerPage = 6;
-
-//   // Use environment variables for API URLs
-//   const API_BASE = import.meta.env.VITE_BASE_URL;
-//   const API_URL = import.meta.env.API_URL;
-
-//   const theme = {
-//     isDarkMode,
-//     bg: isDarkMode ? '#1a1a2e' : '#f8f9fa',
-//     card: isDarkMode ? '#16213e' : '#ffffff',
-//     text: isDarkMode ? '#e9ecef' : '#2c3e50',
-//     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-//     heroBg: isDarkMode 
-//       ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")` 
-//       : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`,
-//     primaryColor: brandColor,
-//     primaryHover: '#3d1f0a',
-//   };
-
-//   // Helper function to get full image URL
-//   const getImageUrl = (imagePath) => {
-//     if (!imagePath) return null;
-//     if (imagePath.startsWith('http')) return imagePath;
-//     const cleanPath = imagePath.replace(/^\/storage\/storage\//, '/storage/');
-//     if (cleanPath.startsWith('/storage/')) {
-//       return `${API_URL}${cleanPath}`;
-//     }
-//     return `${API_URL}/storage/${cleanPath}`;
-//   };
-
-//   // Fetch all events
-//   const fetchEvents = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const response = await axios.get(`${API_BASE}/events/all`);
-//       if (response.data.success && response.data.data) {
-//         setEvents(response.data.data);
-//       } else {
-//         setEvents([]);
-//         setError('No events found');
-//       }
-//     } catch (err) {
-//       console.error("Error fetching events:", err);
-//       setError('Failed to load events. Please try again later.');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchEvents();
-//   }, []);
-
-//   // Filter events based on search and category
-//   const filteredEvents = events.filter(event => {
-//     const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       event.subtitle?.toLowerCase().includes(searchTerm.toLowerCase());
-//     const matchesCategory = selectedCategory === 'all' ||
-//       (selectedCategory === 'upcoming' && new Date(event.event_datetime) > new Date()) ||
-//       (selectedCategory === 'past' && new Date(event.event_datetime) < new Date());
-//     return matchesSearch && matchesCategory;
-//   });
-
-//   // Pagination
-//   const indexOfLastEvent = currentPage * eventsPerPage;
-//   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-//   const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
-//   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-
-//   // Navigate to event details
-//   const handleEventClick = (eventId, slug) => {
-//     navigate(`/event/${slug || eventId}`);
-//   };
-
-//   // Styles
-//   const styles = {
-//     pageContainer: {
-//       backgroundColor: theme.bg,
-//       minHeight: '100vh',
-//       transition: 'all 0.3s ease',
-//     },
-//     heroSection: {
-//       background: theme.heroBg,
-//       backgroundSize: 'cover',
-//       backgroundPosition: 'center',
-//       padding: '100px 0',
-//       color: 'white',
-//       position: 'relative',
-//       overflow: 'hidden',
-//       transition: 'all 0.3s ease',
-//     },
-//     heroContent: {
-//       position: 'relative',
-//       zIndex: 2,
-//     },
-//     heroTitle: {
-//       textShadow: '2px 4px 10px rgba(0,0,0,0.5)',
-//     },
-//     heroSubtitle: {
-//       opacity: 0.95,
-//       textShadow: '1px 2px 5px rgba(0,0,0,0.5)',
-//     },
-//     spinner: {
-//       width: '3rem',
-//       height: '3rem',
-//     },
-//     loadingText: {
-//       color: theme.text,
-//       fontSize: '1.1rem',
-//     },
-//     errorAlert: {
-//       borderRadius: '12px',
-//       padding: '20px',
-//     },
-//     searchBox: {
-//       position: 'relative',
-//     },
-//     searchIcon: {
-//       position: 'absolute',
-//       left: '15px',
-//       top: '50%',
-//       transform: 'translateY(-50%)',
-//       zIndex: 10,
-//       color: brandColor,
-//     },
-//     searchInput: {
-//       paddingLeft: '40px',
-//       borderRadius: '12px',
-//       border: `2px solid ${theme.border}`,
-//       height: '50px',
-//       fontSize: '15px',
-//       backgroundColor: theme.card,
-//       color: theme.text,
-//     },
-//     filterButtons: {
-//       display: 'flex',
-//       gap: '10px',
-//       justifycontent: 'flex-end',
-//     },
-//     filterBtn: {
-//       borderRadius: '25px',
-//       padding: '8px 20px',
-//       transition: 'all 0.3s ease',
-//     },
-//     eventCard: {
-//       backgroundColor: theme.card,
-//       borderRadius: '16px',
-//       overflow: 'hidden',
-//       boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
-//       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-//       cursor: 'pointer',
-//       height: '100%',
-//       display: 'flex',
-//       flexDirection: 'column',
-//     },
-//     eventImageWrapper: {
-//       position: 'relative',
-//       overflow: 'hidden',
-//       height: '250px',
-//     },
-//     eventCardImg: {
-//       width: '100%',
-//       height: '100%',
-//       objectFit: 'cover',
-//       transition: 'transform 0.5s ease',
-//     },
-//     eventDateBadge: {
-//       position: 'absolute',
-//       top: '15px',
-//       left: '15px',
-//       backgroundColor: 'rgba(0,0,0,0.8)',
-//       color: 'white',
-//       borderRadius: '10px',
-//       padding: '8px 12px',
-//       textAlign: 'center',
-//       minWidth: '55px',
-//       backdropFilter: 'blur(5px)',
-//       zIndex: 2,
-//     },
-//     eventDay: {
-//       display: 'block',
-//       fontSize: '22px',
-//       fontWeight: 'bold',
-//       lineHeight: 1,
-//     },
-//     eventMonth: {
-//       display: 'block',
-//       fontSize: '12px',
-//       textTransform: 'uppercase',
-//     },
-//     eventOverlay: {
-//       position: 'absolute',
-//       top: 0,
-//       left: 0,
-//       right: 0,
-//       bottom: 0,
-//       backgroundColor: 'rgba(0,0,0,0.6)',
-//       display: 'flex',
-//       alignItems: 'center',
-//       justifyContent: 'center',
-//       opacity: 0,
-//       transition: 'opacity 0.3s ease',
-//       zIndex: 3,
-//     },
-//     viewDetailsBtn: {
-//       borderRadius: '25px',
-//       padding: '10px 25px',
-//       fontWeight: '600',
-//       backgroundColor: brandColor,
-//       border: 'none',
-//       color: 'white',
-//     },
-//     eventCardBody: {
-//       padding: '20px',
-//       flex: 1,
-//       display: 'flex',
-//       flexDirection: 'column',
-//     },
-//     eventCardTitle: {
-//       fontSize: '18px',
-//       fontWeight: 'bold',
-//       marginBottom: '5px',
-//       color: theme.text,
-//     },
-//     eventCardSubtitle: {
-//       fontSize: '14px',
-//       color: brandColor,
-//       marginBottom: '12px',
-//     },
-//     eventMeta: {
-//       display: 'flex',
-//       gap: '15px',
-//       marginBottom: '12px',
-//       flexWrap: 'wrap',
-//     },
-//     eventMetaItem: {
-//       fontSize: '12px',
-//       color: '#6c757d',
-//     },
-//     eventCardDescription: {
-//       fontSize: '13px',
-//       color: '#6c757d',
-//       lineHeight: 1.5,
-//       marginBottom: '15px',
-//     },
-//     eventFeatures: {
-//       display: 'flex',
-//       flexWrap: 'wrap',
-//       gap: '8px',
-//       marginBottom: '15px',
-//     },
-//     featureTag: {
-//       backgroundColor: isDarkMode ? '#2d3436' : '#f0f0f0',
-//       padding: '4px 10px',
-//       borderRadius: '15px',
-//       fontSize: '11px',
-//       color: isDarkMode ? '#e9ecef' : '#666',
-//       display: 'inline-flex',
-//       alignItems: 'center',
-//     },
-//     eventCardFooter: {
-//       display: 'flex',
-//       justifyContent: 'space-between',
-//       alignItems: 'center',
-//       paddingTop: '12px',
-//       borderTop: `1px solid ${theme.border}`,
-//       marginTop: 'auto',
-//     },
-//     paginationWrapper: {
-//       display: 'flex',
-//       justifyContent: 'center',
-//     },
-//     noEvents: {
-//       padding: '60px 20px',
-//     },
-//     noEventsIcon: {
-//       fontSize: '64px',
-//       color: '#dee2e6',
-//     },
-//     resultsCount: {
-//       fontSize: '14px',
-//       color: theme.text,
-//     },
-//   };
-
-//   // Loading state
-//   if (loading) {
-//     return (
-//       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-//         <Header
-//           theme={theme}
-//           isDarkMode={isDarkMode}
-//           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-//         />
-//         <div className="container py-5">
-//           <div className="text-center py-5">
-//             <div className="spinner-border" style={{ ...styles.spinner, color: brandColor }} role="status">
-//               <span className="visually-hidden">Loading...</span>
-//             </div>
-//             <p className="mt-3" style={styles.loadingText}>Loading amazing events...</p>
-//           </div>
-//         </div>
-//         <Footer theme={theme} />
-//       </div>
-//     );
-//   }
-
-//   // Error state
-//   if (error) {
-//     return (
-//       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-//         <Header
-//           theme={theme}
-//           isDarkMode={isDarkMode}
-//           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-//         />
-//         <div className="container py-5">
-//           <div className="alert alert-danger text-center" style={styles.errorAlert}>
-//             <i className="bi bi-exclamation-triangle-fill me-2"></i>
-//             {error}
-//           </div>
-//         </div>
-//         <Footer theme={theme} />
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div style={styles.pageContainer}>
-//       <Header
-//         theme={theme}
-//         isDarkMode={isDarkMode}
-//         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-//       />
-
-//       {/* Hero Section */}
-//       <div className="hero-section" style={styles.heroSection}>
-//         <div className="container">
-//           <div className="text-center" style={styles.heroContent}>
-//             <h1 className="display-3 fw-bold mb-3" style={styles.heroTitle}>
-//               Explore Our Events
-//             </h1>
-//             <p className="lead mb-4" style={styles.heroSubtitle}>
-//               Discover unforgettable experiences and create lasting memories
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="container py-5">
-//         {/* Search and Filter Section */}
-//         <div className="row mb-5">
-//           <div className="col-md-6 mb-3">
-//             <div className="search-box" style={styles.searchBox}>
-//               <i className="bi bi-search" style={styles.searchIcon}></i>
-//               <input
-//                 type="text"
-//                 className="form-control"
-//                 placeholder="Search events by title..."
-//                 value={searchTerm}
-//                 onChange={(e) => setSearchTerm(e.target.value)}
-//                 style={styles.searchInput}
-//               />
-//             </div>
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <div className="filter-buttons" style={styles.filterButtons}>
-//               <button
-//                 className={`btn ${selectedCategory === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
-//                 onClick={() => setSelectedCategory('all')}
-//                 style={{
-//                   ...styles.filterBtn,
-//                   backgroundColor: selectedCategory === 'all' ? brandColor : 'transparent',
-//                   borderColor: brandColor,
-//                   color: selectedCategory === 'all' ? 'white' : brandColor,
-//                 }}
-//                 onMouseEnter={(e) => {
-//                   if (selectedCategory !== 'all') {
-//                     e.currentTarget.style.backgroundColor = brandColor;
-//                     e.currentTarget.style.color = 'white';
-//                   }
-//                 }}
-//                 onMouseLeave={(e) => {
-//                   if (selectedCategory !== 'all') {
-//                     e.currentTarget.style.backgroundColor = 'transparent';
-//                     e.currentTarget.style.color = brandColor;
-//                   }
-//                 }}
-//               >
-//                 <i className="bi bi-grid-3x3-gap-fill me-2"></i>
-//                 All Events
-//               </button>
-//               <button
-//                 className={`btn ${selectedCategory === 'upcoming' ? 'btn-primary' : 'btn-outline-primary'}`}
-//                 onClick={() => setSelectedCategory('upcoming')}
-//                 style={{
-//                   ...styles.filterBtn,
-//                   backgroundColor: selectedCategory === 'upcoming' ? brandColor : 'transparent',
-//                   borderColor: brandColor,
-//                   color: selectedCategory === 'upcoming' ? 'white' : brandColor,
-//                 }}
-//                 onMouseEnter={(e) => {
-//                   if (selectedCategory !== 'upcoming') {
-//                     e.currentTarget.style.backgroundColor = brandColor;
-//                     e.currentTarget.style.color = 'white';
-//                   }
-//                 }}
-//                 onMouseLeave={(e) => {
-//                   if (selectedCategory !== 'upcoming') {
-//                     e.currentTarget.style.backgroundColor = 'transparent';
-//                     e.currentTarget.style.color = brandColor;
-//                   }
-//                 }}
-//               >
-//                 <i className="bi bi-calendar-event-fill me-2"></i>
-//                 Upcoming
-//               </button>
-//               <button
-//                 className={`btn ${selectedCategory === 'past' ? 'btn-primary' : 'btn-outline-primary'}`}
-//                 onClick={() => setSelectedCategory('past')}
-//                 style={{
-//                   ...styles.filterBtn,
-//                   backgroundColor: selectedCategory === 'past' ? brandColor : 'transparent',
-//                   borderColor: brandColor,
-//                   color: selectedCategory === 'past' ? 'white' : brandColor,
-//                 }}
-//                 onMouseEnter={(e) => {
-//                   if (selectedCategory !== 'past') {
-//                     e.currentTarget.style.backgroundColor = brandColor;
-//                     e.currentTarget.style.color = 'white';
-//                   }
-//                 }}
-//                 onMouseLeave={(e) => {
-//                   if (selectedCategory !== 'past') {
-//                     e.currentTarget.style.backgroundColor = 'transparent';
-//                     e.currentTarget.style.color = brandColor;
-//                   }
-//                 }}
-//               >
-//                 <i className="bi bi-calendar-check-fill me-2"></i>
-//                 Past Events
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Events Grid */}
-//         {filteredEvents.length === 0 ? (
-//           <div className="text-center py-5" style={styles.noEvents}>
-//             <i className="bi bi-calendar-x" style={styles.noEventsIcon}></i>
-//             <h3 className="mt-3" style={{ color: theme.text }}>No events found</h3>
-//             <p className="text-muted">Try adjusting your search or filter criteria</p>
-//           </div>
-//         ) : (
-//           <>
-//             <div className="row g-4">
-//               {currentEvents.map((event) => (
-//                 <div key={event.id} className="col-lg-4 col-md-6">
-//                   <div className="event-card" style={styles.eventCard} onClick={() => handleEventClick(event.id, event.slug)}>
-//                     <div className="event-image-wrapper" style={styles.eventImageWrapper}>
-//                       <img
-//                         src={getImageUrl(event.mainImg) || getImageUrl(event.thumbImg)}
-//                         alt={event.title}
-//                         className="event-card-img"
-//                         style={styles.eventCardImg}
-//                         onError={(e) => {
-//                           e.target.onerror = null;
-//                           e.target.src = 'https://via.placeholder.com/400x300?text=Event';
-//                         }}
-//                       />
-//                       <div className="event-date-badge" style={styles.eventDateBadge}>
-//                         <span className="event-day" style={styles.eventDay}>
-//                           {event.dateBox?.day || new Date(event.event_datetime).getDate()}
-//                         </span>
-//                         <span className="event-month" style={styles.eventMonth}>
-//                           {event.dateBox?.month || new Date(event.event_datetime).toLocaleString('default', { month: 'short' })}
-//                         </span>
-//                       </div>
-//                       <div className="event-overlay" style={styles.eventOverlay}>
-//                         <button className="btn btn-sm" style={styles.viewDetailsBtn}>
-//                           View Details <i className="bi bi-arrow-right"></i>
-//                         </button>
-//                       </div>
-//                     </div>
-//                     <div className="event-card-body" style={styles.eventCardBody}>
-//                       <h5 className="event-card-title" style={styles.eventCardTitle}>{event.title}</h5>
-//                       <p className="event-card-subtitle" style={styles.eventCardSubtitle}>{event.mainTitle}</p>
-//                       <div className="event-meta" style={styles.eventMeta}>
-//                         <span className="event-meta-item" style={styles.eventMetaItem}>
-//                           <i className="bi bi-clock me-1"></i> {event.time}
-//                         </span>
-//                         <span className="event-meta-item" style={styles.eventMetaItem}>
-//                           <i className="bi bi-person me-1"></i> {event.postedBy}
-//                         </span>
-//                       </div>
-//                       <p className="event-card-description" style={styles.eventCardDescription}>
-//                         {event.description ?
-//                           (event.description.length > 100 ?
-//                             `${event.description.substring(0, 100)}...` :
-//                             event.description
-//                           ) :
-//                           'Experience an unforgettable event with premium services and world-class hospitality.'
-//                         }
-//                       </p>
-//                       <div className="event-features" style={styles.eventFeatures}>
-//                         {event.features && event.features.slice(0, 2).map((feature, idx) => (
-//                           <span key={idx} className="feature-tag" style={styles.featureTag}>
-//                             <i className="bi bi-check-circle-fill me-1" style={{ color: brandColor }}></i> {feature.substring(0, 30)}
-//                           </span>
-//                         ))}
-//                       </div>
-//                       <div className="event-card-footer" style={styles.eventCardFooter}>
-//                         <span className="text-muted small">
-//                           <i className="bi bi-chat me-1"></i> {event.comments || 0} comments
-//                         </span>
-//                         <span className="small" style={{ color: brandColor }}>
-//                           Read More <i className="bi bi-arrow-right-short"></i>
-//                         </span>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-
-//             {/* Pagination */}
-//             {totalPages > 1 && (
-//               <div className="pagination-wrapper mt-5" style={styles.paginationWrapper}>
-//                 <nav>
-//                   <ul className="pagination justify-content-center">
-//                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-//                       <button 
-//                         className="page-link" 
-//                         onClick={() => setCurrentPage(currentPage - 1)}
-//                         style={{ color: brandColor }}
-//                       >
-//                         <i className="bi bi-chevron-left"></i> Previous
-//                       </button>
-//                     </li>
-//                     {[...Array(totalPages)].map((_, index) => (
-//                       <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-//                         <button 
-//                           className="page-link" 
-//                           onClick={() => setCurrentPage(index + 1)}
-//                           style={currentPage === index + 1 ? { backgroundColor: brandColor, borderColor: brandColor, color: 'white' } : { color: brandColor }}
-//                         >
-//                           {index + 1}
-//                         </button>
-//                       </li>
-//                     ))}
-//                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-//                       <button 
-//                         className="page-link" 
-//                         onClick={() => setCurrentPage(currentPage + 1)}
-//                         style={{ color: brandColor }}
-//                       >
-//                         Next <i className="bi bi-chevron-right"></i>
-//                       </button>
-//                     </li>
-//                   </ul>
-//                 </nav>
-//               </div>
-//             )}
-
-//             {/* Results count */}
-//             <div className="text-center mt-4" style={styles.resultsCount}>
-//               <p>
-//                 Showing {indexOfFirstEvent + 1} to {Math.min(indexOfLastEvent, filteredEvents.length)} of {filteredEvents.length} events
-//               </p>
-//             </div>
-//           </>
-//         )}
-//       </div>
-
-//       <Footer theme={theme} />
-
-//       {/* Add hover effect styles */}
-//       <style>{`
-//         .event-card:hover {
-//           transform: translateY(-10px);
-//           box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
-//         }
-        
-//         .event-card:hover .event-card-img {
-//           transform: scale(1.1);
-//         }
-        
-//         .event-card:hover .event-overlay {
-//           opacity: 1;
-//         }
-        
-//         .filter-buttons .btn:hover {
-//           transform: translateY(-2px);
-//         }
-        
-//         .page-link {
-//           transition: all 0.3s ease;
-//           cursor: pointer;
-//         }
-        
-//         .page-link:hover {
-//           transform: translateY(-2px);
-//           background-color: ${brandColor};
-//           color: white !important;
-//         }
-        
-//         .page-item.active .page-link {
-//           background-color: ${brandColor} !important;
-//           border-color: ${brandColor} !important;
-//         }
-        
-//         @media (max-width: 768px) {
-//           .filter-buttons {
-//             justify-content: center;
-//           }
-          
-//           .hero-section {
-//             padding: 50px 0;
-//           }
-          
-//           .hero-section h1 {
-//             font-size: 32px;
-//           }
-//         }
-//       `}</style>
-//     </div>
-//   );
-// };
-
-// export default AllEvents;
-
-// import Header from "./Common/Header";
-// import Footer from "./Common/Footer";
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
-
-// const AllEvents = () => {
-//   const brandColor = '#5e2e10';
-//   const navigate = useNavigate();
-//   const [isDarkMode, setIsDarkMode] = useState(false);
-//   const [events, setEvents] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [selectedCategory, setSelectedCategory] = useState('all');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const eventsPerPage = 6; // ৬টি করে দেখাবে (সব লেআউটে সুন্দর ফিট হওয়ার জন্য)
-
-//   // Use environment variables for API URLs
-//   const API_BASE = import.meta.env.VITE_BASE_URL;
-//   const API_URL = import.meta.env.API_URL;
-
-//   const theme = {
-//     isDarkMode,
-//     bg: isDarkMode ? '#1a1a2e' : '#f8f9fa',
-//     card: isDarkMode ? '#16213e' : '#ffffff',
-//     text: isDarkMode ? '#e9ecef' : '#2c3e50',
-//     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-//     heroBg: isDarkMode 
-//       ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")` 
-//       : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`,
-//     primaryColor: brandColor,
-//     primaryHover: '#3d1f0a',
-//   };
-
-//   // Helper function to get full image URL
-//   const getImageUrl = (imagePath) => {
-//     if (!imagePath) return null;
-//     if (imagePath.startsWith('http')) return imagePath;
-//     const cleanPath = imagePath.replace(/^\/storage\/storage\//, '/storage/');
-//     if (cleanPath.startsWith('/storage/')) {
-//       return `${API_URL}${cleanPath}`;
-//     }
-//     return `${API_URL}/storage/${cleanPath}`;
-//   };
-
-//   // Fetch all events
-//   const fetchEvents = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const response = await axios.get(`${API_BASE}/events/all`);
-//       if (response.data.success && response.data.data) {
-//         setEvents(response.data.data);
-//       } else {
-//         setEvents([]);
-//         setError('No events found');
-//       }
-//     } catch (err) {
-//       console.error("Error fetching events:", err);
-//       setError('Failed to load events. Please try again later.');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchEvents();
-//   }, []);
-
-//   // Filter events based on search and category
-//   const filteredEvents = events.filter(event => {
-//     const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       event.subtitle?.toLowerCase().includes(searchTerm.toLowerCase());
-//     const matchesCategory = selectedCategory === 'all' ||
-//       (selectedCategory === 'upcoming' && new Date(event.event_datetime) > new Date()) ||
-//       (selectedCategory === 'past' && new Date(event.event_datetime) < new Date());
-//     return matchesSearch && matchesCategory;
-//   });
-
-//   // Pagination
-//   const indexOfLastEvent = currentPage * eventsPerPage;
-//   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-//   const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
-//   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-
-//   // Navigate to event details
-//   const handleEventClick = (eventId, slug) => {
-//     navigate(`/event/${slug || eventId}`);
-//   };
-
-//   // Styles
-//   const styles = {
-//     pageContainer: {
-//       backgroundColor: theme.bg,
-//       minHeight: '100vh',
-//       transition: 'all 0.3s ease',
-//     },
-//     heroSection: {
-//       background: theme.heroBg,
-//       backgroundSize: 'cover',
-//       backgroundPosition: 'center',
-//       padding: '80px 0',
-//       color: 'white',
-//       position: 'relative',
-//       overflow: 'hidden',
-//       transition: 'all 0.3s ease',
-//     },
-//     heroContent: {
-//       position: 'relative',
-//       zIndex: 2,
-//     },
-//     heroTitle: {
-//       textShadow: '2px 4px 10px rgba(0,0,0,0.5)',
-//     },
-//     heroSubtitle: {
-//       opacity: 0.95,
-//       textShadow: '1px 2px 5px rgba(0,0,0,0.5)',
-//     },
-//     spinner: {
-//       width: '3rem',
-//       height: '3rem',
-//     },
-//     loadingText: {
-//       color: theme.text,
-//       fontSize: '1.1rem',
-//     },
-//     errorAlert: {
-//       borderRadius: '12px',
-//       padding: '20px',
-//     },
-//     searchBox: {
-//       position: 'relative',
-//     },
-//     searchIcon: {
-//       position: 'absolute',
-//       left: '15px',
-//       top: '50%',
-//       transform: 'translateY(-50%)',
-//       zIndex: 10,
-//       color: brandColor,
-//     },
-//     searchInput: {
-//       paddingLeft: '40px',
-//       borderRadius: '12px',
-//       border: `2px solid ${theme.border}`,
-//       height: '50px',
-//       fontSize: '15px',
-//       backgroundColor: theme.card,
-//       color: theme.text,
-//     },
-//     filterButtons: {
-//       display: 'flex',
-//       gap: '10px',
-//       justifycontent: 'flex-end',
-//     },
-//     filterBtn: {
-//       borderRadius: '25px',
-//       padding: '8px 20px',
-//       transition: 'all 0.3s ease',
-//     },
-//     eventCard: {
-//       backgroundColor: theme.card,
-//       borderRadius: '16px',
-//       overflow: 'hidden',
-//       boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
-//       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-//       cursor: 'pointer',
-//       height: '100%',
-//       display: 'flex',
-//       flexDirection: 'column',
-//       width: '100%', // Removed maxWidth and margin:0 auto so Bootstrap Grid handles it
-//     },
-//     eventImageWrapper: {
-//       position: 'relative',
-//       overflow: 'hidden',
-//       height: '180px', 
-//     },
-//     eventCardImg: {
-//       width: '100%',
-//       height: '100%',
-//       objectFit: 'cover',
-//       transition: 'transform 0.5s ease',
-//     },
-//     eventDateBadge: {
-//       position: 'absolute',
-//       top: '12px',
-//       left: '12px',
-//       backgroundColor: 'rgba(0,0,0,0.8)',
-//       color: 'white',
-//       borderRadius: '8px',
-//       padding: '6px 10px',
-//       textAlign: 'center',
-//       minWidth: '45px',
-//       backdropFilter: 'blur(5px)',
-//       zIndex: 2,
-//     },
-//     eventDay: {
-//       display: 'block',
-//       fontSize: '18px',
-//       fontWeight: 'bold',
-//       lineHeight: 1,
-//     },
-//     eventMonth: {
-//       display: 'block',
-//       fontSize: '10px',
-//       textTransform: 'uppercase',
-//     },
-//     eventOverlay: {
-//       position: 'absolute',
-//       top: 0,
-//       left: 0,
-//       right: 0,
-//       bottom: 0,
-//       backgroundColor: 'rgba(0,0,0,0.6)',
-//       display: 'flex',
-//       alignItems: 'center',
-//       justifyContent: 'center',
-//       opacity: 0,
-//       transition: 'opacity 0.3s ease',
-//       zIndex: 3,
-//     },
-//     viewDetailsBtn: {
-//       borderRadius: '25px',
-//       padding: '8px 20px',
-//       fontWeight: '600',
-//       fontSize: '13px',
-//       backgroundColor: brandColor,
-//       border: 'none',
-//       color: 'white',
-//     },
-//     eventCardBody: {
-//       padding: '16px 18px 18px', 
-//       flex: 1,
-//       display: 'flex',
-//       flexDirection: 'column',
-//     },
-//     eventCardTitle: {
-//       fontSize: '17px',
-//       fontWeight: 'bold',
-//       marginBottom: '4px',
-//       color: theme.text,
-//     },
-//     eventCardSubtitle: {
-//       fontSize: '13px',
-//       color: brandColor,
-//       marginBottom: '10px',
-//     },
-//     eventMeta: {
-//       display: 'flex',
-//       gap: '12px',
-//       marginBottom: '10px',
-//       flexWrap: 'wrap',
-//     },
-//     eventMetaItem: {
-//       fontSize: '12px',
-//       color: '#6c757d',
-//     },
-//     eventCardDescription: {
-//       fontSize: '13px',
-//       color: '#6c757d',
-//       lineHeight: 1.5,
-//       marginBottom: '12px',
-//     },
-//     eventFeatures: {
-//       display: 'flex',
-//       flexWrap: 'wrap',
-//       gap: '6px',
-//       marginBottom: '12px',
-//     },
-//     featureTag: {
-//       backgroundColor: isDarkMode ? '#2d3436' : '#f0f0f0',
-//       padding: '4px 8px',
-//       borderRadius: '15px',
-//       fontSize: '11px',
-//       color: isDarkMode ? '#e9ecef' : '#666',
-//       display: 'inline-flex',
-//       alignItems: 'center',
-//     },
-//     eventCardFooter: {
-//       display: 'flex',
-//       justifyContent: 'space-between',
-//       alignItems: 'center',
-//       paddingTop: '10px',
-//       borderTop: `1px solid ${theme.border}`,
-//       marginTop: 'auto',
-//     },
-//     paginationWrapper: {
-//       display: 'flex',
-//       justifyContent: 'center',
-//     },
-//     noEvents: {
-//       padding: '60px 20px',
-//     },
-//     noEventsIcon: {
-//       fontSize: '64px',
-//       color: '#dee2e6',
-//     },
-//     resultsCount: {
-//       fontSize: '14px',
-//       color: theme.text,
-//     },
-//   };
-
-//   // Loading state
-//   if (loading) {
-//     return (
-//       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-//         <Header
-//           theme={theme}
-//           isDarkMode={isDarkMode}
-//           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-//         />
-//         <div className="container py-5">
-//           <div className="text-center py-5">
-//             <div className="spinner-border" style={{ ...styles.spinner, color: brandColor }} role="status">
-//               <span className="visually-hidden">Loading...</span>
-//             </div>
-//             <p className="mt-3" style={styles.loadingText}>Loading amazing events...</p>
-//           </div>
-//         </div>
-//         <Footer theme={theme} />
-//       </div>
-//     );
-//   }
-
-//   // Error state
-//   if (error) {
-//     return (
-//       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-//         <Header
-//           theme={theme}
-//           isDarkMode={isDarkMode}
-//           toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-//         />
-//         <div className="container py-5">
-//           <div className="alert alert-danger text-center" style={styles.errorAlert}>
-//             <i className="bi bi-exclamation-triangle-fill me-2"></i>
-//             {error}
-//           </div>
-//         </div>
-//         <Footer theme={theme} />
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div style={styles.pageContainer}>
-//       <Header
-//         theme={theme}
-//         isDarkMode={isDarkMode}
-//         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-//       />
-
-//       {/* Hero Section */}
-//       <div className="hero-section" style={styles.heroSection}>
-//         <div className="container">
-//           <div className="text-center" style={styles.heroContent}>
-//             <h1 className="display-3 fw-bold mb-3" style={styles.heroTitle}>
-//               Explore Our Events
-//             </h1>
-//             <p className="lead mb-4" style={styles.heroSubtitle}>
-//               Discover unforgettable experiences and create lasting memories
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="container py-5">
-//         {/* Search and Filter Section */}
-//         <div className="row mb-5">
-//           <div className="col-md-6 mb-3">
-//             <div className="search-box" style={styles.searchBox}>
-//               <i className="bi bi-search" style={styles.searchIcon}></i>
-//               <input
-//                 type="text"
-//                 className="form-control"
-//                 placeholder="Search events by title..."
-//                 value={searchTerm}
-//                 onChange={(e) => setSearchTerm(e.target.value)}
-//                 style={styles.searchInput}
-//               />
-//             </div>
-//           </div>
-//           <div className="col-md-6 mb-3">
-//             <div className="filter-buttons" style={styles.filterButtons}>
-//               <button
-//                 className={`btn ${selectedCategory === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
-//                 onClick={() => setSelectedCategory('all')}
-//                 style={{
-//                   ...styles.filterBtn,
-//                   backgroundColor: selectedCategory === 'all' ? brandColor : 'transparent',
-//                   borderColor: brandColor,
-//                   color: selectedCategory === 'all' ? 'white' : brandColor,
-//                 }}
-//                 onMouseEnter={(e) => {
-//                   if (selectedCategory !== 'all') {
-//                     e.currentTarget.style.backgroundColor = brandColor;
-//                     e.currentTarget.style.color = 'white';
-//                   }
-//                 }}
-//                 onMouseLeave={(e) => {
-//                   if (selectedCategory !== 'all') {
-//                     e.currentTarget.style.backgroundColor = 'transparent';
-//                     e.currentTarget.style.color = brandColor;
-//                   }
-//                 }}
-//               >
-//                 <i className="bi bi-grid-3x3-gap-fill me-2"></i>
-//                 All Events
-//               </button>
-//               <button
-//                 className={`btn ${selectedCategory === 'upcoming' ? 'btn-primary' : 'btn-outline-primary'}`}
-//                 onClick={() => setSelectedCategory('upcoming')}
-//                 style={{
-//                   ...styles.filterBtn,
-//                   backgroundColor: selectedCategory === 'upcoming' ? brandColor : 'transparent',
-//                   borderColor: brandColor,
-//                   color: selectedCategory === 'upcoming' ? 'white' : brandColor,
-//                 }}
-//                 onMouseEnter={(e) => {
-//                   if (selectedCategory !== 'upcoming') {
-//                     e.currentTarget.style.backgroundColor = brandColor;
-//                     e.currentTarget.style.color = 'white';
-//                   }
-//                 }}
-//                 onMouseLeave={(e) => {
-//                   if (selectedCategory !== 'upcoming') {
-//                     e.currentTarget.style.backgroundColor = 'transparent';
-//                     e.currentTarget.style.color = brandColor;
-//                   }
-//                 }}
-//               >
-//                 <i className="bi bi-calendar-event-fill me-2"></i>
-//                 Upcoming
-//               </button>
-//               <button
-//                 className={`btn ${selectedCategory === 'past' ? 'btn-primary' : 'btn-outline-primary'}`}
-//                 onClick={() => setSelectedCategory('past')}
-//                 style={{
-//                   ...styles.filterBtn,
-//                   backgroundColor: selectedCategory === 'past' ? brandColor : 'transparent',
-//                   borderColor: brandColor,
-//                   color: selectedCategory === 'past' ? 'white' : brandColor,
-//                 }}
-//                 onMouseEnter={(e) => {
-//                   if (selectedCategory !== 'past') {
-//                     e.currentTarget.style.backgroundColor = brandColor;
-//                     e.currentTarget.style.color = 'white';
-//                   }
-//                 }}
-//                 onMouseLeave={(e) => {
-//                   if (selectedCategory !== 'past') {
-//                     e.currentTarget.style.backgroundColor = 'transparent';
-//                     e.currentTarget.style.color = brandColor;
-//                   }
-//                 }}
-//               >
-//                 <i className="bi bi-calendar-check-fill me-2"></i>
-//                 Past Events
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Events Grid - Responsive Columns */}
-//         {filteredEvents.length === 0 ? (
-//           <div className="text-center py-5" style={styles.noEvents}>
-//             <i className="bi bi-calendar-x" style={styles.noEventsIcon}></i>
-//             <h3 className="mt-3" style={{ color: theme.text }}>No events found</h3>
-//             <p className="text-muted">Try adjusting your search or filter criteria</p>
-//           </div>
-//         ) : (
-//           <>
-//             <div className="row g-4 justify-content-center">
-//               {currentEvents.map((event) => (
-//                 <div key={event.id} className="col-xl-3 col-lg-4 col-md-6 col-12"> 
-//                   {/* 🔥 RESPONSIVE RULE: 
-//                       >=1200px (1920x1080) = 4 cards (col-xl-3)
-//                       992px to 1199px (1366x768, 1280x...) = 3 cards (col-lg-4)
-//                       768px to 991px (Tablet) = 2 cards (col-md-6)
-//                       < 768px (Mobile) = 1 card (col-12)
-//                   */}
-//                   <div className="event-card" style={styles.eventCard} onClick={() => handleEventClick(event.id, event.slug)}>
-//                     <div className="event-image-wrapper" style={styles.eventImageWrapper}>
-//                       <img
-//                         src={getImageUrl(event.mainImg) || getImageUrl(event.thumbImg)}
-//                         alt={event.title}
-//                         className="event-card-img"
-//                         style={styles.eventCardImg}
-//                         onError={(e) => {
-//                           e.target.onerror = null;
-//                           e.target.src = 'https://via.placeholder.com/400x300?text=Event';
-//                         }}
-//                       />
-//                       <div className="event-date-badge" style={styles.eventDateBadge}>
-//                         <span className="event-day" style={styles.eventDay}>
-//                           {event.dateBox?.day || new Date(event.event_datetime).getDate()}
-//                         </span>
-//                         <span className="event-month" style={styles.eventMonth}>
-//                           {event.dateBox?.month || new Date(event.event_datetime).toLocaleString('default', { month: 'short' })}
-//                         </span>
-//                       </div>
-//                       <div className="event-overlay" style={styles.eventOverlay}>
-//                         <button className="btn btn-sm" style={styles.viewDetailsBtn}>
-//                           View Details <i className="bi bi-arrow-right"></i>
-//                         </button>
-//                       </div>
-//                     </div>
-//                     <div className="event-card-body" style={styles.eventCardBody}>
-//                       <h5 className="event-card-title" style={styles.eventCardTitle}>{event.title}</h5>
-//                       <p className="event-card-subtitle" style={styles.eventCardSubtitle}>{event.mainTitle}</p>
-//                       <div className="event-meta" style={styles.eventMeta}>
-//                         <span className="event-meta-item" style={styles.eventMetaItem}>
-//                           <i className="bi bi-clock me-1"></i> {event.time}
-//                         </span>
-//                         <span className="event-meta-item" style={styles.eventMetaItem}>
-//                           <i className="bi bi-person me-1"></i> {event.postedBy}
-//                         </span>
-//                       </div>
-//                       <p className="event-card-description" style={styles.eventCardDescription}>
-//                         {event.description ?
-//                           (event.description.length > 100 ?
-//                             `${event.description.substring(0, 100)}...` :
-//                             event.description
-//                           ) :
-//                           'Experience an unforgettable event with premium services.'
-//                         }
-//                       </p>
-//                       <div className="event-features" style={styles.eventFeatures}>
-//                         {event.features && event.features.slice(0, 2).map((feature, idx) => (
-//                           <span key={idx} className="feature-tag" style={styles.featureTag}>
-//                             <i className="bi bi-check-circle-fill me-1" style={{ color: brandColor }}></i> {feature.substring(0, 30)}
-//                           </span>
-//                         ))}
-//                       </div>
-//                       <div className="event-card-footer" style={styles.eventCardFooter}>
-//                         <span className="text-muted small">
-//                           <i className="bi bi-chat me-1"></i> {event.comments || 0} comments
-//                         </span>
-//                         <span className="small" style={{ color: brandColor }}>
-//                           Read More <i className="bi bi-arrow-right-short"></i>
-//                         </span>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-
-//             {/* Pagination */}
-//             {totalPages > 1 && (
-//               <div className="pagination-wrapper mt-5" style={styles.paginationWrapper}>
-//                 <nav>
-//                   <ul className="pagination justify-content-center">
-//                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-//                       <button 
-//                         className="page-link" 
-//                         onClick={() => setCurrentPage(currentPage - 1)}
-//                         style={{ color: brandColor }}
-//                       >
-//                         <i className="bi bi-chevron-left"></i> Previous
-//                       </button>
-//                     </li>
-//                     {[...Array(totalPages)].map((_, index) => (
-//                       <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-//                         <button 
-//                           className="page-link" 
-//                           onClick={() => setCurrentPage(index + 1)}
-//                           style={currentPage === index + 1 ? { backgroundColor: brandColor, borderColor: brandColor, color: 'white' } : { color: brandColor }}
-//                         >
-//                           {index + 1}
-//                         </button>
-//                       </li>
-//                     ))}
-//                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-//                       <button 
-//                         className="page-link" 
-//                         onClick={() => setCurrentPage(currentPage + 1)}
-//                         style={{ color: brandColor }}
-//                       >
-//                         Next <i className="bi bi-chevron-right"></i>
-//                       </button>
-//                     </li>
-//                   </ul>
-//                 </nav>
-//               </div>
-//             )}
-
-//             {/* Results count */}
-//             <div className="text-center mt-4" style={styles.resultsCount}>
-//               <p>
-//                 Showing {indexOfFirstEvent + 1} to {Math.min(indexOfLastEvent, filteredEvents.length)} of {filteredEvents.length} events
-//               </p>
-//             </div>
-//           </>
-//         )}
-//       </div>
-
-//       <Footer theme={theme} />
-
-//       {/* Add hover effect styles */}
-//       <style>{`
-//         .event-card:hover {
-//           transform: translateY(-8px);
-//           box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
-//         }
-        
-//         .event-card:hover .event-card-img {
-//           transform: scale(1.1);
-//         }
-        
-//         .event-card:hover .event-overlay {
-//           opacity: 1;
-//         }
-        
-//         .filter-buttons .btn:hover {
-//           transform: translateY(-2px);
-//         }
-        
-//         .page-link {
-//           transition: all 0.3s ease;
-//           cursor: pointer;
-//         }
-        
-//         .page-link:hover {
-//           transform: translateY(-2px);
-//           background-color: ${brandColor};
-//           color: white !important;
-//         }
-        
-//         .page-item.active .page-link {
-//           background-color: ${brandColor} !important;
-//           border-color: ${brandColor} !important;
-//         }
-        
-//         /* Mobile and Tablet adjustments */
-//         @media (max-width: 991px) {
-//           .hero-section {
-//             padding: 50px 0;
-//           }
-//           .hero-section h1 {
-//             font-size: 32px;
-//           }
-//         }
-//       `}</style>
-//     </div>
-//   );
-// };
-
-// export default AllEvents;
-
 import Header from "./Common/Header";
 import Footer from "./Common/Footer";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
+const brandColor = '#5e2e10';
+const brandHover = '#3d1f0a';
+const eventsPerPage = 6;
+const DESCRIPTION_LIMIT = 120; // এর চেয়ে লম্বা হলে "See more" দেখাবে
+
+const API_BASE = import.meta.env.VITE_BASE_URL;
+// Vite এ শুধু VITE_ দিয়ে শুরু হওয়া env পড়া যায়; না থাকলে BASE_URL থেকে /api বাদ দিয়ে নেবে
+const API_URL = (import.meta.env.VITE_API_URL || API_BASE || '').replace(/\/api\/?$/, '');
+
+const EVENT_PLACEHOLDER =
+  'data:image/svg+xml;charset=UTF-8,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+      <rect width="100%" height="100%" fill="#f6eee9"/>
+      <text x="50%" y="50%" fill="${brandColor}" font-family="sans-serif" font-size="20"
+        text-anchor="middle" dominant-baseline="middle">Event</text>
+    </svg>`
+  );
+
+// ---------- Filter list ----------
+const FILTERS = [
+  { key: 'all', label: 'All Events', icon: 'bi-grid-3x3-gap-fill' },
+  { key: 'running', label: 'Running', icon: 'bi-broadcast' },
+  { key: 'upcoming', label: 'Upcoming', icon: 'bi-calendar-event-fill' },
+  { key: 'past', label: 'Past Events', icon: 'bi-calendar-check-fill' },
+];
+
+const STATUS_LABEL = {
+  running: { text: 'Running now', icon: 'bi-broadcast' },
+  upcoming: { text: 'Upcoming', icon: 'bi-calendar-event' },
+  past: { text: 'Completed', icon: 'bi-check2-circle' },
+};
+
+const isSameDay = (a, b) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+/**
+ * Event এর অবস্থা: 'running' | 'upcoming' | 'past' | null (তারিখ নেই/ভুল)
+ * - end_datetime থাকলে: start <= এখন <= end হলে running
+ * - end_datetime না থাকলে: event এর তারিখ আজ হলে running
+ */
+const getEventStatus = (event, now = new Date()) => {
+  const start = new Date(event.event_datetime);
+  if (Number.isNaN(start.getTime())) return null;
+
+  const end = event.end_datetime ? new Date(event.end_datetime) : null;
+  const hasValidEnd = end && !Number.isNaN(end.getTime());
+
+  if (hasValidEnd) {
+    if (now < start) return 'upcoming';
+    if (now <= end) return 'running';
+    return 'past';
+  }
+
+  if (isSameDay(start, now)) return 'running';
+  return start > now ? 'upcoming' : 'past';
+};
 
 const AllEvents = () => {
-  const brandColor = '#5e2e10';
-  const navigate = useNavigate();
   const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [events, setEvents] = useState([]);
@@ -1317,10 +73,7 @@ const AllEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 6;
-
-  const API_BASE = import.meta.env.VITE_BASE_URL;
-  const API_URL = import.meta.env.API_URL;
+  const [expanded, setExpanded] = useState({}); // কোন card এর description খোলা
 
   const theme = {
     isDarkMode,
@@ -1328,21 +81,19 @@ const AllEvents = () => {
     card: isDarkMode ? '#16213e' : '#ffffff',
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    heroBg: isDarkMode 
-      ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")` 
+    heroBg: isDarkMode
+      ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`
       : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`,
     primaryColor: brandColor,
-    primaryHover: '#3d1f0a',
+    primaryHover: brandHover,
   };
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
     if (imagePath.startsWith('http')) return imagePath;
     const cleanPath = imagePath.replace(/^\/storage\/storage\//, '/storage/');
-    if (cleanPath.startsWith('/storage/')) {
-      return `${API_URL}${cleanPath}`;
-    }
-    return `${API_URL}/storage/${cleanPath}`;
+    if (cleanPath.startsWith('/storage/')) return `${API_URL}${cleanPath}`;
+    return `${API_URL}/storage/${cleanPath.replace(/^\/+/, '')}`;
   };
 
   const fetchEvents = async () => {
@@ -1357,7 +108,7 @@ const AllEvents = () => {
         setError('No events found');
       }
     } catch (err) {
-      console.error("Error fetching events:", err);
+      console.error('Error fetching events:', err);
       setError('Failed to load events. Please try again later.');
     } finally {
       setLoading(false);
@@ -1368,49 +119,61 @@ const AllEvents = () => {
     fetchEvents();
   }, []);
 
-  // Always start this page from the top when navigating to it
+  // Page এ আসলে সবসময় উপর থেকে শুরু
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'auto',
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.pathname]);
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.mainTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.subtitle?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' ||
-      (selectedCategory === 'upcoming' && new Date(event.event_datetime) > new Date()) ||
-      (selectedCategory === 'past' && new Date(event.event_datetime) < new Date());
-    return matchesSearch && matchesCategory;
-  });
+  // Search বা filter বদলালে page 1 এ ফিরে যাও
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory]);
+
+  // Pagination বদলালে উপরে scroll
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  const toggleExpanded = (id) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  // প্রতিটা event এর status একবার হিসাব করে রাখি
+  const now = new Date();
+  const eventsWithStatus = events.map((event) => ({ ...event, _status: getEventStatus(event, now) }));
+
+  const q = searchTerm.trim().toLowerCase();
+  const searchedEvents = eventsWithStatus.filter((event) =>
+    !q ||
+    event.title?.toLowerCase().includes(q) ||
+    event.mainTitle?.toLowerCase().includes(q) ||
+    event.subtitle?.toLowerCase().includes(q)
+  );
+
+  // প্রতিটা filter এ কয়টা event (search অনুযায়ী)
+  const counts = {
+    all: searchedEvents.length,
+    running: searchedEvents.filter((e) => e._status === 'running').length,
+    upcoming: searchedEvents.filter((e) => e._status === 'upcoming').length,
+    past: searchedEvents.filter((e) => e._status === 'past').length,
+  };
+
+  const filteredEvents = searchedEvents.filter(
+    (event) => selectedCategory === 'all' || event._status === selectedCategory
+  );
 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
-  // Keep the event list at the top when changing pagination
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
-  }, [currentPage]);
-
-  const handleEventClick = (eventId, slug) => {
-    navigate(`/event/${slug || eventId}`);
-  };
+  const emptyMessage = {
+    running: 'No events are running right now',
+    upcoming: 'No upcoming events',
+    past: 'No past events',
+    all: 'No events found',
+  }[selectedCategory];
 
   const styles = {
-    pageContainer: {
-      backgroundColor: theme.bg,
-      minHeight: '100vh',
-      transition: 'all 0.3s ease',
-    },
+    pageContainer: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
     heroSection: {
       background: theme.heroBg,
       backgroundSize: 'cover',
@@ -1421,32 +184,13 @@ const AllEvents = () => {
       overflow: 'hidden',
       transition: 'all 0.3s ease',
     },
-    heroContent: {
-      position: 'relative',
-      zIndex: 2,
-    },
-    heroTitle: {
-      textShadow: '2px 4px 10px rgba(0,0,0,0.5)',
-    },
-    heroSubtitle: {
-      opacity: 0.95,
-      textShadow: '1px 2px 5px rgba(0,0,0,0.5)',
-    },
-    spinner: {
-      width: '3rem',
-      height: '3rem',
-    },
-    loadingText: {
-      color: theme.text,
-      fontSize: '1.1rem',
-    },
-    errorAlert: {
-      borderRadius: '12px',
-      padding: '20px',
-    },
-    searchBox: {
-      position: 'relative',
-    },
+    heroContent: { position: 'relative', zIndex: 2 },
+    heroTitle: { textShadow: '2px 4px 10px rgba(0,0,0,0.5)' },
+    heroSubtitle: { opacity: 0.95, textShadow: '1px 2px 5px rgba(0,0,0,0.5)' },
+    spinner: { width: '3rem', height: '3rem' },
+    loadingText: { color: theme.text, fontSize: '1.1rem' },
+    errorAlert: { borderRadius: '12px', padding: '20px' },
+    searchBox: { position: 'relative' },
     searchIcon: {
       position: 'absolute',
       left: '15px',
@@ -1464,39 +208,19 @@ const AllEvents = () => {
       backgroundColor: theme.card,
       color: theme.text,
     },
-    filterButtons: {
-      display: 'flex',
-      gap: '10px',
-      justifyContent: 'flex-end',
-    },
-    filterBtn: {
-      borderRadius: '25px',
-      padding: '8px 20px',
-      transition: 'all 0.3s ease',
-    },
     eventCard: {
       backgroundColor: theme.card,
       borderRadius: '16px',
       overflow: 'hidden',
       boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-      cursor: 'pointer',
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
     },
-    eventImageWrapper: {
-      position: 'relative',
-      overflow: 'hidden',
-      height: '180px', 
-    },
-    eventCardImg: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-      transition: 'transform 0.5s ease',
-    },
+    eventImageWrapper: { position: 'relative', overflow: 'hidden', height: '180px' },
+    eventCardImg: { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' },
     eventDateBadge: {
       position: 'absolute',
       top: '12px',
@@ -1510,79 +234,32 @@ const AllEvents = () => {
       backdropFilter: 'blur(5px)',
       zIndex: 2,
     },
-    eventDay: {
-      display: 'block',
-      fontSize: '18px',
-      fontWeight: 'bold',
-      lineHeight: 1,
-    },
-    eventMonth: {
-      display: 'block',
-      fontSize: '10px',
-      textTransform: 'uppercase',
-    },
-    eventOverlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      opacity: 0,
-      transition: 'opacity 0.3s ease',
-      zIndex: 3,
-    },
-    viewDetailsBtn: {
-      borderRadius: '25px',
-      padding: '8px 20px',
-      fontWeight: '600',
-      fontSize: '13px',
-      backgroundColor: brandColor,
-      border: 'none',
-      color: 'white',
-    },
-    eventCardBody: {
-      padding: '16px 18px 18px', 
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    eventCardTitle: {
-      fontSize: '17px',
-      fontWeight: 'bold',
-      marginBottom: '4px',
-      color: theme.text,
-    },
-    eventCardSubtitle: {
-      fontSize: '13px',
-      color: brandColor,
-      marginBottom: '10px',
-    },
-    eventMeta: {
-      display: 'flex',
-      gap: '12px',
-      marginBottom: '10px',
-      flexWrap: 'wrap',
-    },
-    eventMetaItem: {
-      fontSize: '12px',
-      color: '#6c757d',
-    },
+    eventDay: { display: 'block', fontSize: '18px', fontWeight: 'bold', lineHeight: 1 },
+    eventMonth: { display: 'block', fontSize: '10px', textTransform: 'uppercase' },
+    eventCardBody: { padding: '16px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' },
+    eventCardTitle: { fontSize: '17px', fontWeight: 'bold', marginBottom: '4px', color: theme.text },
+    eventCardSubtitle: { fontSize: '13px', color: brandColor, marginBottom: '10px' },
+    eventMeta: { display: 'flex', gap: '12px', marginBottom: '10px', flexWrap: 'wrap' },
+    eventMetaItem: { fontSize: '12px', color: '#6c757d' },
     eventCardDescription: {
       fontSize: '13px',
       color: '#6c757d',
       lineHeight: 1.5,
+      marginBottom: '4px',
+      whiteSpace: 'pre-line',
+    },
+    seeMoreBtn: {
+      background: 'none',
+      border: 'none',
+      padding: 0,
+      fontSize: '12px',
+      fontWeight: 600,
+      color: brandColor,
+      cursor: 'pointer',
+      alignSelf: 'flex-start',
       marginBottom: '12px',
     },
-    eventFeatures: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '6px',
-      marginBottom: '12px',
-    },
+    eventFeatures: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' },
     featureTag: {
       backgroundColor: isDarkMode ? '#2d3436' : '#f0f0f0',
       padding: '4px 8px',
@@ -1600,31 +277,16 @@ const AllEvents = () => {
       borderTop: `1px solid ${theme.border}`,
       marginTop: 'auto',
     },
-    paginationWrapper: {
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    noEvents: {
-      padding: '60px 20px',
-    },
-    noEventsIcon: {
-      fontSize: '64px',
-      color: '#dee2e6',
-    },
-    resultsCount: {
-      fontSize: '14px',
-      color: theme.text,
-    },
+    paginationWrapper: { display: 'flex', justifyContent: 'center' },
+    noEvents: { padding: '60px 20px' },
+    noEventsIcon: { fontSize: '64px', color: '#dee2e6' },
+    resultsCount: { fontSize: '14px', color: theme.text },
   };
 
   if (loading) {
     return (
       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-        <Header
-          theme={theme}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-        />
+        <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />
         <div className="container py-5">
           <div className="text-center py-5">
             <div className="spinner-border" style={{ ...styles.spinner, color: brandColor }} role="status">
@@ -1641,15 +303,20 @@ const AllEvents = () => {
   if (error) {
     return (
       <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
-        <Header
-          theme={theme}
-          isDarkMode={isDarkMode}
-          toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-        />
+        <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />
         <div className="container py-5">
           <div className="alert alert-danger text-center" style={styles.errorAlert}>
             <i className="bi bi-exclamation-triangle-fill me-2"></i>
             {error}
+            <div className="mt-3">
+              <button
+                className="btn text-white"
+                onClick={fetchEvents}
+                style={{ backgroundColor: brandColor, borderColor: brandColor, borderRadius: '25px' }}
+              >
+                Try Again
+              </button>
+            </div>
           </div>
         </div>
         <Footer theme={theme} />
@@ -1659,11 +326,7 @@ const AllEvents = () => {
 
   return (
     <div style={styles.pageContainer}>
-      <Header
-        theme={theme}
-        isDarkMode={isDarkMode}
-        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-      />
+      <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />
 
       {/* Hero Section */}
       <div className="hero-section" style={styles.heroSection}>
@@ -1681,8 +344,8 @@ const AllEvents = () => {
 
       <div className="container py-5">
         {/* Search and Filter Section */}
-        <div className="row mb-5">
-          <div className="col-md-6 mb-3">
+        <div className="row mb-5 align-items-center">
+          <div className="col-lg-5 mb-3">
             <div className="search-box" style={styles.searchBox}>
               <i className="bi bi-search" style={styles.searchIcon}></i>
               <input
@@ -1695,83 +358,29 @@ const AllEvents = () => {
               />
             </div>
           </div>
-          <div className="col-md-6 mb-3">
-            <div className="filter-buttons" style={styles.filterButtons}>
-              <button
-                className={`btn ${selectedCategory === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
-                onClick={() => setSelectedCategory('all')}
-                style={{
-                  ...styles.filterBtn,
-                  backgroundColor: selectedCategory === 'all' ? brandColor : 'transparent',
-                  borderColor: brandColor,
-                  color: selectedCategory === 'all' ? 'white' : brandColor,
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedCategory !== 'all') {
-                    e.currentTarget.style.backgroundColor = brandColor;
-                    e.currentTarget.style.color = 'white';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedCategory !== 'all') {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = brandColor;
-                  }
-                }}
-              >
-                <i className="bi bi-grid-3x3-gap-fill me-2 filter-icon"></i>
-                <span className="filter-text">All Events</span>
-              </button>
-              <button
-                className={`btn ${selectedCategory === 'upcoming' ? 'btn-primary' : 'btn-outline-primary'}`}
-                onClick={() => setSelectedCategory('upcoming')}
-                style={{
-                  ...styles.filterBtn,
-                  backgroundColor: selectedCategory === 'upcoming' ? brandColor : 'transparent',
-                  borderColor: brandColor,
-                  color: selectedCategory === 'upcoming' ? 'white' : brandColor,
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedCategory !== 'upcoming') {
-                    e.currentTarget.style.backgroundColor = brandColor;
-                    e.currentTarget.style.color = 'white';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedCategory !== 'upcoming') {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = brandColor;
-                  }
-                }}
-              >
-                <i className="bi bi-calendar-event-fill me-2 filter-icon"></i>
-                <span className="filter-text">Upcoming</span>
-              </button>
-              <button
-                className={`btn ${selectedCategory === 'past' ? 'btn-primary' : 'btn-outline-primary'}`}
-                onClick={() => setSelectedCategory('past')}
-                style={{
-                  ...styles.filterBtn,
-                  backgroundColor: selectedCategory === 'past' ? brandColor : 'transparent',
-                  borderColor: brandColor,
-                  color: selectedCategory === 'past' ? 'white' : brandColor,
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedCategory !== 'past') {
-                    e.currentTarget.style.backgroundColor = brandColor;
-                    e.currentTarget.style.color = 'white';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedCategory !== 'past') {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = brandColor;
-                  }
-                }}
-              >
-                <i className="bi bi-calendar-check-fill me-2 filter-icon"></i>
-                <span className="filter-text">Past Events</span>
-              </button>
+          <div className="col-lg-7 mb-3">
+            <div className="filter-buttons" role="tablist" aria-label="Filter events">
+              {FILTERS.map((f) => {
+                const active = selectedCategory === f.key;
+                return (
+                  <button
+                    key={f.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    className={`ev-filter-btn ${active ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(f.key)}
+                  >
+                    {f.key === 'running' ? (
+                      <span className="live-dot" aria-hidden="true"></span>
+                    ) : (
+                      <i className={`bi ${f.icon} filter-icon`}></i>
+                    )}
+                    <span className="filter-text">{f.label}</span>
+                    <span className="filter-count">{counts[f.key]}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -1779,91 +388,140 @@ const AllEvents = () => {
         {/* Events Grid */}
         {filteredEvents.length === 0 ? (
           <div className="text-center py-5" style={styles.noEvents}>
-            <i className="bi bi-calendar-x" style={styles.noEventsIcon}></i>
-            <h3 className="mt-3" style={{ color: theme.text }}>No events found</h3>
+            <i className={`bi ${selectedCategory === 'running' ? 'bi-broadcast' : 'bi-calendar-x'}`} style={styles.noEventsIcon}></i>
+            <h3 className="mt-3" style={{ color: theme.text }}>{emptyMessage}</h3>
             <p className="text-muted">Try adjusting your search or filter criteria</p>
+            {(searchTerm || selectedCategory !== 'all') && (
+              <button
+                className="btn mt-2 text-white"
+                onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }}
+                style={{ backgroundColor: brandColor, borderColor: brandColor, borderRadius: '25px', padding: '8px 22px' }}
+              >
+                Show all events
+              </button>
+            )}
           </div>
         ) : (
           <>
             <div className="row g-4 justify-content-center">
-              {currentEvents.map((event) => (
-                <div key={event.id} className="col-xl-3 col-lg-4 col-md-6 col-12">
-                  <div className="event-card" style={styles.eventCard} onClick={() => handleEventClick(event.id, event.slug)}>
-                    <div className="event-image-wrapper" style={styles.eventImageWrapper}>
-                      <img
-                        src={getImageUrl(event.mainImg) || getImageUrl(event.thumbImg)}
-                        alt={event.title}
-                        className="event-card-img"
-                        style={styles.eventCardImg}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://via.placeholder.com/400x300?text=Event';
-                        }}
-                      />
-                      <div className="event-date-badge" style={styles.eventDateBadge}>
-                        <span className="event-day" style={styles.eventDay}>
-                          {event.dateBox?.day || new Date(event.event_datetime).getDate()}
-                        </span>
-                        <span className="event-month" style={styles.eventMonth}>
-                          {event.dateBox?.month || new Date(event.event_datetime).toLocaleString('default', { month: 'short' })}
-                        </span>
-                      </div>
-                      <div className="event-overlay" style={styles.eventOverlay}>
-                        <button className="btn btn-sm" style={styles.viewDetailsBtn}>
-                          View Details <i className="bi bi-arrow-right"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div className="event-card-body" style={styles.eventCardBody}>
-                      <h5 className="event-card-title" style={styles.eventCardTitle}>{event.title}</h5>
-                      <p className="event-card-subtitle" style={styles.eventCardSubtitle}>{event.mainTitle}</p>
-                      <div className="event-meta" style={styles.eventMeta}>
-                        <span className="event-meta-item" style={styles.eventMetaItem}>
-                          <i className="bi bi-clock me-1"></i> {event.time}
-                        </span>
-                        <span className="event-meta-item" style={styles.eventMetaItem}>
-                          <i className="bi bi-person me-1"></i> {event.postedBy}
-                        </span>
-                      </div>
-                      <p className="event-card-description" style={styles.eventCardDescription}>
-                        {event.description ?
-                          (event.description.length > 100 ?
-                            `${event.description.substring(0, 100)}...` :
-                            event.description
-                          ) :
-                          'Experience an unforgettable event with premium services.'
-                        }
-                      </p>
-                      <div className="event-features" style={styles.eventFeatures}>
-                        {event.features && event.features.slice(0, 2).map((feature, idx) => (
-                          <span key={idx} className="feature-tag" style={styles.featureTag}>
-                            <i className="bi bi-check-circle-fill me-1" style={{ color: brandColor }}></i> {feature.substring(0, 30)}
+              {currentEvents.map((event) => {
+                const eventDate = new Date(event.event_datetime);
+                const isRunning = event._status === 'running';
+                const status = STATUS_LABEL[event._status];
+
+                const description = event.description || 'Experience an unforgettable event with premium services.';
+                const isLong = description.length > DESCRIPTION_LIMIT;
+                const isOpen = !!expanded[event.id];
+
+                return (
+                  <div key={event.id} className="col-xl-3 col-lg-4 col-md-6 col-12">
+                    <div className="event-card" style={styles.eventCard}>
+                      <div className="event-image-wrapper" style={styles.eventImageWrapper}>
+                        <img
+                          src={getImageUrl(event.mainImg) || getImageUrl(event.thumbImg) || EVENT_PLACEHOLDER}
+                          alt={event.title}
+                          className="event-card-img"
+                          style={styles.eventCardImg}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = EVENT_PLACEHOLDER;
+                          }}
+                        />
+                        <div className="event-date-badge" style={styles.eventDateBadge}>
+                          <span className="event-day" style={styles.eventDay}>
+                            {event.dateBox?.day || eventDate.getDate()}
                           </span>
-                        ))}
+                          <span className="event-month" style={styles.eventMonth}>
+                            {event.dateBox?.month || eventDate.toLocaleString('default', { month: 'short' })}
+                          </span>
+                        </div>
+
+                        {isRunning && (
+                          <span className="live-badge">
+                            <span className="live-dot"></span> LIVE
+                          </span>
+                        )}
                       </div>
-                      <div className="event-card-footer" style={styles.eventCardFooter}>
-                        <span className="text-muted small">
-                          <i className="bi bi-chat me-1"></i> {event.comments || 0} comments
-                        </span>
-                        <span className="small" style={{ color: brandColor }}>
-                          Read More <i className="bi bi-arrow-right-short"></i>
-                        </span>
+
+                      <div className="event-card-body" style={styles.eventCardBody}>
+                        <h5 className="event-card-title" style={styles.eventCardTitle}>{event.title}</h5>
+                        {event.mainTitle && (
+                          <p className="event-card-subtitle" style={styles.eventCardSubtitle}>{event.mainTitle}</p>
+                        )}
+
+                        <div className="event-meta" style={styles.eventMeta}>
+                          {event.time && (
+                            <span className="event-meta-item" style={styles.eventMetaItem}>
+                              <i className="bi bi-clock me-1"></i> {event.time}
+                            </span>
+                          )}
+                          {event.postedBy && (
+                            <span className="event-meta-item" style={styles.eventMetaItem}>
+                              <i className="bi bi-person me-1"></i> {event.postedBy}
+                            </span>
+                          )}
+                        </div>
+
+                        <p
+                          className={`event-card-description ${isLong && !isOpen ? 'is-clamped' : ''}`}
+                          style={styles.eventCardDescription}
+                        >
+                          {description}
+                        </p>
+                        {isLong ? (
+                          <button
+                            type="button"
+                            style={styles.seeMoreBtn}
+                            onClick={() => toggleExpanded(event.id)}
+                            aria-expanded={isOpen}
+                          >
+                            {isOpen ? 'See less' : 'See more'}
+                          </button>
+                        ) : (
+                          <div style={{ marginBottom: '12px' }} />
+                        )}
+
+                        {Array.isArray(event.features) && event.features.length > 0 && (
+                          <div className="event-features" style={styles.eventFeatures}>
+                            {event.features.map((feature, idx) => (
+                              <span key={idx} className="feature-tag" style={styles.featureTag}>
+                                <i className="bi bi-check-circle-fill me-1" style={{ color: brandColor }}></i> {String(feature)}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="event-card-footer" style={styles.eventCardFooter}>
+                          <span className="text-muted small">
+                            <i className="bi bi-calendar3 me-1"></i>
+                            {Number.isNaN(eventDate.getTime())
+                              ? '—'
+                              : eventDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                          {status && (
+                            <span className={`status-pill status-${event._status}`}>
+                              <i className={`bi ${status.icon} me-1`}></i>{status.text}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="pagination-wrapper mt-5" style={styles.paginationWrapper}>
                 <nav>
-                  <ul className="pagination justify-content-center">
+                  <ul className="pagination justify-content-center flex-wrap">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button 
-                        className="page-link" 
-                        onClick={() => setCurrentPage(currentPage - 1)}
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
                         style={{ color: brandColor }}
                       >
                         <i className="bi bi-chevron-left"></i> Previous
@@ -1871,19 +529,22 @@ const AllEvents = () => {
                     </li>
                     {[...Array(totalPages)].map((_, index) => (
                       <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                        <button 
-                          className="page-link" 
+                        <button
+                          className="page-link"
                           onClick={() => setCurrentPage(index + 1)}
-                          style={currentPage === index + 1 ? { backgroundColor: brandColor, borderColor: brandColor, color: 'white' } : { color: brandColor }}
+                          style={currentPage === index + 1
+                            ? { backgroundColor: brandColor, borderColor: brandColor, color: 'white' }
+                            : { color: brandColor }}
                         >
                           {index + 1}
                         </button>
                       </li>
                     ))}
                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                      <button 
-                        className="page-link" 
-                        onClick={() => setCurrentPage(currentPage + 1)}
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
                         style={{ color: brandColor }}
                       >
                         Next <i className="bi bi-chevron-right"></i>
@@ -1906,116 +567,159 @@ const AllEvents = () => {
 
       <Footer theme={theme} />
 
-      {/* Add hover effect styles with mobile responsive fixes */}
       <style>{`
+        /* ---------- Event card ---------- */
         .event-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+          transform: translateY(-6px);
+          box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
         }
-        
-        .event-card:hover .event-card-img {
-          transform: scale(1.1);
+        .event-card:hover .event-card-img { transform: scale(1.06); }
+
+        .event-card-description.is-clamped {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
-        
-        .event-card:hover .event-overlay {
-          opacity: 1;
+
+        /* ---------- Status pill (card footer) ---------- */
+        .status-pill {
+          display: inline-flex;
+          align-items: center;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 3px 10px;
+          border-radius: 999px;
+          white-space: nowrap;
         }
-        
-        .filter-buttons .btn:hover {
+        .status-running  { background: #fdecec; color: #c0262b; }
+        .status-upcoming { background: ${brandColor}15; color: ${brandColor}; }
+        .status-past     { background: #eef0f2; color: #6c757d; }
+
+        /* ---------- Filter buttons ---------- */
+        .filter-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          justify-content: flex-end;
+        }
+        .ev-filter-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: 25px;
+          border: 1.5px solid ${brandColor};
+          background: transparent;
+          color: ${brandColor};
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+        .ev-filter-btn:hover {
+          background: ${brandColor};
+          color: #fff;
           transform: translateY(-2px);
         }
-        
-        .page-link {
-          transition: all 0.3s ease;
-          cursor: pointer;
+        .ev-filter-btn.active {
+          background: ${brandColor};
+          color: #fff;
+          box-shadow: 0 6px 16px ${brandColor}40;
         }
-        
-        .page-link:hover {
+        .filter-count {
+          min-width: 22px;
+          height: 22px;
+          padding: 0 7px;
+          border-radius: 999px;
+          background: ${brandColor}15;
+          color: inherit;
+          font-size: 11px;
+          font-weight: 700;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .ev-filter-btn:hover .filter-count,
+        .ev-filter-btn.active .filter-count { background: rgba(255,255,255,0.22); }
+
+        /* ---------- Live indicator ---------- */
+        .live-dot {
+          position: relative;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #e5383b;
+          flex-shrink: 0;
+        }
+        .live-dot::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: #e5383b;
+          animation: livePulse 1.4s ease-out infinite;
+        }
+        @keyframes livePulse {
+          0%   { transform: scale(1); opacity: 0.7; }
+          100% { transform: scale(2.6); opacity: 0; }
+        }
+        .live-badge {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          z-index: 2;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: rgba(0,0,0,0.75);
+          color: #fff;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.6px;
+          backdrop-filter: blur(4px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .live-dot::after { animation: none; }
+        }
+
+        /* ---------- Pagination ---------- */
+        .page-link { transition: all 0.3s ease; cursor: pointer; }
+        .page-item:not(.disabled) .page-link:hover {
           transform: translateY(-2px);
           background-color: ${brandColor};
           color: white !important;
         }
-        
         .page-item.active .page-link {
           background-color: ${brandColor} !important;
           border-color: ${brandColor} !important;
         }
-        
-        /* Mobile and Tablet adjustments */
+
+        /* ---------- Responsive ---------- */
         @media (max-width: 991px) {
-          .hero-section {
-            padding: 50px 0;
-          }
-          .hero-section h1 {
-            font-size: 32px;
-          }
+          .hero-section { padding: 50px 0; }
+          .hero-section h1 { font-size: 32px; }
+          .filter-buttons { justify-content: center; }
         }
 
-        /* Hide filter button icons on mobile devices */
         @media (max-width: 767px) {
-          .filter-buttons {
-            flex-wrap: wrap;
-            justify-content: center !important;
-          }
-          
-          .filter-buttons .btn {
-            font-size: 13px;
-            padding: 6px 15px;
-            min-width: 90px;
-          }
-          
-          /* Hide icons on mobile */
-          .filter-icon {
-            display: none !important;
-          }
-          
-          /* Adjust spacing for text only */
-          .filter-text {
-            margin-left: 0 !important;
-          }
-          
-          /* Remove me-2 class effect */
-          .filter-icon.me-2 {
-            margin-right: 0 !important;
-          }
-          
-          .hero-section {
-            padding: 40px 0;
-          }
-          .hero-section h1 {
-            font-size: 28px;
-          }
-          .hero-section p {
-            font-size: 16px;
-          }
+          .filter-icon { display: none !important; }
+          .ev-filter-btn { font-size: 13px; padding: 6px 12px; gap: 6px; }
+          .hero-section { padding: 40px 0; }
+          .hero-section h1 { font-size: 28px; }
+          .hero-section p { font-size: 16px; }
         }
 
-        /* For very small screens */
         @media (max-width: 480px) {
-          .filter-buttons .btn {
-            font-size: 12px;
-            padding: 5px 12px;
-            min-width: 80px;
-          }
-          
           .filter-buttons {
-            gap: 6px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
           }
-        }
-
-        /* Hide icons on tablets too (optional - up to 991px) */
-        @media (max-width: 991px) and (min-width: 768px) {
-          .filter-icon {
-            display: none !important;
-          }
-          
-          .filter-text {
-            margin-left: 0 !important;
-          }
-          
-          .filter-icon.me-2 {
-            margin-right: 0 !important;
-          }
+          .ev-filter-btn { justify-content: center; font-size: 12px; padding: 7px 10px; }
         }
       `}</style>
     </div>

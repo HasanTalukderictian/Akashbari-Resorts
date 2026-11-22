@@ -358,7 +358,7 @@ const AboutUs = () => {
                         </div>
                         <h2 className="modern-title mb-3">
                             Message from Our
-                            <span style={{ color: brandColor }}> CEO & Founder</span>
+                            <span style={{ color: brandColor }}> Managing Director & Founder</span>
                         </h2>
                         <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontSize: '1rem' }}>
                             Meet the visionary behind Akashbari's success
@@ -389,7 +389,7 @@ const AboutUs = () => {
                                         border: `1px solid ${brandColor}30`
                                     }}>
                                         <h4 className="mb-0" style={{ color: brandColor, fontWeight: '700' }}>Touhidul Alam Milky</h4>
-                                        <p className="mb-0 text-muted">CEO & Founder, Akashbari Group</p>
+                                        <p className="mb-0 text-muted">Managing Director & Founder, Akashbari Group</p>
                                     </div>
                                 </div>
                             </div>
