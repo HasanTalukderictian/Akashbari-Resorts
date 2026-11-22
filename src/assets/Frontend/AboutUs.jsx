@@ -3,88 +3,245 @@ import Header from './Common/Header';
 import Footer from './Common/Footer';
 import '../css/about.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faEye, 
-  faBullseye, 
-  faStar, 
-  faHeart,
-  faEnvelope
+import {
+    faEye,
+    faBullseye,
+    faStar,
+    faHeart,
+    faEnvelope,
+    faPhone
 } from '@fortawesome/free-solid-svg-icons';
-// ব্র্যান্ড আইকনগুলো আলাদাভাবে ইম্পোর্ট করতে হবে
-import { 
-  faLinkedin, 
-  faTwitter 
-} from '@fortawesome/free-brands-svg-icons';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
-// Import images
-import king1 from '../image/King-room1.jpg';
-import king2 from '../image/King-room2.jpg';
 import king3 from '../image/section/Blog/hotle.jpeg';
-import king4 from '../image/King-room4.jpg';
-import king5 from '../image/king5.jpg';
-import img4 from '../image/facility4.jpg';
-import image1 from '../image/place-1-1.jpg';
-import image2 from '../image/place-1-3.jpg';
-import image3 from '../image/place-1-2.jpg';
-// CEO Image - আপনার ইমেজ পাথ অনুযায়ী পরিবর্তন করুন
 import ceoImage from '../../assets/image/section/Blog/ceo.jpg';
 
+// Company logo থাকলে import করে এখানে বসান, যেমন:
+// import companyLogo from '../image/logo.png';
+const COMPANY_LOGO = null;
+
+// ---------- Brand colors ----------
+const brandColor = '#5e2e10';      // main brand
+const brandDark = '#3d1f0a';       // hover / darker
+const brandTint = '#f6eee9';       // হালকা background
+const DEFAULT_COMPANY = 'Akashbari Global Services';
+const DEFAULT_TEAM = 'Our Team';
+
+// Placeholder (via.placeholder.com বন্ধ হয়ে গেছে)
+const makePlaceholder = (text) =>
+    'data:image/svg+xml;charset=UTF-8,' +
+    encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400">
+            <rect width="100%" height="100%" fill="${brandTint}"/>
+            <text x="50%" y="50%" fill="${brandColor}" font-family="sans-serif" font-size="18"
+              text-anchor="middle" dominant-baseline="middle">${text}</text>
+        </svg>`
+    );
+const MEMBER_PLACEHOLDER = makePlaceholder('No Image');
+const CEO_PLACEHOLDER = makePlaceholder('CEO Image');
+
+// 01XXXXXXXXX → 8801XXXXXXXXX (WhatsApp এর জন্য country code লাগে)
+const toWhatsAppLink = (phone) => {
+    let digits = (phone || '').replace(/\D/g, '');
+    if (digits.startsWith('0')) digits = '88' + digits;
+    return `https://wa.me/${digits}`;
+};
+
+// ---------- Team অনুযায়ী group (API যে order এ দেয় সেই order থাকবে) ----------
+const groupByTeam = (members) =>
+    members.reduce((groups, member) => {
+        const key = member.team_name?.trim() || DEFAULT_TEAM;
+        const existing = groups.find((g) => g.name === key);
+        if (existing) existing.members.push(member);
+        else groups.push({ name: key, members: [member] });
+        return groups;
+    }, []);
+
+// ---------- পদ অনুযায়ী ক্রম (উপরের পদ আগে) ----------
+// নতুন পদ লাগলে সঠিক জায়গায় একটা লাইন যোগ করুন
+// প্রতিটা লাইনে: [মূল নাম, ...একই পদের অন্য বানান]
+const DESIGNATION_ORDER = [
+    ['chairman'],
+    ['managing director', 'md'],
+    ['ceo', 'chief executive officer'],
+    ['director'],
+    ['general manager', 'gm'],
+    ['deputy general manager', 'dgm'],
+    ['assistant general manager', 'agm'],
+    ['senior manager', 'sr. manager', 'sr manager'],
+    ['manager', 'branch manager'],
+    ['deputy manager'],
+    ['assistant manager', 'asst. manager', 'asst manager'],
+    ['senior executive', 'sr. executive', 'sr executive'],
+    ['executive'],
+    ['junior executive', 'jr. executive', 'jr executive'],
+    ['officer'],
+    ['trainee', 'intern'],
+];
+
+const normalize = (text) => (text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+// সব বানান → rank (0 = সবচেয়ে উপরে)
+const RANK_MAP = new Map(
+    DESIGNATION_ORDER.flatMap((aliases, rank) => aliases.map((a) => [a, rank]))
+);
+// লম্বা নাম আগে, যাতে "assistant manager" কে "manager" না ধরে
+const ALIASES_BY_LENGTH = [...RANK_MAP.keys()].sort((a, b) => b.length - a.length);
+
+const getRank = (designation) => {
+    const d = normalize(designation);
+    if (RANK_MAP.has(d)) return RANK_MAP.get(d);
+
+    // "Sales Executive" → "executive", "Branch Manager" → "manager"
+    const alias = ALIASES_BY_LENGTH.find((a) => d.endsWith(' ' + a));
+    return alias ? RANK_MAP.get(alias) : Infinity; // অচেনা পদ → সবার শেষে
+};
+
+// পদ অনুযায়ী serial করে (একই পদের মধ্যে API এর order থাকে)
+const sortByRank = (members) =>
+    [...members].sort((a, b) => {
+        const ra = getRank(a.designation);
+        const rb = getRank(b.designation);
+        if (ra !== rb) return ra - rb;
+        // দুজনই অচেনা পদ হলে পদের নাম অনুযায়ী A-Z
+        if (ra === Infinity) return normalize(a.designation).localeCompare(normalize(b.designation));
+        return 0;
+    });
+
+const VALUES = [
+    { icon: faEye, title: 'Our Vision', text: "To be Bangladesh's most preferred eco-luxury resort, setting global benchmarks in sustainable hospitality." },
+    { icon: faBullseye, title: 'Our Mission', text: 'To provide exceptional hospitality experiences while preserving nature and empowering local communities.' },
+    { icon: faStar, title: 'Our Goal', text: 'To expand sustainably across Bangladesh, creating 1000+ jobs and becoming a model for responsible tourism.' }
+];
+
+// ---------- Team Card ----------
+const TeamCard = ({ member }) => {
+    const [first, ...rest] = (member.company || DEFAULT_COMPANY).trim().split(/\s+/);
+    const hasContact = member.phone || member.email;
+
+    return (
+        <div className="ag-card">
+            {/* Left: Photo */}
+            <div className="ag-photo">
+                <img
+                    src={member.image || MEMBER_PLACEHOLDER}
+                    alt={member.name}
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = MEMBER_PLACEHOLDER; }}
+                />
+
+                {hasContact && (
+                    <div className="ag-overlay">
+                        {member.phone && (
+                            <a href={`tel:${member.phone}`} className="ag-action" aria-label={`Call ${member.name}`}>
+                                <FontAwesomeIcon icon={faPhone} />
+                            </a>
+                        )}
+                        {member.phone && (
+                            <a href={toWhatsAppLink(member.phone)} className="ag-action" target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp ${member.name}`}>
+                                <FontAwesomeIcon icon={faWhatsapp} />
+                            </a>
+                        )}
+                        {member.email && (
+                            <a href={`mailto:${member.email}`} className="ag-action" aria-label={`Email ${member.name}`}>
+                                <FontAwesomeIcon icon={faEnvelope} />
+                            </a>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Right: Info */}
+            <div className="ag-info">
+                <div className="ag-info-top">
+                    <div className="ag-badge">
+                        {COMPANY_LOGO ? (
+                            <img src={COMPANY_LOGO} alt="" className="ag-badge-logo" />
+                        ) : (
+                            <span className="ag-badge-mark">{first.charAt(0).toUpperCase()}</span>
+                        )}
+                        <span className="ag-badge-text">
+                            <strong>{first.toUpperCase()}</strong>
+                            {rest.length > 0 && <small>{rest.join(' ').toUpperCase()}</small>}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="ag-info-body">
+                    <h3 className="ag-name">{member.name}</h3>
+
+                    <div className="ag-role">
+                        <span className="ag-designation">{member.designation}</span>
+                        {member.department && <span className="ag-dept">{member.department}</span>}
+                    </div>
+
+                    {hasContact && (
+                        <>
+                            <div className="ag-divider" />
+                            <ul className="ag-contacts">
+                                {member.phone && (
+                                    <li>
+                                        <FontAwesomeIcon icon={faPhone} className="ag-ico" />
+                                        <a href={`tel:${member.phone}`}>{member.phone}</a>
+                                    </li>
+                                )}
+                                {member.phone && (
+                                    <li>
+                                        <FontAwesomeIcon icon={faWhatsapp} className="ag-ico" />
+                                        <a href={toWhatsAppLink(member.phone)} target="_blank" rel="noopener noreferrer">{member.phone}</a>
+                                    </li>
+                                )}
+                                {member.email && (
+                                    <li>
+                                        <FontAwesomeIcon icon={faEnvelope} className="ag-ico" />
+                                        <a href={`mailto:${member.email}`} className="ag-email">{member.email}</a>
+                                    </li>
+                                )}
+                            </ul>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const AboutUs = () => {
-    const brandColor = '#5e2e10';
-    const [selectedImage, setSelectedImage] = useState(king1);
-    const [activeId, setActiveId] = useState(1);
     const [teamMembers, setTeamMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    // পেজ লোড হলে টপে স্ক্রল করার জন্য
     useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'instant'
-        });
+        window.scrollTo({ top: 0, behavior: 'instant' });
     }, []);
 
-    const galleryImages = [
-        { id: 1, img: king1, title: "King Room", alt: "Luxury king room with modern amenities" },
-        { id: 2, img: king2, title: "Suits Room", alt: "Elegant suite with separate living area" },
-        { id: 3, img: king3, title: "Lake View", alt: "Scenic lake view from premium rooms" },
-        { id: 4, img: king4, title: "City View", alt: "Panoramic city skyline view" },
-        { id: 5, img: king5, title: "Family Room", alt: "Spacious family suite with kids area" }
-    ];
+    const fetchTeamMembers = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await fetch(`${API_BASE_URL}/team-members`);
+            const result = await response.json();
 
-    const placesList = [
-        { id: 1, img: image1, title: "Coastal Paradise", category: "beach" },
-        { id: 2, img: image2, title: "Cultural Tours", category: "culture" },
-        { id: 3, img: image3, title: "Mountain Views", category: "nature" },
-        { id: 4, img: img4, title: "Heritage Sites", category: "historical" }
-    ];
-
-    // Fetch team members from API
-    useEffect(() => {
-        const fetchTeamMembers = async () => {
-            try {
-                setLoading(true);
-                const response = await fetch(`${API_BASE_URL}/team-members`);
-                const result = await response.json();
-
-                if (result.status === true) {
-                    setTeamMembers(result.data);
-                } else {
-                    setError(result.message || 'Failed to fetch team members');
-                }
-            } catch (error) {
-                console.error('Error fetching team members:', error);
-                setError('Network error. Please check your connection.');
-            } finally {
-                setLoading(false);
+            if (response.ok && result.status === true) {
+                setTeamMembers(result.data || []);
+            } else {
+                setError(result.message || 'Failed to fetch team members');
             }
-        };
+        } catch (err) {
+            console.error('Error fetching team members:', err);
+            setError('Network error. Please check your connection.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchTeamMembers();
     }, []);
+
+    const teamGroups = groupByTeam(teamMembers);
 
     return (
         <>
@@ -93,7 +250,6 @@ const AboutUs = () => {
             {/* Section 1: Banner */}
             <section className="about-banner text-center d-flex flex-column justify-content-center">
                 <div className="container">
-
                     <div className="row">
                         <div className="col-12 text-white text-center">
                             <h1 className="banner-title serif mb-3">About Us</h1>
@@ -115,8 +271,6 @@ const AboutUs = () => {
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </section>
 
@@ -127,47 +281,49 @@ const AboutUs = () => {
                         <div className="col-lg-6">
                             <div className="modern-content">
                                 <div className="section-badge mb-3" style={{ color: brandColor }}>
-                                    
                                     WELCOME TO AKASHBARI
                                 </div>
                                 <h2 className="modern-title mb-4">
                                     Experience Luxury At
-                                    <span  style={{ color: brandColor, fontSize: '50px'}}> Akashbari Hotels & Resorts</span>
+                                    <span style={{ color: brandColor, fontSize: '50px' }}> Akashbari Hotels & Resorts</span>
                                 </h2>
                                 <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4" style={{ borderColor: brandColor }}>
-                                    <p className="mb-2">
-                                        <strong> Business Type:</strong> Luxury Hospitality & Eco Resort
-                                    </p>
-                                    <p className="mb-0">
-                                        <strong> Established Since:</strong> 2023
-                                    </p>
+                                    <p className="mb-2"><strong> Business Type:</strong> Luxury Hospitality & Eco Resort</p>
+                                    <p className="mb-0"><strong> Established Since:</strong> 2023</p>
                                 </div>
                                 <p className="modern-description text-muted mb-4" style={{ fontFamily: 'inherit', fontSize: '1rem', lineHeight: '1.6' }}>
                                     Akashbari Hotels & Resort is a premier getaway destination blending nature with world-class hospitality.
                                     Designed for families, couples, and corporate events, we offer a tranquil environment away from the hustle of daily life.
                                 </p>
                                 <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600', color: brandColor }}>
-                                     Our Premium Facilities:
+                                    Our Premium Facilities:
                                 </h4>
                                 <ul className="list-unstyled mb-4">
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Premium Eco Cottages & Suites</li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Infinity Swimming Pool</li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Multi-Cuisine Fine Dining Restaurant</li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Guided Nature Trails & Kids Zone</li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Corporate Conference Hall & Event Spaces</li>
+                                    {[
+                                        'Premium Eco Cottages & Suites',
+                                        'Infinity Swimming Pool',
+                                        'Multi-Cuisine Fine Dining Restaurant',
+                                        'Guided Nature Trails & Kids Zone',
+                                        'Corporate Conference Hall & Event Spaces'
+                                    ].map((item) => (
+                                        <li key={item} className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ {item}</li>
+                                    ))}
                                 </ul>
 
                                 <h4 className="serif mb-3" style={{ fontSize: '1.3rem', fontWeight: '600', color: brandColor }}>
                                     We Offer Investment Opportunity:
                                 </h4>
                                 <ul className="list-unstyled mb-4">
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Became a Property Owner</li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Yearly Profit </li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Free Membership</li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Investment Guildeline </li>
-                                    <li className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ Socail Networking</li>
+                                    {[
+                                        'Become a Property Owner',
+                                        'Yearly Profit',
+                                        'Free Membership',
+                                        'Investment Guideline',
+                                        'Social Networking'
+                                    ].map((item) => (
+                                        <li key={item} className="mb-2 text-secondary" style={{ fontSize: '1.05rem' }}>✓ {item}</li>
+                                    ))}
                                 </ul>
-
                             </div>
                         </div>
                         <div className="col-lg-6">
@@ -186,10 +342,9 @@ const AboutUs = () => {
                 </div>
             </section>
 
-            {/* ========== CEO SECTION - Same design as existing sections ========== */}
+            {/* ========== CEO SECTION ========== */}
             <section className="ceo-section py-5" style={{ backgroundColor: '#ffffff' }}>
                 <div className="container">
-                    {/* Section Header - Same as vision section */}
                     <div className="text-center mb-5">
                         <div className="section-badge d-inline-flex align-items-center gap-2 mb-3" style={{
                             backgroundColor: `${brandColor}15`,
@@ -197,23 +352,20 @@ const AboutUs = () => {
                             borderRadius: '50px',
                             color: brandColor,
                             fontSize: '14px',
-                            fontWeight: '600',
-                            fontFamily: 'inherit'
+                            fontWeight: '600'
                         }}>
-                            <span style={{ fontSize: '18px' }}></span>
                             LEADERSHIP CORNER
                         </div>
-                        <h2 className="modern-title mb-3" style={{ fontFamily: 'inherit' }}>
+                        <h2 className="modern-title mb-3">
                             Message from Our
-                            <span  style={{ color: brandColor }}> CEO & Founder</span>
+                            <span style={{ color: brandColor }}> CEO & Founder</span>
                         </h2>
-                        <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontFamily: 'inherit', fontSize: '1rem' }}>
+                        <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontSize: '1rem' }}>
                             Meet the visionary behind Akashbari's success
                         </p>
                     </div>
 
                     <div className="row align-items-center g-5">
-                        {/* Left Side - CEO Image */}
                         <div className="col-lg-5">
                             <div className="ceo-image-area text-center">
                                 <div className="position-relative d-inline-block">
@@ -228,206 +380,72 @@ const AboutUs = () => {
                                             alt="CEO & Founder"
                                             className="img-fluid w-100"
                                             style={{ minHeight: '350px', objectFit: 'cover' }}
-                                            onError={(e) => {
-                                                e.target.src = 'https://via.placeholder.com/350x400?text=CEO+Image';
-                                            }}
+                                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = CEO_PLACEHOLDER; }}
                                         />
                                     </div>
                                     <div className="ceo-name-card mt-3 p-3 bg-white rounded-3 shadow-sm" style={{
                                         position: 'relative',
                                         zIndex: '2',
-                                        fontFamily: 'inherit',
                                         border: `1px solid ${brandColor}30`
                                     }}>
-                                        <h4 className="mb-0" style={{ color: brandColor, fontWeight: '700', fontFamily: 'inherit' }}>Touhidul Alam Milky</h4>
-                                        <p className="mb-0 text-muted" style={{ fontFamily: 'inherit' }}>CEO & Founder, Akashbari Group</p>
+                                        <h4 className="mb-0" style={{ color: brandColor, fontWeight: '700' }}>Touhidul Alam Milky</h4>
+                                        <p className="mb-0 text-muted">CEO & Founder, Akashbari Group</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Side - CEO Content */}
                         <div className="col-lg-7">
-                            {/* CEO Message Box - Same style as business info box */}
                             <div className="ceo-message-box p-4 rounded-4 mb-4" style={{
                                 backgroundColor: '#fcfcfc',
                                 borderLeft: `4px solid ${brandColor}`,
-                                boxShadow: '0 5px 20px rgba(0,0,0,0.05)',
-                                fontFamily: 'inherit'
+                                boxShadow: '0 5px 20px rgba(0,0,0,0.05)'
                             }}>
-                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4', fontFamily: 'inherit' }}>"</span>
+                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4' }}>"</span>
                                 <p className="ceo-quote-text px-3" style={{
                                     fontSize: '1rem',
                                     lineHeight: '1.7',
                                     color: '#4a5568',
-                                    fontStyle: 'italic',
-                                    fontFamily: 'inherit'
+                                    fontStyle: 'italic'
                                 }}>
                                     Akashbari was born from a dream to create a sanctuary where luxury meets nature,
                                     where every guest feels like family, and where hospitality goes beyond service to become
                                     an unforgettable experience. Our journey is driven by passion, integrity, and an unwavering
                                     commitment to excellence.
                                 </p>
-                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4', display: 'block', textAlign: 'right', fontFamily: 'inherit' }}>"</span>
+                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4', display: 'block', textAlign: 'right' }}>"</span>
                             </div>
 
-                            {/* Vision, Mission, Goal Grid - Updated with Font Awesome icons */}
                             <div className="row g-3">
-                                <div className="col-md-4">
-                                    <div className="vm-card text-center p-3 rounded-3" style={{
-                                        backgroundColor: '#fcfcfc',
-                                        border: `1px solid ${brandColor}30`,
-                                        transition: 'all 0.3s ease',
-                                        cursor: 'pointer',
-                                        height: '100%',
-                                        fontFamily: 'inherit'
-                                    }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.style.boxShadow = `0 10px 25px ${brandColor}30`;
-                                            e.currentTarget.style.borderColor = brandColor;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                            e.currentTarget.style.borderColor = `${brandColor}30`;
-                                        }}>
-                                        <div className="vm-icon mb-2" style={{ fontSize: '36px', color: brandColor }}>
-                                            <FontAwesomeIcon icon={faEye} />
+                                {VALUES.map((v) => (
+                                    <div className="col-md-4" key={v.title}>
+                                        <div className="vm-card text-center p-3 rounded-3 h-100">
+                                            <div className="vm-icon mb-2" style={{ fontSize: '36px', color: brandColor }}>
+                                                <FontAwesomeIcon icon={v.icon} />
+                                            </div>
+                                            <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontSize: '1.1rem' }}>{v.title}</h5>
+                                            <p className="small text-muted mb-0" style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>{v.text}</p>
                                         </div>
-                                        <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Vision</h5>
-                                        <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
-                                            To be Bangladesh's most preferred eco-luxury resort, setting global benchmarks in sustainable hospitality.
-                                        </p>
                                     </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="vm-card text-center p-3 rounded-3" style={{
-                                        backgroundColor: '#fcfcfc',
-                                        border: `1px solid ${brandColor}30`,
-                                        transition: 'all 0.3s ease',
-                                        cursor: 'pointer',
-                                        height: '100%',
-                                        fontFamily: 'inherit'
-                                    }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.style.boxShadow = `0 10px 25px ${brandColor}30`;
-                                            e.currentTarget.style.borderColor = brandColor;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                            e.currentTarget.style.borderColor = `${brandColor}30`;
-                                        }}>
-                                        <div className="vm-icon mb-2" style={{ fontSize: '36px', color: brandColor }}>
-                                            <FontAwesomeIcon icon={faBullseye} />
-                                        </div>
-                                        <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Mission</h5>
-                                        <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
-                                            To provide exceptional hospitality experiences while preserving nature and empowering local communities.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="vm-card text-center p-3 rounded-3" style={{
-                                        backgroundColor: '#fcfcfc',
-                                        border: `1px solid ${brandColor}30`,
-                                        transition: 'all 0.3s ease',
-                                        cursor: 'pointer',
-                                        height: '100%',
-                                        fontFamily: 'inherit'
-                                    }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(-5px)';
-                                            e.currentTarget.style.boxShadow = `0 10px 25px ${brandColor}30`;
-                                            e.currentTarget.style.borderColor = brandColor;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                            e.currentTarget.style.borderColor = `${brandColor}30`;
-                                        }}>
-                                        <div className="vm-icon mb-2" style={{ fontSize: '36px', color: brandColor }}>
-                                            <FontAwesomeIcon icon={faStar} />
-                                        </div>
-                                        <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontFamily: 'inherit', fontSize: '1.1rem' }}>Our Goal</h5>
-                                        <p className="small text-muted mb-0" style={{ fontFamily: 'inherit', fontSize: '0.85rem', lineHeight: '1.5' }}>
-                                            To expand sustainably across Bangladesh, creating 1000+ jobs and becoming a model for responsible tourism.
-                                        </p>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
-
-
-
                         </div>
                     </div>
                 </div>
             </section>
-            {/* ========== CEO SECTION ENDS HERE ========== */}
 
-
-
-            <style>{`
-                .vision-card:hover .vision-icon-wrapper {
-                    transform: scale(1.1);
-                    transition: transform 0.3s ease;
-                }
-                
-                .vision-stats-wrapper {
-                    animation: fadeInUp 0.6s ease-out;
-                }
-                
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                
-                .vision-card {
-                    animation: fadeInUp 0.5s ease-out;
-                    animation-fill-mode: backwards;
-                }
-                
-                .vision-card:nth-child(1) { animation-delay: 0.1s; }
-                .vision-card:nth-child(2) { animation-delay: 0.2s; }
-                .vision-card:nth-child(3) { animation-delay: 0.3s; }
-                .vision-card:nth-child(4) { animation-delay: 0.4s; }
-                
-                .ceo-section {
-                    animation: fadeIn 0.8s ease-out;
-                }
-                
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
-                }
-            `}</style>
-
-            {/* Team Section - Dynamic from API */}
-            {/* <section className="team-section-modern py-5">
+            {/* ========== TEAM SECTION ========== */}
+            <section className="ag-team-section py-5">
                 <div className="container">
-                    <div className="team-header-modern text-center">
-
+                    <div className="team-header-modern text-center mb-4">
                         <div className="section-tag centered" style={{ color: brandColor }}>
-                    
                             MEET OUR EXPERTS
                         </div>
-                        <h2 className="team-title" style={{ fontFamily: 'inherit' }}>
-                            The Passionate <span  style={{ color: brandColor }}>People Behind</span><br />
+                        <h2 className="team-title">
+                            The Passionate <span style={{ color: brandColor }}>People Behind</span><br />
                             Your Perfect Stay
                         </h2>
-                        <p className="team-subtitle" style={{ fontFamily: 'inherit', fontSize: '0.95rem' }}>
+                        <p className="team-subtitle" style={{ fontSize: '0.95rem' }}>
                             Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment.
                             From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
                         </p>
@@ -435,7 +453,7 @@ const AboutUs = () => {
 
                     {loading ? (
                         <div className="text-center py-5">
-                            <div className="spinner-border text-primary" role="status" style={{ color: brandColor }}>
+                            <div className="spinner-border" role="status" style={{ color: brandColor }}>
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                             <p className="mt-3 text-muted">Loading team members...</p>
@@ -444,316 +462,272 @@ const AboutUs = () => {
                         <div className="text-center py-5">
                             <p className="text-danger">⚠️ {error}</p>
                             <button
-                                className="btn btn-primary mt-3"
-                                onClick={() => window.location.reload()}
+                                className="btn mt-3 text-white"
+                                onClick={fetchTeamMembers}
                                 style={{ backgroundColor: brandColor, borderColor: brandColor }}
                             >
                                 Retry
                             </button>
                         </div>
                     ) : teamMembers.length > 0 ? (
-                        <div className="team-grid-modern">
-                            {teamMembers.map((member) => (
-                                <div className="team-card-modern" key={member.id}>
-                                    <div className="team-card-inner">
-                                        <div className="team-image-wrapper">
-                                            <img
-                                                src={member.image}
-                                                alt={member.name}
-                                                className="team-image"
-                                                onError={(e) => {
-                                                    e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
-                                                }}
-                                            />
-                                            <div className="team-social-overlay">
-                                                <a href={`mailto:${member.email || 'info@akashbari.com'}`} className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
-                                                    <FontAwesomeIcon icon={faEnvelope} />
-                                                </a>
-                                                <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
-                                                    <FontAwesomeIcon icon={faLinkedin} />
-                                                </a>
-                                                <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
-                                                    <FontAwesomeIcon icon={faTwitter} />
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div className="team-info">
-                                            <h3 className="team-member-name" style={{ fontFamily: 'inherit', color: brandColor }}>{member.name}</h3>
-                                            <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
-                                            <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
-                                            <div className="team-divider" style={{ backgroundColor: brandColor }}></div>
-
-                                        </div>
-                                    </div>
+                        teamGroups.map((group) => (
+                            <div key={group.name} className="ag-group">
+                                <div className="ag-group-head">
+                                    <h3>{group.name}</h3>
+                                    <span className="ag-group-line" />
+                                    <span className="ag-group-count">{group.members.length}</span>
                                 </div>
-                            ))}
-                        </div>
+
+                                {/* এক grid এ serial: Manager → Assistant Manager → Senior Executive → Executive (মাঝে ফাঁকা নেই) */}
+                                <div className="ag-grid">
+                                    {sortByRank(group.members).map((member) => (
+                                        <TeamCard key={member.id} member={member} />
+                                    ))}
+                                </div>
+                            </div>
+                        ))
                     ) : (
                         <div className="text-center py-5">
                             <p className="text-muted">No team members found.</p>
                         </div>
                     )}
                 </div>
-            </section> */}
-
-
-            <section className="team-section-modern py-5">
-    <div className="container">
-        <div className="team-header-modern text-center">
-            <div className="section-tag centered" style={{ color: brandColor }}>
-                MEET OUR EXPERTS
-            </div>
-            <h2 className="team-title" style={{ fontFamily: 'inherit' }}>
-                The Passionate <span style={{ color: brandColor }}>People Behind</span><br />
-                Your Perfect Stay
-            </h2>
-            <p className="team-subtitle" style={{ fontFamily: 'inherit', fontSize: '0.95rem' }}>
-                Akashbari is supported by a dedicated team focused on creating a calm, welcoming environment.
-                From daily operations to guest support, each role contributes to a smooth and thoughtful stay experience.
-            </p>
-        </div>
-
-        {loading ? (
-            <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status" style={{ color: brandColor }}>
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="mt-3 text-muted">Loading team members...</p>
-            </div>
-        ) : error ? (
-            <div className="text-center py-5">
-                <p className="text-danger">⚠️ {error}</p>
-                <button
-                    className="btn btn-primary mt-3"
-                    onClick={() => window.location.reload()}
-                    style={{ backgroundColor: brandColor, borderColor: brandColor }}
-                >
-                    Retry
-                </button>
-            </div>
-        ) : teamMembers.length > 0 ? (
-            <div className="team-grid-modern">
-                {teamMembers.map((member) => (
-                    <div className="team-card-modern" key={member.id}>
-                        <div className="team-card-inner">
-                            <div className="team-image-wrapper">
-                                <img
-                                    src={member.image}
-                                    alt={member.name}
-                                    className="team-image"
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'contain', // Shows full image without cropping
-                                        objectPosition: 'center',
-                                        backgroundColor: '#f8f9fa',
-                                        display: 'block'
-                                    }}
-                                    onError={(e) => {
-                                        e.target.src = 'https://via.placeholder.com/300x300?text=No+Image';
-                                    }}
-                                />
-                                <div className="team-social-overlay">
-                                    <a href={`mailto:${member.email || 'info@akashbari.com'}`} className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
-                                        <FontAwesomeIcon icon={faEnvelope} />
-                                    </a>
-                                    <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
-                                        <FontAwesomeIcon icon={faLinkedin} />
-                                    </a>
-                                    <a href="#" className="social-link" target="_blank" rel="noopener noreferrer" style={{ backgroundColor: brandColor }}>
-                                        <FontAwesomeIcon icon={faTwitter} />
-                                    </a>
-                                </div>
-                            </div>
-                            <div className="team-info">
-                                <h3 className="team-member-name" style={{ fontFamily: 'inherit', color: brandColor }}>{member.name}</h3>
-                                <p className="team-member-role" style={{ fontFamily: 'inherit' }}>{member.designation}</p>
-                                <p className="team-member-bio" style={{ fontFamily: 'inherit' }}>{member.subtitle}</p>
-                                <div className="team-divider" style={{ backgroundColor: brandColor }}></div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        ) : (
-            <div className="text-center py-5">
-                <p className="text-muted">No team members found.</p>
-            </div>
-        )}
-    </div>
-</section>
-
-{/* Add this CSS to your stylesheet or in a <style> tag */}
-<style>{`
-    .team-grid-modern {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 30px;
-        padding: 20px 0;
-    }
-
-    .team-card-modern {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background: #ffffff;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .team-card-modern:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    }
-
-    .team-card-inner {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .team-image-wrapper {
-        position: relative;
-        width: 100%;
-        padding-top: 100%; /* 1:1 Square aspect ratio */
-        overflow: hidden;
-        background: #f8f9fa;
-        flex-shrink: 0;
-    }
-
-    .team-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* Shows full image without cropping */
-        object-position: center;
-        background-color: #f8f9fa;
-        padding: 10px; /* Optional: Adds some breathing room */
-    }
-
-    /* Alternative: If you want the image to fill the container but show fully */
-    /* Use this if you prefer the image to stretch to fill without cropping */
-    /*
-    .team-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-    }
-    */
-
-    .team-social-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        padding: 15px;
-        background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
-    }
-
-    .team-image-wrapper:hover .team-social-overlay {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .social-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        color: white !important;
-        text-decoration: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .social-link:hover {
-        transform: scale(1.1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .team-info {
-        padding: 20px 20px 25px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background: #ffffff;
-    }
-
-    .team-member-name {
-        font-size: 1.15rem;
-        font-weight: 600;
-        margin-bottom: 5px;
-        letter-spacing: -0.01em;
-    }
-
-    .team-member-role {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-bottom: 8px;
-        font-weight: 500;
-    }
-
-    .team-member-bio {
-        font-size: 0.88rem;
-        color: #495057;
-        line-height: 1.6;
-        margin-bottom: 12px;
-        flex: 1;
-    }
-
-    .team-divider {
-        width: 40px;
-        height: 3px;
-        border-radius: 2px;
-        margin-top: auto;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .team-grid-modern {
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        .team-image-wrapper {
-            padding-top: 100%;
-        }
-
-        .team-info {
-            padding: 16px 16px 20px;
-        }
-
-        .team-member-name {
-            font-size: 1rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .team-grid-modern {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-    }
-`}</style>
+            </section>
 
             <Footer />
+
+            <style>{`
+                /* ---------- CEO / Vision cards ---------- */
+                .ceo-section { animation: fadeIn 0.8s ease-out; }
+                .vm-card {
+                    background-color: #fcfcfc;
+                    border: 1px solid ${brandColor}30;
+                    transition: all 0.3s ease;
+                }
+                .vm-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 25px ${brandColor}30;
+                    border-color: ${brandColor};
+                }
+
+                /* ---------- Team section ---------- */
+                .ag-team-section {
+                    --ag-brand: ${brandColor};
+                    --ag-brand-dark: ${brandDark};
+                    --ag-tint: ${brandTint};
+                    background: #f7f5f1;
+                }
+
+                .ag-group + .ag-group { margin-top: 48px; }
+
+                .ag-group-head {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    margin-bottom: 22px;
+                }
+                .ag-group-head h3 {
+                    margin: 0;
+                    font-size: 1.35rem;
+                    font-weight: 800;
+                    color: var(--ag-brand);
+                    white-space: nowrap;
+                }
+                .ag-group-line { flex: 1; height: 1px; background: ${brandColor}30; }
+                .ag-group-count {
+                    min-width: 26px;
+                    height: 26px;
+                    padding: 0 8px;
+                    border-radius: 999px;
+                    background: var(--ag-tint);
+                    color: var(--ag-brand);
+                    font-size: 0.78rem;
+                    font-weight: 700;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .ag-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                    gap: 22px;
+                }
+
+                /* Card */
+                .ag-card {
+                    display: grid;
+                    grid-template-columns: 50% 50%;
+                    min-height: 300px;
+                    border-radius: 16px;
+                    overflow: hidden;
+                    background: var(--ag-tint);
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+                    transition: transform 0.35s ease, box-shadow 0.35s ease;
+                    animation: agFadeUp 0.5s ease-out backwards;
+                }
+                .ag-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 16px 34px ${brandColor}33;
+                }
+
+                /* Photo — info panel এর নিচে 18px ঢুকে থাকে, তাই মাঝে কোনো gap থাকে না */
+                .ag-photo {
+                    position: relative;
+                    overflow: hidden;
+                    margin-right: -18px;
+                    z-index: 0;
+                }
+                .ag-photo img {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: top center;
+                    transition: transform 0.5s ease;
+                }
+                .ag-card:hover .ag-photo img { transform: scale(1.06); }
+
+                /* Hover action buttons */
+                .ag-overlay {
+                    position: absolute;
+                    left: 0;
+                    right: 18px; /* panel এর নিচে ঢাকা অংশ বাদ দিয়ে center */
+                    bottom: 0;
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 40px 10px 14px;
+                    background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+                    opacity: 0;
+                    transform: translateY(12px);
+                    transition: opacity 0.3s ease, transform 0.3s ease;
+                }
+                .ag-card:hover .ag-overlay { opacity: 1; transform: translateY(0); }
+                .ag-action {
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 50%;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--ag-brand);
+                    color: #fff !important;
+                    text-decoration: none;
+                    font-size: 14px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+                    transition: transform 0.2s ease, background 0.2s ease;
+                }
+                .ag-action:hover { transform: scale(1.12); background: var(--ag-brand-dark); }
+
+                /* Info panel */
+                .ag-info {
+                    position: relative;
+                    z-index: 1;
+                    background: #fff;
+                    border: 3px solid var(--ag-brand);
+                    border-radius: 12px;
+                    display: flex;
+                    flex-direction: column;
+                    min-width: 0;
+                }
+                .ag-info-top {
+                    padding: 12px 16px;
+                    border-bottom: 1px solid ${brandColor}1f;
+                }
+                .ag-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 4px 12px 4px 8px;
+                    border: 1px solid var(--ag-brand);
+                    border-radius: 6px;
+                    line-height: 1.1;
+                }
+                .ag-badge-logo { width: 22px; height: 22px; object-fit: contain; }
+                .ag-badge-mark {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 4px;
+                    background: var(--ag-brand);
+                    color: #fff;
+                    font-size: 11px;
+                    font-weight: 800;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .ag-badge-text { display: flex; flex-direction: column; }
+                .ag-badge-text strong { font-size: 11px; font-weight: 800; color: #1d1d1d; letter-spacing: 0.3px; }
+                .ag-badge-text small { font-size: 8px; font-weight: 600; color: var(--ag-brand); letter-spacing: 0.4px; }
+
+                .ag-info-body {
+                    padding: 16px;
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                }
+                .ag-name {
+                    font-size: 1.15rem;
+                    font-weight: 800;
+                    color: #1d1d1d;
+                    line-height: 1.25;
+                    margin: 0 0 6px;
+                }
+                .ag-role {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 6px 8px;
+                }
+                .ag-designation { color: var(--ag-brand); font-weight: 700; font-size: 0.9rem; }
+                .ag-dept {
+                    background: var(--ag-tint);
+                    color: var(--ag-brand);
+                    font-size: 0.72rem;
+                    font-weight: 500;
+                    padding: 3px 10px;
+                    border-radius: 999px;
+                }
+                .ag-divider { border-top: 1px dashed ${brandColor}33; margin: 14px 0 12px; }
+
+                .ag-contacts { list-style: none; padding: 0; margin: 0; }
+                .ag-contacts li {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 10px;
+                    font-size: 0.85rem;
+                    color: #444;
+                    margin-bottom: 9px;
+                }
+                .ag-contacts li:last-child { margin-bottom: 0; }
+                .ag-ico { color: var(--ag-brand); opacity: 0.75; width: 14px; margin-top: 3px; flex-shrink: 0; }
+                .ag-contacts a { color: #444; text-decoration: none; transition: color 0.2s ease; }
+                .ag-contacts a:hover { color: var(--ag-brand); }
+                .ag-email { overflow-wrap: anywhere; }
+
+                @keyframes agFadeUp {
+                    from { opacity: 0; transform: translateY(24px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+                /* Responsive */
+                @media (max-width: 576px) {
+                    .ag-grid { grid-template-columns: 1fr; gap: 16px; }
+                    .ag-card { grid-template-columns: 50% 50%; min-height: 260px; }
+                    .ag-info-top { padding: 10px 12px; }
+                    .ag-info-body { padding: 12px; }
+                    .ag-name { font-size: 1rem; }
+                    .ag-contacts li { font-size: 0.78rem; gap: 8px; }
+                }
+
+                /* Touch device এ hover নেই */
+                @media (hover: none) {
+                    .ag-card:hover { transform: none; }
+                }
+            `}</style>
         </>
     );
 };

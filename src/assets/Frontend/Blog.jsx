@@ -5,45 +5,34 @@ import '../css/blog.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// API Base URL - FIXED (no hardcoded URLs)
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BASE_URL;
 
-// Laravel storage image URL
+// Helper function to get full image URL - FIXED for Laravel storage (no hardcoded URLs)
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null;
+
+  // If already a full URL, return as is
   if (imagePath.startsWith('http')) return imagePath;
-  const cleanPath = imagePath.replace(/^\/+/, '');
-  const baseUrl = API_URL.replace(/\/api\/?$/, '');
-  return `${baseUrl}/storage/${cleanPath}`;
-};
 
-// via.placeholder.com বন্ধ হয়ে গেছে, তাই নিজস্ব SVG placeholder
-const PLACEHOLDER_IMAGE =
-  'data:image/svg+xml;charset=UTF-8,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250">
-      <rect width="100%" height="100%" fill="#f2e8d5"/>
-      <text x="50%" y="50%" fill="#5e2e10" font-family="sans-serif" font-size="18"
-        text-anchor="middle" dominant-baseline="middle">No Image</text>
-    </svg>`
-  );
-
-// sections কখনো JSON string আসতে পারে, তাই safe parse
-const parseSections = (sections) => {
-  if (!sections) return [];
-  if (Array.isArray(sections)) return sections;
-  try {
-    const parsed = JSON.parse(sections);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+  // Clean the path - remove any leading slashes
+  let cleanPath = imagePath;
+  if (cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1);
   }
+
+  // Get base URL without /api
+  const baseUrl = API_URL.replace('/api', '');
+
+  // Construct the full URL for Laravel storage
+  const imageUrl = `${baseUrl}/storage/${cleanPath}`;
+
+  return imageUrl;
 };
 
-const formatDate = (d) =>
-  d
-    ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-    : '';
+// Placeholder image when no image is available
+const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image+Available';
 
 const Blog = () => {
   const brandColor = '#5e2e10';
@@ -52,56 +41,78 @@ const Blog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
-  const [activePost, setActivePost] = useState(null); // modal এ যে blog খোলা
 
+  // পেজ লোড হলে টপে স্ক্রল করার জন্য
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
   }, []);
 
-  // Modal খোলা থাকলে: পেছনের scroll বন্ধ + ESC চাপলে বন্ধ
-  useEffect(() => {
-    if (!activePost) return;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e) => e.key === 'Escape' && setActivePost(null);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [activePost]);
-
-  const handleImageError = (id) => {
-    setImageErrors((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+  // Handle image error - use placeholder
+  const handleImageError = (blogId) => {
+    if (!imageErrors[blogId]) {
+      setImageErrors(prev => ({ ...prev, [blogId]: true }));
+    }
   };
 
-  const getFinalImageUrl = (post) =>
-    imageErrors[post.id] || !post.imageUrl ? PLACEHOLDER_IMAGE : post.imageUrl;
+  // Get final image URL with fallback
+  const getFinalImageUrl = (blog) => {
+    if (imageErrors[blog.id]) {
+      return PLACEHOLDER_IMAGE;
+    }
+    if (blog.imageUrl) {
+      return blog.imageUrl;
+    }
+    return PLACEHOLDER_IMAGE;
+  };
 
+  // Fetch blogs from API (public: shudhu Published blog ashbe)
   const fetchBlogs = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/blogs`);
+
       if (response.data.status === true) {
-        const formatted = response.data.data.map((blog) => ({
-          id: blog.id,
-          title: blog.title,
-          excerpt: blog.excerpt,
-          category: blog.category,
-          author: blog.author,
-          date: formatDate(blog.created_at),
-          imageUrl: getImageUrl(blog.image),
-          introduction: blog.introduction,
-          sections: parseSections(blog.sections),
-          conclusion: blog.conclusion,
-          read_time: blog.read_time || '5 min read',
-        }));
-        setBlogData(formatted);
+        const blogs = response.data.data;
+
+        // Transform API data to match component structure
+        const formattedBlogs = blogs.map((blog) => {
+          // Generate image URL from API
+          const imageUrl = blog.image ? getImageUrl(blog.image) : null;
+
+          return {
+            id: blog.id,
+            title: blog.title,
+            slug: blog.slug,
+            excerpt: blog.excerpt,
+            category: blog.category,
+            author: blog.author,
+            date: blog.created_at ? new Date(blog.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : '2024-01-01',
+            imageUrl: imageUrl,
+            originalImage: blog.image,
+            introduction: blog.introduction,
+            sections: blog.sections,
+            conclusion: blog.conclusion,
+            read_time: blog.read_time || '5 min read',
+            views: blog.views || 0,
+            likes: blog.likes || 0,
+            status: blog.status
+          };
+        });
+
+        setBlogData(formattedBlogs);
       } else {
         setError('Failed to load blogs');
       }
-    } catch (err) {
-      console.error('Error fetching blogs:', err);
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
       setError('Unable to connect to server. Please try again later.');
     } finally {
       setLoading(false);
@@ -112,13 +123,20 @@ const Blog = () => {
     fetchBlogs();
   }, []);
 
-  const handleWriteClick = () => {
-    const visitorToken = localStorage.getItem('visitor_token');
-    if (visitorToken) navigate('/write-blog');
-    else navigate('/visitor-login', { state: { from: '/write-blog' } });
+  const handleCardClick = (post) => {
+    navigate(`/blog-details/${post.id}`, { state: { post } });
   };
 
-  // ---------- Loading / Error / Empty ----------
+  // Visitor login thakle form e, na thakle login e (login er pore abar /write-blog e fire ashbe)
+  const handleWriteClick = () => {
+    const visitorToken = localStorage.getItem('visitor_token');
+    if (visitorToken) {
+      navigate('/write-blog');
+    } else {
+      navigate('/visitor-login', { state: { from: '/write-blog' } });
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -127,7 +145,7 @@ const Blog = () => {
           <div className="spinner-border" role="status" style={{ width: '3rem', height: '3rem', color: brandColor }}>
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="mt-3 text-muted">Loading blog posts...</p>
+          <p className="mt-3 text-muted">Loading amazing blog posts...</p>
         </div>
         <Footer />
       </>
@@ -144,7 +162,7 @@ const Blog = () => {
             <p>{error}</p>
             <button
               className="btn mt-3 px-4 py-2 rounded-pill"
-              onClick={fetchBlogs}
+              onClick={() => fetchBlogs()}
               style={{ backgroundColor: brandColor, color: 'white', border: 'none' }}
             >
               Try Again
@@ -161,85 +179,138 @@ const Blog = () => {
       <>
         <Header />
         <div className="text-center py-5" style={{ minHeight: '60vh' }}>
-          <span style={{ fontSize: '64px' }}>📝</span>
-          <h3 className="text-muted mt-3">No blog posts found</h3>
-          <p className="text-muted">Check back later, or share your own story!</p>
-          <button
-            className="btn mt-2 px-4 py-2 rounded-pill fw-semibold"
-            onClick={handleWriteClick}
-            style={{ backgroundColor: brandColor, color: 'white', border: 'none' }}
-          >
-            Write a blog
-          </button>
+          <div className="empty-state">
+            <span style={{ fontSize: '64px' }}>📝</span>
+            <h3 className="text-muted mt-3">No blog posts found</h3>
+            <p className="text-muted">Check back later for new content, or share your own story!</p>
+            <button
+              className="btn mt-2 px-4 py-2 rounded-pill fw-semibold"
+              onClick={handleWriteClick}
+              style={{ backgroundColor: brandColor, color: 'white', border: 'none' }}
+            >
+              Write a blog
+            </button>
+          </div>
         </div>
         <Footer />
       </>
     );
   }
 
-  // ---------- Main ----------
   return (
     <>
       <Header />
 
-      {/* Banner */}
+      {/* Banner Section */}
       <section className="blog-banner text-center d-flex flex-column justify-content-center">
         <div className="container">
+          <div className="row">
+
           <div className="col-12 text-white text-center">
-            <h1 className="blog-title serif mb-3">Blog</h1>
-            <p
-              className="lead mb-0"
-              style={{
-                fontSize: '1.1rem',
-                fontWeight: 300,
-                letterSpacing: '0.5px',
-                borderLeft: `3px solid ${brandColor}`,
-                borderRight: `3px solid ${brandColor}`,
-                display: 'inline-block',
-                padding: '0 20px',
-              }}
-            >
-              Stories, insights, and updates from our world
-            </p>
-            <div>
-              <button className="write-blog-btn btn mt-4 px-4 py-2 rounded-pill fw-semibold" onClick={handleWriteClick}>
-                <i className="bi bi-pencil-square me-2"></i>
-                Write a blog
-              </button>
-            </div>
+  <h1 className="blog-title serif mb-3">Blog</h1>
+  <div className="message-wrapper">
+    <p className="lead mb-0" style={{ 
+      fontSize: '1.1rem', 
+      fontWeight: '300',
+      letterSpacing: '0.5px',
+      borderLeft: `3px solid ${brandColor}`,
+      borderRight: `3px solid ${brandColor}`,
+      display: 'inline-block',
+      padding: '0 20px'
+    }}>
+      <i className="bi bi-journal-bookmark-fill me-2" style={{ color: brandColor }}></i>
+      Stories, insights, and updates from our world
+      <i className="bi bi-arrow-right ms-2" style={{ color: brandColor }}></i>
+    </p>
+  </div>
+
+  {/* Write a Blog button */}
+  <button
+    className="write-blog-btn btn mt-4 px-4 py-2 rounded-pill fw-semibold"
+    onClick={handleWriteClick}
+  >
+    <i className="bi bi-pencil-square me-2"></i>
+    Write a blog
+  </button>
+</div>
+
           </div>
         </div>
       </section>
 
-      {/* Blog Grid — short card */}
+      {/* Blog Grid Section */}
       <section className="blog-content-section py-5">
         <div className="container">
-          <div className="row g-3">
-            {blogData.map((post, index) => (
-              <div className="col-xl-3 col-lg-4 col-md-6 col-12" key={post.id}>
-                <div className="blog-card h-100" style={{ animationDelay: `${Math.min(index, 8) * 0.08}s` }}>
-                  <div className="blog-img-wrapper">
+          <div className="row g-2">
+            {blogData.map((post) => (
+              <div
+                className="col-xl-3 col-lg-4 col-md-6 col-12"
+                key={post.id}
+                onClick={() => handleCardClick(post)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="blog-card h-100 shadow-sm rounded-4 overflow-hidden">
+                  <div className="blog-img-wrapper position-relative overflow-hidden">
                     <img
                       src={getFinalImageUrl(post)}
                       alt={post.title}
-                      loading="lazy"
+                      className="img-fluid w-100"
+                      style={{
+                        height: '160px',
+                        objectFit: 'cover',
+                        transition: 'transform 0.3s ease'
+                      }}
                       onError={() => handleImageError(post.id)}
                     />
+                    {post.status === 'Published' && (
+                      <span className="position-absolute top-0 end-0 m-2 px-2 py-1 text-white rounded-pill small" style={{ backgroundColor: brandColor, fontSize: '10px' }}>
+                        {post.status}
+                      </span>
+                    )}
                   </div>
-
-                  <div className="blog-info">
-                    {post.category && <span className="blog-category">{post.category}</span>}
-
-                    <h4 className="blog-card-title">{post.title}</h4>
-
-                    <div className="blog-meta">
-                      {post.date && <span><i className="far fa-calendar-alt"></i> {post.date}</span>}
-                      <span><i className="far fa-clock"></i> {post.read_time}</span>
+                  
+                  <div className="blog-info p-3 d-flex flex-column justify-content-between">
+                    <div>
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <span className="blog-category small text-uppercase fw-semibold" style={{ color: brandColor, fontSize: '11px' }}>
+                          {post.category}
+                        </span>
+                        <span className="text-muted small" style={{ fontSize: '11px' }}>
+                          <i className="far fa-eye"></i> {post.views || 0}
+                        </span>
+                      </div>
+                      <h4 className="blog-card-title my-2" style={{
+                        fontSize: '1.05rem',
+                        fontWeight: '700',
+                        lineHeight: '1.3',
+                        color: '#2c3e50'
+                      }}>
+                        {post.title}
+                      </h4>
+                      <div className="blog-meta mb-2">
+                        <span className="text-muted small" style={{ fontSize: '11px' }}>
+                          <i className="far fa-calendar-alt"></i> {post.date}
+                        </span>
+                        <span className="text-muted small ms-2" style={{ fontSize: '11px' }}>
+                          <i className="far fa-user"></i> {post.author}
+                        </span>
+                        <span className="text-muted small ms-2" style={{ fontSize: '11px' }}>
+                          <i className="far fa-clock"></i> {post.read_time}
+                        </span>
+                      </div>
+                      <p className="blog-excerpt text-muted small" style={{ lineHeight: '1.5', fontSize: '12px', marginBottom: '10px' }}>
+                        {post.excerpt && post.excerpt.length > 80
+                          ? post.excerpt.substring(0, 80) + '...'
+                          : post.excerpt || 'Click to read more...'}
+                      </p>
                     </div>
-
-                    <p className="blog-excerpt">{post.excerpt || post.introduction || ''}</p>
-
-                    <button className="read-more-btn-gold" onClick={() => setActivePost(post)}>
+                    
+                    <button className="read-more-btn-gold mt-2 w-100 py-1 rounded-pill border-0 fw-semibold" style={{
+                      backgroundColor: brandColor,
+                      color: 'white',
+                      transition: 'all 0.3s ease',
+                      fontSize: '12px'
+                    }}>
                       Read More →
                     </button>
                   </div>
@@ -250,208 +321,98 @@ const Blog = () => {
         </div>
       </section>
 
-      {/* Blog Modal — same page এ পুরো blog */}
-      {activePost && (
-        <div className="blog-modal-backdrop" onClick={() => setActivePost(null)}>
-          <div
-            className="blog-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label={activePost.title}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button className="blog-modal-close" onClick={() => setActivePost(null)} aria-label="Close">
-              ×
-            </button>
-
-            <img
-              src={getFinalImageUrl(activePost)}
-              alt={activePost.title}
-              className="blog-modal-img"
-              onError={() => handleImageError(activePost.id)}
-            />
-
-            <div className="blog-modal-body">
-              {activePost.category && <span className="blog-category">{activePost.category}</span>}
-              <h2 className="blog-modal-title">{activePost.title}</h2>
-              <div className="blog-meta mb-3">
-                {activePost.author && <span><i className="far fa-user"></i> {activePost.author}</span>}
-                {activePost.date && <span><i className="far fa-calendar-alt"></i> {activePost.date}</span>}
-                <span><i className="far fa-clock"></i> {activePost.read_time}</span>
-              </div>
-
-              {activePost.introduction && <p>{activePost.introduction}</p>}
-
-              {activePost.sections.map((sec, i) => (
-                <div key={i} className="mb-3">
-                  {(sec.heading || sec.title) && <h5 className="blog-modal-heading">{sec.heading || sec.title}</h5>}
-                  {(sec.content || sec.body || sec.text) && <p>{sec.content || sec.body || sec.text}</p>}
-                </div>
-              ))}
-
-              {activePost.conclusion && (
-                <>
-                  <h5 className="blog-modal-heading">Conclusion</h5>
-                  <p>{activePost.conclusion}</p>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       <Footer />
 
       <style>{`
         .blog-card {
-          background: #fffaf0;
-          border: 1px solid #f2e8d5;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          background: white;
           border-radius: 16px;
           overflow: hidden;
-          display: flex;
-          flex-direction: column;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          animation: fadeInUp 0.5s ease-out backwards;
         }
+        
         .blog-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 26px rgba(0,0,0,0.1);
+          transform: translateY(-6px);
+          box-shadow: 0 15px 30px rgba(0,0,0,0.12);
         }
-        .blog-img-wrapper { padding: 10px 10px 0; overflow: hidden; }
-        .blog-img-wrapper img {
-          width: 100%;
-          height: 160px;
-          object-fit: cover;
-          border-radius: 12px;
-          transition: transform 0.3s ease;
+        
+        .blog-card:hover .blog-img-wrapper img {
+          transform: scale(1.05);
         }
-        .blog-card:hover .blog-img-wrapper img { transform: scale(1.04); }
-
-        .blog-info {
-          padding: 12px 14px 14px;
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-        .blog-category {
-          color: #5e2e10;
-          font-size: 11px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-        .blog-card-title {
-          font-size: 1rem;
-          font-weight: 700;
-          line-height: 1.35;
-          color: #2c3e50;
-          margin: 6px 0;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .blog-meta {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          font-size: 11px;
-          color: #6c757d;
-          margin-bottom: 6px;
-        }
-        .blog-excerpt {
-          font-size: 12px;
-          line-height: 1.5;
-          color: #6c757d;
-          margin-bottom: 10px;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .read-more-btn-gold {
-          margin-top: auto;
-          width: 100%;
-          padding: 6px 0;
-          border: none;
-          border-radius: 999px;
-          background-color: #5e2e10;
-          color: #fff;
-          font-size: 12px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
+        
         .read-more-btn-gold:hover {
-          background-color: #3d1f0a;
           transform: translateY(-2px);
           box-shadow: 0 5px 15px rgba(94, 46, 16, 0.3);
+          background-color: #3d1f0a !important;
         }
 
+        /* Write a blog button (banner er upor, tai white bg + brand text) */
         .write-blog-btn {
-          background-color: #fff;
+          background-color: #ffffff;
           color: #5e2e10;
           border: none;
-          transition: all 0.2s ease;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
+
         .write-blog-btn:hover {
           background-color: #5e2e10;
-          color: #fff;
+          color: #ffffff;
           transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
-
-        /* Modal */
-        .blog-modal-backdrop {
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.6);
-          z-index: 2000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 16px;
-          animation: fadeIn 0.2s ease;
-        }
-        .blog-modal {
-          position: relative;
-          background: #fff;
-          border-radius: 16px;
-          width: 100%;
-          max-width: 760px;
-          max-height: 90vh;
-          overflow-y: auto;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-        .blog-modal-close {
-          position: absolute;
-          top: 10px;
-          right: 12px;
-          width: 36px;
-          height: 36px;
-          border: none;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.9);
-          color: #5e2e10;
-          font-size: 24px;
-          line-height: 1;
-          z-index: 1;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .blog-modal-img { width: 100%; height: 280px; object-fit: cover; }
-        .blog-modal-body { padding: 20px 24px 28px; color: #444; line-height: 1.7; }
-        .blog-modal-title { font-size: 1.6rem; font-weight: 700; color: #2c3e50; margin: 6px 0 8px; }
-        .blog-modal-heading { color: #5e2e10; font-weight: 700; margin-top: 12px; }
-
+        
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .blog-card {
+          animation: fadeInUp 0.5s ease-out;
+          animation-fill-mode: backwards;
+        }
+        
+        .blog-card:nth-child(1) { animation-delay: 0.1s; }
+        .blog-card:nth-child(2) { animation-delay: 0.2s; }
+        .blog-card:nth-child(3) { animation-delay: 0.3s; }
+        .blog-card:nth-child(4) { animation-delay: 0.4s; }
+        .blog-card:nth-child(5) { animation-delay: 0.5s; }
+        .blog-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 991px) {
+          .blog-img-wrapper img {
+            height: 140px !important;
+          }
+        }
 
+        @media (max-width: 768px) {
+          .blog-card-title {
+            font-size: 1rem !important;
+          }
+          .blog-info {
+            padding: 0.75rem !important;
+          }
+          .blog-img-wrapper img {
+            height: 130px !important;
+          }
+        }
+        
         @media (max-width: 576px) {
-          .blog-modal-img { height: 200px; }
-          .blog-modal-body { padding: 16px; }
-          .blog-modal-title { font-size: 1.3rem; }
+          .blog-img-wrapper img {
+            height: 160px !important; /* 🔥 INCREASED FROM 120px TO 160px for Mobile */
+          }
+          .blog-info {
+            padding: 0.8rem !important; /* 🔥 Slightly increased padding for mobile */
+          }
+          .blog-card-title {
+            font-size: 1.1rem !important; /* 🔥 Slightly increased font size for mobile */
+          }
         }
       `}</style>
     </>

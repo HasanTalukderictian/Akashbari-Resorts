@@ -1,857 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import Header from './Header';
-// import Sidebar from './Sidebar';
-// import Footer from './Footer';
-
-// const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-
-// const Teamate = ({ theme: propsTheme }) => {
-//     const [isCollapsed, setIsCollapsed] = useState(false);
-//     const [isDarkMode, setIsDarkMode] = useState(false);
-//     const [showModal, setShowModal] = useState(false);
-//     const [editingItem, setEditingItem] = useState(null);
-//     const [searchTerm, setSearchTerm] = useState('');
-//     const [currentPage, setCurrentPage] = useState(1);
-//     const itemsPerPage = 5;
-//     const [loading, setLoading] = useState(false);
-//     const [teamMembers, setTeamMembers] = useState([]);
-//     const [authError, setAuthError] = useState(null);
-
-//     // Form State
-//     const [formData, setFormData] = useState({
-//         id: '',
-//         name: '',
-//         designation: '',
-//         subtitle: '',
-//         image: '',
-//         imagePreview: null
-//     });
-
-//     const theme = propsTheme || {
-//         isDarkMode: isDarkMode,
-//         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-//         card: isDarkMode ? '#16213e' : '#ffffff',
-//         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-//         border: isDarkMode ? '#2d3436' : '#ebedf2',
-//         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
-//         primary: '#5e2e10',
-//         primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)',
-//         danger: '#ef4444',
-//         success: '#10b981',
-//         warning: '#f59e0b'
-//     };
-
-//     // Get authentication headers
-//     const getAuthHeaders = () => {
-//         const token = localStorage.getItem('token');
-//         return {
-//             'Authorization': `Bearer ${token}`,
-//             'Role': localStorage.getItem('Role') || 'admin'
-//         };
-//     };
-
-//     // Get multipart headers for file upload
-//     const getMultipartHeaders = () => {
-//         const token = localStorage.getItem('token');
-//         return {
-//             'Authorization': `Bearer ${token}`,
-//             'Role': localStorage.getItem('Role') || 'admin',
-//             'Content-Type': 'multipart/form-data'
-//         };
-//     };
-
-//     // Check authentication
-//     const checkAuth = () => {
-//         const token = localStorage.getItem('token');
-//         if (!token) {
-//             setAuthError("Please login to access this page");
-//             setTimeout(() => window.location.href = '/login', 2000);
-//             return false;
-//         }
-//         return true;
-//     };
-
-//     // =========================
-//     // FETCH TEAM MEMBERS WITH AUTH
-//     // =========================
-//     const fetchTeamMembers = async () => {
-//         if (!checkAuth()) return;
-        
-//         try {
-//             setLoading(true);
-//             setAuthError(null);
-//             const headers = getAuthHeaders();
-//             const response = await axios.get(`${API_BASE_URL}/team-members`, { headers });
-            
-//             if (response.status === 401) {
-//                 localStorage.removeItem('token');
-//                 localStorage.removeItem('Role');
-//                 setAuthError("Session expired. Please login again.");
-//                 setTimeout(() => window.location.href = '/login', 2000);
-//                 return;
-//             }
-            
-//             if (response.data.status === true) {
-//                 setTeamMembers(response.data.data || []);
-//             } else {
-//                 setTeamMembers([]);
-//             }
-//         } catch (error) {
-//             console.error('Fetch error:', error);
-//             if (error.response?.status === 401) {
-//                 localStorage.removeItem('token');
-//                 localStorage.removeItem('Role');
-//                 setAuthError("Session expired. Please login again.");
-//                 setTimeout(() => window.location.href = '/login', 2000);
-//             } else {
-//                 setAuthError("Failed to fetch team members. Please try again.");
-//             }
-//             setTeamMembers([]);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchTeamMembers();
-//     }, []);
-
-//     // =========================
-//     // IMAGE CHANGE
-//     // =========================
-//     const handleImageChange = (e) => {
-//         const file = e.target.files[0];
-//         if (file) {
-//             if (file.size > 5 * 1024 * 1024) {
-//                 alert('Image size should be less than 5MB');
-//                 return;
-//             }
-//             const reader = new FileReader();
-//             reader.onloadend = () => {
-//                 setFormData({
-//                     ...formData,
-//                     image: file,
-//                     imagePreview: reader.result
-//                 });
-//             };
-//             reader.readAsDataURL(file);
-//         }
-//     };
-
-//     // =========================
-//     // OPEN MODAL
-//     // =========================
-//     const openModal = (member = null) => {
-//         if (member) {
-//             setFormData({
-//                 id: member.id,
-//                 name: member.name,
-//                 designation: member.designation,
-//                 subtitle: member.subtitle || '',
-//                 image: '',
-//                 imagePreview: member.image
-//             });
-//             setEditingItem(member);
-//         } else {
-//             setFormData({
-//                 id: '',
-//                 name: '',
-//                 designation: '',
-//                 subtitle: '',
-//                 image: '',
-//                 imagePreview: null
-//             });
-//             setEditingItem(null);
-//         }
-//         setShowModal(true);
-//     };
-
-//     // =========================
-//     // CLOSE MODAL
-//     // =========================
-//     const closeModal = () => {
-//         setShowModal(false);
-//         setFormData({
-//             id: '',
-//             name: '',
-//             designation: '',
-//             subtitle: '',
-//             image: '',
-//             imagePreview: null
-//         });
-//         setEditingItem(null);
-//     };
-
-//     // =========================
-//     // SAVE TEAM MEMBER WITH AUTH
-//     // =========================
-//     const handleSave = async (e) => {
-//         e.preventDefault();
-        
-//         if (!checkAuth()) return;
-
-//         if (!formData.name || !formData.designation) {
-//             alert('Please fill all required fields');
-//             return;
-//         }
-
-//         try {
-//             setLoading(true);
-            
-//             const payload = new FormData();
-//             payload.append('name', formData.name);
-//             payload.append('designation', formData.designation);
-//             payload.append('subtitle', formData.subtitle || '');
-
-//             if (formData.image instanceof File) {
-//                 payload.append('image', formData.image);
-//             }
-
-//             let response;
-//             const headers = getMultipartHeaders();
-
-//             // UPDATE - using your edit-team-member route
-//             if (editingItem) {
-//                 payload.append('_method', 'POST');
-//                 response = await axios.post(
-//                     `${API_BASE_URL}/edit-team-member/${editingItem.id}`,
-//                     payload,
-//                     { headers }
-//                 );
-                
-//                 if (response.status === 401) {
-//                     localStorage.removeItem('token');
-//                     localStorage.removeItem('Role');
-//                     alert("Session expired. Please login again.");
-//                     setTimeout(() => window.location.href = '/login', 2000);
-//                     return;
-//                 }
-                
-//                 if (response.data.status === true) {
-//                     alert('Team member updated successfully');
-//                     fetchTeamMembers();
-//                     closeModal();
-//                 } else {
-//                     alert(response.data.message || 'Update failed');
-//                 }
-//             } 
-//             // CREATE - using your add-team-member route
-//             else {
-//                 response = await axios.post(
-//                     `${API_BASE_URL}/add-team-member`,
-//                     payload,
-//                     { headers }
-//                 );
-                
-//                 if (response.status === 401) {
-//                     localStorage.removeItem('token');
-//                     localStorage.removeItem('Role');
-//                     alert("Session expired. Please login again.");
-//                     setTimeout(() => window.location.href = '/login', 2000);
-//                     return;
-//                 }
-                
-//                 if (response.data.status === true) {
-//                     alert('Team member created successfully');
-//                     fetchTeamMembers();
-//                     closeModal();
-//                 } else {
-//                     alert(response.data.message || 'Creation failed');
-//                 }
-//             }
-//         } catch (error) {
-//             console.error('Save error:', error);
-            
-//             if (error.response?.status === 401) {
-//                 localStorage.removeItem('token');
-//                 localStorage.removeItem('Role');
-//                 alert("Session expired. Please login again.");
-//                 setTimeout(() => window.location.href = '/login', 2000);
-//             } else if (error.response) {
-//                 if (error.response.status === 422) {
-//                     const errors = error.response.data.errors;
-//                     if (errors) {
-//                         Object.keys(errors).forEach((key) => {
-//                             alert(`${key}: ${errors[key][0]}`);
-//                         });
-//                     } else {
-//                         alert('Validation error occurred');
-//                     }
-//                 } else if (error.response.status === 500) {
-//                     alert('Server error. Please check your backend.');
-//                 } else {
-//                     alert(error.response.data?.message || 'Something went wrong');
-//                 }
-//             } else if (error.request) {
-//                 alert('No response from server. Please check if backend is running.');
-//             } else {
-//                 alert('Error: ' + error.message);
-//             }
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     // =========================
-//     // DELETE MEMBER WITH AUTH
-//     // =========================
-//     const handleDelete = async (id) => {
-//         if (!checkAuth()) return;
-        
-//         const confirmDelete = window.confirm('Are you sure you want to delete this member?');
-//         if (!confirmDelete) return;
-
-//         try {
-//             setLoading(true);
-//             const headers = getAuthHeaders();
-//             const response = await axios.delete(`${API_BASE_URL}/delete-team-member/${id}`, { headers });
-            
-//             if (response.status === 401) {
-//                 localStorage.removeItem('token');
-//                 localStorage.removeItem('Role');
-//                 alert("Session expired. Please login again.");
-//                 setTimeout(() => window.location.href = '/login', 2000);
-//                 return;
-//             }
-            
-//             if (response.data.status === true) {
-//                 alert('Team member deleted successfully');
-//                 fetchTeamMembers();
-//             } else {
-//                 alert(response.data.message || 'Delete failed');
-//             }
-//         } catch (error) {
-//             console.error('Delete error:', error);
-//             if (error.response?.status === 401) {
-//                 localStorage.removeItem('token');
-//                 localStorage.removeItem('Role');
-//                 alert("Session expired. Please login again.");
-//                 setTimeout(() => window.location.href = '/login', 2000);
-//             } else {
-//                 alert(error.response?.data?.message || 'Delete failed');
-//             }
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     // =========================
-//     // FILTER SEARCH
-//     // =========================
-//     const filteredMembers = teamMembers.filter(
-//         (member) =>
-//             member.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//             member.designation?.toLowerCase().includes(searchTerm.toLowerCase())
-//     );
-
-//     // =========================
-//     // PAGINATION
-//     // =========================
-//     const indexOfLastItem = currentPage * itemsPerPage;
-//     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//     const currentItems = filteredMembers.slice(indexOfFirstItem, indexOfLastItem);
-//     const totalPages = Math.ceil(filteredMembers.length / itemsPerPage);
-
-//     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-//     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
-//     // =========================
-//     // STYLES
-//     // =========================
-//     const styles = {
-//         container: {
-//             backgroundColor: theme.bg,
-//             minHeight: '100vh',
-//             transition: 'all 0.3s ease'
-//         },
-//         mainArea: {
-//             height: '100vh',
-//             display: 'flex',
-//             flexDirection: 'column',
-//             overflow: 'hidden'
-//         },
-//         contentContainer: {
-//             flex: 1,
-//             overflowY: 'auto',
-//             display: 'flex',
-//             flexDirection: 'column'
-//         },
-//         contentScroll: {
-//             flex: '1 0 auto',
-//             padding: '24px'
-//         },
-//         footerWrapper: {
-//             flexShrink: 0
-//         },
-//         alert: {
-//             padding: '12px 20px',
-//             backgroundColor: 'rgba(94, 46, 16, 0.15)',
-//             color: '#5e2e10',
-//             borderRadius: '8px',
-//             marginBottom: '20px',
-//             fontWeight: '500'
-//         },
-//         tableWrapper: {
-//             backgroundColor: theme.card,
-//             borderRadius: '16px',
-//             padding: '20px',
-//             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-//             marginBottom: '20px'
-//         },
-//         headerSection: {
-//             display: 'flex',
-//             justifyContent: 'space-between',
-//             alignItems: 'center',
-//             marginBottom: '20px',
-//             flexWrap: 'wrap',
-//             gap: '15px'
-//         },
-//         pageTitle: {
-//             fontSize: '24px',
-//             fontWeight: '700',
-//             color: theme.text,
-//             margin: 0
-//         },
-//         addButton: {
-//             background: theme.primaryGradient,
-//             color: 'white',
-//             border: 'none',
-//             padding: '10px 24px',
-//             borderRadius: '8px',
-//             cursor: 'pointer',
-//             fontSize: '14px',
-//             fontWeight: '600',
-//             display: 'flex',
-//             alignItems: 'center',
-//             gap: '8px',
-//             boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
-//         },
-//         searchBox: {
-//             padding: '10px 15px',
-//             borderRadius: '8px',
-//             border: `1px solid ${theme.border}`,
-//             backgroundColor: theme.bg,
-//             color: theme.text,
-//             width: '250px',
-//             fontSize: '14px',
-//             outline: 'none'
-//         },
-//         table: {
-//             width: '100%',
-//             borderCollapse: 'collapse'
-//         },
-//         th: {
-//             textAlign: 'left',
-//             padding: '12px',
-//             borderBottom: `2px solid ${theme.border}`,
-//             color: theme.text,
-//             fontWeight: '600'
-//         },
-//         td: {
-//             padding: '12px',
-//             borderBottom: `1px solid ${theme.border}`,
-//             color: theme.text
-//         },
-//         memberImage: {
-//             width: '50px',
-//             height: '50px',
-//             borderRadius: '50%',
-//             objectFit: 'cover'
-//         },
-//         actionButtons: {
-//             display: 'flex',
-//             gap: '8px'
-//         },
-//         editBtn: {
-//             padding: '6px 12px',
-//             backgroundColor: '#5e2e10',
-//             color: 'white',
-//             border: 'none',
-//             borderRadius: '6px',
-//             cursor: 'pointer',
-//             display: 'flex',
-//             alignItems: 'center',
-//             gap: '4px',
-//             transition: 'all 0.3s ease'
-//         },
-//         deleteBtn: {
-//             padding: '6px 12px',
-//             backgroundColor: '#ef4444',
-//             color: 'white',
-//             border: 'none',
-//             borderRadius: '6px',
-//             cursor: 'pointer',
-//             display: 'flex',
-//             alignItems: 'center',
-//             gap: '4px',
-//             transition: 'all 0.3s ease'
-//         },
-//         modalOverlay: {
-//             position: 'fixed',
-//             top: 0,
-//             left: 0,
-//             right: 0,
-//             bottom: 0,
-//             backgroundColor: 'rgba(0,0,0,0.7)',
-//             display: 'flex',
-//             alignItems: 'center',
-//             justifyContent: 'center',
-//             zIndex: 1000,
-//             backdropFilter: 'blur(5px)'
-//         },
-//         modal: {
-//             backgroundColor: theme.card,
-//             borderRadius: '16px',
-//             width: '500px',
-//             maxWidth: '90%',
-//             maxHeight: '90vh',
-//             overflowY: 'auto'
-//         },
-//         modalHeader: {
-//             padding: '20px',
-//             borderBottom: `1px solid ${theme.border}`,
-//             display: 'flex',
-//             justifyContent: 'space-between',
-//             alignItems: 'center'
-//         },
-//         modalBody: {
-//             padding: '20px'
-//         },
-//         modalFooter: {
-//             padding: '20px',
-//             borderTop: `1px solid ${theme.border}`,
-//             display: 'flex',
-//             justifyContent: 'flex-end',
-//             gap: '10px'
-//         },
-//         input: {
-//             width: '100%',
-//             padding: '10px',
-//             borderRadius: '8px',
-//             border: `1px solid ${theme.border}`,
-//             backgroundColor: theme.bg,
-//             color: theme.text,
-//             marginBottom: '15px',
-//             fontSize: '14px',
-//             outline: 'none'
-//         },
-//         imagePreview: {
-//             width: '100%',
-//             height: '150px',
-//             objectFit: 'cover',
-//             borderRadius: '8px',
-//             marginBottom: '10px'
-//         },
-//         loadingSpinner: {
-//             textAlign: 'center',
-//             padding: '40px',
-//             color: theme.text
-//         },
-//         disabledBtn: {
-//             opacity: 0.6,
-//             cursor: 'not-allowed'
-//         }
-//     };
-
-//     // Hover handlers
-//     const handleButtonHover = (e, color) => {
-//         e.currentTarget.style.backgroundColor = color;
-//         e.currentTarget.style.transform = 'translateY(-2px)';
-//     };
-
-//     const handleButtonLeave = (e, color) => {
-//         e.currentTarget.style.backgroundColor = color;
-//         e.currentTarget.style.transform = 'translateY(0)';
-//     };
-
-//     return (
-//         <div style={styles.container} className="container-fluid p-0">
-//             <div className="d-flex">
-//                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="users" />
-
-//                 <div style={styles.mainArea} className="flex-grow-1">
-//                     <Header
-//                         theme={theme}
-//                         isDarkMode={isDarkMode}
-//                         toggleDarkMode={toggleDarkMode}
-//                         toggleSidebar={toggleSidebar}
-//                     />
-
-//                     <div style={styles.contentContainer}>
-//                         <div style={styles.contentScroll}>
-//                             <div style={styles.tableWrapper}>
-//                                 <div style={styles.headerSection}>
-//                                     <h2 style={styles.pageTitle}>👥 Team Members</h2>
-//                                     <div style={{ display: 'flex', gap: '10px' }}>
-//                                         <input
-//                                             type="text"
-//                                             placeholder="🔍 Search..."
-//                                             style={styles.searchBox}
-//                                             value={searchTerm}
-//                                             onChange={(e) => {
-//                                                 setSearchTerm(e.target.value);
-//                                                 setCurrentPage(1);
-//                                             }}
-//                                         />
-//                                         <button 
-//                                             style={styles.addButton} 
-//                                             onClick={() => openModal()}
-//                                             disabled={loading}
-//                                             onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-//                                             onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-//                                         >
-//                                             ➕ Add Member
-//                                         </button>
-//                                     </div>
-//                                 </div>
-
-//                                 {/* Auth Error Display */}
-//                                 {authError && (
-//                                     <div style={styles.alert}>
-//                                         <i className="bi bi-exclamation-triangle-fill me-2"></i>
-//                                         {authError}
-//                                     </div>
-//                                 )}
-
-//                                 {loading && teamMembers.length === 0 ? (
-//                                     <div style={styles.loadingSpinner}>
-//                                         <div className="spinner-border text-primary" role="status">
-//                                             <span className="visually-hidden">Loading...</span>
-//                                         </div>
-//                                         <p>Loading team members...</p>
-//                                     </div>
-//                                 ) : (
-//                                     <div style={{ overflowX: 'auto' }}>
-//                                         <table style={styles.table}>
-//                                             <thead>
-//                                                 <tr>
-//                                                     <th style={styles.th}>Image</th>
-//                                                     <th style={styles.th}>Name</th>
-//                                                     <th style={styles.th}>Designation</th>
-//                                                     <th style={styles.th}>Subtitle</th>
-//                                                     <th style={styles.th}>Actions</th>
-//                                                 </tr>
-//                                             </thead>
-//                                             <tbody>
-//                                                 {currentItems.length > 0 ? (
-//                                                     currentItems.map((member) => (
-//                                                         <tr key={member.id}>
-//                                                             <td style={styles.td}>
-//                                                                 <img
-//                                                                     src={member.image}
-//                                                                     alt={member.name}
-//                                                                     style={styles.memberImage}
-//                                                                     onError={(e) => {
-//                                                                         e.target.src = 'https://via.placeholder.com/50?text=No+Image';
-//                                                                     }}
-//                                                                 />
-//                                                             </td>
-//                                                             <td style={styles.td}>
-//                                                                 <strong>{member.name}</strong>
-//                                                             </td>
-//                                                             <td style={styles.td}>{member.designation}</td>
-//                                                             <td style={styles.td}>{member.subtitle}</td>
-//                                                             <td style={styles.td}>
-//                                                                 <div style={styles.actionButtons}>
-//                                                                     <button 
-//                                                                         style={styles.editBtn} 
-//                                                                         onClick={() => openModal(member)}
-//                                                                         disabled={loading}
-//                                                                         onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-//                                                                         onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-//                                                                     >
-//                                                                         ✏️ Edit
-//                                                                     </button>
-//                                                                     <button 
-//                                                                         style={styles.deleteBtn} 
-//                                                                         onClick={() => handleDelete(member.id)}
-//                                                                         disabled={loading}
-//                                                                         onMouseEnter={(e) => {
-//                                                                             e.currentTarget.style.backgroundColor = '#c82333';
-//                                                                             e.currentTarget.style.transform = 'translateY(-2px)';
-//                                                                         }}
-//                                                                         onMouseLeave={(e) => {
-//                                                                             e.currentTarget.style.backgroundColor = '#ef4444';
-//                                                                             e.currentTarget.style.transform = 'translateY(0)';
-//                                                                         }}
-//                                                                     >
-//                                                                         🗑️ Delete
-//                                                                     </button>
-//                                                                 </div>
-//                                                             </td>
-//                                                         </tr>
-//                                                     ))
-//                                                 ) : (
-//                                                     <tr>
-//                                                         <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: theme.text }}>
-//                                                             📭 No team members found
-//                                                             <br />
-//                                                             <button 
-//                                                                 style={{ ...styles.addButton, marginTop: '10px' }} 
-//                                                                 onClick={() => openModal()}
-//                                                                 disabled={loading}
-//                                                                 onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-//                                                                 onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-//                                                             >
-//                                                                 Add your first team member
-//                                                             </button>
-//                                                         </td>
-//                                                     </tr>
-//                                                 )}
-//                                             </tbody>
-//                                         </table>
-//                                     </div>
-//                                 )}
-
-//                                 {/* Pagination */}
-//                                 {totalPages > 1 && (
-//                                     <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
-//                                         <button
-//                                             style={{...styles.editBtn, ...(currentPage === 1 && styles.disabledBtn)}}
-//                                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-//                                             disabled={currentPage === 1 || loading}
-//                                             onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-//                                             onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-//                                         >
-//                                             ← Previous
-//                                         </button>
-//                                         <span style={{ padding: '6px 12px', color: theme.text }}>
-//                                             Page {currentPage} of {totalPages}
-//                                         </span>
-//                                         <button
-//                                             style={{...styles.editBtn, ...(currentPage === totalPages && styles.disabledBtn)}}
-//                                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-//                                             disabled={currentPage === totalPages || loading}
-//                                             onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-//                                             onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-//                                         >
-//                                             Next →
-//                                         </button>
-//                                     </div>
-//                                 )}
-//                             </div>
-//                         </div>
-
-//                         <div style={styles.footerWrapper}>
-//                             <Footer theme={theme} />
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-
-//             {/* MODAL */}
-//             {showModal && (
-//                 <div style={styles.modalOverlay} onClick={closeModal}>
-//                     <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-//                         <form onSubmit={handleSave}>
-//                             <div style={styles.modalHeader}>
-//                                 <h3 style={{ color: theme.text, margin: 0 }}>
-//                                     {editingItem ? '✏️ Edit Team Member' : '➕ Add Team Member'}
-//                                 </h3>
-//                                 <button
-//                                     type="button"
-//                                     onClick={closeModal}
-//                                     style={{
-//                                         background: 'none',
-//                                         border: 'none',
-//                                         fontSize: '22px',
-//                                         cursor: 'pointer',
-//                                         color: theme.text
-//                                     }}
-//                                 >
-//                                     ×
-//                                 </button>
-//                             </div>
-
-//                             <div style={styles.modalBody}>
-//                                 {formData.imagePreview && (
-//                                     <img src={formData.imagePreview} alt="Preview" style={styles.imagePreview} />
-//                                 )}
-                                
-//                                 <input
-//                                     type="file"
-//                                     accept="image/*"
-//                                     onChange={handleImageChange}
-//                                     style={styles.input}
-//                                     disabled={loading}
-//                                 />
-                                
-//                                 <input
-//                                     type="text"
-//                                     placeholder="Name *"
-//                                     value={formData.name}
-//                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-//                                     style={styles.input}
-//                                     required
-//                                     disabled={loading}
-//                                 />
-                                
-//                                 <input
-//                                     type="text"
-//                                     placeholder="Designation *"
-//                                     value={formData.designation}
-//                                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-//                                     style={styles.input}
-//                                     required
-//                                     disabled={loading}
-//                                 />
-                                
-//                                 <textarea
-//                                     rows="4"
-//                                     placeholder="Subtitle / Bio"
-//                                     value={formData.subtitle}
-//                                     onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-//                                     style={styles.input}
-//                                     disabled={loading}
-//                                 />
-//                             </div>
-
-//                             <div style={styles.modalFooter}>
-//                                 <button
-//                                     type="button"
-//                                     onClick={closeModal}
-//                                     style={{
-//                                         padding: '10px 20px',
-//                                         border: 'none',
-//                                         borderRadius: '8px',
-//                                         cursor: 'pointer',
-//                                         backgroundColor: '#6c757d',
-//                                         color: 'white'
-//                                     }}
-//                                     disabled={loading}
-//                                 >
-//                                     Cancel
-//                                 </button>
-//                                 <button 
-//                                     type="submit" 
-//                                     style={{...styles.addButton, ...(loading && styles.disabledBtn)}}
-//                                     disabled={loading}
-//                                     onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-//                                     onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-//                                 >
-//                                     {loading ? (
-//                                         <>
-//                                             <span className="spinner-border spinner-border-sm me-2"></span>
-//                                             {editingItem ? 'Updating...' : 'Saving...'}
-//                                         </>
-//                                     ) : (
-//                                         editingItem ? 'Update' : 'Save'
-//                                     )}
-//                                 </button>
-//                             </div>
-//                         </form>
-//                     </div>
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default Teamate;
-
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -859,7 +6,27 @@ import Footer from './Footer';
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URL;
 const ITEMS_PER_PAGE = 5;
-const EMPTY_FORM = { id: '', name: '', designation: '', subtitle: '', image: '', imagePreview: null };
+const MAX_IMAGE_MB = 2; // backend এর সাথে মিল (max:2048)
+
+const EMPTY_FORM = {
+    id: '', name: '', designation: '', subtitle: '',
+    phone: '', email: '', department: '', company: '', team_name: '',
+    image: '', imagePreview: null
+};
+
+const TEXT_FIELDS = ['name', 'designation', 'subtitle', 'phone', 'email', 'department', 'company', 'team_name'];
+const SEARCH_FIELDS = ['name', 'designation', 'email', 'phone', 'department', 'company', 'team_name'];
+const TABLE_HEADERS = ['Image', 'Name', 'Team', 'Department / Company', 'Contact', 'Actions'];
+
+const AVATAR_PLACEHOLDER =
+    'data:image/svg+xml;charset=UTF-8,' +
+    encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+            <rect width="100%" height="100%" fill="#dcdcdc"/>
+            <text x="50%" y="54%" fill="#6b6b6b" font-family="sans-serif" font-size="20"
+              text-anchor="middle" dominant-baseline="middle">?</text>
+        </svg>`
+    );
 
 const getAuthHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -879,7 +46,7 @@ const Modal = ({ theme, title, onClose, children, footer }) => (
         <div style={{
             backgroundColor: theme.card, color: theme.text,
             border: `1px solid ${theme.border}`, borderRadius: '16px',
-            width: '100%', maxWidth: '480px', maxHeight: '90vh',
+            width: '100%', maxWidth: '560px', maxHeight: '90vh',
             display: 'flex', flexDirection: 'column', animation: 'slideUp .2s ease'
         }}>
             <div style={{
@@ -887,7 +54,7 @@ const Modal = ({ theme, title, onClose, children, footer }) => (
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center'
             }}>
                 <h5 className="m-0 fw-bold">{title}</h5>
-                <button onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '20px', color: theme.text, opacity: 0.6, cursor: 'pointer' }}>✕</button>
+                <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '20px', color: theme.text, opacity: 0.6, cursor: 'pointer' }}>✕</button>
             </div>
             <div style={{ padding: '22px', overflowY: 'auto' }}>{children}</div>
             {footer && (
@@ -908,6 +75,7 @@ const Teamate = ({ theme: propsTheme }) => {
     const [authError, setAuthError] = useState(null);
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [teamFilter, setTeamFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
     const [showModal, setShowModal] = useState(false);
@@ -933,6 +101,11 @@ const Teamate = ({ theme: propsTheme }) => {
         width: '100%', padding: '10px 14px', borderRadius: '10px',
         border: `1px solid ${theme.border}`, backgroundColor: theme.bg,
         color: theme.text, marginBottom: '14px', fontSize: '14px', outline: 'none'
+    };
+    const labelStyle = { fontSize: '12px', fontWeight: 600, color: theme.textLight, marginBottom: '4px', display: 'block' };
+    const pillStyle = {
+        fontSize: '11px', border: `1px solid ${theme.border}`, borderRadius: '999px',
+        padding: '2px 10px', display: 'inline-block', whiteSpace: 'nowrap', color: theme.text
     };
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -978,21 +151,39 @@ const Teamate = ({ theme: propsTheme }) => {
 
     useEffect(() => { fetchTeamMembers(); }, []);
 
+    const setField = (key) => (e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }));
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        if (file.size > 5 * 1024 * 1024) return showToast('Image size should be less than 5MB', 'error');
+        if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+            e.target.value = '';
+            return showToast(`Image size should be less than ${MAX_IMAGE_MB}MB`, 'error');
+        }
         const reader = new FileReader();
-        reader.onloadend = () => setFormData({ ...formData, image: file, imagePreview: reader.result });
+        reader.onloadend = () => setFormData((prev) => ({ ...prev, image: file, imagePreview: reader.result }));
         reader.readAsDataURL(file);
     };
 
     const openModal = (member = null) => {
         if (member) {
-            setFormData({ id: member.id, name: member.name, designation: member.designation, subtitle: member.subtitle || '', image: '', imagePreview: member.image });
+            setFormData({
+                id: member.id,
+                name: member.name || '',
+                designation: member.designation || '',
+                subtitle: member.subtitle || '',
+                phone: member.phone || '',
+                email: member.email || '',
+                department: member.department || '',
+                company: member.company || '',
+                team_name: member.team_name || '',
+                image: '',
+                imagePreview: member.image
+            });
             setEditingItem(member);
         } else {
-            setFormData(EMPTY_FORM);
+            // নতুন member: filter এ কোনো team select করা থাকলে সেটাই default
+            setFormData({ ...EMPTY_FORM, team_name: teamFilter });
             setEditingItem(null);
         }
         setShowModal(true);
@@ -1003,20 +194,22 @@ const Teamate = ({ theme: propsTheme }) => {
     const handleSave = async (e) => {
         e.preventDefault();
         if (!checkAuth()) return;
-        if (!formData.name || !formData.designation) return showToast('Please fill all required fields', 'error');
+        if (!formData.name.trim() || !formData.designation.trim()) {
+            return showToast('Name and Designation are required', 'error');
+        }
+        if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+            return showToast('Please enter a valid email', 'error');
+        }
 
         setLoading(true);
         const payload = new FormData();
-        payload.append('name', formData.name);
-        payload.append('designation', formData.designation);
-        payload.append('subtitle', formData.subtitle || '');
+        TEXT_FIELDS.forEach((key) => payload.append(key, (formData[key] || '').trim()));
         if (formData.image instanceof File) payload.append('image', formData.image);
 
         try {
             const url = editingItem
                 ? `${API_BASE_URL}/edit-team-member/${editingItem.id}`
                 : `${API_BASE_URL}/add-team-member`;
-            if (editingItem) payload.append('_method', 'POST');
 
             const res = await axios.post(url, payload, { headers: getMultipartHeaders() });
             if (res.data.status === true) {
@@ -1033,6 +226,8 @@ const Teamate = ({ theme: propsTheme }) => {
             } else if (err.response?.status === 422 && err.response.data.errors) {
                 const firstError = Object.values(err.response.data.errors)[0][0];
                 showToast(firstError, 'error');
+            } else if (err.response?.status === 429) {
+                showToast('Too many requests. Please wait a moment.', 'error');
             } else if (err.response) {
                 showToast(err.response.data?.message || 'Something went wrong', 'error');
             } else if (err.request) {
@@ -1066,13 +261,25 @@ const Teamate = ({ theme: propsTheme }) => {
         }
     };
 
-    const filteredMembers = teamMembers.filter(m =>
-        m.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.designation?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // আগে থেকে থাকা team নাম (datalist suggestion + filter dropdown এর জন্য)
+    const teamNames = [...new Set(teamMembers.map((m) => m.team_name?.trim()).filter(Boolean))].sort();
+
+    const q = searchTerm.trim().toLowerCase();
+    const filteredMembers = teamMembers.filter((m) => {
+        const matchesTeam = !teamFilter || m.team_name?.trim() === teamFilter;
+        const matchesSearch = !q || SEARCH_FIELDS.some((k) => m[k]?.toString().toLowerCase().includes(q));
+        return matchesTeam && matchesSearch;
+    });
     const totalPages = Math.ceil(filteredMembers.length / ITEMS_PER_PAGE);
     const indexOfFirstItem = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentItems = filteredMembers.slice(indexOfFirstItem, indexOfFirstItem + ITEMS_PER_PAGE);
+
+    // delete এর পর শেষ page খালি হয়ে গেলে আগের page এ ফিরে যাও
+    useEffect(() => {
+        if (currentPage > 1 && currentPage > totalPages) setCurrentPage(Math.max(1, totalPages));
+    }, [totalPages, currentPage]);
+
+    const dash = <span style={{ color: theme.textLight }}>—</span>;
 
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }} className="container-fluid p-0">
@@ -1086,14 +293,27 @@ const Teamate = ({ theme: propsTheme }) => {
                         <div style={{ padding: '24px' }}>
                             <div style={{ backgroundColor: theme.card, border: `1px solid ${theme.border}`, borderRadius: '16px', padding: '20px' }}>
                                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
-                                    <h2 style={{ fontSize: '22px', fontWeight: 700, color: theme.text, margin: 0 }}>Team Members</h2>
-                                    <div className="d-flex gap-2">
+                                    <h2 style={{ fontSize: '22px', fontWeight: 700, color: theme.text, margin: 0 }}>
+                                        Team Members
+                                        <span style={{ fontSize: '13px', fontWeight: 500, color: theme.textLight, marginLeft: '8px' }}>
+                                            ({filteredMembers.length})
+                                        </span>
+                                    </h2>
+                                    <div className="d-flex gap-2 flex-wrap">
+                                        <select
+                                            value={teamFilter}
+                                            onChange={(e) => { setTeamFilter(e.target.value); setCurrentPage(1); }}
+                                            style={{ ...fieldStyle, width: '180px', marginBottom: 0 }}
+                                        >
+                                            <option value="">All Teams</option>
+                                            {teamNames.map((t) => <option key={t} value={t}>{t}</option>)}
+                                        </select>
                                         <input
                                             type="text"
-                                            placeholder="Search..."
+                                            placeholder="Search name, email, team..."
                                             value={searchTerm}
                                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                                            style={{ ...fieldStyle, width: '220px', marginBottom: 0 }}
+                                            style={{ ...fieldStyle, width: '240px', marginBottom: 0 }}
                                         />
                                         <button
                                             onClick={() => openModal()}
@@ -1118,28 +338,59 @@ const Teamate = ({ theme: propsTheme }) => {
                                     </div>
                                 ) : (
                                     <div className="table-responsive">
-                                        <table className="table table-hover" style={{ color: theme.text, marginBottom: 0 }}>
+                                        <table className="table table-hover align-middle" style={{ color: theme.text, marginBottom: 0 }}>
                                             <thead>
                                                 <tr style={{ borderBottom: `2px solid ${theme.border}` }}>
-                                                    {['Image', 'Name', 'Designation', 'Subtitle', 'Actions'].map(h => (
-                                                        <th key={h} style={{ color: theme.text, padding: '12px' }}>{h}</th>
+                                                    {TABLE_HEADERS.map((h) => (
+                                                        <th key={h} style={{ color: theme.text, padding: '12px', whiteSpace: 'nowrap' }}>{h}</th>
                                                     ))}
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {currentItems.length > 0 ? currentItems.map(member => (
+                                                {currentItems.length > 0 ? currentItems.map((member) => (
                                                     <tr key={member.id} style={{ borderColor: theme.border }}>
                                                         <td style={{ padding: '12px' }}>
                                                             <img
-                                                                src={member.image}
+                                                                src={member.image || AVATAR_PLACEHOLDER}
                                                                 alt={member.name}
                                                                 style={{ width: '46px', height: '46px', borderRadius: '50%', objectFit: 'cover', border: `1px solid ${theme.border}` }}
-                                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=No+Image'; }}
+                                                                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = AVATAR_PLACEHOLDER; }}
                                                             />
                                                         </td>
-                                                        <td style={{ padding: '12px', color: theme.text }}><strong>{member.name}</strong></td>
-                                                        <td style={{ padding: '12px', color: theme.text }}>{member.designation}</td>
-                                                        <td style={{ padding: '12px', color: theme.textLight }}>{member.subtitle}</td>
+
+                                                        <td style={{ padding: '12px', color: theme.text }}>
+                                                            <strong>{member.name}</strong>
+                                                            <div style={{ fontSize: '12px', color: theme.textLight }}>{member.designation}</div>
+                                                        </td>
+
+                                                        <td style={{ padding: '12px' }}>
+                                                            {member.team_name ? <span style={pillStyle}>{member.team_name}</span> : dash}
+                                                        </td>
+
+                                                        <td style={{ padding: '12px', color: theme.text, fontSize: '13px' }}>
+                                                            <div>{member.department || dash}</div>
+                                                            <div style={{ fontSize: '12px', color: theme.textLight }}>{member.company}</div>
+                                                        </td>
+
+                                                        <td style={{ padding: '12px', fontSize: '13px' }}>
+                                                            {member.phone || member.email ? (
+                                                                <>
+                                                                    {member.phone && (
+                                                                        <div>
+                                                                            <i className="bi bi-telephone me-1"></i>
+                                                                            <a href={`tel:${member.phone}`} style={{ color: theme.text, textDecoration: 'none' }}>{member.phone}</a>
+                                                                        </div>
+                                                                    )}
+                                                                    {member.email && (
+                                                                        <div>
+                                                                            <i className="bi bi-envelope me-1"></i>
+                                                                            <a href={`mailto:${member.email}`} style={{ color: theme.textLight, textDecoration: 'none' }}>{member.email}</a>
+                                                                        </div>
+                                                                    )}
+                                                                </>
+                                                            ) : dash}
+                                                        </td>
+
                                                         <td style={{ padding: '12px' }}>
                                                             <div className="d-flex gap-2">
                                                                 <button className="btn btn-sm btn-outline-dark" onClick={() => openModal(member)} disabled={loading}>
@@ -1153,13 +404,22 @@ const Teamate = ({ theme: propsTheme }) => {
                                                     </tr>
                                                 )) : (
                                                     <tr>
-                                                        <td colSpan="5" className="text-center py-5" style={{ color: theme.textLight }}>
+                                                        <td colSpan={TABLE_HEADERS.length} className="text-center py-5" style={{ color: theme.textLight }}>
                                                             <i className="bi bi-people display-4 d-block mb-3" style={{ opacity: 0.4 }}></i>
-                                                            No team members found
+                                                            {searchTerm || teamFilter ? 'No members match your filter' : 'No team members found'}
                                                             <div className="mt-3">
-                                                                <button onClick={() => openModal()} disabled={loading} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 20px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
-                                                                    Add your first team member
-                                                                </button>
+                                                                {searchTerm || teamFilter ? (
+                                                                    <button
+                                                                        className="btn btn-outline-dark"
+                                                                        onClick={() => { setSearchTerm(''); setTeamFilter(''); setCurrentPage(1); }}
+                                                                    >
+                                                                        Clear filters
+                                                                    </button>
+                                                                ) : (
+                                                                    <button onClick={() => openModal()} disabled={loading} style={{ backgroundColor: accent, color: accentOn, border: 'none', padding: '10px 20px', borderRadius: '10px', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+                                                                        Add your first team member
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1171,11 +431,11 @@ const Teamate = ({ theme: propsTheme }) => {
 
                                 {totalPages > 1 && (
                                     <div className="d-flex justify-content-center align-items-center gap-3 mt-4">
-                                        <button className="btn btn-sm btn-outline-dark" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading}>
+                                        <button className="btn btn-sm btn-outline-dark" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1 || loading}>
                                             ← Previous
                                         </button>
                                         <span style={{ color: theme.textLight, fontSize: '13px' }}>Page {currentPage} of {totalPages}</span>
-                                        <button className="btn btn-sm btn-outline-dark" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || loading}>
+                                        <button className="btn btn-sm btn-outline-dark" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || loading}>
                                             Next →
                                         </button>
                                     </div>
@@ -1204,10 +464,58 @@ const Teamate = ({ theme: propsTheme }) => {
                         {formData.imagePreview && (
                             <img src={formData.imagePreview} alt="Preview" style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '10px', marginBottom: '14px', border: `1px solid ${theme.border}` }} />
                         )}
-                        <input type="file" accept="image/*" onChange={handleImageChange} style={fieldStyle} disabled={loading} />
-                        <input type="text" placeholder="Name *" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} style={fieldStyle} required disabled={loading} />
-                        <input type="text" placeholder="Designation *" value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} style={fieldStyle} required disabled={loading} />
-                        <textarea rows="4" placeholder="Subtitle / Bio" value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} style={{ ...fieldStyle, marginBottom: 0 }} disabled={loading} />
+
+                        <label style={labelStyle}>Photo (max {MAX_IMAGE_MB}MB)</label>
+                        <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleImageChange} style={fieldStyle} disabled={loading} />
+
+                        <div className="row g-2">
+                            <div className="col-sm-6">
+                                <label style={labelStyle}>Name *</label>
+                                <input type="text" value={formData.name} onChange={setField('name')} style={fieldStyle} required disabled={loading} />
+                            </div>
+                            <div className="col-sm-6">
+                                <label style={labelStyle}>Designation *</label>
+                                <input type="text" value={formData.designation} onChange={setField('designation')} style={fieldStyle} required disabled={loading} />
+                            </div>
+
+                            <div className="col-12">
+                                <label style={labelStyle}>Team Name</label>
+                                <input
+                                    type="text"
+                                    list="team-name-options"
+                                    placeholder="e.g. Management Team"
+                                    value={formData.team_name}
+                                    onChange={setField('team_name')}
+                                    style={fieldStyle}
+                                    maxLength={255}
+                                    disabled={loading}
+                                />
+                                <datalist id="team-name-options">
+                                    {teamNames.map((t) => <option key={t} value={t} />)}
+                                </datalist>
+                            </div>
+
+                            <div className="col-sm-6">
+                                <label style={labelStyle}>Phone</label>
+                                <input type="tel" placeholder="+8801XXXXXXXXX" value={formData.phone} onChange={setField('phone')} style={fieldStyle} maxLength={20} disabled={loading} />
+                            </div>
+                            <div className="col-sm-6">
+                                <label style={labelStyle}>Email</label>
+                                <input type="email" placeholder="name@example.com" value={formData.email} onChange={setField('email')} style={fieldStyle} disabled={loading} />
+                            </div>
+
+                            <div className="col-sm-6">
+                                <label style={labelStyle}>Department</label>
+                                <input type="text" placeholder="e.g. Sales, HR" value={formData.department} onChange={setField('department')} style={fieldStyle} disabled={loading} />
+                            </div>
+                            <div className="col-sm-6">
+                                <label style={labelStyle}>Company</label>
+                                <input type="text" placeholder="e.g. Akashbari Global Services" value={formData.company} onChange={setField('company')} style={fieldStyle} disabled={loading} />
+                            </div>
+                        </div>
+
+                        <label style={labelStyle}>Subtitle / Bio</label>
+                        <textarea rows="3" value={formData.subtitle} onChange={setField('subtitle')} style={{ ...fieldStyle, marginBottom: 0 }} disabled={loading} />
                     </Modal>
                 </form>
             )}
@@ -1253,9 +561,10 @@ const Teamate = ({ theme: propsTheme }) => {
             {/* Toast */}
             {toast.show && (
                 <div style={{
-                    position: 'fixed', bottom: '20px', right: '20px', zIndex: 2000,
+                    position: 'fixed', bottom: '20px', right: '20px', zIndex: 2100,
                     padding: '12px 20px', borderRadius: '10px', fontSize: '14px', fontWeight: 500,
-                    backgroundColor: accent, color: accentOn
+                    backgroundColor: toast.type === 'error' ? '#b42318' : accent,
+                    color: toast.type === 'error' ? '#fff' : accentOn
                 }}>
                     {toast.message}
                 </div>
@@ -1264,7 +573,6 @@ const Teamate = ({ theme: propsTheme }) => {
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes slideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-                .form-control, .form-select { background-color: ${theme.bg} !important; color: ${theme.text} !important; border-color: ${theme.border} !important; }
                 .table tbody tr:hover { background-color: ${theme.isDarkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'} !important; }
             `}</style>
         </div>
