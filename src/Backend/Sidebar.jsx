@@ -1,245 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import { NavLink, useLocation } from 'react-router-dom';
-// import { FaBuilding } from "react-icons/fa";
-
-// const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
-//     // Sub-menu open/close state
-//     const [isLandingOpen, setIsLandingOpen] = useState(false);
-//     const [isClubOpen, setIsClubOpen] = useState(false);
-//     const location = useLocation();
-
-//     const menuItems = [
-//         { id: 'dashboard', label: 'Dashboard', icon: 'bi bi-speedometer2', path: '/dashboard' },
-//         { id: 'users', label: 'Users', icon: 'bi bi-people-fill', path: '/users' },
-//         { id: 'gallery', label: 'Gallery', icon: 'bi bi-images', path: '/admin-gallery' },
-//         { id: 'query', label: 'Package Query', icon: 'bi bi-images', path: '/package-query' },
-//         { id: 'project', label: 'Project View', icon: 'bi bi-images', path: '/admin-project-view' },
-//         { id: 'blog', label: 'Blog Page', icon: 'bi bi-newspaper', path: '/admin-blog' },
-//         { id: 'notice', label: 'Notice', icon: 'bi bi-megaphone-fill', path: '/admin-notice' },
-//         { id: 'statistics', label: 'Price statistics', icon: 'bi bi-graph-up', path: '/admin-stat' },
-//         { id: 'affilites', label: 'Affiliates', icon: 'bi bi-share-fill', path: '/admin-affilites' },
-//         { id: 'sister', label: 'Sister Concers', icon: 'bi bi-people-fill', path: '/admin-sister' },
-//         { id: 'events', label: 'Events', icon: 'bi bi-calendar-event', path: '/admin-events' },
-//         { id: 'teams', label: 'Teams', icon: 'bi bi-people-fill', path: '/admin-team' },
-//         { id: 'FAQ', label: 'FAQ', icon: 'bi bi-question-circle-fill', path: '/admin-faq' },
-//         { id: 'JOB', label: 'JOB', icon: 'bi bi-pencil-square', path: '/admin-job' },
-//         { id: 'JOBQUERY', label: 'JOBQUERY', icon: 'bi bi-funnel-fill', path: '/admin-jobquery' },
-//     ];
-
-//     // Club এর সাব-মেনু আইটেম
-//     const clubSubItems = [
-//         { id: 'club-info', label: 'Club Info', icon: 'bi bi-info-circle', path: '/admin-club' },
-//         { id: 'club-gallery', label: 'Club Gallery', icon: 'bi bi-images', path: '/admin-club-gallery' },
-//         { id: 'club-rules', label: 'Club Rules', icon: 'bi bi-file-text-fill', path: '/admin-club-rules' },
-//         { id: 'club-facilities', label: 'Facilities', icon: 'bi bi-building', path: '/admin-club-facilities' },
-//         { id: 'club-committee', label: 'Committee', icon: 'bi bi-person-badge', path: '/admin-club-committee' },
-//         { id: 'club-notice', label: 'Club Notice', icon: 'bi bi-megaphone-fill', path: '/admin-club-notice' },
-//     ];
-
-//     const landingSubItems = [
-//         { id: 'content', label: 'Contents', icon: 'bi bi-files', path: '/content' },
-//         { id: 'welcome', label: 'Welcome Section', icon: 'bi bi-emoji-smile', path: '/welcome' },
-//         { id: 'video', label: 'Video Section', icon: 'bi bi-play-btn', path: '/video' },
-//         { id: 'owner', label: 'Owner Section', icon: 'bi bi-person-badge', path: '/owner-section' },
-//         { id: 'benefit', label: 'Owner Benefit', icon: 'bi bi-gem', path: '/owner-benefit' },
-//         { id: 'investment', label: 'Investment Package', icon: 'bi bi-piggy-bank', path: '/admin-investment' },
-//         { id: 'investmentbenefit', label: 'Investment Benefit', icon: 'bi bi-bar-chart-steps', path: '/admin-investmentbenefit' },
-//         { id: 'luxury', label: 'Luxury Section', icon: 'bi bi-diamond', path: '/admin-luxury' },
-//         { id: 'testo', label: 'Testo Section', icon: 'bi bi-chat-quote', path: '/admin-testo' },
-//         { id: 'client', label: 'Happy Client', icon: 'bi bi-emoji-laughing', path: '/admin-client' },
-//         { id: 'achievement', label: 'Achievement', icon: 'bi bi-trophy-fill', path: '/admin-achievement' },
-//         { id: 'investrecord', label: 'Invest Record', icon: 'bi bi-cash-stack', path: '/admin-investrecord' }
-//     ];
-
-//     // Check if any sub-menu item is active
-//     const isAnySubItemActive = (subItems) => {
-//         return subItems.some(subItem => location.pathname === subItem.path);
-//     };
-
-//     // Auto-open submenu if any sub-item is active and sidebar is not collapsed
-
-//     useEffect(() => {
-//         if (!isCollapsed) {
-//             if (isAnySubItemActive(landingSubItems)) {
-//                 setIsLandingOpen(true);
-//             }
-//             if (isAnySubItemActive(clubSubItems)) {
-//                 setIsClubOpen(true);
-//             }
-//         }
-//     }, [location.pathname, isCollapsed]);
-
-//     const sidebarBg = {
-//         width: isCollapsed ? '80px' : '260px',
-//         backgroundColor: theme?.card || '#fff',
-//         height: '100vh',
-//         transition: 'width 0.3s ease',
-//         borderRight: `1px solid ${theme?.border || '#eee'}`,
-//         overflowY: 'auto',
-//         overflowX: 'hidden'
-//     };
-
-//     const navLinkStyle = (isActive) => ({
-//         ...(styles?.navLink || {}),
-//         color: isActive ? '#fff' : theme?.sidebarText,
-//         background: isActive ? 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)' : 'transparent',
-//         borderRadius: '8px',
-//         marginBottom: '5px',
-//         textDecoration: 'none',
-//         display: 'flex',
-//         alignItems: 'center',
-//         padding: isCollapsed ? '12px 0' : '12px 20px',
-//         justifyContent: isCollapsed ? 'center' : 'flex-start',
-//         boxShadow: isActive ? '0 4px 15px rgba(94, 46, 16, 0.3)' : 'none',
-//         transition: 'all 0.3s ease',
-//         cursor: 'pointer',
-//         border: 'none',
-//         width: '100%'
-//     });
-
-//     return (
-//         <div className="d-none d-md-block shadow-sm" style={styles?.sidebar || sidebarBg}>
-
-//             {/* Logo Section */}
-//             <div className="p-4 mb-2 text-center">
-//                 {isCollapsed ? (
-//                     <div className="rounded-circle d-flex align-items-center justify-content-center mx-auto"
-//                         style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)', boxShadow: '0 4px 10px rgba(94, 46, 16, 0.3)' }}>
-//                         <span className="text-white fw-bold">D</span>
-//                     </div>
-//                 ) : (
-//                     <h3 style={{ color: '#5e2e10', fontWeight: '800', letterSpacing: '1px', margin: 0 }}>
-//                         DASHBOARD
-//                     </h3>
-//                 )}
-//             </div>
-
-//             {/* User Card */}
-//             <div className="mx-3 mb-4 p-2 d-flex align-items-center rounded-3"
-//                 style={{ backgroundColor: theme?.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f8f9fa' }}>
-//                 <img src="https://i.pravatar.cc/40?img=12"
-//                     className="rounded-circle shadow-sm"
-//                     alt="user"
-//                     style={{ border: '2px solid #5e2e10', padding: '2px' }} />
-//                 {!isCollapsed && (
-//                     <div className="ms-3 overflow-hidden">
-//                         <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Welcome</p>
-//                         <span className="text-muted" style={{ fontSize: '11px' }}>Premium Admin</span>
-//                     </div>
-//                 )}
-//             </div>
-
-//             {/* Menu Items */}
-//             <div className="px-2">
-//                 {/* Dashboard & Users */}
-//                 {menuItems.slice(0, 2).map((item) => (
-//                     <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-//                         <i className={`${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-//                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
-//                     </NavLink>
-//                 ))}
-
-//                 {/* Landing Page Mother Menu */}
-//                 <div className="w-100">
-//                     <div
-//                         onClick={() => !isCollapsed && setIsLandingOpen(!isLandingOpen)}
-//                         style={navLinkStyle(isAnySubItemActive(landingSubItems))}
-//                     >
-//                         <i className={`bi bi-browser-safari ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-//                         {!isCollapsed && (
-//                             <div className="d-flex justify-content-between align-items-center w-100">
-//                                 <span style={{ fontSize: '14px', fontWeight: '500' }}>Landing Page</span>
-//                                 <i className={`bi bi-chevron-${isLandingOpen ? 'down' : 'right'}`} style={{ fontSize: '12px' }}></i>
-//                             </div>
-//                         )}
-//                     </div>
-
-//                     {/* Landing Page Sub-items */}
-//                     {!isCollapsed && isLandingOpen && (
-//                         <div className="ms-3 ps-2 border-start" style={{ borderColor: '#5e2e10 !important' }}>
-//                             {landingSubItems.map((sub) => (
-//                                 <NavLink
-//                                     key={sub.id}
-//                                     to={sub.path}
-//                                     style={({ isActive }) => ({
-//                                         ...navLinkStyle(isActive),
-//                                         padding: '10px 15px',
-//                                         marginBottom: '2px',
-//                                         fontSize: '13px'
-//                                     })}
-//                                 >
-//                                     <i className={`${sub.icon} me-3`}></i>
-//                                     <span>{sub.label}</span>
-//                                 </NavLink>
-//                             ))}
-//                         </div>
-//                     )}
-//                 </div>
-
-//                 {/* Gallery to Sister (মেনু আইটেম) */}
-//                 {menuItems.slice(2).map((item) => (
-//                     <NavLink key={item.id} to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-//                         <i className={`${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-//                         {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.label}</span>}
-//                     </NavLink>
-//                 ))}
-
-//                 {/* Club Mother Menu - নতুন যোগ করা */}
-//                 <div className="w-100 mt-2">
-//                     <div
-//                         onClick={() => !isCollapsed && setIsClubOpen(!isClubOpen)}
-//                         style={navLinkStyle(isAnySubItemActive(clubSubItems))}
-//                     >
-//                         <i className={`bi bi-building ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-//                         {!isCollapsed && (
-//                             <div className="d-flex justify-content-between align-items-center w-100">
-//                                 <span style={{ fontSize: '14px', fontWeight: '500' }}>Club</span>
-//                                 <i className={`bi bi-chevron-${isClubOpen ? 'down' : 'right'}`} style={{ fontSize: '12px' }}></i>
-//                             </div>
-//                         )}
-//                     </div>
-
-//                     {/* Club Sub-items */}
-//                     {!isCollapsed && isClubOpen && (
-//                         <div className="ms-3 ps-2 border-start" style={{ borderColor: '#5e2e10 !important' }}>
-//                             {clubSubItems.map((sub) => (
-//                                 <NavLink
-//                                     key={sub.id}
-//                                     to={sub.path}
-//                                     style={({ isActive }) => ({
-//                                         ...navLinkStyle(isActive),
-//                                         padding: '10px 15px',
-//                                         marginBottom: '2px',
-//                                         fontSize: '13px'
-//                                     })}
-//                                 >
-//                                     <i className={`${sub.icon} me-3`}></i>
-//                                     <span>{sub.label}</span>
-//                                 </NavLink>
-//                             ))}
-//                         </div>
-//                     )}
-//                 </div>
-
-//                 {/* Events & Teams (যদি আলাদা রাখতে চান) */}
-//                 <NavLink to="/admin-events" style={({ isActive }) => navLinkStyle(isActive)}>
-//                     <i className={`bi bi-calendar-event ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-//                     {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>Events</span>}
-//                 </NavLink>
-
-//                 <NavLink to="/admin-team" style={({ isActive }) => navLinkStyle(isActive)}>
-//                     <i className={`bi bi-people-fill ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-//                     {!isCollapsed && <span style={{ fontSize: '14px', fontWeight: '500' }}>Teams</span>}
-//                 </NavLink>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Sidebar;
-
-
-
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -253,7 +11,7 @@ const MENU_ITEMS = [
     { id: 'notice', label: 'Notice', icon: 'bi-megaphone-fill', path: '/admin-notice' },
     { id: 'statistics', label: 'Price statistics', icon: 'bi-graph-up', path: '/admin-stat' },
     { id: 'affilites', label: 'Affiliates', icon: 'bi-share-fill', path: '/admin-affilites' },
-    { id: 'sister', label: 'Sister Concers', icon: 'bi-diagram-3-fill', path: '/admin-sister' },
+    { id: 'sister', label: 'Sister Concerns', icon: 'bi-diagram-3-fill', path: '/admin-sister' },
     { id: 'events', label: 'Events', icon: 'bi-calendar-event-fill', path: '/admin-events' },
     { id: 'teams', label: 'Teams', icon: 'bi-person-lines-fill', path: '/admin-team' },
     { id: 'FAQ', label: 'FAQ', icon: 'bi-question-circle-fill', path: '/admin-faq' },
@@ -264,10 +22,6 @@ const MENU_ITEMS = [
 const CLUB_SUB_ITEMS = [
     { id: 'club-info', label: 'Club Info', icon: 'bi-info-circle-fill', path: '/admin-club' },
     { id: 'club-gallery', label: 'Club Gallery', icon: 'bi-images', path: '/admin-club-gallery' },
-    // { id: 'club-rules', label: 'Club Rules', icon: 'bi-file-text-fill', path: '/admin-club-rules' },
-    // { id: 'club-facilities', label: 'Facilities', icon: 'bi-building', path: '/admin-club-facilities' },
-    // { id: 'club-committee', label: 'Committee', icon: 'bi-person-badge-fill', path: '/admin-club-committee' },
-    // { id: 'club-notice', label: 'Club Notice', icon: 'bi-megaphone-fill', path: '/admin-club-notice' },
 ];
 
 const LANDING_SUB_ITEMS = [
@@ -282,155 +36,299 @@ const LANDING_SUB_ITEMS = [
     { id: 'testo', label: 'Testo Section', icon: 'bi-chat-quote-fill', path: '/admin-testo' },
     { id: 'client', label: 'Happy Client', icon: 'bi-emoji-laughing-fill', path: '/admin-client' },
     { id: 'achievement', label: 'Achievement', icon: 'bi-trophy-fill', path: '/admin-achievement' },
-    { id: 'investrecord', label: 'Invest Record', icon: 'bi-cash-stack', path: '/admin-investrecord' }
+    { id: 'investrecord', label: 'Invest Record', icon: 'bi-cash-stack', path: '/admin-investrecord' },
 ];
 
-const isAnySubItemActive = (subItems, pathname) => subItems.some(item => pathname === item.path);
+// ---------- রং: সব page এ একই (page এর theme রং নেওয়া হয় না, শুধু dark mode দেখে) ----------
+const LIGHT = {
+    bg: '#ffffff',
+    text: '#111111',
+    muted: '#6b6b6b',
+    accent: '#111111',
+    accentOn: '#ffffff',
+    border: '#dcdcdc',
+    hover: 'rgba(0,0,0,0.05)',
+    soft: '#f5f5f5',
+};
+
+const DARK = {
+    bg: '#141414',
+    text: '#f5f5f5',
+    muted: '#a3a3a3',
+    accent: '#f5f5f5',
+    accentOn: '#111111',
+    border: '#2b2b2b',
+    hover: 'rgba(255,255,255,0.07)',
+    soft: 'rgba(255,255,255,0.05)',
+};
+
+const isAnySubItemActive = (subItems, pathname) => subItems.some((item) => pathname === item.path);
+
+/* ---------- Single menu link (component এর বাইরে, তাই প্রতি render এ নতুন হয় না) ---------- */
+const MenuLink = ({ item, isCollapsed, sub = false }) => (
+    <NavLink
+        to={item.path}
+        end
+        title={isCollapsed ? item.label : undefined}
+        className={({ isActive }) =>
+            `sb-link ${sub ? 'sb-sub' : ''} ${isCollapsed ? 'sb-collapsed' : ''} ${isActive ? 'active' : ''}`
+        }
+    >
+        <i className={`bi ${item.icon} sb-icon`}></i>
+        {!isCollapsed && <span className="sb-label">{item.label}</span>}
+    </NavLink>
+);
+
+/* ---------- Dropdown menu ---------- */
+const SubMenu = ({ label, icon, items, isOpen, onToggle, active, isCollapsed }) => (
+    <div className="sb-group">
+        <button
+            type="button"
+            title={isCollapsed ? label : undefined}
+            onClick={() => !isCollapsed && onToggle()}
+            aria-expanded={isOpen}
+            className={`sb-link ${isCollapsed ? 'sb-collapsed' : ''} ${active ? 'sb-parent-active' : ''}`}
+        >
+            <i className={`bi ${icon} sb-icon`}></i>
+            {!isCollapsed && (
+                <>
+                    <span className="sb-label">{label}</span>
+                    <i className={`bi bi-chevron-down sb-chevron ${isOpen ? 'open' : ''}`}></i>
+                </>
+            )}
+        </button>
+
+        {!isCollapsed && isOpen && (
+            <div className="sb-submenu">
+                {items.map((subItem) => (
+                    <MenuLink key={subItem.id} item={subItem} isCollapsed={false} sub />
+                ))}
+            </div>
+        )}
+    </div>
+);
 
 const Sidebar = ({ theme, isCollapsed, styles = {} }) => {
-    const [isLandingOpen, setIsLandingOpen] = useState(false);
-    const [isClubOpen, setIsClubOpen] = useState(false);
     const location = useLocation();
+    const [isLandingOpen, setIsLandingOpen] = useState(() => isAnySubItemActive(LANDING_SUB_ITEMS, location.pathname));
+    const [isClubOpen, setIsClubOpen] = useState(() => isAnySubItemActive(CLUB_SUB_ITEMS, location.pathname));
 
-    // Black & white theme values (invert automatically with dark mode)
-    const accent = theme?.text || '#111111';
-    const accentOn = theme?.card || '#ffffff';
-    const border = theme?.border || '#dcdcdc';
+    const colors = theme?.isDarkMode ? DARK : LIGHT;
 
+    // অন্য page এ গেলে সংশ্লিষ্ট dropdown খোলা রাখো
     useEffect(() => {
-        if (isCollapsed) return;
         if (isAnySubItemActive(LANDING_SUB_ITEMS, location.pathname)) setIsLandingOpen(true);
         if (isAnySubItemActive(CLUB_SUB_ITEMS, location.pathname)) setIsClubOpen(true);
-    }, [location.pathname, isCollapsed]);
+    }, [location.pathname]);
 
-    const sidebarBg = {
-        width: isCollapsed ? '80px' : '260px',
-        backgroundColor: theme?.card || '#fff',
-        height: '100vh',
-        transition: 'width 0.3s ease',
-        borderRight: `1px solid ${border}`,
-        overflowY: 'auto',
-        overflowX: 'hidden'
+    const cssVars = {
+        '--sb-bg': colors.bg,
+        '--sb-text': colors.text,
+        '--sb-muted': colors.muted,
+        '--sb-accent': colors.accent,
+        '--sb-accent-on': colors.accentOn,
+        '--sb-border': colors.border,
+        '--sb-hover': colors.hover,
+        '--sb-soft': colors.soft,
     };
 
-    const navLinkStyle = (isActive, sub = false) => ({
-        ...(styles?.navLink || {}),
-        color: isActive ? accentOn : theme?.sidebarText,
-        backgroundColor: isActive ? accent : 'transparent',
-        border: !isActive && sub ? `1px solid transparent` : 'none',
-        borderRadius: '8px',
-        marginBottom: sub ? '2px' : '5px',
-        textDecoration: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        padding: sub ? '10px 15px' : (isCollapsed ? '12px 0' : '12px 20px'),
-        justifyContent: isCollapsed ? 'center' : 'flex-start',
-        transition: 'all 0.2s ease',
-        cursor: 'pointer',
-        width: '100%',
-        fontSize: sub ? '13px' : '14px',
-        fontWeight: 500
-    });
-
-    const MenuLink = ({ item }) => (
-        <NavLink to={item.path} style={({ isActive }) => navLinkStyle(isActive)}>
-            <i className={`bi ${item.icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-            {!isCollapsed && <span>{item.label}</span>}
-        </NavLink>
-    );
-
-    const SubMenu = ({ label, icon, items, isOpen, toggle, active }) => (
-        <div className="w-100 mt-1">
-            <div onClick={() => !isCollapsed && toggle(!isOpen)} style={navLinkStyle(active)}>
-                <i className={`bi ${icon} ${isCollapsed ? 'fs-4' : 'fs-5 me-3'}`}></i>
-                {!isCollapsed && (
-                    <div className="d-flex justify-content-between align-items-center w-100">
-                        <span>{label}</span>
-                        <i className={`bi bi-chevron-${isOpen ? 'down' : 'right'}`} style={{ fontSize: '12px' }}></i>
-                    </div>
-                )}
-            </div>
-            {!isCollapsed && isOpen && (
-                <div className="ms-3 ps-2" style={{ borderLeft: `2px solid ${accent}` }}>
-                    {items.map(sub => (
-                        <NavLink key={sub.id} to={sub.path} style={({ isActive }) => navLinkStyle(isActive, true)}>
-                            <i className={`bi ${sub.icon} me-3`}></i>
-                            <span>{sub.label}</span>
-                        </NavLink>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-
     return (
-        <div className="d-none d-md-block shadow-sm" style={styles?.sidebar || sidebarBg}>
-
-            {/* Logo Section */}
-            <div className="p-4 mb-2 text-center">
-                {isCollapsed ? (
-                    <div
-                        className="rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                        style={{ width: '40px', height: '40px', backgroundColor: accent, color: accentOn, fontWeight: 700 }}
-                    >
-                        D
-                    </div>
-                ) : (
-                    <h3 style={{ color: accent, fontWeight: 800, letterSpacing: '1px', margin: 0 }}>
-                        DASHBOARD
-                    </h3>
-                )}
+        <aside
+            className={`sb d-none d-md-block shadow-sm ${isCollapsed ? 'is-collapsed' : ''}`}
+            style={{ ...cssVars, ...(styles?.sidebar || {}) }}
+        >
+            {/* Logo */}
+            <div className="sb-logo">
+                {isCollapsed ? <div className="sb-logo-mini">D</div> : <h3>DASHBOARD</h3>}
             </div>
 
             {/* User Card */}
-            <div
-                className="mx-3 mb-4 p-2 d-flex align-items-center rounded-3"
-                style={{ backgroundColor: theme?.isDarkMode ? 'rgba(255,255,255,0.05)' : '#f5f5f5', border: `1px solid ${border}` }}
-            >
-                <img
-                    src="https://i.pravatar.cc/40?img=12"
-                    className="rounded-circle"
-                    alt="user"
-                    style={{ border: `2px solid ${accent}`, padding: '2px' }}
-                />
+            <div className="sb-user">
+                <img src="https://i.pravatar.cc/40?img=12" alt="user" />
                 {!isCollapsed && (
-                    <div className="ms-3 overflow-hidden">
-                        <p className="m-0 fw-bold small text-truncate" style={{ color: theme?.text }}>Welcome</p>
-                        <span style={{ fontSize: '11px', color: theme?.textLight || '#6b6b6b' }}>Premium Admin</span>
+                    <div className="sb-user-text">
+                        <p>Welcome</p>
+                        <span>Premium Admin</span>
                     </div>
                 )}
             </div>
 
-            {/* Menu Items */}
-            <div className="px-2">
-                {/* Dashboard & Users */}
-                {MENU_ITEMS.slice(0, 2).map(item => <MenuLink key={item.id} item={item} />)}
+            {/* Menu */}
+            <nav className="sb-nav">
+                {MENU_ITEMS.slice(0, 2).map((item) => (
+                    <MenuLink key={item.id} item={item} isCollapsed={isCollapsed} />
+                ))}
 
-                {/* Landing Page */}
                 <SubMenu
                     label="Landing Page"
                     icon="bi-browser-safari"
                     items={LANDING_SUB_ITEMS}
                     isOpen={isLandingOpen}
-                    toggle={setIsLandingOpen}
+                    onToggle={() => setIsLandingOpen((v) => !v)}
                     active={isAnySubItemActive(LANDING_SUB_ITEMS, location.pathname)}
+                    isCollapsed={isCollapsed}
                 />
 
-                {/* Gallery through Job Query */}
-                {MENU_ITEMS.slice(2).map(item => <MenuLink key={item.id} item={item} />)}
+                {MENU_ITEMS.slice(2).map((item) => (
+                    <MenuLink key={item.id} item={item} isCollapsed={isCollapsed} />
+                ))}
 
-                {/* Club */}
                 <SubMenu
                     label="Club"
                     icon="bi-building"
                     items={CLUB_SUB_ITEMS}
                     isOpen={isClubOpen}
-                    toggle={setIsClubOpen}
+                    onToggle={() => setIsClubOpen((v) => !v)}
                     active={isAnySubItemActive(CLUB_SUB_ITEMS, location.pathname)}
+                    isCollapsed={isCollapsed}
                 />
-            </div>
-        </div>
+            </nav>
+
+            <style>{`
+                aside.sb {
+                    width: 260px;
+                    height: 100vh;
+                    flex-shrink: 0;
+                    background: var(--sb-bg) !important;
+                    border-right: 1px solid var(--sb-border);
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    transition: width 0.3s ease;
+                }
+                aside.sb.is-collapsed { width: 80px; }
+
+                /* Logo */
+                aside.sb .sb-logo { padding: 24px 16px 16px; text-align: center; }
+                aside.sb .sb-logo h3 {
+                    margin: 0;
+                    color: var(--sb-accent) !important;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                }
+                aside.sb .sb-logo-mini {
+                    width: 40px;
+                    height: 40px;
+                    margin: 0 auto;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--sb-accent);
+                    color: var(--sb-accent-on) !important;
+                    font-weight: 700;
+                }
+
+                /* User card */
+                aside.sb .sb-user {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin: 0 12px 20px;
+                    padding: 8px;
+                    border-radius: 12px;
+                    background: var(--sb-soft);
+                    border: 1px solid var(--sb-border);
+                }
+                aside.sb.is-collapsed .sb-user { justify-content: center; }
+                aside.sb .sb-user img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    padding: 2px;
+                    border: 2px solid var(--sb-accent);
+                    flex-shrink: 0;
+                }
+                aside.sb .sb-user-text { overflow: hidden; }
+                aside.sb .sb-user-text p {
+                    margin: 0;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: var(--sb-text) !important;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                aside.sb .sb-user-text span { font-size: 11px; color: var(--sb-muted) !important; }
+
+                /* Menu */
+                aside.sb .sb-nav { padding: 0 8px 24px; }
+
+                /* সব অবস্থায় (normal / hover / focus / visited) রং এখানে ঠিক করা */
+                aside.sb .sb-link,
+                aside.sb .sb-link:visited {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
+                    padding: 11px 18px;
+                    margin-bottom: 4px;
+                    border: none;
+                    border-radius: 8px;
+                    background: transparent !important;
+                    color: var(--sb-text) !important;
+                    font-size: 14px;
+                    font-weight: 500;
+                    text-align: left;
+                    text-decoration: none !important;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease, color 0.2s ease;
+                }
+                aside.sb .sb-link:hover,
+                aside.sb .sb-link:focus-visible {
+                    background: var(--sb-hover) !important;
+                    color: var(--sb-text) !important;
+                    outline: none;
+                }
+                aside.sb .sb-link.active,
+                aside.sb .sb-link.active:hover,
+                aside.sb .sb-link.active:focus-visible {
+                    background: var(--sb-accent) !important;
+                    color: var(--sb-accent-on) !important;
+                }
+
+                /* ভেতরের icon / লেখা সবসময় link এর রং নেবে (বাইরের CSS কাজ করবে না) */
+                aside.sb .sb-link i,
+                aside.sb .sb-link span,
+                aside.sb .sb-link .bi {
+                    color: inherit !important;
+                }
+
+                /* Dropdown এর ভেতরের page active থাকলে parent হালকা হাইলাইট */
+                aside.sb .sb-link.sb-parent-active {
+                    background: var(--sb-hover) !important;
+                    font-weight: 600;
+                }
+
+                aside.sb .sb-icon { font-size: 18px; flex-shrink: 0; width: 20px; text-align: center; }
+                aside.sb .sb-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+                aside.sb .sb-chevron { font-size: 12px; transition: transform 0.2s ease; }
+                aside.sb .sb-chevron.open { transform: rotate(180deg); }
+
+                /* Collapsed */
+                aside.sb .sb-link.sb-collapsed { justify-content: center; padding: 12px 0; }
+                aside.sb .sb-link.sb-collapsed .sb-icon { font-size: 20px; }
+
+                /* Sub menu */
+                aside.sb .sb-group { margin-top: 4px; }
+                aside.sb .sb-submenu {
+                    margin: 2px 0 6px 18px;
+                    padding-left: 8px;
+                    border-left: 2px solid var(--sb-border);
+                }
+                aside.sb .sb-link.sb-sub {
+                    padding: 9px 14px;
+                    margin-bottom: 2px;
+                    font-size: 13px;
+                }
+                aside.sb .sb-link.sb-sub .sb-icon { font-size: 14px; }
+
+                /* Scrollbar */
+                aside.sb::-webkit-scrollbar { width: 6px; }
+                aside.sb::-webkit-scrollbar-thumb { background: var(--sb-border); border-radius: 3px; }
+            `}</style>
+        </aside>
     );
 };
 
-export default Sidebar;
+export default Sidebar;  

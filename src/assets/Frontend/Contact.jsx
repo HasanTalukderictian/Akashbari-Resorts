@@ -9,6 +9,7 @@ import contactImg from '../image/section/Blog/Hotel6.png'
 // CEO Image
 
 import axios from 'axios';
+import Offices from './Offices';
 
 const Contact = () => {
     const brandColor = '#5e2e10';
@@ -349,7 +350,7 @@ const Contact = () => {
                             Our Location
                         </span>
                         <h2 className="serif display-6">
-                            Find Us on <span  style={{ color: brandColor }}>Google Maps</span>
+                            Find Our Project  <span  style={{ color: brandColor }}>Google Maps</span>
                         </h2>
                         <p className="text-muted mt-3">
                             Visit us at Akashbari Resort, Sreepur, Gazipur - where nature meets luxury
@@ -498,6 +499,11 @@ const Contact = () => {
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <section>
+
+                <Offices/>
             </section>
 
             <style jsx>{`
