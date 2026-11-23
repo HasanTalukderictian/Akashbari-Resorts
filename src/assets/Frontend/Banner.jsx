@@ -127,7 +127,7 @@ const Banner = ({ onDiscoverClick, onPackagesClick }) => {
             </button>
 
             <button className="discover-btn" onClick={onPackagesClick}>
-              PACKAGES
+              INVESTMENT
             </button>
           </div>
         </div>

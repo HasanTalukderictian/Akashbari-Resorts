@@ -55,6 +55,8 @@ import JobQuery from './Backend/JobQuery'
 import Register from './assets/Frontend/Register'
 import UserLogin from './assets/Frontend/UserLogin'
 import WriteBlog from './assets/Frontend/Writeblog'
+import InvestmentForm from './assets/Frontend/InvestmentForm'
+import InvestQuery from './Backend/InvestQuery'
 
 
 function App() {
@@ -78,6 +80,7 @@ function App() {
         <Route path='/sister' element={<Affliates />} />
         <Route path='/partner' element={<Partner />} />
         <Route path='/blog' element={<Blog />} />
+        <Route path='/invest-form' element={<InvestmentForm />} />
         <Route path='/club' element={<Club />} />
         <Route path="/blog-details/:id" element={<BlogDetails />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -137,6 +140,12 @@ function App() {
         <Route path="/admin-jobquery" element={
           <PrivateRoute>
             <JobQuery />
+          </PrivateRoute>
+        } />
+
+          <Route path="/admin-investquery" element={
+          <PrivateRoute>
+            <InvestQuery />
           </PrivateRoute>
         } />
 

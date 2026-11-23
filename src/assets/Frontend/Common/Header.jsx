@@ -54,11 +54,11 @@ const Header = () => {
               </Nav.Link>
 
               <Nav.Link eventKey="packages" onClick={() => goToSection("invest-section")}>
-                PACKAGES
+                INVESMENT
               </Nav.Link>
 
               <Nav.Link eventKey="investment" onClick={() => goToSection("owner-section")}>
-                INVESTMENT
+                BENEFITS
               </Nav.Link>
 
               <Nav.Link eventKey="gallery" onClick={() => navigate("/gallery")}>
@@ -81,8 +81,14 @@ const Header = () => {
                 EVENT
               </Nav.Link>
 
-              <button className="contact-btn" onClick={() => navigate("/contact")}>
+           
+
+              <Nav.Link  onClick={() => navigate("/contact")}>
                 CONTACT
+              </Nav.Link>
+
+               <button className="contact-btn" onClick={() => navigate("/invest-form")}>
+                Ownership
               </button>
             </Nav>
           </Navbar.Collapse>

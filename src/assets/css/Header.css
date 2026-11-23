@@ -5,7 +5,7 @@
     top: 0;
     z-index: 999;
     background: #f8f8f8;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #5e2e10;
     width: 100%;
 }
 
@@ -42,6 +42,7 @@
     background: #5e2e10;
     color: #fff;
     border: none;
+    border-radius: 10px;
     padding: 8px 18px;
     margin-left: 15px;
     font-size: 13px;

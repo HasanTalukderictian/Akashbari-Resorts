@@ -16,6 +16,7 @@ const MENU_ITEMS = [
     { id: 'teams', label: 'Teams', icon: 'bi-person-lines-fill', path: '/admin-team' },
     { id: 'FAQ', label: 'FAQ', icon: 'bi-question-circle-fill', path: '/admin-faq' },
     { id: 'JOB', label: 'Job', icon: 'bi-briefcase-fill', path: '/admin-job' },
+     { id: 'INVESTQUERY', label: 'Invest Query', icon: 'bi-envelope-open-fill', path: '/admin-investquery' },
     { id: 'JOBQUERY', label: 'Job Query', icon: 'bi-envelope-open-fill', path: '/admin-jobquery' },
 ];
 
