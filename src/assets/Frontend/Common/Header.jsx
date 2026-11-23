@@ -1,141 +1,93 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, Container } from "react-bootstrap";
 
 import "../../css/Header.css";
 import Logo from "../../image/Akashbari  resort logo png-01.png";
 
-const Header = ({ scrollToOwner }) => {
+const scrollToId = (id) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
+const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isHome = location.pathname === "/";
 
-  const handleInvestmentClick = () => {
-
-    // already home page
-    if (location.pathname === "/") {
-
-      scrollToOwner?.();
-
+  // Home page এর কোনো section এ যাওয়া
+  const goToSection = (id) => {
+    if (isHome) {
+      scrollToId(id);
     } else {
-
-      // first go home page
-      navigate("/");
-
-      // wait page render
-      setTimeout(() => {
-
-        const ownerSection =
-          document.getElementById("owner-section");
-
-        ownerSection?.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-
-      }, 500);
+      // Landing page data load হওয়ার পর নিজেই এই section এ scroll করবে
+      navigate("/", { state: { scrollTo: id } });
     }
   };
 
   const handleHomeClick = () => {
-
-    navigate("/");
-
-    setTimeout(() => {
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-    }, 100);
+    if (isHome) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+      window.scrollTo({ top: 0 });
+    }
   };
 
   return (
     <header className="sticky-header shadow-sm">
-
       <Container>
-        <Navbar expand="lg" className="py-2 px-0">
-
-          {/* Logo */}
+        {/* collapseOnSelect: mobile এ menu item চাপলে menu বন্ধ হবে */}
+        <Navbar expand="lg" collapseOnSelect className="py-2 px-0">
           <Navbar.Brand
             onClick={handleHomeClick}
             className="d-flex align-items-center"
             style={{ cursor: "pointer" }}
           >
-            <img
-              src={Logo}
-              alt="Logo"
-              className="logo"
-            />
+            <img src={Logo} alt="Logo" className="logo" />
           </Navbar.Brand>
 
           <Navbar.Toggle />
 
           <Navbar.Collapse>
-
             <Nav className="ms-auto align-items-center menu">
-
-              <Nav.Link onClick={handleHomeClick}>
+              <Nav.Link eventKey="home" onClick={handleHomeClick}>
                 HOME
               </Nav.Link>
 
-              <Nav.Link onClick={handleInvestmentClick}>
+              <Nav.Link eventKey="packages" onClick={() => goToSection("invest-section")}>
+                PACKAGES
+              </Nav.Link>
+
+              <Nav.Link eventKey="investment" onClick={() => goToSection("owner-section")}>
                 INVESTMENT
               </Nav.Link>
 
-              <Nav.Link onClick={() => navigate("/gallery")}>
+              <Nav.Link eventKey="gallery" onClick={() => navigate("/gallery")}>
                 GALLERY
               </Nav.Link>
 
-              <Nav.Link onClick={() => navigate("/about")}>
+              <Nav.Link eventKey="about" onClick={() => navigate("/about")}>
                 ABOUT US
               </Nav.Link>
 
-              <Nav.Link onClick={() => navigate("/blog")}>
+              <Nav.Link eventKey="blog" onClick={() => navigate("/blog")}>
                 BLOG
               </Nav.Link>
-              
-              <Nav.Link onClick={() => navigate("/career")}>
+
+              <Nav.Link eventKey="career" onClick={() => navigate("/career")}>
                 CAREER
               </Nav.Link>
 
-              <Nav.Link onClick={() => navigate("/all-events")}>
+              <Nav.Link eventKey="event" onClick={() => navigate("/all-events")}>
                 EVENT
               </Nav.Link>
 
-
-               {/* <Nav.Link onClick={() => navigate("/partner")}>
-                AFFILIATES
-              </Nav.Link> */}
-
-              {/* AFFILIATES Dropdown Menu */}
-
-              
-              {/* <NavDropdown
-                title={<span style={{ color: "#5e2e10" }}>AFFILIATES</span>}
-                id="affiliates-dropdown"
-              >
-                <NavDropdown.Item onClick={() => navigate("/partner")}>
-                  PARTNER
-                </NavDropdown.Item>
-                <NavDropdown.Item onClick={() => navigate("/sister")}>
-                  SISTER CONCERS
-                </NavDropdown.Item>
-              </NavDropdown> */}
-
-              <button
-                className="contact-btn"
-                onClick={() => navigate("/contact")}
-              >
+              <button className="contact-btn" onClick={() => navigate("/contact")}>
                 CONTACT
               </button>
-
             </Nav>
-
           </Navbar.Collapse>
         </Navbar>
       </Container>
-
     </header>
   );
 };
