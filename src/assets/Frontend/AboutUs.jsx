@@ -9,12 +9,18 @@ import {
     faStar,
     faHeart,
     faEnvelope,
-    faPhone
+    faPhone,
+    faQuoteLeft
 } from '@fortawesome/free-solid-svg-icons';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
+// API URL + storage image URL — config/api.js থেকে
+// ⚠️ path: InvestmentForm.jsx যেখান থেকে '../../Config/api' import করে, এই ফাইলও একই folder এ থাকলে এটাই ঠিক
+import { API_BASE_URL, storageUrl } from '../../Config/api';
+
 import king3 from '../image/section/Blog/hotle.jpeg';
-import ceoImage from '../../assets/image/section/Blog/ceo.jpg';
+import ceoImage from '../Background/sir.jpeg';
+import chairman from '../Background/mam  size.png';
 
 // Company logo থাকলে import করে এখানে বসান, যেমন:
 // import companyLogo from '../image/logo.png';
@@ -38,7 +44,10 @@ const makePlaceholder = (text) =>
         </svg>`
     );
 const MEMBER_PLACEHOLDER = makePlaceholder('No Image');
-const CEO_PLACEHOLDER = makePlaceholder('CEO Image');
+const LEADER_PLACEHOLDER = makePlaceholder('Photo');
+
+// Member এর ছবি: পুরো URL হলে সেটাই, শুধু path হলে storage URL বানাবে
+const getMemberImage = (image) => storageUrl(image) || MEMBER_PLACEHOLDER;
 
 // 01XXXXXXXXX → 8801XXXXXXXXX (WhatsApp এর জন্য country code লাগে)
 const toWhatsAppLink = (phone) => {
@@ -108,11 +117,69 @@ const sortByRank = (members) =>
         return 0;
     });
 
+// ---------- Leadership (Chairman + Managing Director) ----------
+// ⚠️ Chairman এর নাম আর বক্তব্য আসলটা দিয়ে বদলে দিন
+// focus = ছবির কোন অংশ দেখাবে ('center 0%' = একদম উপর, 'center 50%' = মাঝখান)
+const LEADERS = [
+    {
+        key: 'chairman',
+        image: chairman,
+        focus: 'center 20%',
+        name: 'Chairman Name',
+        role: 'Chairman',
+        org: 'Akashbari Group',
+        quote:
+            'Our vision has always been to build something that lasts — a place where nature, comfort and trust come together. ' +
+            'Every step we take is guided by our commitment to our guests, our investors and the communities we serve.',
+    },
+    {
+        key: 'md',
+        image: ceoImage,
+        focus: 'center 20%',
+        name: 'Touhidul Alam Milky',
+        role: 'Managing Director & Founder',
+        org: 'Akashbari Group',
+        quote:
+            'Akashbari was born from a dream to create a sanctuary where luxury meets nature, where every guest feels like family, ' +
+            'and where hospitality goes beyond service to become an unforgettable experience. Our journey is driven by passion, ' +
+            'integrity, and an unwavering commitment to excellence.',
+    },
+];
+
 const VALUES = [
     { icon: faEye, title: 'Our Vision', text: "To be Bangladesh's most preferred eco-luxury resort, setting global benchmarks in sustainable hospitality." },
     { icon: faBullseye, title: 'Our Mission', text: 'To provide exceptional hospitality experiences while preserving nature and empowering local communities.' },
     { icon: faStar, title: 'Our Goal', text: 'To expand sustainably across Bangladesh, creating 1000+ jobs and becoming a model for responsible tourism.' }
 ];
+
+// ---------- Leader Card (বাঁয়ে ছবি — পুরো উচ্চতা, ডানে বক্তব্য) ----------
+const LeaderCard = ({ leader }) => (
+    <article className="ld-card">
+        <div className="ld-photo">
+            <img
+                src={leader.image}
+                alt={`${leader.name}, ${leader.role}`}
+                loading="lazy"
+                style={{ objectPosition: leader.focus || 'center top' }}
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = LEADER_PLACEHOLDER; }}
+            />
+            <span className="ld-role-badge">{leader.role}</span>
+        </div>
+
+        <div className="ld-body">
+            <FontAwesomeIcon icon={faQuoteLeft} className="ld-quote-icon" />
+            <p className="ld-quote">{leader.quote}</p>
+
+            <div className="ld-sign">
+                <span className="ld-sign-line" />
+                <div>
+                    <h4 className="ld-name">{leader.name}</h4>
+                    <span className="ld-title">{leader.role}, {leader.org}</span>
+                </div>
+            </div>
+        </div>
+    </article>
+);
 
 // ---------- Team Card ----------
 const TeamCard = ({ member }) => {
@@ -124,7 +191,7 @@ const TeamCard = ({ member }) => {
             {/* Left: Photo */}
             <div className="ag-photo">
                 <img
-                    src={member.image || MEMBER_PLACEHOLDER}
+                    src={getMemberImage(member.image)}
                     alt={member.name}
                     loading="lazy"
                     onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = MEMBER_PLACEHOLDER; }}
@@ -211,18 +278,22 @@ const AboutUs = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
     }, []);
 
-    const fetchTeamMembers = async () => {
+    const fetchTeamMembers = async (signal) => {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`${API_BASE_URL}/team-members`);
-            const result = await response.json();
+
+            const response = await fetch(`${API_BASE_URL}/team-members`, {
+                signal,
+                headers: { Accept: 'application/json' },
+            });
+
+            // Server error হলে HTML আসতে পারে, তাই json() fail করলেও crash করবে না
+            const result = await response.json().catch(() => ({}));
 
             if (response.ok && result.status === true) {
                 setTeamMembers(result.data || []);
@@ -230,15 +301,18 @@ const AboutUs = () => {
                 setError(result.message || 'Failed to fetch team members');
             }
         } catch (err) {
+            if (err.name === 'AbortError') return; // page ছেড়ে গেলে
             console.error('Error fetching team members:', err);
             setError('Network error. Please check your connection.');
         } finally {
-            setLoading(false);
+            if (!signal?.aborted) setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchTeamMembers();
+        const controller = new AbortController();
+        fetchTeamMembers(controller.signal);
+        return () => controller.abort();
     }, []);
 
     const teamGroups = groupByTeam(teamMembers);
@@ -280,14 +354,14 @@ const AboutUs = () => {
                     <div className="row align-items-center g-5">
                         <div className="col-lg-6">
                             <div className="modern-content">
-                                <div className="section-badge mb-3" style={{ color: brandColor }}>
+                                <div className="section-badge mb-3" style={{ color: brandColor, background: `${brandColor}15` }}>
                                     WELCOME TO AKASHBARI
                                 </div>
                                 <h2 className="modern-title mb-4">
                                     Experience Luxury At
                                     <span style={{ color: brandColor, fontSize: '50px' }}> Akashbari Hotels & Resorts</span>
                                 </h2>
-                                <div className="p-3 mb-4 rounded-3 bg-white shadow-sm border-start border-4" style={{ borderColor: brandColor }}>
+                                <div className="p-3 mb-4 rounded-3 bg-white shadow-sm" style={{ borderLeft: `4px solid ${brandColor}` }}>
                                     <p className="mb-2"><strong> Business Type:</strong> Luxury Hospitality & Eco Resort</p>
                                     <p className="mb-0"><strong> Established Since:</strong> 2023</p>
                                 </div>
@@ -342,7 +416,7 @@ const AboutUs = () => {
                 </div>
             </section>
 
-            {/* ========== CEO SECTION ========== */}
+            {/* ========== LEADERSHIP SECTION (Chairman + MD পাশাপাশি) ========== */}
             <section className="ceo-section py-5" style={{ backgroundColor: '#ffffff' }}>
                 <div className="container">
                     <div className="text-center mb-5">
@@ -358,78 +432,33 @@ const AboutUs = () => {
                         </div>
                         <h2 className="modern-title mb-3">
                             Message from Our
-                            <span style={{ color: brandColor }}> Managing Director & Founder</span>
+                            <span style={{ color: brandColor }}> Leadership</span>
                         </h2>
                         <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontSize: '1rem' }}>
-                            Meet the visionary behind Akashbari's success
+                            Meet the visionaries behind Akashbari's success
                         </p>
                     </div>
 
-                    <div className="row align-items-center g-5">
-                        <div className="col-lg-5">
-                            <div className="ceo-image-area text-center">
-                                <div className="position-relative d-inline-block">
-                                    <div className="ceo-image-wrapper rounded-4 overflow-hidden shadow-lg" style={{
-                                        border: `5px solid ${brandColor}`,
-                                        borderRadius: '20px',
-                                        maxWidth: '350px',
-                                        margin: '0 auto'
-                                    }}>
-                                        <img
-                                            src={ceoImage}
-                                            alt="CEO & Founder"
-                                            className="img-fluid w-100"
-                                            style={{ minHeight: '350px', objectFit: 'cover' }}
-                                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = CEO_PLACEHOLDER; }}
-                                        />
+                    {/* Chairman + Managing Director */}
+                    <div className="ld-grid">
+                        {LEADERS.map((leader) => (
+                            <LeaderCard key={leader.key} leader={leader} />
+                        ))}
+                    </div>
+
+                    {/* Vision / Mission / Goal */}
+                    <div className="row g-3 mt-4 pt-2">
+                        {VALUES.map((v) => (
+                            <div className="col-md-4" key={v.title}>
+                                <div className="vm-card text-center p-4 rounded-3 h-100">
+                                    <div className="vm-icon mb-2" style={{ fontSize: '34px', color: brandColor }}>
+                                        <FontAwesomeIcon icon={v.icon} />
                                     </div>
-                                    <div className="ceo-name-card mt-3 p-3 bg-white rounded-3 shadow-sm" style={{
-                                        position: 'relative',
-                                        zIndex: '2',
-                                        border: `1px solid ${brandColor}30`
-                                    }}>
-                                        <h4 className="mb-0" style={{ color: brandColor, fontWeight: '700' }}>Touhidul Alam Milky</h4>
-                                        <p className="mb-0 text-muted">Managing Director & Founder, Akashbari Group</p>
-                                    </div>
+                                    <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontSize: '1.1rem' }}>{v.title}</h5>
+                                    <p className="small text-muted mb-0" style={{ fontSize: '0.88rem', lineHeight: '1.6' }}>{v.text}</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="col-lg-7">
-                            <div className="ceo-message-box p-4 rounded-4 mb-4" style={{
-                                backgroundColor: '#fcfcfc',
-                                borderLeft: `4px solid ${brandColor}`,
-                                boxShadow: '0 5px 20px rgba(0,0,0,0.05)'
-                            }}>
-                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4' }}>"</span>
-                                <p className="ceo-quote-text px-3" style={{
-                                    fontSize: '1rem',
-                                    lineHeight: '1.7',
-                                    color: '#4a5568',
-                                    fontStyle: 'italic'
-                                }}>
-                                    Akashbari was born from a dream to create a sanctuary where luxury meets nature,
-                                    where every guest feels like family, and where hospitality goes beyond service to become
-                                    an unforgettable experience. Our journey is driven by passion, integrity, and an unwavering
-                                    commitment to excellence.
-                                </p>
-                                <span style={{ fontSize: '40px', color: brandColor, opacity: '0.4', display: 'block', textAlign: 'right' }}>"</span>
-                            </div>
-
-                            <div className="row g-3">
-                                {VALUES.map((v) => (
-                                    <div className="col-md-4" key={v.title}>
-                                        <div className="vm-card text-center p-3 rounded-3 h-100">
-                                            <div className="vm-icon mb-2" style={{ fontSize: '36px', color: brandColor }}>
-                                                <FontAwesomeIcon icon={v.icon} />
-                                            </div>
-                                            <h5 className="mb-2" style={{ fontWeight: '700', color: brandColor, fontSize: '1.1rem' }}>{v.title}</h5>
-                                            <p className="small text-muted mb-0" style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>{v.text}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -438,7 +467,7 @@ const AboutUs = () => {
             <section className="ag-team-section py-5">
                 <div className="container">
                     <div className="team-header-modern text-center mb-4">
-                        <div className="section-tag centered" style={{ color: brandColor }}>
+                        <div className="section-tag centered" style={{ color: brandColor, background: `${brandColor}15` }}>
                             MEET OUR EXPERTS
                         </div>
                         <h2 className="team-title">
@@ -463,7 +492,7 @@ const AboutUs = () => {
                             <p className="text-danger">⚠️ {error}</p>
                             <button
                                 className="btn mt-3 text-white"
-                                onClick={fetchTeamMembers}
+                                onClick={() => fetchTeamMembers()}
                                 style={{ backgroundColor: brandColor, borderColor: brandColor }}
                             >
                                 Retry
@@ -497,7 +526,7 @@ const AboutUs = () => {
             <Footer />
 
             <style>{`
-                /* ---------- CEO / Vision cards ---------- */
+                /* ---------- Vision / Mission / Goal cards ---------- */
                 .ceo-section { animation: fadeIn 0.8s ease-out; }
                 .vm-card {
                     background-color: #fcfcfc;
@@ -508,6 +537,124 @@ const AboutUs = () => {
                     transform: translateY(-5px);
                     box-shadow: 0 10px 25px ${brandColor}30;
                     border-color: ${brandColor};
+                }
+
+                /* ---------- Leadership cards ---------- */
+                .ld-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 28px;
+                }
+
+                /* Card: বাঁয়ে ছবি, ডানে লেখা */
+                .ld-card {
+                    display: grid;
+                    grid-template-columns: 50% 50%;
+                    min-height: 350px;
+                    background: #fff;
+                    border: 1px solid ${brandColor}26;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    box-shadow: 0 10px 30px rgba(94, 46, 16, 0.08);
+                    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+                }
+                .ld-card:hover {
+                    transform: translateY(-6px);
+                    border-color: ${brandColor};
+                    box-shadow: 0 20px 44px rgba(94, 46, 16, 0.18);
+                }
+
+                /* ছবি: card এর বাঁ অংশের পুরো উচ্চতা জুড়ে */
+                .ld-photo {
+                    position: relative;
+                    overflow: hidden;
+                    background: ${brandTint};
+                }
+                .ld-photo img {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                    transition: transform 0.6s ease;
+                }
+                .ld-card:hover .ld-photo img { transform: scale(1.05); }
+
+                /* উপরে হালকা ছায়া — badge পরিষ্কার দেখাতে */
+                                /* নিচে হালকা ছায়া — badge পরিষ্কার দেখাতে */
+                .ld-photo::after {
+                    content: '';
+                    position: absolute;
+                    left: 0; right: 0; bottom: 0;
+                    height: 35%;
+                    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+                    pointer-events: none;
+                }
+
+                .ld-role-badge {
+                    position: absolute;
+                    bottom: 16px;
+                    left: 16px;
+                    z-index: 1;
+                    max-width: calc(100% - 32px);
+                    padding: 6px 12px;
+                    border-radius: 999px;
+                    background: ${brandColor};
+                    color: #fff;
+                    font-size: 0.66rem;
+                    font-weight: 700;
+                    letter-spacing: 0.1em;
+                    line-height: 1.3;
+                    text-transform: uppercase;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+                }
+
+                /* লেখার অংশ */
+                .ld-body {
+                    display: flex;
+                    flex-direction: column;
+                    padding: 34px 30px 30px;
+                    border-left: 4px solid ${brandColor};
+                }
+                .ld-quote-icon {
+                    font-size: 20px;
+                    color: ${brandColor};
+                    opacity: 0.25;
+                    margin-bottom: 12px;
+                }
+                .ld-quote {
+                    font-size: 0.98rem;
+                    line-height: 1.8;
+                    color: #4a5568;
+                    font-style: italic;
+                    margin: 0 0 24px;
+                }
+
+                .ld-sign {
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                    margin-top: auto;
+                    padding-top: 18px;
+                    border-top: 1px dashed ${brandColor}33;
+                }
+                .ld-sign-line {
+                    width: 32px;
+                    height: 2px;
+                    background: ${brandColor};
+                    flex-shrink: 0;
+                }
+                .ld-name {
+                    margin: 0;
+                    font-family: 'Playfair Display', serif;
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: ${brandColor};
+                }
+                .ld-title {
+                    font-size: 0.82rem;
+                    color: #6c757d;
                 }
 
                 /* ---------- Team section ---------- */
@@ -593,7 +740,7 @@ const AboutUs = () => {
                 .ag-overlay {
                     position: absolute;
                     left: 0;
-                    right: 18px; /* panel এর নিচে ঢাকা অংশ বাদ দিয়ে center */
+                    right: 18px;
                     bottom: 0;
                     display: flex;
                     justify-content: center;
@@ -713,8 +860,24 @@ const AboutUs = () => {
                 }
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-                /* Responsive */
+                /* ---------- Responsive ---------- */
+
+                /* মাঝারি screen: card গুলো একটার নিচে একটা, কিন্তু ভেতরে আগের মতো পাশাপাশি */
+                @media (max-width: 1199px) {
+                    .ld-grid { grid-template-columns: 1fr; max-width: 820px; margin: 0 auto; }
+                    .ld-card { grid-template-columns: 38% 62%; min-height: 380px; }
+                }
+
+                /* Mobile: ছবি উপরে, লেখা নিচে */
                 @media (max-width: 576px) {
+                    .ld-card { grid-template-columns: 1fr; min-height: 0; }
+                    .ld-photo { height: 380px; }
+                    .ld-body {
+                        padding: 24px 20px 22px;
+                        border-left: none;
+                        border-top: 4px solid ${brandColor};
+                    }
+
                     .ag-grid { grid-template-columns: 1fr; gap: 16px; }
                     .ag-card { grid-template-columns: 50% 50%; min-height: 260px; }
                     .ag-info-top { padding: 10px 12px; }
@@ -725,7 +888,8 @@ const AboutUs = () => {
 
                 /* Touch device এ hover নেই */
                 @media (hover: none) {
-                    .ag-card:hover { transform: none; }
+                    .ag-card:hover,
+                    .ld-card:hover { transform: none; }
                 }
             `}</style>
         </>
