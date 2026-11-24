@@ -380,8 +380,8 @@ const Contact = () => {
                                 <h4 className="serif mb-3" style={{ color: brandColor }}> Address Details</h4>
                                 <div className="location-info mb-4">
                                     <p className="mb-2">
-                                        <strong>Resort Name:</strong><br />
-                                        Akashbari Hotels & Resorts
+                                        <strong>Resort Name: </strong>
+                                         Akashbari Hotels & Resorts
                                     </p>
                                     <p className="mb-2">
                                         <strong>Exact Location:</strong><br />

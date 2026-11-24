@@ -1,556 +1,48 @@
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import Header from './Header';
-// import Sidebar from './Sidebar';
-// import Footer from './Footer';
-
-// const FqaSettings = ({ theme: propsTheme }) => {
-//     const [isCollapsed, setIsCollapsed] = useState(false);
-//     const [isDarkMode, setIsDarkMode] = useState(false);
-//     const [faqs, setFaqs] = useState([]);
-//     const [loading, setLoading] = useState(false);
-//     const [error, setError] = useState(null);
-//     const [showModal, setShowModal] = useState(false);
-//     const [editingFaq, setEditingFaq] = useState(null);
-//     const [formData, setFormData] = useState({
-//         faq_question: '',
-//         faq_answe: ''
-//     });
-//     const [currentPage, setCurrentPage] = useState(1);
-//     const [itemsPerPage] = useState(10);
-//     const [totalItems, setTotalItems] = useState(0);
-
-//     // Get API base URL from environment variables
-//     const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/api';
-
-//     const theme = propsTheme || {
-//         isDarkMode,
-//         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-//         card: isDarkMode ? '#16213e' : '#ffffff',
-//         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-//         border: isDarkMode ? '#2d3436' : '#ebedf2',
-//         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b'
-//     };
-
-//     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-//     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
-//     const styles = {
-//         container: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
-//         mainArea: { height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-//         contentContainer: { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' },
-//         contentScroll: { flex: '1 0 auto', padding: '24px' },
-//         footerWrapper: { flexShrink: 0 },
-//         table: {
-//             width: '100%',
-//             borderCollapse: 'collapse',
-//             backgroundColor: theme.card,
-//             borderRadius: '8px',
-//             overflow: 'hidden',
-//             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-//         },
-//         th: {
-//             backgroundColor: theme.isDarkMode ? '#2d3436' : '#f8f9fa',
-//             color: theme.text,
-//             padding: '12px',
-//             textAlign: 'left',
-//             borderBottom: `2px solid ${theme.border}`
-//         },
-//         td: {
-//             padding: '12px',
-//             color: theme.text,
-//             borderBottom: `1px solid ${theme.border}`
-//         },
-//         button: {
-//             padding: '8px 12px',
-//             margin: '0 4px',
-//             border: 'none',
-//             borderRadius: '4px',
-//             cursor: 'pointer',
-//             fontSize: '14px',
-//             display: 'inline-flex',
-//             alignItems: 'center',
-//             gap: '4px'
-//         },
-//         addButton: {
-//             backgroundColor: '#007bff',
-//             color: '#fff',
-//             padding: '10px 20px',
-//             border: 'none',
-//             borderRadius: '4px',
-//             cursor: 'pointer',
-//             fontSize: '16px',
-//             marginBottom: '20px',
-//             display: 'inline-flex',
-//             alignItems: 'center',
-//             gap: '8px'
-//         },
-//         modal: {
-//             position: 'fixed',
-//             top: 0,
-//             left: 0,
-//             right: 0,
-//             bottom: 0,
-//             backgroundColor: 'rgba(0,0,0,0.5)',
-//             display: 'flex',
-//             justifyContent: 'center',
-//             alignItems: 'center',
-//             zIndex: 1000
-//         },
-//         modalContent: {
-//             backgroundColor: theme.card,
-//             padding: '30px',
-//             borderRadius: '8px',
-//             maxWidth: '600px',
-//             width: '90%',
-//             maxHeight: '80vh',
-//             overflowY: 'auto'
-//         },
-//         formGroup: {
-//             marginBottom: '15px'
-//         },
-//         label: {
-//             display: 'block',
-//             marginBottom: '5px',
-//             color: theme.text,
-//             fontWeight: '500'
-//         },
-//         input: {
-//             width: '100%',
-//             padding: '10px',
-//             border: `1px solid ${theme.border}`,
-//             borderRadius: '4px',
-//             backgroundColor: theme.isDarkMode ? '#2d3436' : '#fff',
-//             color: theme.text,
-//             fontSize: '14px'
-//         },
-//         textarea: {
-//             width: '100%',
-//             padding: '10px',
-//             border: `1px solid ${theme.border}`,
-//             borderRadius: '4px',
-//             backgroundColor: theme.isDarkMode ? '#2d3436' : '#fff',
-//             color: theme.text,
-//             fontSize: '14px',
-//             minHeight: '100px',
-//             resize: 'vertical'
-//         },
-//         pagination: {
-//             display: 'flex',
-//             justifyContent: 'center',
-//             alignItems: 'center',
-//             padding: '20px 0',
-//             gap: '10px'
-//         },
-//         pageButton: {
-//             padding: '8px 12px',
-//             border: `1px solid ${theme.border}`,
-//             borderRadius: '4px',
-//             backgroundColor: theme.card,
-//             color: theme.text,
-//             cursor: 'pointer'
-//         },
-//         activePageButton: {
-//             backgroundColor: '#007bff',
-//             color: '#fff',
-//             border: 'none'
-//         },
-//         actionButton: {
-//             background: 'none',
-//             border: 'none',
-//             cursor: 'pointer',
-//             padding: '4px 8px',
-//             fontSize: '18px',
-//             transition: 'transform 0.2s'
-//         }
-//     };
-
-//     // Fetch FAQs
-//     const fetchFaqs = async () => {
-//         setLoading(true);
-//         setError(null);
-//         try {
-//             const response = await axios.get(`${API_BASE_URL}/faqs`);
-            
-//             // Check if response data is an array
-//             let faqData = [];
-//             if (Array.isArray(response.data)) {
-//                 faqData = response.data;
-//             } else if (response.data && typeof response.data === 'object') {
-//                 // If response is an object with data property (common in Laravel API)
-//                 if (Array.isArray(response.data.data)) {
-//                     faqData = response.data.data;
-//                 } else if (Array.isArray(response.data.faqs)) {
-//                     faqData = response.data.faqs;
-//                 } else {
-//                     // Try to convert object values to array if they have numeric keys
-//                     const values = Object.values(response.data);
-//                     if (values.some(v => typeof v === 'object' && v !== null)) {
-//                         faqData = values;
-//                     } else {
-//                         faqData = [response.data];
-//                     }
-//                 }
-//             }
-            
-//             setFaqs(faqData);
-//             setTotalItems(faqData.length);
-//             setError(null);
-//         } catch (err) {
-//             setError('Failed to fetch FAQs');
-//             console.error('Error fetching FAQs:', err);
-//             setFaqs([]);
-//             setTotalItems(0);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchFaqs();
-//     }, []);
-
-//     // Handle form input changes
-//     const handleInputChange = (e) => {
-//         const { name, value } = e.target;
-//         setFormData({
-//             ...formData,
-//             [name]: value
-//         });
-//     };
-
-//     // Reset form
-//     const resetForm = () => {
-//         setFormData({
-//             faq_question: '',
-//             faq_answe: ''
-//         });
-//         setEditingFaq(null);
-//     };
-
-//     // Open modal for adding
-//     const handleAddClick = () => {
-//         resetForm();
-//         setShowModal(true);
-//     };
-
-//     // Open modal for editing
-//     const handleEditClick = (faq) => {
-//         setEditingFaq(faq);
-//         setFormData({
-//             faq_question: faq.faq_question || '',
-//             faq_answe: faq.faq_answe || ''
-//         });
-//         setShowModal(true);
-//     };
-
-//     // Submit form (Create or Update)
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         setLoading(true);
-//         setError(null);
-//         try {
-//             if (editingFaq) {
-//                 // Update existing FAQ
-//                 await axios.put(`${API_BASE_URL}/faqs/${editingFaq.id}`, formData);
-//             } else {
-//                 // Create new FAQ
-//                 await axios.post(`${API_BASE_URL}/faqs`, formData);
-//             }
-//             await fetchFaqs();
-//             setShowModal(false);
-//             resetForm();
-//         } catch (err) {
-//             setError('Failed to save FAQ');
-//             console.error('Error saving FAQ:', err);
-//             if (err.response && err.response.data && err.response.data.message) {
-//                 setError(err.response.data.message);
-//             }
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     // Delete FAQ
-//     const handleDelete = async (id) => {
-//         if (window.confirm('Are you sure you want to delete this FAQ?')) {
-//             try {
-//                 await axios.delete(`${API_BASE_URL}/faqs/${id}`);
-//                 await fetchFaqs();
-//                 setError(null);
-//             } catch (err) {
-//                 setError('Failed to delete FAQ');
-//                 console.error('Error deleting FAQ:', err);
-//                 if (err.response && err.response.data && err.response.data.message) {
-//                     setError(err.response.data.message);
-//                 }
-//             }
-//         }
-//     };
-
-//     // Pagination logic - ensure faqs is an array
-//     const faqsArray = Array.isArray(faqs) ? faqs : [];
-//     const indexOfLastItem = currentPage * itemsPerPage;
-//     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-//     const currentItems = faqsArray.slice(indexOfFirstItem, indexOfLastItem);
-//     const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-//     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-//     return (
-//         <div style={styles.container} className="container-fluid p-0">
-//             <div className="d-flex">
-//                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="users" />
-
-//                 <div style={styles.mainArea} className="flex-grow-1">
-//                     <Header 
-//                         theme={theme} 
-//                         isDarkMode={isDarkMode} 
-//                         toggleDarkMode={toggleDarkMode} 
-//                         toggleSidebar={toggleSidebar} 
-//                     />
-
-//                     <div style={styles.contentContainer}>
-//                         <div style={styles.contentScroll}>
-//                             <div className="d-flex justify-content-between align-items-center mb-3">
-//                                 <h2 style={{ color: theme.text }}>FAQ Management</h2>
-//                                 <button 
-//                                     style={styles.addButton}
-//                                     onClick={handleAddClick}
-//                                 >
-//                                     <span>➕</span> Add New FAQ
-//                                 </button>
-//                             </div>
-
-//                             {error && (
-//                                 <div className="alert alert-danger" role="alert">
-//                                     {error}
-//                                 </div>
-//                             )}
-
-//                             {loading ? (
-//                                 <div style={{ color: theme.text, textAlign: 'center', padding: '50px' }}>
-//                                     Loading...
-//                                 </div>
-//                             ) : (
-//                                 <>
-//                                     <table style={styles.table}>
-//                                         <thead>
-//                                             <tr>
-//                                                 <th style={styles.th}>#</th>
-//                                                 <th style={styles.th}>Question</th>
-//                                                 <th style={styles.th}>Answer</th>
-//                                                 <th style={styles.th}>Actions</th>
-//                                             </tr>
-//                                         </thead>
-//                                         <tbody>
-//                                             {currentItems.length > 0 ? (
-//                                                 currentItems.map((faq, index) => (
-//                                                     <tr key={faq.id || index}>
-//                                                         <td style={styles.td}>
-//                                                             {indexOfFirstItem + index + 1}
-//                                                         </td>
-//                                                         <td style={styles.td}>
-//                                                             {faq.faq_question || 'N/A'}
-//                                                         </td>
-//                                                         <td style={styles.td}>
-//                                                             {faq.faq_answe && faq.faq_answe.length > 100 
-//                                                                 ? `${faq.faq_answe.substring(0, 100)}...` 
-//                                                                 : faq.faq_answe || 'N/A'}
-//                                                         </td>
-//                                                         <td style={styles.td}>
-//                                                             <button
-//                                                                 style={{
-//                                                                     ...styles.actionButton,
-//                                                                     color: '#28a745'
-//                                                                 }}
-//                                                                 onClick={() => handleEditClick(faq)}
-//                                                                 title="Edit FAQ"
-//                                                             >
-//                                                                 ✏️
-//                                                             </button>
-//                                                             <button
-//                                                                 style={{
-//                                                                     ...styles.actionButton,
-//                                                                     color: '#dc3545'
-//                                                                 }}
-//                                                                 onClick={() => handleDelete(faq.id)}
-//                                                                 title="Delete FAQ"
-//                                                             >
-//                                                                 🗑️
-//                                                             </button>
-//                                                         </td>
-//                                                     </tr>
-//                                                 ))
-//                                             ) : (
-//                                                 <tr>
-//                                                     <td colSpan="4" style={{ 
-//                                                         ...styles.td, 
-//                                                         textAlign: 'center',
-//                                                         padding: '40px'
-//                                                     }}>
-//                                                         No FAQs found. Click "Add New FAQ" to create one.
-//                                                     </td>
-//                                                 </tr>
-//                                             )}
-//                                         </tbody>
-//                                     </table>
-
-//                                     {/* Pagination */}
-//                                     {totalPages > 1 && (
-//                                         <div style={styles.pagination}>
-//                                             <button
-//                                                 style={{
-//                                                     ...styles.pageButton,
-//                                                     ...(currentPage === 1 && { opacity: 0.5, cursor: 'not-allowed' })
-//                                                 }}
-//                                                 onClick={() => paginate(currentPage - 1)}
-//                                                 disabled={currentPage === 1}
-//                                             >
-//                                                 Previous
-//                                             </button>
-                                            
-//                                             {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
-//                                                 <button
-//                                                     key={number}
-//                                                     style={{
-//                                                         ...styles.pageButton,
-//                                                         ...(currentPage === number && styles.activePageButton)
-//                                                     }}
-//                                                     onClick={() => paginate(number)}
-//                                                 >
-//                                                     {number}
-//                                                 </button>
-//                                             ))}
-                                            
-//                                             <button
-//                                                 style={{
-//                                                     ...styles.pageButton,
-//                                                     ...(currentPage === totalPages && { opacity: 0.5, cursor: 'not-allowed' })
-//                                                 }}
-//                                                 onClick={() => paginate(currentPage + 1)}
-//                                                 disabled={currentPage === totalPages}
-//                                             >
-//                                                 Next
-//                                             </button>
-//                                         </div>
-//                                     )}
-//                                 </>
-//                             )}
-//                         </div>
-
-//                         <div style={styles.footerWrapper}>
-//                             <Footer theme={theme} />
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-
-//             {/* Modal */}
-//             {showModal && (
-//                 <div style={styles.modal} onClick={() => setShowModal(false)}>
-//                     <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-//                         <div className="d-flex justify-content-between align-items-center mb-3">
-//                             <h3 style={{ color: theme.text }}>
-//                                 {editingFaq ? 'Edit FAQ' : 'Add New FAQ'}
-//                             </h3>
-//                             <button
-//                                 onClick={() => setShowModal(false)}
-//                                 style={{
-//                                     background: 'none',
-//                                     border: 'none',
-//                                     fontSize: '24px',
-//                                     color: theme.text,
-//                                     cursor: 'pointer'
-//                                 }}
-//                             >
-//                                 ×
-//                             </button>
-//                         </div>
-                        
-//                         <form onSubmit={handleSubmit}>
-//                             <div style={styles.formGroup}>
-//                                 <label style={styles.label}>Question *</label>
-//                                 <input
-//                                     type="text"
-//                                     name="faq_question"
-//                                     value={formData.faq_question}
-//                                     onChange={handleInputChange}
-//                                     style={styles.input}
-//                                     required
-//                                     placeholder="Enter the FAQ question"
-//                                 />
-//                             </div>
-
-//                             <div style={styles.formGroup}>
-//                                 <label style={styles.label}>Answer *</label>
-//                                 <textarea
-//                                     name="faq_answe"
-//                                     value={formData.faq_answe}
-//                                     onChange={handleInputChange}
-//                                     style={styles.textarea}
-//                                     required
-//                                     placeholder="Enter the FAQ answer"
-//                                 />
-//                             </div>
-
-//                             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-//                                 <button
-//                                     type="button"
-//                                     onClick={() => setShowModal(false)}
-//                                     style={{
-//                                         ...styles.button,
-//                                         backgroundColor: '#6c757d',
-//                                         color: '#fff'
-//                                     }}
-//                                 >
-//                                     Cancel
-//                                 </button>
-//                                 <button
-//                                     type="submit"
-//                                     style={{
-//                                         ...styles.button,
-//                                         backgroundColor: '#007bff',
-//                                         color: '#fff'
-//                                     }}
-//                                     disabled={loading}
-//                                 >
-//                                     {loading ? 'Saving...' : (editingFaq ? 'Update' : 'Save')}
-//                                 </button>
-//                             </div>
-//                         </form>
-//                     </div>
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default FqaSettings;
-
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
+// ⚠️ path আপনার folder অনুযায়ী ঠিক করুন (src/Config/api.js)
+import { API_BASE_URL } from '../Config/api';
+
 const EMPTY_FORM = { faq_question: '', faq_answe: '' };
 const ITEMS_PER_PAGE = 10;
 
-const API_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000/api';
+// ---------- Axios instance: প্রতিটা request এ token + JSON header ----------
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    headers: { Accept: 'application/json' }
+});
 
-// Normalizes whatever shape the API returns into a plain array
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Role = localStorage.getItem('Role') || 'admin';
+    return config;
+});
+
+// API যে আকারেই data দিক, একটা array বানাও
 const extractFaqArray = (data) => {
     if (Array.isArray(data)) return data;
-    if (data && typeof data === 'object') {
-        if (Array.isArray(data.data)) return data.data;
-        if (Array.isArray(data.faqs)) return data.faqs;
-        const values = Object.values(data);
-        if (values.some(v => typeof v === 'object' && v !== null)) return values;
-        return [data];
-    }
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.data?.data)) return data.data.data; // paginated
+    if (Array.isArray(data?.faqs)) return data.faqs;
     return [];
+};
+
+// Error থেকে পড়ার মতো message বের করো
+const getErrorMessage = (err, fallback) => {
+    const body = err.response?.data;
+    if (body?.errors) {
+        const first = Object.values(body.errors)[0];
+        return Array.isArray(first) ? first[0] : String(first);
+    }
+    if (typeof body === 'object' && body?.message) return body.message;
+    if (err.response?.status >= 500) return `Server error (${err.response.status}). Please try again.`;
+    if (!err.response) return 'Network error. Please check your connection.';
+    return fallback;
 };
 
 const Modal = ({ theme, title, icon, iconColor, onClose, children, footer }) => (
@@ -574,7 +66,7 @@ const Modal = ({ theme, title, icon, iconColor, onClose, children, footer }) => 
                 <h5 style={{ color: theme.text, margin: 0, fontWeight: 600 }}>
                     <i className={`bi ${icon} me-2`} style={{ color: iconColor }}></i>{title}
                 </h5>
-                <button onClick={onClose} style={{
+                <button type="button" onClick={onClose} style={{
                     background: 'transparent', border: 'none', fontSize: '22px',
                     color: theme.text, opacity: 0.6, cursor: 'pointer'
                 }}>✕</button>
@@ -595,7 +87,9 @@ const FqaSettings = ({ theme: propsTheme }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [faqs, setFaqs] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState('');
 
     const [showModal, setShowModal] = useState(false);
     const [editingFaq, setEditingFaq] = useState(null);
@@ -612,6 +106,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
         border: isDarkMode ? '#2c2f4d' : '#e7e5ee',
         accent: '#6c5ce7'
     };
+    const accent = theme.accent || theme.text;
 
     const fieldStyle = {
         backgroundColor: theme.bg, color: theme.text, border: `1px solid ${theme.border}`,
@@ -621,15 +116,48 @@ const FqaSettings = ({ theme: propsTheme }) => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
+    // ---------- Login check / session expired ----------
+    const hasToken = () => {
+        if (!localStorage.getItem('token')) {
+            setError('Please login to access this page');
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
+            return false;
+        }
+        return true;
+    };
+
+    // 401/403 হলে true ফেরত দেয়
+    const handleAuthError = (err) => {
+        const status = err.response?.status;
+        if (status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('Role');
+            setError('Session expired. Please login again.');
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
+            return true;
+        }
+        if (status === 403) {
+            setError('This account does not have admin access.');
+            return true;
+        }
+        return false;
+    };
+
+    useEffect(() => {
+        if (!success) return;
+        const t = setTimeout(() => setSuccess(''), 3000);
+        return () => clearTimeout(t);
+    }, [success]);
+
     const fetchFaqs = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await axios.get(`${API_BASE_URL}/faqs`);
+            const res = await api.get('/faqs');
             setFaqs(extractFaqArray(res.data));
         } catch (err) {
             console.error('Error fetching FAQs:', err);
-            setError('Failed to fetch FAQs');
+            if (!handleAuthError(err)) setError(getErrorMessage(err, 'Failed to fetch FAQs'));
             setFaqs([]);
         } finally {
             setLoading(false);
@@ -637,6 +165,12 @@ const FqaSettings = ({ theme: propsTheme }) => {
     };
 
     useEffect(() => { fetchFaqs(); }, []);
+
+    // Delete এর পর page ফাঁকা হলে আগের page এ যাও
+    const totalPages = Math.max(1, Math.ceil(faqs.length / ITEMS_PER_PAGE));
+    useEffect(() => {
+        if (currentPage > totalPages) setCurrentPage(totalPages);
+    }, [totalPages, currentPage]);
 
     const closeModal = () => { setShowModal(false); setEditingFaq(null); setFormData(EMPTY_FORM); };
 
@@ -650,47 +184,62 @@ const FqaSettings = ({ theme: propsTheme }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        if (!hasToken()) return;
+
+        const payload = {
+            faq_question: formData.faq_question.trim(),
+            faq_answe: formData.faq_answe.trim()
+        };
+        if (!payload.faq_question || !payload.faq_answe) {
+            setError('Question and answer are required');
+            return;
+        }
+
+        setSaving(true);
         setError(null);
         try {
             if (editingFaq) {
-                await axios.put(`${API_BASE_URL}/faqs/${editingFaq.id}`, formData);
+                await api.put(`/faqs/${editingFaq.id}`, payload);
             } else {
-                await axios.post(`${API_BASE_URL}/faqs`, formData);
+                await api.post('/faqs', payload);
             }
-            await fetchFaqs();
             closeModal();
+            setSuccess(editingFaq ? 'FAQ updated successfully!' : 'FAQ added successfully!');
+            if (!editingFaq) setCurrentPage(1);
+            await fetchFaqs();
         } catch (err) {
             console.error('Error saving FAQ:', err);
-            setError(err.response?.data?.message || 'Failed to save FAQ');
+            if (!handleAuthError(err)) setError(getErrorMessage(err, 'Failed to save FAQ'));
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
     const confirmDelete = async () => {
-        if (!deletingFaq) return;
-        setLoading(true);
+        if (!deletingFaq || !hasToken()) return;
+        setSaving(true);
+        setError(null);
         try {
-            await axios.delete(`${API_BASE_URL}/faqs/${deletingFaq.id}`);
-            await fetchFaqs();
+            await api.delete(`/faqs/${deletingFaq.id}`);
             setDeletingFaq(null);
+            setSuccess('FAQ deleted successfully!');
+            await fetchFaqs();
         } catch (err) {
             console.error('Error deleting FAQ:', err);
-            setError(err.response?.data?.message || 'Failed to delete FAQ');
+            setDeletingFaq(null);
+            if (!handleAuthError(err)) setError(getErrorMessage(err, 'Failed to delete FAQ'));
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
-    const totalPages = Math.ceil(faqs.length / ITEMS_PER_PAGE);
     const indexOfFirstItem = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentItems = faqs.slice(indexOfFirstItem, indexOfFirstItem + ITEMS_PER_PAGE);
 
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }} className="container-fluid p-0">
             <div className="d-flex">
-                <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="users" />
+                <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="faq" />
 
                 <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} className="flex-grow-1">
                     <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar} />
@@ -700,12 +249,32 @@ const FqaSettings = ({ theme: propsTheme }) => {
                             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                                 <div>
                                     <h2 style={{ color: theme.text }}>FAQ Management</h2>
-                                    <p style={{ color: theme.text, opacity: 0.65 }}>Manage frequently asked questions</p>
+                                    <p style={{ color: theme.text, opacity: 0.65 }}>
+                                        Manage frequently asked questions · {faqs.length} total
+                                    </p>
                                 </div>
-                                <button className="btn" style={{ backgroundColor: theme.accent, color: '#fff' }} onClick={openAddModal}>
-                                    <i className="bi bi-plus-circle me-2"></i>Add New FAQ
-                                </button>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        className="btn"
+                                        style={{ border: `1px solid ${theme.border}`, color: theme.text }}
+                                        onClick={fetchFaqs}
+                                        disabled={loading}
+                                        title="Refresh"
+                                    >
+                                        <i className="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                    <button className="btn" style={{ backgroundColor: accent, color: '#fff' }} onClick={openAddModal}>
+                                        <i className="bi bi-plus-circle me-2"></i>Add New FAQ
+                                    </button>
+                                </div>
                             </div>
+
+                            {success && (
+                                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i className="bi bi-check-circle-fill me-2"></i>{success}
+                                    <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+                                </div>
+                            )}
 
                             {error && (
                                 <div className="alert alert-danger alert-dismissible fade show" role="alert">
@@ -724,9 +293,9 @@ const FqaSettings = ({ theme: propsTheme }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {loading ? (
+                                        {loading && faqs.length === 0 ? (
                                             <tr><td colSpan="4" className="text-center py-5">
-                                                <div className="spinner-border" style={{ color: theme.accent }} role="status"></div>
+                                                <div className="spinner-border" style={{ color: accent }} role="status"></div>
                                                 <p className="mt-2" style={{ color: theme.text }}>Loading FAQs...</p>
                                             </td></tr>
                                         ) : currentItems.length === 0 ? (
@@ -736,7 +305,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                                                 <p style={{ opacity: 0.65 }}>Click "Add New FAQ" to create one.</p>
                                             </td></tr>
                                         ) : currentItems.map((faq, i) => (
-                                            <tr key={faq.id || i} style={{ color: theme.text, borderBottom: `1px solid ${theme.border}` }}>
+                                            <tr key={faq.id || i} style={{ color: theme.text, borderBottom: `1px solid ${theme.border}`, opacity: loading ? 0.6 : 1 }}>
                                                 <td style={{ padding: '12px 16px', fontWeight: 600 }}>{indexOfFirstItem + i + 1}</td>
                                                 <td style={{ padding: '12px 16px' }}><strong>{faq.faq_question || 'N/A'}</strong></td>
                                                 <td style={{ padding: '12px 16px', opacity: 0.85 }}>
@@ -755,7 +324,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                             </div>
 
                             {totalPages > 1 && (
-                                <div className="d-flex justify-content-center align-items-center gap-2 py-4">
+                                <div className="d-flex justify-content-center align-items-center gap-2 py-4 flex-wrap">
                                     <button
                                         className="btn btn-sm"
                                         style={{ border: `1px solid ${theme.border}`, color: theme.text, opacity: currentPage === 1 ? 0.5 : 1 }}
@@ -770,7 +339,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                                             className="btn btn-sm"
                                             style={{
                                                 border: `1px solid ${theme.border}`,
-                                                backgroundColor: currentPage === num ? theme.accent : 'transparent',
+                                                backgroundColor: currentPage === num ? accent : 'transparent',
                                                 color: currentPage === num ? '#fff' : theme.text
                                             }}
                                             onClick={() => setCurrentPage(num)}
@@ -800,12 +369,12 @@ const FqaSettings = ({ theme: propsTheme }) => {
                         theme={theme}
                         title={editingFaq ? 'Edit FAQ' : 'Add New FAQ'}
                         icon={editingFaq ? 'bi-pencil-square' : 'bi-plus-circle'}
-                        iconColor={theme.accent}
+                        iconColor={accent}
                         onClose={closeModal}
                         footer={<>
                             <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
-                            <button type="submit" className="btn btn-primary" disabled={loading}>
-                                {loading
+                            <button type="submit" className="btn btn-primary" disabled={saving}>
+                                {saving
                                     ? <><span className="spinner-border spinner-border-sm me-2"></span>Saving...</>
                                     : <><i className="bi bi-save me-2"></i>{editingFaq ? 'Update' : 'Save'}</>}
                             </button>
@@ -818,6 +387,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                             <input
                                 type="text"
                                 required
+                                maxLength={500}
                                 value={formData.faq_question}
                                 onChange={(e) => setFormData({ ...formData, faq_question: e.target.value })}
                                 style={fieldStyle}
@@ -848,7 +418,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         zIndex: 1050, padding: '20px', animation: 'fadeIn .2s ease'
                     }}
-                    onClick={(e) => e.target === e.currentTarget && !loading && setDeletingFaq(null)}
+                    onClick={(e) => e.target === e.currentTarget && !saving && setDeletingFaq(null)}
                 >
                     <div style={{
                         backgroundColor: theme.isDarkMode ? '#000' : '#fff',
@@ -873,7 +443,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <button
                                 onClick={() => setDeletingFaq(null)}
-                                disabled={loading}
+                                disabled={saving}
                                 style={{
                                     flex: 1, padding: '10px', borderRadius: '8px', fontWeight: 600, fontSize: '14px',
                                     backgroundColor: 'transparent',
@@ -886,7 +456,7 @@ const FqaSettings = ({ theme: propsTheme }) => {
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                disabled={loading}
+                                disabled={saving}
                                 style={{
                                     flex: 1, padding: '10px', borderRadius: '8px', fontWeight: 600, fontSize: '14px',
                                     backgroundColor: theme.isDarkMode ? '#fff' : '#000',
@@ -895,14 +465,14 @@ const FqaSettings = ({ theme: propsTheme }) => {
                                     cursor: 'pointer'
                                 }}
                             >
-                                {loading ? 'Deleting...' : 'Delete'}
+                                {saving ? 'Deleting...' : 'Delete'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes slideIn { from { transform: translateY(-24px) scale(0.96); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
                 .form-control, .form-select {
@@ -910,12 +480,12 @@ const FqaSettings = ({ theme: propsTheme }) => {
                     color: ${theme.text} !important;
                     border-color: ${theme.border} !important;
                 }
-                .table tbody tr:hover { background-color: ${theme.accent}0d !important; }
+                .table tbody tr:hover { background-color: ${accent}0d !important; }
                 .btn-group .btn { border-radius: 6px; padding: 4px 10px; margin: 0 2px; }
                 ::-webkit-scrollbar { width: 6px; height: 6px; }
                 ::-webkit-scrollbar-track { background: ${theme.bg}; }
                 ::-webkit-scrollbar-thumb { background: ${theme.border}; border-radius: 10px; }
-                ::-webkit-scrollbar-thumb:hover { background: ${theme.accent}; }
+                ::-webkit-scrollbar-thumb:hover { background: ${accent}; }
             `}</style>
         </div>
     );

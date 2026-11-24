@@ -72,7 +72,7 @@ function App() {
       <Routes>
         {/* ফ্রন্টএন্ড রুটসমূহ - পাবলিক */}
         <Route path='/home' element={<Homepage />} />
-        <Route path='/' element={<LandingPage />} />
+   
         <Route path='/about' element={<AboutUs />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/career' element={<Career />} />
@@ -88,6 +88,10 @@ function App() {
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/event/:id" element={<EventsDetails />} />
         <Route path="*" element={<NotFound />} />
+
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/investment" element={<LandingPage investmentOnly />} />
+        <Route path="/benefits" element={<LandingPage view="benefits" />} />
 
         <Route path="/write-blog" element={<WriteBlog />} />
 
@@ -143,7 +147,7 @@ function App() {
           </PrivateRoute>
         } />
 
-          <Route path="/admin-investquery" element={
+        <Route path="/admin-investquery" element={
           <PrivateRoute>
             <InvestQuery />
           </PrivateRoute>

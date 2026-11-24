@@ -3,6 +3,7 @@ import Footer from "./Common/Footer";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import backgroundImage from '../Background/21188763-450a-4fa6-bd55-00e25dd6c660.jfif'
 
 const brandColor = '#5e2e10';
 const brandHover = '#3d1f0a';
@@ -81,9 +82,9 @@ const AllEvents = () => {
     card: isDarkMode ? '#16213e' : '#ffffff',
     text: isDarkMode ? '#e9ecef' : '#2c3e50',
     border: isDarkMode ? '#2d3436' : '#e0e0e0',
-    heroBg: isDarkMode
-      ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`
-      : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://i.ibb.co.com/SDpZ5cqG/Hotel4.png")`,
+        heroBg: isDarkMode
+      ? `linear-gradient(rgba(26, 26, 46, 0.85), rgba(22, 33, 62, 0.85)), url("${backgroundImage}")`
+      : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("${backgroundImage}")`,
     primaryColor: brandColor,
     primaryHover: brandHover,
   };

@@ -4,30 +4,16 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import "../../css/Header.css";
 import Logo from "../../image/Akashbari  resort logo png-01.png";
 
-const scrollToId = (id) => {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-};
-
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isHome = location.pathname === "/";
 
-  // Home page এর কোনো section এ যাওয়া
-  const goToSection = (id) => {
-    if (isHome) {
-      scrollToId(id);
-    } else {
-      // Landing page data load হওয়ার পর নিজেই এই section এ scroll করবে
-      navigate("/", { state: { scrollTo: id } });
-    }
-  };
-
-  const handleHomeClick = () => {
-    if (isHome) {
+  // একই page এ থাকলে উপরে scroll, না হলে সেই page এ যাও
+  const goToPage = (path) => {
+    if (location.pathname === path) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      navigate("/");
+      navigate(path);
       window.scrollTo({ top: 0 });
     }
   };
@@ -38,7 +24,7 @@ const Header = () => {
         {/* collapseOnSelect: mobile এ menu item চাপলে menu বন্ধ হবে */}
         <Navbar expand="lg" collapseOnSelect className="py-2 px-0">
           <Navbar.Brand
-            onClick={handleHomeClick}
+            onClick={() => goToPage("/")}
             className="d-flex align-items-center"
             style={{ cursor: "pointer" }}
           >
@@ -49,45 +35,45 @@ const Header = () => {
 
           <Navbar.Collapse>
             <Nav className="ms-auto align-items-center menu">
-              <Nav.Link eventKey="home" onClick={handleHomeClick}>
+              <Nav.Link eventKey="home" onClick={() => goToPage("/")}>
                 HOME
               </Nav.Link>
 
-              <Nav.Link eventKey="packages" onClick={() => goToSection("invest-section")}>
-                INVESMENT
+              {/* Investment + Packages + Owner */}
+              <Nav.Link eventKey="investment" onClick={() => goToPage("/investment")}>
+                INVESTMENT
               </Nav.Link>
 
-              <Nav.Link eventKey="investment" onClick={() => goToSection("owner-section")}>
+              {/* Welcome + Facility */}
+              <Nav.Link eventKey="benefits" onClick={() => goToPage("/benefits")}>
                 BENEFITS
               </Nav.Link>
 
-              <Nav.Link eventKey="gallery" onClick={() => navigate("/gallery")}>
+              <Nav.Link eventKey="gallery" onClick={() => goToPage("/gallery")}>
                 GALLERY
               </Nav.Link>
 
-              <Nav.Link eventKey="about" onClick={() => navigate("/about")}>
+              <Nav.Link eventKey="about" onClick={() => goToPage("/about")}>
                 ABOUT US
               </Nav.Link>
 
-              <Nav.Link eventKey="blog" onClick={() => navigate("/blog")}>
+              <Nav.Link eventKey="blog" onClick={() => goToPage("/blog")}>
                 BLOG
               </Nav.Link>
 
-              <Nav.Link eventKey="career" onClick={() => navigate("/career")}>
+              <Nav.Link eventKey="career" onClick={() => goToPage("/career")}>
                 CAREER
               </Nav.Link>
 
-              <Nav.Link eventKey="event" onClick={() => navigate("/all-events")}>
+              <Nav.Link eventKey="event" onClick={() => goToPage("/all-events")}>
                 EVENT
               </Nav.Link>
 
-           
-
-              <Nav.Link  onClick={() => navigate("/contact")}>
+              <Nav.Link eventKey="contact" onClick={() => goToPage("/contact")}>
                 CONTACT
               </Nav.Link>
 
-               <button className="contact-btn" onClick={() => navigate("/invest-form")}>
+              <button className="contact-btn" onClick={() => goToPage("/invest-form")}>
                 Ownership
               </button>
             </Nav>

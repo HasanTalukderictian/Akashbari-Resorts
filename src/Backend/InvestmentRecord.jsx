@@ -6,28 +6,66 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FaEdit, FaTrash, FaPlus, FaTimes } from 'react-icons/fa';
 
+// ⚠️ path আপনার folder অনুযায়ী ঠিক করুন (src/Config/api.js)
+import { API_BASE_URL } from '../Config/api';
+
+const BRAND = '#5e2e10';
+const BRAND_HOVER = '#8B4513';
+
+const EMPTY_FORM = { title: '', desc: '' };
+const EMPTY_VALUE_FORM = { member: '', revenue: '', expericence: '', amenities: '' };
+
+// ---------- Axios instance: প্রতিটা request এ token + JSON header ----------
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    withCredentials: false,
+    headers: { Accept: 'application/json' }
+});
+
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Role = localStorage.getItem('Role') || 'admin';
+    return config;
+});
+
+// Error থেকে পড়ার মতো message
+const getErrorMessage = (error, fallback) => {
+    const body = error.response?.data;
+    if (body?.errors) {
+        const first = Object.values(body.errors)[0];
+        return Array.isArray(first) ? first[0] : String(first);
+    }
+    if (body && typeof body === 'object' && body.message) return body.message;
+    if (error.response?.status >= 500) return `Server error (${error.response.status}). Please try again.`;
+    if (!error.response) return 'Network error. Please check your connection.';
+    return fallback;
+};
+
+const toNumber = (v) => {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : 0;
+};
+
 const InvestmentRecord = ({ theme: propsTheme }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
+
     const [records, setRecords] = useState([]);
     const [valueRecords, setValueRecords] = useState([]);
-    const [loading, setLoading] = useState(false);
+
+    const [loadingRecords, setLoadingRecords] = useState(false);
+    const [loadingValues, setLoadingValues] = useState(false);
+    const [saving, setSaving] = useState(false);
+
     const [showModal, setShowModal] = useState(false);
     const [showValueModal, setShowValueModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isEditingValue, setIsEditingValue] = useState(false);
     const [currentId, setCurrentId] = useState(null);
     const [currentValueId, setCurrentValueId] = useState(null);
-    const [formData, setFormData] = useState({
-        title: '',
-        desc: ''
-    });
-    const [valueFormData, setValueFormData] = useState({
-        member: '',
-        revenue: '',
-        expericence: '',
-        amenities: ''
-    });
+    const [formData, setFormData] = useState(EMPTY_FORM);
+    const [valueFormData, setValueFormData] = useState(EMPTY_VALUE_FORM);
 
     const theme = propsTheme || {
         isDarkMode,
@@ -36,64 +74,66 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
         border: isDarkMode ? '#2d3436' : '#ebedf2',
         sidebarText: isDarkMode ? '#b2bec3' : '#3e4b5b',
-        primary: '#5e2e10'
+        primary: BRAND
+    };
+    const dark = theme.isDarkMode ?? isDarkMode;
+
+    // ---------- Login check / session expired ----------
+    const hasToken = () => {
+        if (!localStorage.getItem('token')) {
+            Swal.fire('Login required', 'Please login to access this page', 'warning')
+                .then(() => { window.location.href = '/login'; });
+            return false;
+        }
+        return true;
     };
 
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    // 401/403 হলে true ফেরত দেয়
+    const handleAuthError = (error) => {
+        const status = error.response?.status;
+        if (status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('Role');
+            Swal.fire('Session expired', 'Please login again.', 'warning')
+                .then(() => { window.location.href = '/login'; });
+            return true;
+        }
+        if (status === 403) {
+            Swal.fire('Access denied', 'This account does not have admin access.', 'error');
+            return true;
+        }
+        return false;
+    };
 
-    // Configure axios defaults
-    axios.defaults.withCredentials = false;
-    axios.defaults.headers.common['Accept'] = 'application/json';
+    const showError = (error, fallback) => {
+        console.error(fallback, error);
+        if (!handleAuthError(error)) Swal.fire('Error!', getErrorMessage(error, fallback), 'error');
+    };
 
-    // Fetch all investment records
+    // ---------- Fetch ----------
     const fetchRecords = async () => {
-        setLoading(true);
+        setLoadingRecords(true);
         try {
-            const response = await axios.get(`${BASE_URL}/get-investrecord`);
-            
-            console.log('Fetch response:', response.data);
-            
-            if (response.data.status === true) {
-                setRecords(response.data.data || []);
-            } else {
-                setRecords([]);
-            }
+            const { data } = await api.get('/get-investrecord');
+            setRecords(data?.status === true && Array.isArray(data.data) ? data.data : []);
         } catch (error) {
-            console.error('Error fetching records:', error);
-            if (error.response) {
-                Swal.fire('Error!', error.response.data.message || 'Failed to fetch records', 'error');
-            } else {
-                Swal.fire('Error!', 'Network error. Please check your connection.', 'error');
-            }
+            showError(error, 'Failed to fetch records');
             setRecords([]);
         } finally {
-            setLoading(false);
+            setLoadingRecords(false);
         }
     };
 
-    // Fetch all value records
     const fetchValueRecords = async () => {
-        setLoading(true);
+        setLoadingValues(true);
         try {
-            const response = await axios.get(`${BASE_URL}/get-valuerecord`);
-            
-            console.log('Fetch value records response:', response.data);
-            
-            if (response.data.status === true) {
-                setValueRecords(response.data.data || []);
-            } else {
-                setValueRecords([]);
-            }
+            const { data } = await api.get('/get-valuerecord');
+            setValueRecords(data?.status === true && Array.isArray(data.data) ? data.data : []);
         } catch (error) {
-            console.error('Error fetching value records:', error);
-            if (error.response) {
-                Swal.fire('Error!', error.response.data.message || 'Failed to fetch value records', 'error');
-            } else {
-                Swal.fire('Error!', 'Network error. Please check your connection.', 'error');
-            }
+            showError(error, 'Failed to fetch value records');
             setValueRecords([]);
         } finally {
-            setLoading(false);
+            setLoadingValues(false);
         }
     };
 
@@ -102,277 +142,138 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         fetchValueRecords();
     }, []);
 
-    // Handle form input change for investment records
-    const handleInputChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    // ---------- Form handlers ----------
+    const handleInputChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleValueInputChange = (e) => setValueFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-    // Handle form input change for value records
-    const handleValueInputChange = (e) => {
-        setValueFormData({
-            ...valueFormData,
-            [e.target.name]: e.target.value
-        });
-    };
+    const resetForm = () => { setFormData(EMPTY_FORM); setIsEditing(false); setCurrentId(null); };
+    const resetValueForm = () => { setValueFormData(EMPTY_VALUE_FORM); setIsEditingValue(false); setCurrentValueId(null); };
 
-    // Reset investment form
-    const resetForm = () => {
-        setFormData({
-            title: '',
-            desc: ''
-        });
-        setIsEditing(false);
-        setCurrentId(null);
-    };
+    const closeModal = () => { if (saving) return; setShowModal(false); resetForm(); };
+    const closeValueModal = () => { if (saving) return; setShowValueModal(false); resetValueForm(); };
 
-    // Reset value form
-    const resetValueForm = () => {
-        setValueFormData({
-            member: '',
-            revenue: '',
-            expericence: '',
-            amenities: ''
-        });
-        setIsEditingValue(false);
-        setCurrentValueId(null);
-    };
+    const handleAddClick = () => { resetForm(); setShowModal(true); };
+    const handleAddValueClick = () => { resetValueForm(); setShowValueModal(true); };
 
-    // Open modal for add investment record
-    const handleAddClick = () => {
-        resetForm();
-        setShowModal(true);
-        setIsEditing(false);
-    };
-
-    // Open modal for add value record
-    const handleAddValueClick = () => {
-        resetValueForm();
-        setShowValueModal(true);
-        setIsEditingValue(false);
-    };
-
-    // Open modal for edit investment record
     const handleEditClick = (record) => {
         setIsEditing(true);
         setCurrentId(record.id);
-        setFormData({
-            title: record.title,
-            desc: record.desc
-        });
+        setFormData({ title: record.title ?? '', desc: record.desc ?? '' });
         setShowModal(true);
     };
 
-    // Open modal for edit value record
     const handleEditValueClick = (record) => {
         setIsEditingValue(true);
         setCurrentValueId(record.id);
         setValueFormData({
-            member: record.member,
-            revenue: record.revenue,
-            expericence: record.expericence,
-            amenities: record.amenities
+            member: record.member ?? '',
+            revenue: record.revenue ?? '',
+            expericence: record.expericence ?? '',
+            amenities: record.amenities ?? ''
         });
         setShowValueModal(true);
     };
 
-    // Submit investment record form (Add/Edit)
+    // ---------- Submit: Investment record ----------
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        if (!formData.title) {
-            Swal.fire('Warning!', 'Please enter title', 'warning');
-            return;
-        }
-        
-        if (!formData.desc) {
-            Swal.fire('Warning!', 'Please enter description', 'warning');
-            return;
-        }
+        if (!hasToken()) return;
 
-        setLoading(true);
+        const payload = { title: formData.title.trim(), desc: formData.desc.trim() };
+        if (!payload.title) return Swal.fire('Warning!', 'Please enter title', 'warning');
+        if (!payload.desc) return Swal.fire('Warning!', 'Please enter description', 'warning');
 
+        setSaving(true);
         try {
-            let response;
-            
-            if (isEditing) {
-                response = await axios.post(`${BASE_URL}/edit-investrecord/${currentId}`, formData, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } else {
-                response = await axios.post(`${BASE_URL}/add-investrecord`, formData, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-            }
+            const { data } = isEditing
+                ? await api.post(`/edit-investrecord/${currentId}`, payload)
+                : await api.post('/add-investrecord', payload);
 
-            console.log('Submit response:', response.data);
-
-            if (response.data.status === true) {
-                Swal.fire('Success!', response.data.message || (isEditing ? 'Record updated successfully' : 'Record added successfully'), 'success');
-                resetForm();
+            if (data?.status === true) {
+                Swal.fire('Success!', data.message || (isEditing ? 'Record updated successfully' : 'Record added successfully'), 'success');
                 setShowModal(false);
+                resetForm();
                 fetchRecords();
             } else {
-                Swal.fire('Error!', response.data.message || 'Something went wrong', 'error');
+                Swal.fire('Error!', data?.message || 'Something went wrong', 'error');
             }
         } catch (error) {
-            console.error('Error saving record:', error);
-            if (error.response) {
-                Swal.fire('Error!', error.response.data.message || 'Failed to save record', 'error');
-            } else {
-                Swal.fire('Error!', 'Network error. Please check your connection.', 'error');
-            }
+            showError(error, 'Failed to save record');
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
-    // Submit value record form (Add/Edit)
+    // ---------- Submit: Value record ----------
     const handleValueSubmit = async (e) => {
         e.preventDefault();
-        
-        if (!valueFormData.member) {
-            Swal.fire('Warning!', 'Please enter member count', 'warning');
-            return;
-        }
-        
-        if (!valueFormData.revenue) {
-            Swal.fire('Warning!', 'Please enter revenue', 'warning');
-            return;
-        }
-        
-        if (!valueFormData.expericence) {
-            Swal.fire('Warning!', 'Please enter experience', 'warning');
-            return;
-        }
-        
-        if (!valueFormData.amenities) {
-            Swal.fire('Warning!', 'Please enter amenities', 'warning');
-            return;
+        if (!hasToken()) return;
+
+        const checks = [
+            ['member', 'Please enter member count'],
+            ['revenue', 'Please enter revenue'],
+            ['expericence', 'Please enter years of experience'],
+            ['amenities', 'Please enter amenities']
+        ];
+        for (const [key, msg] of checks) {
+            if (String(valueFormData[key]).trim() === '') return Swal.fire('Warning!', msg, 'warning');
         }
 
-        setLoading(true);
-
+        setSaving(true);
         try {
-            let response;
-            
-            if (isEditingValue) {
-                response = await axios.post(`${BASE_URL}/edit-valuerecord/${currentValueId}`, valueFormData, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } else {
-                response = await axios.post(`${BASE_URL}/add-valuerecord`, valueFormData, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-            }
+            const { data } = isEditingValue
+                ? await api.post(`/edit-valuerecord/${currentValueId}`, valueFormData)
+                : await api.post('/add-valuerecord', valueFormData);
 
-            console.log('Submit value response:', response.data);
-
-            if (response.data.status === true) {
-                Swal.fire('Success!', response.data.message || (isEditingValue ? 'Value record updated successfully' : 'Value record added successfully'), 'success');
-                resetValueForm();
+            if (data?.status === true) {
+                Swal.fire('Success!', data.message || (isEditingValue ? 'Value record updated successfully' : 'Value record added successfully'), 'success');
                 setShowValueModal(false);
+                resetValueForm();
                 fetchValueRecords();
             } else {
-                Swal.fire('Error!', response.data.message || 'Something went wrong', 'error');
+                Swal.fire('Error!', data?.message || 'Something went wrong', 'error');
             }
         } catch (error) {
-            console.error('Error saving value record:', error);
-            if (error.response) {
-                Swal.fire('Error!', error.response.data.message || 'Failed to save value record', 'error');
-            } else {
-                Swal.fire('Error!', 'Network error. Please check your connection.', 'error');
-            }
+            showError(error, 'Failed to save value record');
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
-    // Delete investment record
-    const handleDeleteClick = (id, title) => {
-        Swal.fire({
+    // ---------- Delete ----------
+    const confirmAndDelete = async (text, url, onDone, fallback) => {
+        const result = await Swal.fire({
             title: 'Are you sure?',
-            text: `You want to delete "${title}"?`,
+            text,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#5e2e10',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: BRAND,
+            cancelButtonColor: '#6c757d',
             confirmButtonText: 'Yes, delete it!'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                setLoading(true);
-                try {
-                    const response = await axios.delete(`${BASE_URL}/del-investrecord/${id}`);
-                    
-                    console.log('Delete response:', response.data);
-                    
-                    if (response.data.status === true) {
-                        Swal.fire('Deleted!', response.data.message || 'Record deleted successfully', 'success');
-                        fetchRecords();
-                    } else {
-                        Swal.fire('Error!', response.data.message || 'Failed to delete', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error deleting record:', error);
-                    if (error.response) {
-                        Swal.fire('Error!', error.response.data.message || 'Failed to delete record', 'error');
-                    } else {
-                        Swal.fire('Error!', 'Network error. Please check your connection.', 'error');
-                    }
-                } finally {
-                    setLoading(false);
-                }
-            }
         });
+        if (!result.isConfirmed || !hasToken()) return;
+
+        setSaving(true);
+        try {
+            const { data } = await api.delete(url);
+            if (data?.status === true) {
+                Swal.fire('Deleted!', data.message || 'Deleted successfully', 'success');
+                onDone();
+            } else {
+                Swal.fire('Error!', data?.message || 'Failed to delete', 'error');
+            }
+        } catch (error) {
+            showError(error, fallback);
+        } finally {
+            setSaving(false);
+        }
     };
 
-    // Delete value record
-    const handleDeleteValueClick = (id, member) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `You want to delete record with ${member} members?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#5e2e10',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                setLoading(true);
-                try {
-                    const response = await axios.delete(`${BASE_URL}/del-valuerecord/${id}`);
-                    
-                    console.log('Delete value response:', response.data);
-                    
-                    if (response.data.status === true) {
-                        Swal.fire('Deleted!', response.data.message || 'Value record deleted successfully', 'success');
-                        fetchValueRecords();
-                    } else {
-                        Swal.fire('Error!', response.data.message || 'Failed to delete', 'error');
-                    }
-                } catch (error) {
-                    console.error('Error deleting value record:', error);
-                    if (error.response) {
-                        Swal.fire('Error!', error.response.data.message || 'Failed to delete value record', 'error');
-                    } else {
-                        Swal.fire('Error!', 'Network error. Please check your connection.', 'error');
-                    }
-                } finally {
-                    setLoading(false);
-                }
-            }
-        });
-    };
+    const handleDeleteClick = (id, title) =>
+        confirmAndDelete(`You want to delete "${title}"?`, `/del-investrecord/${id}`, fetchRecords, 'Failed to delete record');
+
+    const handleDeleteValueClick = (id, member) =>
+        confirmAndDelete(`You want to delete record with ${member} members?`, `/del-valuerecord/${id}`, fetchValueRecords, 'Failed to delete value record');
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
@@ -382,11 +283,16 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         e.currentTarget.style.backgroundColor = color;
         e.currentTarget.style.transform = 'translateY(-2px)';
     };
-
     const handleButtonLeave = (e, color) => {
         e.currentTarget.style.backgroundColor = color;
         e.currentTarget.style.transform = 'translateY(0)';
     };
+
+    // Stats
+    const totalMembers = valueRecords.reduce((sum, r) => sum + toNumber(r.member), 0);
+    const totalRevenue = valueRecords.reduce((sum, r) => sum + toNumber(r.revenue), 0);
+    const totalExperience = valueRecords.reduce((sum, r) => sum + toNumber(r.expericence), 0);
+    const totalAmenities = valueRecords.reduce((sum, r) => sum + toNumber(r.amenities), 0);
 
     const styles = {
         container: { backgroundColor: theme.bg, minHeight: '100vh', transition: 'all 0.3s ease' },
@@ -394,265 +300,152 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
         contentContainer: { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' },
         contentScroll: { flex: '1 0 auto', padding: '24px' },
         footerWrapper: { flexShrink: 0 },
-        splitLayout: {
-            display: 'flex',
-            gap: '24px',
-            flexWrap: 'wrap'
-        },
-        leftSection: {
-            flex: '1',
-            minWidth: '300px'
-        },
-        rightSection: {
-            flex: '1',
-            minWidth: '300px'
-        },
+        splitLayout: { display: 'flex', gap: '24px', flexWrap: 'wrap' },
+        leftSection: { flex: '1', minWidth: '300px' },
+        rightSection: { flex: '1', minWidth: '300px' },
         card: {
-            backgroundColor: theme.card,
-            borderRadius: '10px',
-            padding: '20px',
-            marginBottom: '20px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            backgroundColor: theme.card, borderRadius: '10px', padding: '20px',
+            marginBottom: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
         },
+        tableWrap: { overflowX: 'auto' },
         addBtn: {
-            backgroundColor: '#5e2e10',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '16px',
-            transition: 'all 0.3s ease',
+            backgroundColor: BRAND, color: 'white', border: 'none', padding: '10px 20px',
+            borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center',
+            gap: '8px', fontSize: '16px', transition: 'all 0.3s ease',
             boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
         },
-        table: {
-            width: '100%',
-            borderCollapse: 'collapse',
-            backgroundColor: theme.card,
-            borderRadius: '10px',
-            overflow: 'hidden'
-        },
+        table: { width: '100%', borderCollapse: 'collapse', backgroundColor: theme.card, borderRadius: '10px', overflow: 'hidden' },
         th: {
-            backgroundColor: isDarkMode ? '#0f3460' : '#e9ecef',
-            color: theme.text,
-            padding: '12px',
-            textAlign: 'left',
-            fontWeight: 'bold',
-            borderBottom: `1px solid ${theme.border}`
+            backgroundColor: dark ? '#0f3460' : '#e9ecef', color: theme.text, padding: '12px',
+            textAlign: 'left', fontWeight: 'bold', borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap'
         },
-        td: {
-            color: theme.text,
-            padding: '12px',
-            borderBottom: `1px solid ${theme.border}`
-        },
+        td: { color: theme.text, padding: '12px', borderBottom: `1px solid ${theme.border}` },
+        actionsTd: { color: theme.text, padding: '12px', borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' },
         editBtn: {
-            backgroundColor: '#5e2e10',
-            color: 'white',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            marginRight: '8px',
-            fontSize: '12px',
-            transition: 'all 0.3s ease'
+            backgroundColor: BRAND, color: 'white', border: 'none', padding: '6px 12px',
+            borderRadius: '5px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center',
+            gap: '5px', marginRight: '8px', fontSize: '12px', transition: 'all 0.3s ease'
         },
         deleteBtn: {
-            backgroundColor: '#f44336',
-            color: 'white',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontSize: '12px',
-            transition: 'all 0.3s ease'
+            backgroundColor: '#f44336', color: 'white', border: 'none', padding: '6px 12px',
+            borderRadius: '5px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center',
+            gap: '5px', fontSize: '12px', transition: 'all 0.3s ease'
         },
         modalOverlay: {
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '16px'
         },
         modalContent: {
-            backgroundColor: theme.card,
-            borderRadius: '10px',
-            padding: '30px',
-            width: '90%',
-            maxWidth: '500px',
-            maxHeight: '90vh',
-            overflowY: 'auto'
+            backgroundColor: theme.card, borderRadius: '10px', padding: '30px', width: '100%',
+            maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto'
         },
         modalHeader: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px',
-            borderBottom: `1px solid ${theme.border}`,
-            paddingBottom: '10px'
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px',
+            borderBottom: `1px solid ${theme.border}`, paddingBottom: '10px'
         },
-        modalTitle: {
-            color: theme.text,
-            fontSize: '24px',
-            margin: 0
-        },
+        modalTitle: { color: theme.text, fontSize: '22px', margin: 0 },
         closeBtn: {
-            backgroundColor: 'transparent',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: theme.text,
-            transition: 'all 0.3s ease'
+            backgroundColor: 'transparent', border: 'none', fontSize: '24px', cursor: 'pointer',
+            color: theme.text, transition: 'all 0.3s ease'
         },
-        formGroup: {
-            marginBottom: '20px'
-        },
-        label: {
-            display: 'block',
-            color: theme.text,
-            marginBottom: '8px',
-            fontWeight: 'bold'
-        },
+        formGroup: { marginBottom: '20px' },
+        label: { display: 'block', color: theme.text, marginBottom: '8px', fontWeight: 'bold' },
         input: {
-            width: '100%',
-            padding: '10px',
-            border: `1px solid ${theme.border}`,
-            borderRadius: '5px',
-            backgroundColor: theme.bg,
-            color: theme.text,
-            fontSize: '14px'
+            width: '100%', padding: '10px', border: `1px solid ${theme.border}`, borderRadius: '5px',
+            backgroundColor: theme.bg, color: theme.text, fontSize: '14px'
         },
         textarea: {
-            width: '100%',
-            padding: '10px',
-            border: `1px solid ${theme.border}`,
-            borderRadius: '5px',
-            backgroundColor: theme.bg,
-            color: theme.text,
-            fontSize: '14px',
-            minHeight: '100px',
-            resize: 'vertical'
+            width: '100%', padding: '10px', border: `1px solid ${theme.border}`, borderRadius: '5px',
+            backgroundColor: theme.bg, color: theme.text, fontSize: '14px', minHeight: '100px', resize: 'vertical'
         },
         submitBtn: {
-            width: '100%',
-            padding: '12px',
-            backgroundColor: '#5e2e10',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            marginTop: '10px',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
+            width: '100%', padding: '12px', backgroundColor: BRAND, color: 'white', border: 'none',
+            borderRadius: '5px', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '16px', marginTop: '10px',
+            transition: 'all 0.3s ease', boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)', opacity: saving ? 0.7 : 1
         },
-        loadingText: {
-            textAlign: 'center',
-            color: theme.text,
-            padding: '20px'
-        },
-        emptyText: {
-            textAlign: 'center',
-            color: theme.text,
-            padding: '40px',
-            fontSize: '18px'
-        },
+        loadingText: { textAlign: 'center', color: theme.text, padding: '20px' },
+        emptyText: { textAlign: 'center', color: theme.text, padding: '40px', fontSize: '18px' },
         headerContainer: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px',
-            flexWrap: 'wrap',
-            gap: '10px'
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: '0', flexWrap: 'wrap', gap: '10px'
         },
-        title: {
-            color: theme.text,
-            margin: 0
-        },
-        valueStats: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '15px',
-            marginTop: '20px'
-        },
-        statCard: {
-            backgroundColor: isDarkMode ? '#1a1a2e' : '#f8f9fa',
-            padding: '15px',
-            borderRadius: '8px',
-            textAlign: 'center'
-        },
-        statValue: {
-            fontSize: '24px',
-            fontWeight: 'bold',
-            color: '#5e2e10',
-            marginBottom: '5px'
-        },
-        statLabel: {
-            color: theme.text,
-            fontSize: '14px'
-        }
+        title: { color: theme.text, margin: 0 },
+        valueStats: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px', marginTop: '20px' },
+        statCard: { backgroundColor: dark ? '#1a1a2e' : '#f8f9fa', padding: '15px', borderRadius: '8px', textAlign: 'center' },
+        statValue: { fontSize: '24px', fontWeight: 'bold', color: dark ? '#d9a77f' : BRAND, marginBottom: '5px' },
+        statLabel: { color: theme.text, fontSize: '14px' }
     };
+
+    const Spinner = ({ text }) => (
+        <div style={styles.loadingText}>
+            <div className="spinner-border" style={{ color: BRAND }} role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+            <div>{text}</div>
+        </div>
+    );
+
+    const ActionButtons = ({ onEdit, onDelete }) => (
+        <>
+            <button
+                onClick={onEdit}
+                disabled={saving}
+                style={styles.editBtn}
+                title="Edit"
+                onMouseEnter={(e) => handleButtonHover(e, BRAND_HOVER)}
+                onMouseLeave={(e) => handleButtonLeave(e, BRAND)}
+            >
+                <FaEdit />
+            </button>
+            <button
+                onClick={onDelete}
+                disabled={saving}
+                style={styles.deleteBtn}
+                title="Delete"
+                onMouseEnter={(e) => handleButtonHover(e, '#d32f2f')}
+                onMouseLeave={(e) => handleButtonLeave(e, '#f44336')}
+            >
+                <FaTrash />
+            </button>
+        </>
+    );
 
     return (
         <div style={styles.container} className="container-fluid p-0">
             <div className="d-flex">
-                <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="users" />
+                <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="investment-record" />
 
                 <div style={styles.mainArea} className="flex-grow-1">
-                    <Header 
-                        theme={theme} 
-                        isDarkMode={isDarkMode} 
-                        toggleDarkMode={toggleDarkMode} 
-                        toggleSidebar={toggleSidebar} 
-                    />
+                    <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar} />
 
                     <div style={styles.contentContainer}>
                         <div style={styles.contentScroll}>
-                            {/* Split Layout 50% - 50% */}
                             <div style={styles.splitLayout}>
-                                
-                                {/* Left Section: Investment Records Table */}
+
+                                {/* Left: Investment Records */}
                                 <div style={styles.leftSection}>
                                     <div style={styles.card}>
                                         <div style={styles.headerContainer}>
                                             <h2 style={styles.title}>Investment Records</h2>
-                                            <button 
-                                                onClick={handleAddClick} 
+                                            <button
+                                                onClick={handleAddClick}
                                                 style={styles.addBtn}
-                                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-                                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                                                onMouseEnter={(e) => handleButtonHover(e, BRAND_HOVER)}
+                                                onMouseLeave={(e) => handleButtonLeave(e, BRAND)}
                                             >
                                                 <FaPlus /> Add New Record
                                             </button>
                                         </div>
                                     </div>
 
-                                    {loading && !showModal ? (
-                                        <div style={styles.loadingText}>
-                                            <div className="spinner-border text-primary" role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                            <div>Loading records...</div>
-                                        </div>
+                                    {loadingRecords && records.length === 0 ? (
+                                        <Spinner text="Loading records..." />
                                     ) : records.length === 0 ? (
                                         <div style={styles.emptyText}>
                                             No records found. Click "Add New Record" to get started.
                                         </div>
                                     ) : (
-                                        <div style={styles.card}>
+                                        <div style={{ ...styles.card, ...styles.tableWrap, opacity: loadingRecords ? 0.6 : 1 }}>
                                             <table style={styles.table}>
                                                 <thead>
                                                     <tr>
@@ -668,29 +461,11 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                                             <td style={styles.td}>{record.id}</td>
                                                             <td style={styles.td}><strong>{record.title}</strong></td>
                                                             <td style={styles.td}>{record.desc}</td>
-                                                            <td style={styles.td}>
-                                                                <button 
-                                                                    onClick={() => handleEditClick(record)} 
-                                                                    style={styles.editBtn}
-                                                                    onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-                                                                    onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-                                                                >
-                                                                    <FaEdit /> 
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => handleDeleteClick(record.id, record.title)} 
-                                                                    style={styles.deleteBtn}
-                                                                    onMouseEnter={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = '#d32f2f';
-                                                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                                                    }}
-                                                                    onMouseLeave={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = '#f44336';
-                                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                                    }}
-                                                                >
-                                                                    <FaTrash /> 
-                                                                </button>
+                                                            <td style={styles.actionsTd}>
+                                                                <ActionButtons
+                                                                    onEdit={() => handleEditClick(record)}
+                                                                    onDelete={() => handleDeleteClick(record.id, record.title)}
+                                                                />
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -700,42 +475,37 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                     )}
                                 </div>
 
-                                {/* Right Section: Value Records Table */}
+                                {/* Right: Value Records */}
                                 <div style={styles.rightSection}>
                                     <div style={styles.card}>
                                         <div style={styles.headerContainer}>
                                             <h2 style={styles.title}>Value Records</h2>
-                                            <button 
-                                                onClick={handleAddValueClick} 
+                                            <button
+                                                onClick={handleAddValueClick}
                                                 style={styles.addBtn}
-                                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-                                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                                                onMouseEnter={(e) => handleButtonHover(e, BRAND_HOVER)}
+                                                onMouseLeave={(e) => handleButtonLeave(e, BRAND)}
                                             >
                                                 <FaPlus /> Add Value Record
                                             </button>
                                         </div>
                                     </div>
 
-                                    {loading && !showValueModal ? (
-                                        <div style={styles.loadingText}>
-                                            <div className="spinner-border text-primary" role="status">
-                                                <span className="visually-hidden">Loading...</span>
-                                            </div>
-                                            <div>Loading value records...</div>
-                                        </div>
+                                    {loadingValues && valueRecords.length === 0 ? (
+                                        <Spinner text="Loading value records..." />
                                     ) : valueRecords.length === 0 ? (
                                         <div style={styles.emptyText}>
                                             No value records found. Click "Add Value Record" to get started.
                                         </div>
                                     ) : (
-                                        <div style={styles.card}>
+                                        <div style={{ ...styles.card, ...styles.tableWrap, opacity: loadingValues ? 0.6 : 1 }}>
                                             <table style={styles.table}>
                                                 <thead>
                                                     <tr>
                                                         <th style={styles.th}>ID</th>
                                                         <th style={styles.th}>Member</th>
                                                         <th style={styles.th}>Revenue (%)</th>
-                                                        <th style={styles.th}>Year of Experience</th>
+                                                        <th style={styles.th}>Years of Experience</th>
                                                         <th style={styles.th}>Amenities</th>
                                                         <th style={styles.th}>Actions</th>
                                                     </tr>
@@ -748,29 +518,11 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                                             <td style={styles.td}>{record.revenue}%</td>
                                                             <td style={styles.td}>{record.expericence}</td>
                                                             <td style={styles.td}>{record.amenities}</td>
-                                                            <td style={styles.td}>
-                                                                <button 
-                                                                    onClick={() => handleEditValueClick(record)} 
-                                                                    style={styles.editBtn}
-                                                                    onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-                                                                    onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
-                                                                >
-                                                                    <FaEdit /> 
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => handleDeleteValueClick(record.id, record.member)} 
-                                                                    style={styles.deleteBtn}
-                                                                    onMouseEnter={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = '#d32f2f';
-                                                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                                                    }}
-                                                                    onMouseLeave={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = '#f44336';
-                                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                                    }}
-                                                                >
-                                                                    <FaTrash /> 
-                                                                </button>
+                                                            <td style={styles.actionsTd}>
+                                                                <ActionButtons
+                                                                    onEdit={() => handleEditValueClick(record)}
+                                                                    onDelete={() => handleDeleteValueClick(record.id, record.member)}
+                                                                />
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -785,27 +537,19 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                             <h3 style={{ color: theme.text, marginBottom: '15px' }}>Statistics Summary</h3>
                                             <div style={styles.valueStats}>
                                                 <div style={styles.statCard}>
-                                                    <div style={styles.statValue}>
-                                                        {valueRecords.reduce((sum, record) => sum + parseInt(record.member), 0).toLocaleString()}
-                                                    </div>
+                                                    <div style={styles.statValue}>{totalMembers.toLocaleString()}</div>
                                                     <div style={styles.statLabel}>Total Members</div>
                                                 </div>
                                                 <div style={styles.statCard}>
-                                                    <div style={styles.statValue}>
-                                                        {valueRecords.reduce((sum, record) => sum + parseFloat(record.revenue), 0).toFixed(1)}%
-                                                    </div>
+                                                    <div style={styles.statValue}>{totalRevenue.toFixed(1)}%</div>
                                                     <div style={styles.statLabel}>Total Revenue</div>
                                                 </div>
                                                 <div style={styles.statCard}>
-                                                    <div style={styles.statValue}>
-                                                        {valueRecords.reduce((sum, record) => sum + parseFloat(record.expericence), 0).toFixed(1)}%
-                                                    </div>
-                                                    <div style={styles.statLabel}>Total Experience</div>
+                                                    <div style={styles.statValue}>{totalExperience.toLocaleString()}</div>
+                                                    <div style={styles.statLabel}>Years of Experience</div>
                                                 </div>
                                                 <div style={styles.statCard}>
-                                                    <div style={styles.statValue}>
-                                                        {valueRecords.reduce((sum, record) => sum + parseInt(record.amenities), 0)}
-                                                    </div>
+                                                    <div style={styles.statValue}>{totalAmenities.toLocaleString()}</div>
                                                     <div style={styles.statLabel}>Total Amenities</div>
                                                 </div>
                                             </div>
@@ -822,13 +566,13 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                 </div>
             </div>
 
-            {/* Modal for Investment Record Add/Edit */}
+            {/* Modal: Investment Record */}
             {showModal && (
-                <div style={styles.modalOverlay} onClick={() => setShowModal(false)}>
+                <div style={styles.modalOverlay} onClick={closeModal}>
                     <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div style={styles.modalHeader}>
                             <h3 style={styles.modalTitle}>{isEditing ? 'Edit Investment Record' : 'Add New Investment Record'}</h3>
-                            <button onClick={() => setShowModal(false)} style={styles.closeBtn}>
+                            <button type="button" onClick={closeModal} style={styles.closeBtn}>
                                 <FaTimes />
                             </button>
                         </div>
@@ -843,6 +587,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                     onChange={handleInputChange}
                                     style={styles.input}
                                     placeholder="Enter title"
+                                    maxLength={255}
                                     required
                                 />
                             </div>
@@ -859,27 +604,27 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 />
                             </div>
 
-                            <button 
-                                type="submit" 
-                                style={styles.submitBtn} 
-                                disabled={loading}
-                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                            <button
+                                type="submit"
+                                style={styles.submitBtn}
+                                disabled={saving}
+                                onMouseEnter={(e) => handleButtonHover(e, BRAND_HOVER)}
+                                onMouseLeave={(e) => handleButtonLeave(e, BRAND)}
                             >
-                                {loading ? 'Processing...' : (isEditing ? 'Update Record' : 'Add Record')}
+                                {saving ? 'Processing...' : (isEditing ? 'Update Record' : 'Add Record')}
                             </button>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* Modal for Value Record Add/Edit */}
+            {/* Modal: Value Record */}
             {showValueModal && (
-                <div style={styles.modalOverlay} onClick={() => setShowValueModal(false)}>
+                <div style={styles.modalOverlay} onClick={closeValueModal}>
                     <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div style={styles.modalHeader}>
                             <h3 style={styles.modalTitle}>{isEditingValue ? 'Edit Value Record' : 'Add New Value Record'}</h3>
-                            <button onClick={() => setShowValueModal(false)} style={styles.closeBtn}>
+                            <button type="button" onClick={closeValueModal} style={styles.closeBtn}>
                                 <FaTimes />
                             </button>
                         </div>
@@ -889,6 +634,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 <label style={styles.label}>Member Count *</label>
                                 <input
                                     type="number"
+                                    min="0"
                                     name="member"
                                     value={valueFormData.member}
                                     onChange={handleValueInputChange}
@@ -902,6 +648,8 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 <label style={styles.label}>Revenue (%) *</label>
                                 <input
                                     type="number"
+                                    min="0"
+                                    step="0.1"
                                     name="revenue"
                                     value={valueFormData.revenue}
                                     onChange={handleValueInputChange}
@@ -912,14 +660,15 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                             </div>
 
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Experience (%) *</label>
+                                <label style={styles.label}>Years of Experience *</label>
                                 <input
                                     type="number"
+                                    min="0"
                                     name="expericence"
                                     value={valueFormData.expericence}
                                     onChange={handleValueInputChange}
                                     style={styles.input}
-                                    placeholder="Enter experience percentage"
+                                    placeholder="Enter years of experience"
                                     required
                                 />
                             </div>
@@ -928,6 +677,7 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 <label style={styles.label}>Amenities *</label>
                                 <input
                                     type="number"
+                                    min="0"
                                     name="amenities"
                                     value={valueFormData.amenities}
                                     onChange={handleValueInputChange}
@@ -937,14 +687,14 @@ const InvestmentRecord = ({ theme: propsTheme }) => {
                                 />
                             </div>
 
-                            <button 
-                                type="submit" 
-                                style={styles.submitBtn} 
-                                disabled={loading}
-                                onMouseEnter={(e) => handleButtonHover(e, '#8B4513')}
-                                onMouseLeave={(e) => handleButtonLeave(e, '#5e2e10')}
+                            <button
+                                type="submit"
+                                style={styles.submitBtn}
+                                disabled={saving}
+                                onMouseEnter={(e) => handleButtonHover(e, BRAND_HOVER)}
+                                onMouseLeave={(e) => handleButtonLeave(e, BRAND)}
                             >
-                                {loading ? 'Processing...' : (isEditingValue ? 'Update Value Record' : 'Add Value Record')}
+                                {saving ? 'Processing...' : (isEditingValue ? 'Update Value Record' : 'Add Value Record')}
                             </button>
                         </form>
                     </div>

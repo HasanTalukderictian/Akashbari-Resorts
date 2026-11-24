@@ -1,428 +1,52 @@
-
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import Header from './Header';
-// import Sidebar from './Sidebar';
-// import Footer from './Footer';
-
-// const Welcome = ({ theme: propsTheme }) => {
-//     // LocalStorage theke state properly initialize kora hoyeche
-//     const [isCollapsed, setIsCollapsed] = useState(() => {
-//         return localStorage.getItem("sidebar") === "true";
-//     });
-//     const [isDarkMode, setIsDarkMode] = useState(() => {
-//         return localStorage.getItem("darkMode") === "true";
-//     });
-
-//     const [banners, setBanners] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [showModal, setShowModal] = useState(false);
-//     const [imagePreview, setImagePreview] = useState(null);
-//     const [isEditing, setIsEditing] = useState(false);
-//     const [editId, setEditId] = useState(null);
-    
-//     const [formData, setFormData] = useState({
-//         title: '',
-//         description: '',
-//         image: null
-//     });
-
-//     const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-//     // Sidebar collapse toggle logic
-//     const toggleSidebar = () => {
-//         const newState = !isCollapsed;
-//         setIsCollapsed(newState);
-//         localStorage.setItem("sidebar", newState);
-//     };
-
-//     const theme = propsTheme || {
-//         isDarkMode,
-//         bg: isDarkMode ? '#1a1a2e' : '#f2edf3',
-//         card: isDarkMode ? '#16213e' : '#ffffff',
-//         text: isDarkMode ? '#e9ecef' : '#3e4b5b',
-//         border: isDarkMode ? '#2d3436' : '#ebedf2',
-//         inputBg: isDarkMode ? '#2d3436' : '#ffffff',
-//         primary: '#5e2e10',
-//         primaryGradient: 'linear-gradient(135deg, #5e2e10 0%, #8B4513 100%)'
-//     };
-
-//     const fetchWelcomes = async () => {
-//         try {
-//             const response = await axios.get(`${BASE_URL}/get-welcomes`);
-//             if (response.data.success) {
-//                 setBanners(response.data.data);
-//             }
-//         } catch (error) {
-//             console.error("Data load error:", error);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchWelcomes();
-//     }, []);
-
-//     const handleAddClick = () => {
-//         setFormData({ title: '', description: '', image: null });
-//         setImagePreview(null);
-//         setIsEditing(false);
-//         setEditId(null);
-//         setShowModal(true);
-//     };
-
-//     const handleEditClick = (item) => {
-//         setFormData({
-//             title: item.title,
-//             description: item.description,
-//             image: null // Keep null for edit, old image will remain if no new image uploaded
-//         });
-//         setImagePreview(item.image); // Show existing image
-//         setIsEditing(true);
-//         setEditId(item.id);
-//         setShowModal(true);
-//     };
-
-//     const handleChange = (e) => {
-//         const { name, value } = e.target;
-//         setFormData({ ...formData, [name]: value });
-//     };
-
-//     const handleImageChange = (e) => {
-//         const file = e.target.files[0];
-//         if (file) {
-//             setFormData({ ...formData, image: file });
-//             const reader = new FileReader();
-//             reader.onloadend = () => setImagePreview(reader.result);
-//             reader.readAsDataURL(file);
-//         }
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-        
-//         // Validation: Check if either title or description is empty
-//         if (!formData.title.trim() || !formData.description.trim()) {
-//             alert("Please fill in all required fields!");
-//             return;
-//         }
-
-//         try {
-//             if (isEditing && editId) {
-//                 // UPDATE API CALL
-//                 const data = new FormData();
-//                 data.append('title', formData.title);
-//                 data.append('description', formData.description);
-//                 if (formData.image) {
-//                     data.append('image', formData.image);
-//                 }
-//                 // Add _method field for Laravel to handle PUT request
-//                 data.append('_method', 'POST');
-
-//                 const response = await axios.post(`${BASE_URL}/welcome/${editId}`, data, {
-//                     headers: { 'Content-Type': 'multipart/form-data' }
-//                 });
-
-//                 if (response.data.success) {
-//                     alert("Data successfully updated!");
-//                     setShowModal(false);
-//                     fetchWelcomes();
-//                 } else {
-//                     alert(response.data.message || "Update failed!");
-//                 }
-//             } else {
-//                 // ADD NEW API CALL
-//                 const data = new FormData();
-//                 data.append('title', formData.title);
-//                 data.append('description', formData.description);
-//                 if (formData.image) {
-//                     data.append('image', formData.image);
-//                 }
-
-//                 const response = await axios.post(`${BASE_URL}/add-welcomes`, data, {
-//                     headers: { 'Content-Type': 'multipart/form-data' }
-//                 });
-
-//                 if (response.data.success) {
-//                     alert("Data successfully added!");
-//                     setShowModal(false);
-//                     fetchWelcomes();
-//                 } else {
-//                     alert(response.data.message || "Add failed!");
-//                 }
-//             }
-//         } catch (error) {
-//             console.error("Operation error:", error.response?.data || error.message);
-//             alert(error.response?.data?.message || "Something went wrong!");
-//         }
-//     };
-
-//     const handleDelete = async (id) => {
-//         if (!window.confirm("Are you sure?")) return;
-//         try {
-//             await axios.delete(`${BASE_URL}/del-welcomes/${id}`);
-//             setBanners(banners.filter(x => x.id !== id));
-//         } catch (error) {
-//             console.error("Delete failed:", error);
-//             alert("Delete failed!");
-//         }
-//     };
-
-//     // Custom button styles with brand color
-//     const buttonStyles = {
-//         primary: {
-//             background: theme.primaryGradient,
-//             border: 'none',
-//             color: 'white',
-//             padding: '8px 20px',
-//             borderRadius: '8px',
-//             fontWeight: '500',
-//             transition: 'all 0.3s ease',
-//             boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
-//         },
-//         primaryModal: {
-//             background: theme.primaryGradient,
-//             border: 'none',
-//             color: 'white',
-//             padding: '10px 30px',
-//             borderRadius: '8px',
-//             fontWeight: '500',
-//             transition: 'all 0.3s ease',
-//             boxShadow: '0 4px 15px rgba(94, 46, 16, 0.3)'
-//         },
-//         edit: {
-//             backgroundColor: '#3b82f6',
-//             border: 'none',
-//             color: 'white',
-//             padding: '5px 15px',
-//             borderRadius: '6px',
-//             fontSize: '13px',
-//             transition: 'all 0.3s ease',
-//             marginRight: '8px'
-//         },
-//         danger: {
-//             backgroundColor: '#ef4444',
-//             border: 'none',
-//             color: 'white',
-//             padding: '5px 15px',
-//             borderRadius: '6px',
-//             fontSize: '13px',
-//             transition: 'all 0.3s ease'
-//         }
-//     };
-
-//     return (
-//         <div style={{ backgroundColor: theme.bg, minHeight: '100vh', display: 'flex' }}>
-//             {/* Sidebar Section */}
-//             <div style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
-//                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="welcome" />
-//             </div>
-
-//             <div className="flex-grow-1 d-flex flex-column" style={{ width: `calc(100% - ${isCollapsed ? '80px' : '260px'})`, transition: 'all 0.3s ease' }}>
-//                 <Header 
-//                     theme={theme} 
-//                     isDarkMode={isDarkMode} 
-//                     toggleDarkMode={() => setIsDarkMode(!isDarkMode)} 
-//                     toggleSidebar={toggleSidebar} 
-//                 />
-
-//                 <div className="flex-grow-1 overflow-auto p-4">
-//                     <div className="d-flex justify-content-between align-items-center mb-4">
-//                         <h4 style={{ color: theme.text }} className="fw-bold">Welcome Section</h4>
-//                         <button 
-//                             className="btn px-4 shadow-sm" 
-//                             style={buttonStyles.primary}
-//                             onClick={handleAddClick}
-//                             onMouseEnter={(e) => {
-//                                 e.target.style.transform = 'translateY(-2px)';
-//                                 e.target.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
-//                             }}
-//                             onMouseLeave={(e) => {
-//                                 e.target.style.transform = 'translateY(0)';
-//                                 e.target.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
-//                             }}
-//                         >
-//                             + Add Record
-//                         </button>
-//                     </div>
-
-//                     <div className="table-responsive p-3 shadow-sm" style={{ background: theme.card, borderRadius: "12px" }}>
-//                         {loading ? (
-//                             <div className="text-center p-5" style={{ color: theme.text }}>Loading data...</div>
-//                         ) : (
-//                             <table className={`table ${isDarkMode ? 'table-dark' : ''} align-middle mb-0`}>
-//                                 <thead>
-//                                     <tr>
-//                                         <th style={{ width: '100px' }}>Image</th>
-//                                         <th style={{ width: '200px' }}>Title</th>
-//                                         <th>Description</th>
-//                                         <th className="text-end" style={{ width: '180px' }}>Action</th>
-//                                     </tr>
-//                                 </thead>
-//                                 <tbody>
-//                                     {banners.map(b => (
-//                                         <tr key={b.id}>
-//                                             <td>
-//                                                 {b.image ? (
-//                                                     <img src={b.image} alt="thumb" style={{width: '60px', height: '40px', borderRadius: '5px', objectFit: 'cover'}} />
-//                                                 ) : <span className="text-muted small">No Image</span>}
-//                                             </td>
-//                                             <td className="fw-bold" style={{ color: theme.text }}>{b.title}</td>
-//                                             <td style={{ 
-//                                                 color: isDarkMode ? '#ffffff' : '#6c757d', 
-//                                                 fontSize: '0.9rem',
-//                                                 maxWidth: '400px' 
-//                                             }}>
-//                                                 {b.description}
-//                                             </td>
-//                                             <td className="text-end">
-//                                                 <button 
-//                                                     className="btn btn-sm" 
-//                                                     style={buttonStyles.edit}
-//                                                     onClick={() => handleEditClick(b)}
-//                                                     onMouseEnter={(e) => {
-//                                                         e.target.style.backgroundColor = '#2563eb';
-//                                                         e.target.style.transform = 'scale(1.05)';
-//                                                     }}
-//                                                     onMouseLeave={(e) => {
-//                                                         e.target.style.backgroundColor = '#3b82f6';
-//                                                         e.target.style.transform = 'scale(1)';
-//                                                     }}
-//                                                 >
-//                                                     <i className="bi bi-pencil me-1"></i> Edit
-//                                                 </button>
-//                                                 <button 
-//                                                     className="btn btn-sm" 
-//                                                     style={buttonStyles.danger}
-//                                                     onClick={() => handleDelete(b.id)}
-//                                                     onMouseEnter={(e) => {
-//                                                         e.target.style.backgroundColor = '#dc2626';
-//                                                         e.target.style.transform = 'scale(1.05)';
-//                                                     }}
-//                                                     onMouseLeave={(e) => {
-//                                                         e.target.style.backgroundColor = '#ef4444';
-//                                                         e.target.style.transform = 'scale(1)';
-//                                                     }}
-//                                                 >
-//                                                     <i className="bi bi-trash me-1"></i> Delete
-//                                                 </button>
-//                                             </td>
-//                                         </tr>
-//                                     ))}
-//                                     {banners.length === 0 && (
-//                                         <tr>
-//                                             <td colSpan="4" className="text-center p-4" style={{ color: theme.text }}>No records found.</td>
-//                                         </tr>
-//                                     )}
-//                                 </tbody>
-//                             </table>
-//                         )}
-//                     </div>
-//                 </div>
-
-//                 {/* MODAL SECTION - Updated for both Add and Edit */}
-//                 {showModal && (
-//                     <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
-//                         <div className="modal-dialog modal-dialog-centered">
-//                             <div className="modal-content" style={{ backgroundColor: theme.card, color: theme.text, border: `1px solid ${theme.border}` }}>
-//                                 <div className="modal-header border-bottom-0">
-//                                     <h5 className="modal-title">
-//                                         {isEditing ? 'Edit Welcome Section' : 'Add Welcome Section'}
-//                                     </h5>
-//                                     <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
-//                                 </div>
-//                                 <form onSubmit={handleSubmit}>
-//                                     <div className="modal-body">
-//                                         <div className="mb-3">
-//                                             <label className="form-label fw-bold">Title <span className="text-danger">*</span></label>
-//                                             <input 
-//                                                 type="text" 
-//                                                 name="title" 
-//                                                 className="form-control shadow-none" 
-//                                                 style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} 
-//                                                 value={formData.title}
-//                                                 onChange={handleChange} 
-//                                                 required 
-//                                             />
-//                                         </div>
-//                                         <div className="mb-3">
-//                                             <label className="form-label fw-bold">Description <span className="text-danger">*</span></label>
-//                                             <textarea 
-//                                                 name="description" 
-//                                                 className="form-control shadow-none" 
-//                                                 rows="3" 
-//                                                 style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} 
-//                                                 value={formData.description}
-//                                                 onChange={handleChange} 
-//                                                 required
-//                                             ></textarea>
-//                                         </div>
-//                                         <div className="mb-3">
-//                                             <label className="form-label fw-bold">
-//                                                 {isEditing ? 'Change Image (Optional)' : 'Upload Image'}
-//                                             </label>
-//                                             <input 
-//                                                 type="file" 
-//                                                 className="form-control shadow-none" 
-//                                                 accept="image/*" 
-//                                                 style={{ background: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` }} 
-//                                                 onChange={handleImageChange} 
-//                                             />
-//                                             {imagePreview && (
-//                                                 <div className="mt-3 text-center">
-//                                                     <img 
-//                                                         src={imagePreview} 
-//                                                         alt="Preview" 
-//                                                         style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px', objectFit: 'contain' }} 
-//                                                     />
-//                                                     {isEditing && !formData.image && (
-//                                                         <p className="text-muted small mt-1">Current image shown. Upload new to replace.</p>
-//                                                     )}
-//                                                 </div>
-//                                             )}
-//                                         </div>
-//                                     </div>
-//                                     <div className="modal-footer border-top-0">
-//                                         <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-//                                         <button 
-//                                             type="submit" 
-//                                             className="btn px-4" 
-//                                             style={buttonStyles.primaryModal}
-//                                             onMouseEnter={(e) => {
-//                                                 e.target.style.transform = 'translateY(-2px)';
-//                                                 e.target.style.boxShadow = '0 6px 20px rgba(94, 46, 16, 0.4)';
-//                                             }}
-//                                             onMouseLeave={(e) => {
-//                                                 e.target.style.transform = 'translateY(0)';
-//                                                 e.target.style.boxShadow = '0 4px 15px rgba(94, 46, 16, 0.3)';
-//                                             }}
-//                                         >
-//                                             {isEditing ? 'Update' : 'Submit'}
-//                                         </button>
-//                                     </div>
-//                                 </form>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 )}
-//                 <Footer theme={theme} />
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Welcome;
-
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+// ⚠️ path আপনার folder অনুযায়ী ঠিক করুন (src/Config/api.js)
+import { API_BASE_URL, BACKEND_URL } from '../Config/api';
+
 const EMPTY_FORM = { title: '', description: '', image: null };
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+const MAX_SIZE_MB = 2;
+
+// ---------- Axios instance: প্রতিটা request এ token + JSON header ----------
+const api = axios.create({
+    baseURL: API_BASE_URL,
+    withCredentials: false,
+    headers: { Accept: 'application/json' }
+});
+
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Role = localStorage.getItem('Role') || 'admin';
+    return config;
+});
+
+// Backend কখনো `success`, কখনো `status` দেয়, দুটোই ধরো
+const isOk = (data) => data?.success === true || data?.status === true;
+
+const getErrorMessage = (err, fallback) => {
+    const body = err.response?.data;
+    if (body?.errors) {
+        const first = Object.values(body.errors)[0];
+        return Array.isArray(first) ? first[0] : String(first);
+    }
+    if (body && typeof body === 'object' && body.message) return body.message;
+    if (err.response?.status === 413) return 'Image is too large for the server.';
+    if (err.response?.status >= 500) return `Server error (${err.response.status}). Please try again.`;
+    if (!err.response) return 'Network error. Please check your connection.';
+    return fallback;
+};
+
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (/^(https?:|data:|blob:)/i.test(path)) return path;
+    const clean = path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^(public|storage)\//, '');
+    return `${BACKEND_URL}/storage/${clean}`;
+};
 
 const Modal = ({ theme, title, onClose, children, footer, width }) => (
     <div
@@ -444,7 +68,7 @@ const Modal = ({ theme, title, onClose, children, footer, width }) => (
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center'
             }}>
                 <h5 className="m-0 fw-bold">{title}</h5>
-                <button onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '20px', color: theme.text, opacity: 0.6, cursor: 'pointer' }}>✕</button>
+                <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none', fontSize: '20px', color: theme.text, opacity: 0.6, cursor: 'pointer' }}>✕</button>
             </div>
             <div style={{ padding: '22px', overflowY: 'auto' }}>{children}</div>
             {footer && (
@@ -462,15 +86,20 @@ const Welcome = ({ theme: propsTheme }) => {
 
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
+    const [saving, setSaving] = useState(false);
 
     const [showModal, setShowModal] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
     const [formData, setFormData] = useState(EMPTY_FORM);
+    const [fileKey, setFileKey] = useState(0);
 
     const [deletingItem, setDeletingItem] = useState(null);
     const [deleting, setDeleting] = useState(false);
+
+    const [toast, setToast] = useState({ show: false, message: '', type: '' });
 
     const theme = propsTheme || {
         isDarkMode,
@@ -490,13 +119,63 @@ const Welcome = ({ theme: propsTheme }) => {
         localStorage.setItem('sidebar', next);
     };
 
+    const toggleDarkMode = () => {
+        const next = !isDarkMode;
+        setIsDarkMode(next);
+        localStorage.setItem('darkMode', next);
+    };
+
+    const showToast = (message, type = 'success') => {
+        setToast({ show: true, message, type });
+        setTimeout(() => setToast({ show: false, message: '', type: '' }), 3500);
+    };
+
+    // ---------- Login check / session expired ----------
+    const hasToken = () => {
+        if (!localStorage.getItem('token')) {
+            showToast('Please login to access this page', 'error');
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
+            return false;
+        }
+        return true;
+    };
+
+    const handleAuthError = (err) => {
+        const status = err.response?.status;
+        if (status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('Role');
+            showToast('Session expired. Please login again.', 'error');
+            setTimeout(() => { window.location.href = '/login'; }, 2000);
+            return true;
+        }
+        if (status === 403) {
+            showToast('This account does not have admin access.', 'error');
+            return true;
+        }
+        return false;
+    };
+
+    const showError = (err, fallback) => {
+        console.error(fallback, err.response?.data || err.message);
+        if (!handleAuthError(err)) showToast(getErrorMessage(err, fallback), 'error');
+    };
+
+    // ---------- Fetch ----------
     const fetchWelcomes = async () => {
         setLoading(true);
+        setLoadError('');
         try {
-            const res = await axios.get(`${BASE_URL}/get-welcomes`);
-            if (res.data.success) setBanners(res.data.data);
+            const { data } = await api.get('/get-welcomes');
+            if (isOk(data) && Array.isArray(data.data)) {
+                setBanners(data.data);
+            } else {
+                setBanners([]);
+                if (data?.message) setLoadError(data.message);
+            }
         } catch (err) {
-            console.error('Data load error:', err);
+            setLoadError(getErrorMessage(err, 'Failed to load data'));
+            handleAuthError(err);
         } finally {
             setLoading(false);
         }
@@ -504,19 +183,27 @@ const Welcome = ({ theme: propsTheme }) => {
 
     useEffect(() => { fetchWelcomes(); }, []);
 
-    const closeModal = () => { setShowModal(false); setFormData(EMPTY_FORM); setImagePreview(null); };
-
-    const handleAddClick = () => {
+    // ---------- Modal / Form ----------
+    const resetForm = () => {
         setFormData(EMPTY_FORM);
         setImagePreview(null);
         setIsEditing(false);
         setEditId(null);
-        setShowModal(true);
+        setFileKey((k) => k + 1);
     };
 
+    const closeModal = () => {
+        if (saving) return;
+        setShowModal(false);
+        resetForm();
+    };
+
+    const handleAddClick = () => { resetForm(); setShowModal(true); };
+
     const handleEditClick = (item) => {
-        setFormData({ title: item.title, description: item.description, image: null });
-        setImagePreview(item.image);
+        resetForm();
+        setFormData({ title: item.title || '', description: item.description || '', image: null });
+        setImagePreview(getImageUrl(item.image));
         setIsEditing(true);
         setEditId(item.id);
         setShowModal(true);
@@ -524,13 +211,21 @@ const Welcome = ({ theme: propsTheme }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
         if (!file) return;
-        setFormData({ ...formData, image: file });
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            e.target.value = '';
+            return showToast('Only JPG, PNG, GIF and WEBP files are allowed', 'error');
+        }
+        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+            e.target.value = '';
+            return showToast(`Image must be less than ${MAX_SIZE_MB}MB`, 'error');
+        }
+        setFormData((prev) => ({ ...prev, image: file }));
         const reader = new FileReader();
         reader.onloadend = () => setImagePreview(reader.result);
         reader.readAsDataURL(file);
@@ -538,126 +233,157 @@ const Welcome = ({ theme: propsTheme }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.title.trim() || !formData.description.trim()) {
-            alert('Please fill in all required fields!');
-            return;
-        }
+        if (!hasToken()) return;
 
-        const data = new FormData();
-        data.append('title', formData.title);
-        data.append('description', formData.description);
-        if (formData.image) data.append('image', formData.image);
+        const title = formData.title.trim();
+        const description = formData.description.trim();
+        if (!title || !description) return showToast('Please fill in all required fields!', 'error');
 
+        const payload = new FormData();
+        payload.append('title', title);
+        payload.append('description', description);
+        if (formData.image) payload.append('image', formData.image);
+
+        setSaving(true);
         try {
-            if (isEditing && editId) {
-                data.append('_method', 'POST');
-                const res = await axios.post(`${BASE_URL}/welcome/${editId}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
-                if (res.data.success) {
-                    alert('Data successfully updated!');
-                    closeModal();
-                    fetchWelcomes();
-                } else {
-                    alert(res.data.message || 'Update failed!');
-                }
+            const url = isEditing && editId ? `/welcome/${editId}` : '/add-welcomes';
+            // FormData দিলে axios নিজেই multipart + boundary বসায়
+            const { data } = await api.post(url, payload);
+
+            if (isOk(data)) {
+                showToast(data.message || (isEditing ? 'Data successfully updated!' : 'Data successfully added!'));
+                setShowModal(false);
+                resetForm();
+                fetchWelcomes();
             } else {
-                const res = await axios.post(`${BASE_URL}/add-welcomes`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
-                if (res.data.success) {
-                    alert('Data successfully added!');
-                    closeModal();
-                    fetchWelcomes();
-                } else {
-                    alert(res.data.message || 'Add failed!');
-                }
+                showToast(data?.message || (isEditing ? 'Update failed!' : 'Add failed!'), 'error');
             }
         } catch (err) {
-            console.error('Operation error:', err.response?.data || err.message);
-            alert(err.response?.data?.message || 'Something went wrong!');
+            showError(err, 'Something went wrong!');
+        } finally {
+            setSaving(false);
         }
     };
 
+    // ---------- Delete ----------
     const confirmDelete = async () => {
-        if (!deletingItem) return;
+        if (!deletingItem || !hasToken()) return;
         setDeleting(true);
         try {
-            await axios.delete(`${BASE_URL}/del-welcomes/${deletingItem.id}`);
-            setBanners(prev => prev.filter(x => x.id !== deletingItem.id));
+            const { data } = await api.delete(`/del-welcomes/${deletingItem.id}`);
+            // কিছু backend শুধু 200 দেয়, body তে success থাকে না → false না হলেই ok
+            if (data?.success === false || data?.status === false) {
+                showToast(data.message || 'Delete failed!', 'error');
+                return;
+            }
+            setBanners((prev) => prev.filter((x) => x.id !== deletingItem.id));
+            showToast(data?.message || 'Record deleted successfully');
             setDeletingItem(null);
         } catch (err) {
-            console.error('Delete failed:', err);
-            alert('Delete failed!');
+            setDeletingItem(null);
+            showError(err, 'Delete failed!');
         } finally {
             setDeleting(false);
         }
     };
 
-    const fieldStyle = { backgroundColor: theme.inputBg, color: theme.text, border: `1px solid ${theme.border}` };
+    const fieldStyle = { backgroundColor: theme.inputBg || theme.card, color: theme.text, border: `1px solid ${theme.border}` };
 
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh', display: 'flex' }}>
-            <div style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
+            <div style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease', flexShrink: 0 }}>
                 <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="welcome" />
             </div>
 
-            <div className="flex-grow-1 d-flex flex-column">
-                <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} toggleSidebar={toggleSidebar} />
+            <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0, height: '100vh' }}>
+                <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar} />
 
-                <div className="flex-grow-1 overflow-auto p-4">
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h4 style={{ color: theme.text }} className="fw-bold">Welcome Section</h4>
-                        <button
-                            className="btn px-4"
-                            onClick={handleAddClick}
-                            style={{ backgroundColor: accent, color: accentOn, border: 'none', fontWeight: 500, borderRadius: '8px' }}
-                        >
-                            <i className="bi bi-plus-lg me-1"></i>Add Record
-                        </button>
-                    </div>
+                <div className="flex-grow-1 overflow-auto d-flex flex-column">
+                    <div className="p-4 flex-grow-1">
+                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                            <div>
+                                <h4 style={{ color: theme.text }} className="fw-bold mb-1">Welcome Section</h4>
+                                <span style={{ color: theme.textLight, fontSize: '14px' }}>{banners.length} records</span>
+                            </div>
+                            <div className="d-flex gap-2">
+                                <button className="btn btn-outline-dark" onClick={fetchWelcomes} disabled={loading} title="Refresh">
+                                    <i className="bi bi-arrow-clockwise"></i>
+                                </button>
+                                <button
+                                    className="btn px-4"
+                                    onClick={handleAddClick}
+                                    style={{ backgroundColor: accent, color: accentOn, border: 'none', fontWeight: 500, borderRadius: '8px' }}
+                                >
+                                    <i className="bi bi-plus-lg me-1"></i>Add Record
+                                </button>
+                            </div>
+                        </div>
 
-                    <div className="table-responsive p-3" style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '12px' }}>
-                        {loading ? (
-                            <div className="text-center p-5" style={{ color: theme.textLight }}>Loading data...</div>
-                        ) : (
-                            <table className="table align-middle mb-0" style={{ color: theme.text }}>
-                                <thead>
-                                    <tr style={{ borderBottom: `1px solid ${theme.border}` }}>
-                                        <th style={{ width: '100px', color: theme.text }}>Image</th>
-                                        <th style={{ width: '200px', color: theme.text }}>Title</th>
-                                        <th style={{ color: theme.text }}>Description</th>
-                                        <th className="text-end" style={{ width: '180px', color: theme.text }}>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {banners.map(b => (
-                                        <tr key={b.id} style={{ borderColor: theme.border }}>
-                                            <td>
-                                                {b.image ? (
-                                                    <img src={b.image} alt="thumb" style={{ width: '60px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: `1px solid ${theme.border}` }} />
-                                                ) : <span style={{ color: theme.textLight, fontSize: '13px' }}>No Image</span>}
-                                            </td>
-                                            <td className="fw-bold" style={{ color: theme.text }}>{b.title}</td>
-                                            <td style={{ color: theme.textLight, fontSize: '0.9rem', maxWidth: '400px' }}>{b.description}</td>
-                                            <td className="text-end">
-                                                <button className="btn btn-sm btn-outline-dark me-2" onClick={() => handleEditClick(b)}>
-                                                    <i className="bi bi-pencil me-1"></i>Edit
-                                                </button>
-                                                <button className="btn btn-sm btn-outline-dark" onClick={() => setDeletingItem(b)}>
-                                                    <i className="bi bi-trash me-1"></i>Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {banners.length === 0 && (
-                                        <tr>
-                                            <td colSpan="4" className="text-center p-4" style={{ color: theme.textLight }}>No records found.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                        {loadError && (
+                            <div className="alert d-flex align-items-center justify-content-between" style={{ border: '1px solid #b42318', backgroundColor: theme.card, color: theme.text }}>
+                                <span><i className="bi bi-exclamation-triangle-fill me-2" style={{ color: '#b42318' }}></i>{loadError}</span>
+                                <button className="btn btn-sm btn-outline-dark" onClick={fetchWelcomes}>Retry</button>
+                            </div>
                         )}
-                    </div>
-                </div>
 
-                <Footer theme={theme} />
+                        <div className="table-responsive p-3" style={{ background: theme.card, border: `1px solid ${theme.border}`, borderRadius: '12px' }}>
+                            {loading && banners.length === 0 ? (
+                                <div className="text-center p-5" style={{ color: theme.textLight }}>
+                                    <div className="spinner-border mb-2" style={{ color: accent }} role="status"></div>
+                                    <div>Loading data...</div>
+                                </div>
+                            ) : (
+                                <table className="table align-middle mb-0" style={{ color: theme.text, opacity: loading ? 0.6 : 1 }}>
+                                    <thead>
+                                        <tr style={{ borderBottom: `1px solid ${theme.border}` }}>
+                                            <th style={{ width: '100px', color: theme.text }}>Image</th>
+                                            <th style={{ width: '200px', color: theme.text }}>Title</th>
+                                            <th style={{ color: theme.text }}>Description</th>
+                                            <th className="text-end" style={{ width: '180px', color: theme.text }}>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {banners.map(b => {
+                                            const img = getImageUrl(b.image);
+                                            return (
+                                                <tr key={b.id} style={{ borderColor: theme.border }}>
+                                                    <td>
+                                                        {img ? (
+                                                            <img
+                                                                src={img}
+                                                                alt="thumb"
+                                                                loading="lazy"
+                                                                style={{ width: '60px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: `1px solid ${theme.border}` }}
+                                                                onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
+                                                            />
+                                                        ) : <span style={{ color: theme.textLight, fontSize: '13px' }}>No Image</span>}
+                                                    </td>
+                                                    <td className="fw-bold" style={{ color: theme.text }}>{b.title}</td>
+                                                    <td style={{ color: theme.textLight, fontSize: '0.9rem', maxWidth: '400px' }}>{b.description}</td>
+                                                    <td className="text-end" style={{ whiteSpace: 'nowrap' }}>
+                                                        <button className="btn btn-sm btn-outline-dark me-2" onClick={() => handleEditClick(b)}>
+                                                            <i className="bi bi-pencil me-1"></i>Edit
+                                                        </button>
+                                                        <button className="btn btn-sm btn-outline-dark" onClick={() => setDeletingItem(b)}>
+                                                            <i className="bi bi-trash me-1"></i>Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                        {banners.length === 0 && (
+                                            <tr>
+                                                <td colSpan="4" className="text-center p-4" style={{ color: theme.textLight }}>No records found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
+
+                    <Footer theme={theme} />
+                </div>
             </div>
 
             {/* Add/Edit Modal */}
@@ -668,15 +394,17 @@ const Welcome = ({ theme: propsTheme }) => {
                         title={isEditing ? 'Edit Welcome Section' : 'Add Welcome Section'}
                         onClose={closeModal}
                         footer={<>
-                            <button type="button" className="btn btn-outline-dark" onClick={closeModal}>Cancel</button>
-                            <button type="submit" className="btn px-4" style={{ backgroundColor: accent, color: accentOn, border: 'none' }}>
-                                {isEditing ? 'Update' : 'Submit'}
+                            <button type="button" className="btn btn-outline-dark" onClick={closeModal} disabled={saving}>Cancel</button>
+                            <button type="submit" className="btn px-4" disabled={saving} style={{ backgroundColor: accent, color: accentOn, border: 'none' }}>
+                                {saving
+                                    ? <><span className="spinner-border spinner-border-sm me-2"></span>{isEditing ? 'Updating...' : 'Saving...'}</>
+                                    : (isEditing ? 'Update' : 'Submit')}
                             </button>
                         </>}
                     >
                         <div className="mb-3">
                             <label className="form-label fw-bold">Title <span className="text-danger">*</span></label>
-                            <input type="text" name="title" className="form-control shadow-none" style={fieldStyle} value={formData.title} onChange={handleChange} required />
+                            <input type="text" name="title" className="form-control shadow-none" style={fieldStyle} value={formData.title} onChange={handleChange} maxLength={255} required />
                         </div>
                         <div className="mb-3">
                             <label className="form-label fw-bold">Description <span className="text-danger">*</span></label>
@@ -684,7 +412,17 @@ const Welcome = ({ theme: propsTheme }) => {
                         </div>
                         <div>
                             <label className="form-label fw-bold">{isEditing ? 'Change Image (Optional)' : 'Upload Image'}</label>
-                            <input type="file" className="form-control shadow-none" accept="image/*" style={fieldStyle} onChange={handleImageChange} />
+                            <input
+                                key={fileKey}
+                                type="file"
+                                className="form-control shadow-none"
+                                accept="image/jpeg,image/png,image/gif,image/webp"
+                                style={fieldStyle}
+                                onChange={handleImageChange}
+                            />
+                            <div style={{ color: theme.textLight, fontSize: '12px', marginTop: '6px' }}>
+                                JPG, PNG, GIF or WEBP · Max {MAX_SIZE_MB}MB
+                            </div>
                             {imagePreview && (
                                 <div className="mt-3 text-center">
                                     <img src={imagePreview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px', objectFit: 'contain', border: `1px solid ${theme.border}` }} />
@@ -733,6 +471,20 @@ const Welcome = ({ theme: propsTheme }) => {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Toast */}
+            {toast.show && (
+                <div style={{
+                    position: 'fixed', bottom: '20px', right: '20px', zIndex: 2100,
+                    padding: '12px 20px', borderRadius: '10px', fontSize: '14px', fontWeight: 500,
+                    backgroundColor: toast.type === 'error' ? '#b42318' : accent,
+                    color: toast.type === 'error' ? '#fff' : accentOn,
+                    display: 'flex', alignItems: 'center', gap: '8px', maxWidth: 'calc(100% - 40px)'
+                }}>
+                    <i className={`bi ${toast.type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'}`}></i>
+                    {toast.message}
                 </div>
             )}
 

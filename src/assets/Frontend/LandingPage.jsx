@@ -21,7 +21,25 @@ import Sister from "./Sister";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
-const LandingPage = () => {
+/*
+ * কোন page এ কোন section দেখাবে (ক্রম অনুযায়ী)
+ * নতুন section যোগ / বাদ দিতে শুধু এই তালিকা বদলান
+ */
+const PAGE_SECTIONS = {
+    investment: ["invest", "package", "owner"],
+    benefits: ["owner", "benefitsList",  "facility"],
+};
+
+/**
+ * view = "home"       → পুরো Home page
+ * view = "investment" → Investment + Packages + Owner (Header এর INVESTMENT)
+ * view = "benefits"   → Welcome + Facility (Header এর BENEFITS)
+ */
+const LandingPage = ({ view = "home", investmentOnly = false }) => {
+    // পুরোনো route <LandingPage investmentOnly /> ও কাজ করবে
+    const pageView = investmentOnly ? "investment" : view;
+    const isSubPage = pageView !== "home";
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -84,8 +102,15 @@ const LandingPage = () => {
         return () => { mounted = false; };
     }, []);
 
-    // ---------- Header থেকে আসা scroll request ----------
-    // অন্য page থেকে PACKAGES / INVESTMENT চাপলে: data load শেষ হলে সেই section এ যাবে
+    // Investment / Benefits page এ ঢুকলে উপর থেকে শুরু
+    useEffect(() => {
+        if (isSubPage && !location.state?.scrollTo) {
+            window.scrollTo({ top: 0, behavior: "instant" });
+        }
+    }, [isSubPage, location.pathname]);
+
+    // ---------- অন্য page থেকে আসা scroll request ----------
+    // data load শেষ হলে সেই section এ যাবে
     useEffect(() => {
         if (loading || error) return;
 
@@ -113,7 +138,21 @@ const LandingPage = () => {
         setTimeout(() => setIsManualScroll(false), 1500);
     };
 
-    const scrollToBenefitsOnly = () => {
+       const scrollToBenefitsOnly = () => {
+        const hasInvestSection = !!document.getElementById("invest-section");
+        const benefitsEl = document.getElementById("investment-benefits");
+
+        // Benefits page: Investment section নেই, কিন্তু benefits আছে → এখানেই scroll
+        if (!hasInvestSection) {
+            if (benefitsEl) {
+                benefitsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+                navigate("/investment", { state: { scrollTo: "investment-benefits" } });
+            }
+            return;
+        }
+
+        // Home page: আগের মতো
         setShowOnlyBenefits(true);
         setIsManualScroll(true);
         setTimeout(() => {
@@ -175,7 +214,62 @@ const LandingPage = () => {
         );
     }
 
-    // ---------- Page ----------
+    // ---------- সব section এক জায়গায় (design একই, শুধু কোথায় দেখাবে তা বদলায়) ----------
+       const SECTION = {
+        welcome: (
+            <div key="welcome" ref={welcomeRef} id="welcome-section" className="lp-anchor">
+                <Welcome data={landingData.welcome} scrollToInvestment={scrollToBenefitsOnly} />
+            </div>
+        ),
+        invest: (
+            <div key="invest" ref={investRef} id="invest-section" className="lp-anchor">
+                <Investment data={landingData.investment} showOnlyBenefits={showOnlyBenefits} />
+            </div>
+        ),
+        package: (
+            <div key="package" ref={packageRef} id="package-section" className="lp-anchor">
+                <Packagegrap data={landingData.packages} />
+            </div>
+        ),
+        owner: (
+            <div key="owner" ref={ownerRef} id="owner-section" className="lp-anchor">
+                <Owner data={landingData.owner} />
+            </div>
+        ),
+        facility: (
+            <div key="facility" id="facility-section" className="lp-anchor">
+                <Facility data={landingData.facility} />
+            </div>
+        ),
+        // শুধু Investment Benefits (package / stats ছাড়া) — Benefits page এর জন্য
+        benefitsList: (
+            <div key="benefitsList" id="benefits-section" className="lp-anchor">
+                <Investment data={landingData.investment} showOnlyBenefits />
+            </div>
+        ),
+    };
+
+    const anchorStyle = (
+        <style>{`
+            .lp-anchor { scroll-margin-top: 90px; }
+            @media (max-width: 991px) { .lp-anchor { scroll-margin-top: 70px; } }
+        `}</style>
+    );
+
+    // ---------- Investment / Benefits page: শুধু নির্দিষ্ট section ----------
+    if (isSubPage) {
+        const keys = PAGE_SECTIONS[pageView] || [];
+        return (
+            <>
+                <Header />
+                {keys.map((key) => SECTION[key])}
+                <Footer />
+                {anchorStyle}
+            </>
+        );
+    }
+
+    // ---------- Full Home page ----------
     return (
         <>
             <Header />
@@ -188,27 +282,14 @@ const LandingPage = () => {
 
             <Notice data={landingData.notices} />
 
-            <div ref={welcomeRef}>
-                <Welcome data={landingData.welcome} scrollToInvestment={scrollToBenefitsOnly} />
-            </div>
-
-            <div ref={investRef} id="invest-section" className="lp-anchor">
-                <Investment data={landingData.investment} showOnlyBenefits={showOnlyBenefits} />
-            </div>
-
-            {/* Packages — নিজের আলাদা ref */}
-            <div ref={packageRef} id="package-section" className="lp-anchor">
-                <Packagegrap data={landingData.packages} />
-            </div>
-
-            <Video data={landingData.videos} />
-
-            <div ref={ownerRef} id="owner-section" className="lp-anchor">
-                <Owner data={landingData.owner} />
-            </div>
+            {SECTION.welcome}
+            {SECTION.invest}
+            {SECTION.package}
+            {SECTION.owner}
 
             <HappyClient data={landingData.happyClients} />
-            <Facility data={landingData.facility} />
+            {SECTION.facility}
+            <Video data={landingData.videos} />
             <ProjectView data={landingData.projects} />
             <OngoingView data={landingData.ongoing} />
             <Faqpage data={landingData.faqpage} />
@@ -216,12 +297,7 @@ const LandingPage = () => {
             <Testominal data={landingData.testimonials} />
 
             <Footer />
-
-            {/* Sticky header এর নিচে section এর শিরোনাম যেন ঢাকা না পড়ে */}
-            <style>{`
-                .lp-anchor { scroll-margin-top: 90px; }
-                @media (max-width: 991px) { .lp-anchor { scroll-margin-top: 70px; } }
-            `}</style>
+            {anchorStyle}
         </>
     );
 };

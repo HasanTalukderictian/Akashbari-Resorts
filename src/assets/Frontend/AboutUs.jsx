@@ -432,7 +432,7 @@ const AboutUs = () => {
                         </div>
                         <h2 className="modern-title mb-3">
                             Message from Our
-                            <span style={{ color: brandColor }}> Leadership</span>
+                            <span style={{ color: brandColor }}> Leaders</span>
                         </h2>
                         <p className="text-muted mx-auto" style={{ maxWidth: '600px', fontSize: '1rem' }}>
                             Meet the visionaries behind Akashbari's success
