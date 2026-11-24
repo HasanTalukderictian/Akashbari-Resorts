@@ -128,14 +128,7 @@ const Blog = () => {
   };
 
   // Visitor login thakle form e, na thakle login e (login er pore abar /write-blog e fire ashbe)
-  const handleWriteClick = () => {
-    const visitorToken = localStorage.getItem('visitor_token');
-    if (visitorToken) {
-      navigate('/write-blog');
-    } else {
-      navigate('/visitor-login', { state: { from: '/write-blog' } });
-    }
-  };
+
 
   if (loading) {
     return (
@@ -183,13 +176,7 @@ const Blog = () => {
             <span style={{ fontSize: '64px' }}>📝</span>
             <h3 className="text-muted mt-3">No blog posts found</h3>
             <p className="text-muted">Check back later for new content, or share your own story!</p>
-            <button
-              className="btn mt-2 px-4 py-2 rounded-pill fw-semibold"
-              onClick={handleWriteClick}
-              style={{ backgroundColor: brandColor, color: 'white', border: 'none' }}
-            >
-              Write a blog
-            </button>
+           
           </div>
         </div>
         <Footer />
@@ -224,14 +211,7 @@ const Blog = () => {
     </p>
   </div>
 
-  {/* Write a Blog button */}
-  <button
-    className="write-blog-btn btn mt-4 px-4 py-2 rounded-pill fw-semibold"
-    onClick={handleWriteClick}
-  >
-    <i className="bi bi-pencil-square me-2"></i>
-    Write a blog
-  </button>
+  
 </div>
 
           </div>

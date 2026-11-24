@@ -1,5 +1,10 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import ReactGA from 'react-ga4'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './App.css'
+
+/* ---------- Frontend (public) ---------- */
 import Homepage from './assets/Frontend/Homepage'
 import LandingPage from './assets/Frontend/LandingPage'
 import AboutUs from './assets/Frontend/AboutUs'
@@ -7,36 +12,43 @@ import Blog from './assets/Frontend/Blog'
 import BlogDetails from './assets/Frontend/BlogDetails'
 import Contact from './assets/Frontend/Contact'
 import Gallery from './assets/Frontend/Gallery'
-import Dashbord from './Backend/Dashbord'
-import Login from './Backend/Login'
 import PackageDetails from './assets/Frontend/PackageDetails'
+import AllEvents from './assets/Frontend/AllEvents'
+import EventsDetails from './assets/Frontend/EventsDetails'
+import Affliates from './assets/Frontend/Affliates'
+import Club from './assets/Frontend/Club'
+import Partner from './assets/Frontend/Partner'
+import OngoingView from './assets/Frontend/OngoingView'
+import Career from './assets/Frontend/Career'
+import CareerDetails from './assets/Frontend/CareerDetails'
+import Register from './assets/Frontend/Register'
+import UserLogin from './assets/Frontend/UserLogin'
+import WriteBlog from './assets/Frontend/Writeblog'
+import InvestmentForm from './assets/Frontend/InvestmentForm'
+import NotFound from './assets/Frontend/Common/NotFound'
+
+/* ---------- Backend (admin) ---------- */
+import Login from './Backend/Login'
+
+import Dashbord from './Backend/Dashbord'
 import Users from './Backend/Users'
 import Content from './Backend/Content'
 import Welcome from './Backend/Welcome'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import VideoSection from './Backend/VideoSection'
 import OwnerSection from './Backend/Ownersection'
 import OwnerBenefit from './Backend/OwnerBenefit'
 import Investment from './Backend/Investment'
 import InvestmentBenefit from './Backend/InvestmentBenefit'
 import Events from './Backend/Events'
-import AllEvents from './assets/Frontend/AllEvents'
-import EventsDetails from './assets/Frontend/EventsDetails'
 import LuxurySection from './Backend/LuxurySection'
 import Testominal from './Backend/Testominal'
 import HappyClientsection from './Backend/HappyClientsection'
 import GallerySection from './Backend/GallerySection'
 import BlogSection from './Backend/BlogSection'
-import Affliates from './assets/Frontend/Affliates'
 import NoticeSection from './Backend/NoticeSection'
-import PrivateRoute from './assets/Frontend/PrivateRoute'
-import NotFound from './assets/Frontend/Common/NotFound'
 import Packagestatistics from './Backend/Packagestatistics'
 import Affilitaes from './Backend/Affilitaes'
-import Club from './assets/Frontend/Club'
 import Teamate from './Backend/Teamate'
-import Partner from './assets/Frontend/Partner'
-import OngoingView from './assets/Frontend/OngoingView'
 import AdminSister from './Backend/AdminSister'
 import Query from './Backend/Query'
 import Achievement from './Backend/Achievement'
@@ -45,257 +57,125 @@ import ClubSettings from './Backend/ClubSettings'
 import Clubgallery from './Backend/Clubgallery'
 import ProjectState from './Backend/ProjectState'
 import PackageQuery from './Backend/PackageQuery'
-import ReactGA from 'react-ga';
-import { useEffect } from 'react'
 import FqaSettings from './Backend/FqaSettings'
-import Career from './assets/Frontend/Career'
-import CareerDetails from './assets/Frontend/CareerDetails'
 import JobSettings from './Backend/JobSettings'
 import JobQuery from './Backend/JobQuery'
-import Register from './assets/Frontend/Register'
-import UserLogin from './assets/Frontend/UserLogin'
-import WriteBlog from './assets/Frontend/Writeblog'
-import InvestmentForm from './assets/Frontend/InvestmentForm'
 import InvestQuery from './Backend/InvestQuery'
+import AdminRoute from './assets/Frontend/AdminRoute'
 
+/* ---------- Google Analytics (GA4) — একবারই initialize ---------- */
+const GA_ID = 'G-FBHHGLQ9KQ'
+ReactGA.initialize(GA_ID)
 
-function App() {
-
-  ReactGA.initialize('G-FBHHGLQ9KQ');
+// প্রতিবার page বদলালে pageview পাঠায়
+const AnalyticsTracker = () => {
+  const location = useLocation()
 
   useEffect(() => {
-    ReactGA.pageview(window.location.pathname + window.location.search);
-  }, [])
+    ReactGA.send({
+      hitType: 'pageview',
+      page: location.pathname + location.search,
+    })
+  }, [location.pathname, location.search])
 
+  return null
+}
+
+/*
+ * Admin route তালিকা
+ * module = backend এর User::MODULES key (null = শুধু login লাগবে)
+ */
+const ADMIN_ROUTES = [
+  // সবার জন্য (login থাকলেই)
+  { path: '/dashboard', module: null, element: <Dashbord /> },
+
+  // শুধু Super Admin
+  { path: '/users', module: 'users', element: <Users /> },
+
+  // Landing page
+  { path: '/content', module: 'landing', element: <Content /> },
+  { path: '/welcome', module: 'landing', element: <Welcome /> },
+  { path: '/video', module: 'landing', element: <VideoSection /> },
+  { path: '/owner-section', module: 'landing', element: <OwnerSection /> },
+  { path: '/owner-benefit', module: 'landing', element: <OwnerBenefit /> },
+  { path: '/admin-investment', module: 'landing', element: <Investment /> },
+  { path: '/admin-investmentbenefit', module: 'landing', element: <InvestmentBenefit /> },
+  { path: '/admin-luxury', module: 'landing', element: <LuxurySection /> },
+  { path: '/admin-testo', module: 'landing', element: <Testominal /> },
+  { path: '/admin-client', module: 'landing', element: <HappyClientsection /> },
+  { path: '/admin-achievement', module: 'landing', element: <Achievement /> },
+  { path: '/admin-investrecord', module: 'landing', element: <InvestmentRecord /> },
+
+  // অন্য section
+  { path: '/admin-gallery', module: 'gallery', element: <GallerySection /> },
+  { path: '/admin-project-view', module: 'project', element: <ProjectState /> },
+  { path: '/package-query', module: 'package_query', element: <PackageQuery /> },
+  { path: '/admin-query', module: 'package_query', element: <Query /> },
+  { path: '/admin-blog', module: 'blog', element: <BlogSection /> },
+  { path: '/admin-notice', module: 'notice', element: <NoticeSection /> },
+  { path: '/admin-stat', module: 'packages', element: <Packagestatistics /> },
+  { path: '/admin-affilites', module: 'affiliates', element: <Affilitaes /> },
+  { path: '/admin-sister', module: 'partners', element: <AdminSister /> },
+  { path: '/admin-events', module: 'events', element: <Events /> },
+  { path: '/admin-team', module: 'team', element: <Teamate /> },
+  { path: '/admin-faq', module: 'faq', element: <FqaSettings /> },
+  { path: '/admin-job', module: 'jobs', element: <JobSettings /> },
+  { path: '/admin-jobquery', module: 'job_applications', element: <JobQuery /> },
+  { path: '/admin-investquery', module: 'investment_query', element: <InvestQuery /> },
+
+  // Club
+  { path: '/admin-club', module: 'club', element: <ClubSettings /> },
+  { path: '/admin-club-gallery', module: 'club', element: <Clubgallery /> },
+]
+
+function App() {
   return (
     <BrowserRouter>
+      <AnalyticsTracker />
+
       <Routes>
-        {/* ফ্রন্টএন্ড রুটসমূহ - পাবলিক */}
-        <Route path='/home' element={<Homepage />} />
-   
-        <Route path='/about' element={<AboutUs />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/career' element={<Career />} />
+        {/* ---------- Frontend (public) ---------- */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/investment" element={<LandingPage view="investment" />} />
+        <Route path="/benefits" element={<LandingPage view="benefits" />} />
+
+        <Route path="/home" element={<Homepage />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/career" element={<Career />} />
         <Route path="/career/:id" element={<CareerDetails />} />
-        <Route path='/sister' element={<Affliates />} />
-        <Route path='/partner' element={<Partner />} />
-        <Route path='/blog' element={<Blog />} />
-        <Route path='/invest-form' element={<InvestmentForm />} />
-        <Route path='/club' element={<Club />} />
+        <Route path="/sister" element={<Affliates />} />
+        <Route path="/partner" element={<Partner />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/blog-details/:id" element={<BlogDetails />} />
+        <Route path="/write-blog" element={<WriteBlog />} />
+        <Route path="/invest-form" element={<InvestmentForm />} />
+        <Route path="/club" element={<Club />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/ongoing" element={<OngoingView />} />
         <Route path="/package-details/:id" element={<PackageDetails />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/event/:id" element={<EventsDetails />} />
-        <Route path="*" element={<NotFound />} />
 
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/investment" element={<LandingPage investmentOnly />} />
-        <Route path="/benefits" element={<LandingPage view="benefits" />} />
-
-        <Route path="/write-blog" element={<WriteBlog />} />
-
-        {/* লগইন রুট - পাবলিক */}
+        {/* ---------- Login / Register ---------- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/visitor-login" element={<UserLogin />} />
 
+        {/* ---------- Admin (role + permission check) ---------- */}
+        {ADMIN_ROUTES.map(({ path, module, element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<AdminRoute module={module}>{element}</AdminRoute>}
+          />
+        ))}
 
-        {/* অ্যাডমিন রুটসমূহ - প্রাইভেট (লগইন প্রয়োজন) */}
-        <Route path="/dashboard" element={
-          <PrivateRoute>
-            <Dashbord />
-          </PrivateRoute>
-        } />
+        {/* পুরোনো link → নতুন path */}
+        <Route path="/admin-investment-query" element={<Navigate to="/admin-investquery" replace />} />
 
-        <Route path="/users" element={
-          <PrivateRoute>
-            <Users />
-          </PrivateRoute>
-        } />
-
-
-
-        <Route path="/content" element={
-          <PrivateRoute>
-            <Content />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-faq" element={
-          <PrivateRoute>
-            <FqaSettings />
-          </PrivateRoute>
-        } />
-
-        <Route path="/welcome" element={
-          <PrivateRoute>
-            <Welcome />
-          </PrivateRoute>
-        } />
-
-
-        <Route path="/admin-job" element={
-          <PrivateRoute>
-            <JobSettings />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-jobquery" element={
-          <PrivateRoute>
-            <JobQuery />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-investquery" element={
-          <PrivateRoute>
-            <InvestQuery />
-          </PrivateRoute>
-        } />
-
-
-        <Route path="/video" element={
-          <PrivateRoute>
-            <VideoSection />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-club" element={
-          <PrivateRoute>
-            <ClubSettings />
-          </PrivateRoute>
-        } />
-
-
-        <Route path="/package-query" element={
-          <PrivateRoute>
-            <PackageQuery />
-          </PrivateRoute>
-        } />
-
-        <Route path="/owner-section" element={
-          <PrivateRoute>
-            <OwnerSection />
-          </PrivateRoute>
-        } />
-
-        <Route path="/owner-benefit" element={
-          <PrivateRoute>
-            <OwnerBenefit />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-investment" element={
-          <PrivateRoute>
-            <Investment />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-investmentbenefit" element={
-          <PrivateRoute>
-            <InvestmentBenefit />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-events" element={
-          <PrivateRoute>
-            <Events />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-luxury" element={
-          <PrivateRoute>
-            <LuxurySection />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-testo" element={
-          <PrivateRoute>
-            <Testominal />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-gallery" element={
-          <PrivateRoute>
-            <GallerySection />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-project-view" element={
-          <PrivateRoute>
-            <ProjectState />
-          </PrivateRoute>
-        } />
-
-
-        <Route path="/admin-stat" element={
-          <PrivateRoute>
-            <Packagestatistics />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-affilites" element={
-          <PrivateRoute>
-            <Affilitaes />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-sister" element={
-          <PrivateRoute>
-            <AdminSister />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-client" element={
-          <PrivateRoute>
-            <HappyClientsection />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-achievement" element={
-          <PrivateRoute>
-            <Achievement />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-investrecord" element={
-          <PrivateRoute>
-            <InvestmentRecord />
-          </PrivateRoute>
-        } />
-
-
-
-        <Route path="/admin-query" element={
-          <PrivateRoute>
-            <Query />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-notice" element={
-          <PrivateRoute>
-            <NoticeSection />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-team" element={
-          <PrivateRoute>
-            <Teamate />
-          </PrivateRoute>
-        } />
-
-        <Route path="/admin-club-gallery" element={
-          <PrivateRoute>
-            <Clubgallery />
-          </PrivateRoute>
-        } />
-
-
-        <Route path="/admin-blog" element={
-          <PrivateRoute>
-            <BlogSection />
-          </PrivateRoute>
-        } />
+        {/* ---------- 404 (সবার শেষে) ---------- */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

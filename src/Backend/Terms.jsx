@@ -360,14 +360,14 @@ const Terms = () => {
                 }
                 .tp-eyebrow {
                     display: inline-block;
-                    font-size: 0.72rem;
+                    font-size: 0.5rem;
                     letter-spacing: 0.28em;
                     text-transform: uppercase;
                     opacity: 0.85;
                 }
                 .tp-hero h1 {
                     font-family: 'Playfair Display', Georgia, serif;
-                    font-size: clamp(1.9rem, 4.5vw, 3rem);
+                    font-size: clamp(1.2rem, 4.5vw, 3rem);
                     font-weight: 500;
                     margin: 10px 0 0;
                 }
@@ -401,7 +401,7 @@ const Terms = () => {
                     overflow-y: auto;
                 }
                 .tp-toc h6 {
-                    font-size: 0.7rem;
+                    font-size: 0.5rem;
                     letter-spacing: 0.18em;
                     text-transform: uppercase;
                     color: #8a7b70;
