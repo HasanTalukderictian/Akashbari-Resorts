@@ -519,3 +519,45 @@
         padding: 20px;
     }
 }
+
+
+/* ==========================================================================
+   NEW: Investment Benefits — উপর থেকে একটা একটা করে নেমে বসবে
+   (translate আলাদা property, তাই card এর size / layout / hover বদলায় না)
+   ========================================================================== */
+
+.benefits-card-wrapper .benefit-drop {
+    opacity: 0;
+    translate: 0 -40px;
+}
+
+.benefits-card-wrapper.in-view .benefit-drop {
+    animation: benefitDropIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes benefitDropIn {
+    0% {
+        opacity: 0;
+        translate: 0 -40px;
+    }
+    70% {
+        opacity: 1;
+        translate: 0 5px;
+    }
+    100% {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+
+
+/* Motion কমানো থাকলে সরাসরি দেখাও */
+
+@media (prefers-reduced-motion: reduce) {
+    .benefits-card-wrapper .benefit-drop,
+    .benefits-card-wrapper.in-view .benefit-drop {
+        opacity: 1 !important;
+        translate: none !important;
+        animation: none !important;
+    }
+}
