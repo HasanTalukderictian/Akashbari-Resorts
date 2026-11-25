@@ -1,340 +1,288 @@
-.footer {
-    background: #f4f4f2;
-    padding: 60px 0 20px;
-}
-
-
-/* Brand Color */
+/* ===== Brand ===== */
 
 :root {
     --brand-color: #5e2e10;
+    --brand-dark: #3d1f0a;
+    --footer-bg: #f4f4f2;
+    --footer-text: #555;
+    --footer-muted: #777;
+    --footer-line: #e2ddd8;
 }
 
 
-/* Top layout */
+/* ===== Footer ===== */
 
-.footer-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 40px;
+.ab-footer {
+    background: var(--footer-bg);
+    border-top: 3px solid var(--brand-color);
+    padding: 56px 0 0;
+    color: var(--footer-text);
 }
 
 
-/* Columns */
+/* ===== Top: 3 columns ===== */
 
-.footer-col h1 {
+.ab-footer-top {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1.2fr;
+    gap: 48px;
+    padding-bottom: 40px;
+}
+
+.ab-footer-col h2 {
     font-family: Gascogne, serif;
-}
-
-.footer-col h2 {
-    font-size: 28px;
-    letter-spacing: 6px;
+    font-size: 24px;
     font-weight: 400;
-    margin-bottom: 20px;
-    font-family: Gascogne, serif;
-    color: var(--brand-color);
-}
-
-.footer-col h3 {
     letter-spacing: 5px;
-    font-weight: 500;
-    margin-bottom: 20px;
-    font-family: Gascogne, serif;
+    line-height: 1.35;
     color: var(--brand-color);
+    margin: 0 0 12px;
 }
 
-.footer-col ul {
+.ab-footer-col h3 {
+    font-family: Gascogne, serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    color: var(--brand-color);
+    margin: 0 0 22px;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.ab-footer-col h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 36px;
+    height: 2px;
+    background: var(--brand-color);
+    border-radius: 2px;
+}
+
+
+/* ===== Brand column ===== */
+
+.ab-footer-logo {
+    display: inline-block;
+    margin-bottom: 14px;
+}
+
+.ab-footer-logo img {
+    width: 86px;
+    height: 86px;
+    object-fit: contain;
+    display: block;
+}
+
+.ab-footer-tagline {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--footer-muted);
+    max-width: 320px;
+    margin: 0;
+}
+
+
+/* ===== Quick links ===== */
+
+.ab-footer-links {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
-.footer-col ul li {
-    margin-bottom: 10px;
-    color: #555;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    text-align: left;
+.ab-footer-links li {
+    margin-bottom: 12px;
 }
 
-.footer-col ul li:hover {
-    color: var(--brand-color);
-}
-
-
-/* Quick Links - Link styles */
-
-.footer-col.quick-links ul li a {
-    color: #555;
+.ab-footer-links a {
+    position: relative;
+    display: inline-block;
+    color: var(--footer-text);
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-size: 15px;
+    transition: color 0.25s ease, padding-left 0.25s ease;
 }
 
-.footer-col.quick-links ul li a:hover {
+.ab-footer-links a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--brand-color);
+    transform: translateY(-50%);
+    transition: width 0.25s ease;
+}
+
+.ab-footer-links a:hover {
+    color: var(--brand-color);
+    padding-left: 18px;
+}
+
+.ab-footer-links a:hover::before {
+    width: 12px;
+}
+
+
+/* ===== Contact ===== */
+
+.ab-footer-contact {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--footer-text);
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.ab-footer-contact:hover {
+    color: var(--brand-color);
+}
+
+.ab-footer-icon {
+    flex-shrink: 0;
+    font-size: 15px;
+    margin-top: 3px;
     color: var(--brand-color);
 }
 
 
-/* Contact Info Styles */
+/* ===== Social ===== */
 
-.contact-info {
+.ab-footer-social {
+    display: flex;
+    gap: 10px;
     margin-top: 20px;
 }
 
-.contact-info p {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 15px;
-    font-size: 14px;
-    color: #555;
-    line-height: 1.5;
-}
-
-.contact-icon {
-    font-size: 16px;
-    color: var(--brand-color);
-    min-width: 20px;
-}
-
-.address {
-    align-items: flex-start !important;
-}
-
-.address .contact-icon {
-    margin-top: 2px;
-}
-
-.phone {
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.phone:hover {
-    color: var(--brand-color);
-}
-
-.phone:hover .contact-icon {
-    color: var(--brand-color);
-}
-
-
-/* Services section */
-
-.footer-col.services ul li {
-    cursor: pointer;
-}
-
-.footer-col.services ul li:hover {
-    color: var(--brand-color);
-    padding-left: 5px;
-}
-
-
-/* Divider */
-
-.footer-divider {
-    border-top: 1px solid #ddd;
-    margin: 40px 0 20px;
-}
-
-
-/* Bottom Section */
-
-.footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-/* Social icons */
-
-.social-icons {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.social-icons a {
-    color: #555;
-    text-decoration: none;
-    font-size: 20px;
-    transition: all 0.3s ease;
-    width: 40px;
-    height: 40px;
-    background: #e0e0e0;
+.ab-footer-social a {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    font-size: 16px;
+    color: var(--brand-color);
+    background: #fff;
+    border: 1px solid var(--footer-line);
+    text-decoration: none;
+    transition: all 0.25s ease;
 }
 
-.social-icons a:hover {
+.ab-footer-social a:hover {
     color: #fff;
     background: var(--brand-color);
+    border-color: var(--brand-color);
     transform: translateY(-3px);
 }
 
 
-/* Footer Logo */
+/* ===== Bottom bar ===== */
 
-.footer-logo img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-}
-
-
-/* Footer Links */
-
-.footer-links {
+.ab-footer-bottom {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--footer-line);
+    padding: 18px 0;
 }
 
-.footer-links a {
-    text-decoration: none;
-    color: #555;
-    transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: var(--brand-color);
-}
-
-
-/* Copyright Text */
-
-.footer-copyright-text {
-    color: #666;
-    font-size: 14px;
+.ab-footer-bottom p {
     margin: 0;
+    font-size: 13px;
+    color: var(--footer-muted);
 }
 
-.developer-link {
+.ab-footer-dev {
     color: var(--brand-color);
+    font-weight: 600;
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.25s ease;
 }
 
-.developer-link:hover {
-    color: #3d1f0a;
+.ab-footer-dev:hover {
+    color: var(--brand-dark);
     text-decoration: underline;
 }
 
 
-/* ===== RESPONSIVE DESIGN ===== */
+/* ===== RESPONSIVE ===== */
 
-@media (max-width: 1024px) {
-    .footer-top {
-        gap: 30px;
-        flex-wrap: wrap;
+
+/* Tablet: brand উপরে পুরো জায়গা, নিচে দুই কলাম */
+
+@media (max-width: 991px) {
+    .ab-footer-top {
+        grid-template-columns: 1fr 1fr;
+        gap: 36px;
     }
-    .footer-col {
-        flex: 1;
-        min-width: 200px;
+    .ab-footer-brand {
+        grid-column: 1 / -1;
     }
 }
 
-@media (max-width: 768px) {
-    .footer {
-        padding: 40px 20px 20px;
-    }
-    /* Top Section Stack */
-    .footer-top {
-        flex-direction: column;
-        gap: 35px;
-        align-items: center;
-        text-align: center;
-    }
-    .footer-col {
-        width: 100%;
-        text-align: center;
-    }
-    .footer-col ul li {
-        text-align: center;
-    }
-    .footer-col.quick-links ul li a {
-        display: inline-block;
-    }
-    /* Contact Info Center */
-    .contact-info p {
-        justify-content: center;
-    }
-    .address {
-        justify-content: center;
-    }
-    /* Bottom Section */
-    .footer-bottom {
-        flex-direction: column;
-        gap: 25px;
-        text-align: center;
-    }
-    .footer-logo img {
-        width: 80px;
-        height: 80px;
-    }
-    /* Social icons center */
-    .social-icons {
-        justify-content: center;
-    }
-    /* Footer Links center */
-    .footer-links {
-        justify-content: center;
-    }
-    .footer-divider {
-        margin: 30px 0 20px;
-    }
-}
 
-@media (max-width: 480px) {
-    .footer {
-        padding: 30px 15px 15px;
+/* Mobile: সব মাঝখানে, এক কলাম */
+
+@media (max-width: 576px) {
+    .ab-footer {
+        padding-top: 40px;
     }
-    .footer-col h2 {
-        font-size: 24px;
-        letter-spacing: 4px;
+    .ab-footer-top {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        text-align: center;
+        padding-bottom: 30px;
     }
-    .footer-col h3 {
-        font-size: 18px;
+    .ab-footer-col h2 {
+        font-size: 20px;
         letter-spacing: 3px;
     }
-    .contact-info p {
+    .ab-footer-col h3 {
+        font-size: 15px;
+        letter-spacing: 3px;
+    }
+    .ab-footer-col h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .ab-footer-tagline {
+        margin: 0 auto;
+    }
+    .ab-footer-logo img {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto;
+    }
+    .ab-footer-links a:hover {
+        padding-left: 0;
+    }
+    .ab-footer-links a::before {
+        display: none;
+    }
+    .ab-footer-contact {
+        justify-content: center;
+        text-align: left;
+    }
+    .ab-footer-social {
+        justify-content: center;
+    }
+    .ab-footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 6px;
+    }
+    .ab-footer-bottom p {
         font-size: 12px;
-        gap: 8px;
-    }
-    .contact-icon {
-        font-size: 14px;
-    }
-    .social-icons a {
-        width: 35px;
-        height: 35px;
-        font-size: 18px;
-    }
-    .footer-logo img {
-        width: 70px;
-        height: 70px;
-    }
-    .footer-links {
-        gap: 15px;
-    }
-    .footer-copyright-text {
-        font-size: 11px;
-    }
-}
-
-
-/* Small Desktop / Tablet Landscape */
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .footer-top {
-        gap: 25px;
-    }
-    .footer-col h2 {
-        font-size: 24px;
-    }
-    .footer-col h3 {
-        font-size: 18px;
     }
 }
