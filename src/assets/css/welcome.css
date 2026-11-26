@@ -256,3 +256,46 @@
         transition: none;
     }
 }
+
+
+/* ==========================================================
+   NEW: Features & Facilities — item গুলো উপর থেকে একটা একটা
+   করে নেমে বসবে (translate আলাদা property, তাই size / layout
+   বদলায় না)
+   ========================================================== */
+
+.features-drop-group .feature-drop {
+    opacity: 0;
+    translate: 0 -30px;
+}
+
+.features-drop-group.in-view .feature-drop {
+    animation: featureDropIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes featureDropIn {
+    0% {
+        opacity: 0;
+        translate: 0 -30px;
+    }
+    70% {
+        opacity: 1;
+        translate: 0 4px;
+    }
+    100% {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+
+
+/* Motion কমানো থাকলে সরাসরি দেখাও */
+
+@media (prefers-reduced-motion: reduce) {
+    .features-drop-group .feature-drop,
+    .features-drop-group.in-view .feature-drop {
+        opacity: 1 !important;
+        translate: none !important;
+        animation: none !important;
+    }
+}

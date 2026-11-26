@@ -106,12 +106,24 @@ const getRank = (designation) => {
     return alias ? RANK_MAP.get(alias) : Infinity; // অচেনা পদ → সবার শেষে
 };
 
-// পদ অনুযায়ী serial করে (একই পদের মধ্যে API এর order থাকে)
-const sortByRank = (members) =>
+// ---------- NEW: Serial অনুযায়ী ক্রম ----------
+// 1. Admin থেকে Serial No দেওয়া থাকলে → 1, 2, 3… ক্রমে (সবার আগে)
+// 2. Serial না থাকলে বা একই serial হলে → পদ অনুযায়ী (Manager → Assistant Manager → …)
+const serialOf = (member) => {
+    const n = parseInt(member.serial_number, 10);
+    return Number.isFinite(n) && n > 0 ? n : Infinity;
+};
+
+const sortMembers = (members) =>
     [...members].sort((a, b) => {
+        const sa = serialOf(a);
+        const sb = serialOf(b);
+        if (sa !== sb) return sa - sb;
+
         const ra = getRank(a.designation);
         const rb = getRank(b.designation);
         if (ra !== rb) return ra - rb;
+
         // দুজনই অচেনা পদ হলে পদের নাম অনুযায়ী A-Z
         if (ra === Infinity) return normalize(a.designation).localeCompare(normalize(b.designation));
         return 0;
@@ -507,9 +519,9 @@ const AboutUs = () => {
                                     <span className="ag-group-count">{group.members.length}</span>
                                 </div>
 
-                                {/* এক grid এ serial: Manager → Assistant Manager → Senior Executive → Executive (মাঝে ফাঁকা নেই) */}
+                                {/* Serial No অনুযায়ী 1, 2, 3… — serial না থাকলে পদ অনুযায়ী (মাঝে ফাঁকা নেই) */}
                                 <div className="ag-grid">
-                                    {sortByRank(group.members).map((member) => (
+                                    {sortMembers(group.members).map((member) => (
                                         <TeamCard key={member.id} member={member} />
                                     ))}
                                 </div>
@@ -581,8 +593,7 @@ const AboutUs = () => {
                 }
                 .ld-card:hover .ld-photo img { transform: scale(1.05); }
 
-                /* উপরে হালকা ছায়া — badge পরিষ্কার দেখাতে */
-                                /* নিচে হালকা ছায়া — badge পরিষ্কার দেখাতে */
+                /* নিচে হালকা ছায়া — badge পরিষ্কার দেখাতে */
                 .ld-photo::after {
                     content: '';
                     position: absolute;

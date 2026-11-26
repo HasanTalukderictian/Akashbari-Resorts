@@ -11,12 +11,13 @@ const MAX_IMAGE_MB = 2; // backend এর সাথে মিল (max:2048)
 const EMPTY_FORM = {
     id: '', name: '', designation: '', subtitle: '',
     phone: '', email: '', department: '', company: '', team_name: '',
+    serial_number: '',
     image: '', imagePreview: null
 };
 
-const TEXT_FIELDS = ['name', 'designation', 'subtitle', 'phone', 'email', 'department', 'company', 'team_name'];
+const TEXT_FIELDS = ['name', 'designation', 'subtitle', 'phone', 'email', 'department', 'company', 'team_name', 'serial_number'];
 const SEARCH_FIELDS = ['name', 'designation', 'email', 'phone', 'department', 'company', 'team_name'];
-const TABLE_HEADERS = ['Image', 'Name', 'Team', 'Department / Company', 'Contact', 'Actions'];
+const TABLE_HEADERS = ['Image', 'Name', 'Team / Serial', 'Department / Company', 'Contact', 'Actions'];
 
 const AVATAR_PLACEHOLDER =
     'data:image/svg+xml;charset=UTF-8,' +
@@ -30,9 +31,16 @@ const AVATAR_PLACEHOLDER =
 
 const getAuthHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem('token')}`,
-    Role: localStorage.getItem('Role') || 'admin'
+    Role: localStorage.getItem('Role') || 'admin',
+    Accept: 'application/json'
 });
 const getMultipartHeaders = () => ({ ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' });
+
+// Serial: ধনাত্মক পূর্ণসংখ্যা হলে সংখ্যা, নাহলে null
+const toSerial = (value) => {
+    const n = parseInt(value, 10);
+    return Number.isFinite(n) && n > 0 ? n : null;
+};
 
 const Modal = ({ theme, title, onClose, children, footer }) => (
     <div
@@ -81,6 +89,7 @@ const Teamate = ({ theme: propsTheme }) => {
     const [showModal, setShowModal] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState(EMPTY_FORM);
+    const [serialTouched, setSerialTouched] = useState(false); // হাতে serial বদলালে আর auto বসাবে না
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -151,7 +160,32 @@ const Teamate = ({ theme: propsTheme }) => {
 
     useEffect(() => { fetchTeamMembers(); }, []);
 
+    // ওই team এর পরের serial (সবচেয়ে বড় + 1)
+    const nextSerialFor = (team) => {
+        const name = (team || '').trim();
+        if (!name) return '';
+        const max = teamMembers
+            .filter((m) => (m.team_name || '').trim() === name)
+            .reduce((acc, m) => Math.max(acc, toSerial(m.serial_number) || 0), 0);
+        return String(max + 1);
+    };
+
     const setField = (key) => (e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }));
+
+    // Team বদলালে (নতুন member + serial হাতে না বদলালে) পরের serial বসাও
+    const handleTeamChange = (e) => {
+        const value = e.target.value;
+        setFormData((prev) => ({
+            ...prev,
+            team_name: value,
+            serial_number: !editingItem && !serialTouched ? nextSerialFor(value) : prev.serial_number
+        }));
+    };
+
+    const handleSerialChange = (e) => {
+        setSerialTouched(true);
+        setFormData((prev) => ({ ...prev, serial_number: e.target.value }));
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -166,6 +200,7 @@ const Teamate = ({ theme: propsTheme }) => {
     };
 
     const openModal = (member = null) => {
+        setSerialTouched(false);
         if (member) {
             setFormData({
                 id: member.id,
@@ -177,19 +212,20 @@ const Teamate = ({ theme: propsTheme }) => {
                 department: member.department || '',
                 company: member.company || '',
                 team_name: member.team_name || '',
+                serial_number: member.serial_number != null ? String(member.serial_number) : '',
                 image: '',
                 imagePreview: member.image
             });
             setEditingItem(member);
         } else {
-            // নতুন member: filter এ কোনো team select করা থাকলে সেটাই default
-            setFormData({ ...EMPTY_FORM, team_name: teamFilter });
+            // নতুন member: filter এ কোনো team select করা থাকলে সেটাই default + পরের serial
+            setFormData({ ...EMPTY_FORM, team_name: teamFilter, serial_number: nextSerialFor(teamFilter) });
             setEditingItem(null);
         }
         setShowModal(true);
     };
 
-    const closeModal = () => { setShowModal(false); setFormData(EMPTY_FORM); setEditingItem(null); };
+    const closeModal = () => { setShowModal(false); setFormData(EMPTY_FORM); setEditingItem(null); setSerialTouched(false); };
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -200,10 +236,14 @@ const Teamate = ({ theme: propsTheme }) => {
         if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
             return showToast('Please enter a valid email', 'error');
         }
+        const serialText = String(formData.serial_number || '').trim();
+        if (serialText && (!/^\d+$/.test(serialText) || toSerial(serialText) === null)) {
+            return showToast('Serial No must be a whole number (1, 2, 3...)', 'error');
+        }
 
         setLoading(true);
         const payload = new FormData();
-        TEXT_FIELDS.forEach((key) => payload.append(key, (formData[key] || '').trim()));
+        TEXT_FIELDS.forEach((key) => payload.append(key, String(formData[key] ?? '').trim()));
         if (formData.image instanceof File) payload.append('image', formData.image);
 
         try {
@@ -223,6 +263,8 @@ const Teamate = ({ theme: propsTheme }) => {
             console.error('Save error:', err);
             if (err.response?.status === 401) {
                 handleAuthFailure((m) => showToast(m, 'error'));
+            } else if (err.response?.status === 403) {
+                showToast('You do not have permission to manage team members.', 'error');
             } else if (err.response?.status === 422 && err.response.data.errors) {
                 const firstError = Object.values(err.response.data.errors)[0][0];
                 showToast(firstError, 'error');
@@ -284,7 +326,7 @@ const Teamate = ({ theme: propsTheme }) => {
     return (
         <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }} className="container-fluid p-0">
             <div className="d-flex">
-                <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="users" />
+                <Sidebar theme={theme} isCollapsed={isCollapsed} activeView="teams" />
 
                 <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }} className="flex-grow-1">
                     <Header theme={theme} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar} />
@@ -365,6 +407,13 @@ const Teamate = ({ theme: propsTheme }) => {
 
                                                         <td style={{ padding: '12px' }}>
                                                             {member.team_name ? <span style={pillStyle}>{member.team_name}</span> : dash}
+                                                            <div style={{ fontSize: '12px', color: theme.textLight, marginTop: '4px' }}>
+                                                                {toSerial(member.serial_number) ? (
+                                                                    <><i className="bi bi-sort-numeric-down me-1"></i>#{member.serial_number}</>
+                                                                ) : (
+                                                                    'No serial'
+                                                                )}
+                                                            </div>
                                                         </td>
 
                                                         <td style={{ padding: '12px', color: theme.text, fontSize: '13px' }}>
@@ -474,18 +523,19 @@ const Teamate = ({ theme: propsTheme }) => {
                                 <input type="text" value={formData.name} onChange={setField('name')} style={fieldStyle} required disabled={loading} />
                             </div>
                             <div className="col-sm-6">
-                                <label style={labelStyle}>Designation *</label>
+                                <label style={labelStyle}> Branch *</label>
                                 <input type="text" value={formData.designation} onChange={setField('designation')} style={fieldStyle} required disabled={loading} />
                             </div>
 
-                            <div className="col-12">
+                            {/* Team Name + Serial No */}
+                            <div className="col-sm-8">
                                 <label style={labelStyle}>Team Name</label>
                                 <input
                                     type="text"
                                     list="team-name-options"
                                     placeholder="e.g. Management Team"
                                     value={formData.team_name}
-                                    onChange={setField('team_name')}
+                                    onChange={handleTeamChange}
                                     style={fieldStyle}
                                     maxLength={255}
                                     disabled={loading}
@@ -493,6 +543,26 @@ const Teamate = ({ theme: propsTheme }) => {
                                 <datalist id="team-name-options">
                                     {teamNames.map((t) => <option key={t} value={t} />)}
                                 </datalist>
+                            </div>
+                            <div className="col-sm-4">
+                                <label style={labelStyle}>Serial No</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    inputMode="numeric"
+                                    placeholder="1, 2, 3..."
+                                    value={formData.serial_number}
+                                    onChange={handleSerialChange}
+                                    style={fieldStyle}
+                                    disabled={loading}
+                                />
+                            </div>
+                            <div className="col-12" style={{ marginTop: '-8px', marginBottom: '10px' }}>
+                                <small style={{ color: theme.textLight, fontSize: '11px' }}>
+                                    <i className="bi bi-info-circle me-1"></i>
+                                    About Us page এ এই team এর member রা Serial No অনুযায়ী (1, 2, 3...) দেখাবে। খালি রাখলে পদ অনুযায়ী শেষে দেখাবে।
+                                </small>
                             </div>
 
                             <div className="col-sm-6">

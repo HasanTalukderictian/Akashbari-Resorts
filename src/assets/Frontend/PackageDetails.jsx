@@ -15,13 +15,14 @@ const PackageDetails = () => {
     const [benefitsData, setBenefitsData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    
+
     // Modal এবং Toast এর জন্য State
     const [showModal, setShowModal] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState('success'); // 'success' or 'error'
-    
+    const [toastType, setToastType] = useState('success');
+    const [submitting, setSubmitting] = useState(false);
+
     // ফর্ম ডাটা
     const [formData, setFormData] = useState({
         name: '',
@@ -29,7 +30,7 @@ const PackageDetails = () => {
         email: '',
         message: ''
     });
-    
+
     const [formErrors, setFormErrors] = useState({});
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -85,10 +86,7 @@ const PackageDetails = () => {
 
     // AUTO SCROLL TO TOP
     useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'instant'
-        });
+        window.scrollTo({ top: 0, behavior: 'instant' });
     }, [id]);
 
     // Auto-slide functionality
@@ -99,7 +97,6 @@ const PackageDetails = () => {
                     prevIndex === packageData.images.length - 1 ? 0 : prevIndex + 1
                 );
             }, 3000);
-
             return () => clearInterval(interval);
         }
     }, [packageData?.images]);
@@ -120,6 +117,8 @@ const PackageDetails = () => {
         fetchBenefits();
     }, []);
 
+    useEffect(() => () => { document.body.style.overflow = 'auto'; }, []);
+
     const nextImage = () => {
         if (packageData?.images) {
             setCurrentImageIndex((prevIndex) =>
@@ -136,46 +135,30 @@ const PackageDetails = () => {
         }
     };
 
-    // Modal খোলা/বন্ধ করা
     const openModal = () => {
         setShowModal(true);
         document.body.style.overflow = 'hidden';
     };
 
     const closeModal = () => {
+        if (submitting) return;
         setShowModal(false);
         document.body.style.overflow = 'auto';
-        setFormData({
-            name: '',
-            phone: '',
-            email: '',
-            message: ''
-        });
+        setFormData({ name: '', phone: '', email: '', message: '' });
         setFormErrors({});
     };
 
-    // ইনপুট পরিবর্তন হ্যান্ডেল
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        // Error清除
+        setFormData(prev => ({ ...prev, [name]: value }));
         if (formErrors[name]) {
-            setFormErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
+            setFormErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
-    // ফর্ম ভ্যালিডেশন
     const validateForm = () => {
         const errors = {};
-        if (!formData.name.trim()) {
-            errors.name = 'Name is required';
-        }
+        if (!formData.name.trim()) errors.name = 'Name is required';
         if (!formData.phone.trim()) {
             errors.phone = 'Phone number is required';
         } else if (!/^[0-9+\-\s()]{10,15}$/.test(formData.phone.trim())) {
@@ -186,51 +169,61 @@ const PackageDetails = () => {
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
             errors.email = 'Please enter a valid email address';
         }
-        if (!formData.message.trim()) {
-            errors.message = 'Message is required';
-        }
+        if (!formData.message.trim()) errors.message = 'Message is required';
         return errors;
     };
 
-    // ফর্ম সাবমিট
+    const showToastMessage = (type, message) => {
+        setToastType(type);
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 5000);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const errors = validateForm();
         if (Object.keys(errors).length > 0) {
             setFormErrors(errors);
             return;
         }
 
+        setSubmitting(true);
         try {
             const response = await fetch(`${BASE_URL}/package-queries`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Accept: 'application/json',
                 },
                 body: JSON.stringify({
                     package_name: packageData?.title || 'N/A',
-                    ...formData
+                    name: formData.name.trim(),
+                    phone: formData.phone.trim(),
+                    email: formData.email.trim(),
+                    message: formData.message.trim(),
                 }),
             });
-            
-            setToastType('success');
-            setToastMessage('✅ Your query has been submitted successfully! We will contact you soon.');
-            setShowToast(true);
+
+            const result = await response.json().catch(() => ({}));
+
+            if (response.status === 429) {
+                throw new Error('Too many requests. Please wait a minute and try again.');
+            }
+            if (!response.ok || result.status === false) {
+                const firstError = result.errors ? Object.values(result.errors)[0]?.[0] : null;
+                throw new Error(firstError || result.message || 'Something went wrong. Please try again.');
+            }
+
+            setSubmitting(false);
             closeModal();
-            
-            setTimeout(() => {
-                setShowToast(false);
-            }, 5000);
-            
+            showToastMessage('success', '✅ Your query has been submitted successfully! We will contact you soon.');
         } catch (error) {
             console.error('Error submitting form:', error);
-            setToastType('error');
-            setToastMessage('❌ Something went wrong. Please try again.');
-            setShowToast(true);
-            setTimeout(() => {
-                setShowToast(false);
-            }, 5000);
+            showToastMessage('error', `❌ ${error.message || 'Something went wrong. Please try again.'}`);
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -269,6 +262,9 @@ const PackageDetails = () => {
             </div>
         );
     }
+
+    // ✅ Offers array (safe fallback)
+    const offersList = Array.isArray(packageData.offers) ? packageData.offers : [];
 
     return (
         <div style={{ backgroundColor: '#f8f9fa' }}>
@@ -313,7 +309,7 @@ const PackageDetails = () => {
                                 <i className="bi bi-question-circle-fill me-2" style={{ color: brandColor }}></i>
                                 Query About Package
                             </h5>
-                            <button type="button" className="btn-close" onClick={closeModal}></button>
+                            <button type="button" className="btn-close" onClick={closeModal} disabled={submitting}></button>
                         </div>
                         <div className="modal-body">
                             <div className="mb-3">
@@ -322,8 +318,8 @@ const PackageDetails = () => {
                                     <p className="fw-bold mb-0" style={{ color: brandColor }}>{packageData.title}</p>
                                 </div>
                             </div>
-                            
-                            <form onSubmit={handleSubmit}>
+
+                            <form onSubmit={handleSubmit} noValidate>
                                 <div className="mb-3">
                                     <label className="form-label fw-medium" style={{ fontSize: '0.9rem' }}>
                                         <i className="bi bi-person me-1"></i>Your Name <span className="text-danger">*</span>
@@ -337,9 +333,7 @@ const PackageDetails = () => {
                                         onChange={handleInputChange}
                                         style={{ borderRadius: '8px', padding: '10px 14px' }}
                                     />
-                                    {formErrors.name && (
-                                        <div className="invalid-feedback">{formErrors.name}</div>
-                                    )}
+                                    {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
                                 </div>
 
                                 <div className="mb-3">
@@ -355,9 +349,7 @@ const PackageDetails = () => {
                                         onChange={handleInputChange}
                                         style={{ borderRadius: '8px', padding: '10px 14px' }}
                                     />
-                                    {formErrors.phone && (
-                                        <div className="invalid-feedback">{formErrors.phone}</div>
-                                    )}
+                                    {formErrors.phone && <div className="invalid-feedback">{formErrors.phone}</div>}
                                 </div>
 
                                 <div className="mb-3">
@@ -373,9 +365,7 @@ const PackageDetails = () => {
                                         onChange={handleInputChange}
                                         style={{ borderRadius: '8px', padding: '10px 14px' }}
                                     />
-                                    {formErrors.email && (
-                                        <div className="invalid-feedback">{formErrors.email}</div>
-                                    )}
+                                    {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
                                 </div>
 
                                 <div className="mb-3">
@@ -391,9 +381,7 @@ const PackageDetails = () => {
                                         onChange={handleInputChange}
                                         style={{ borderRadius: '8px', padding: '10px 14px', resize: 'vertical' }}
                                     />
-                                    {formErrors.message && (
-                                        <div className="invalid-feedback">{formErrors.message}</div>
-                                    )}
+                                    {formErrors.message && <div className="invalid-feedback">{formErrors.message}</div>}
                                 </div>
 
                                 <div className="d-flex gap-2 mt-4">
@@ -401,6 +389,7 @@ const PackageDetails = () => {
                                         type="button"
                                         className="btn w-50"
                                         onClick={closeModal}
+                                        disabled={submitting}
                                         style={{
                                             backgroundColor: '#e9ecef',
                                             color: '#333',
@@ -408,23 +397,27 @@ const PackageDetails = () => {
                                             padding: '10px',
                                             fontWeight: '500'
                                         }}
-                                    >
-                                        Cancel
-                                    </button>
+                                    >Cancel</button>
                                     <button
                                         type="submit"
                                         className="btn w-50 text-white"
+                                        disabled={submitting}
                                         style={{
                                             backgroundColor: brandColor,
                                             borderRadius: '8px',
                                             padding: '10px',
                                             fontWeight: '500',
-                                            transition: 'all 0.3s ease'
+                                            transition: 'all 0.3s ease',
+                                            opacity: submitting ? 0.75 : 1
                                         }}
-                                        onMouseEnter={(e) => e.target.style.backgroundColor = '#3d1f0a'}
-                                        onMouseLeave={(e) => e.target.style.backgroundColor = brandColor}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3d1f0a'}
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = brandColor}
                                     >
-                                        <i className="bi bi-send me-2"></i>Submit Query
+                                        {submitting ? (
+                                            <><span className="spinner-border spinner-border-sm me-2"></span>Submitting...</>
+                                        ) : (
+                                            <><i className="bi bi-send me-2"></i>Submit Query</>
+                                        )}
                                     </button>
                                 </div>
                             </form>
@@ -560,46 +553,62 @@ const PackageDetails = () => {
             {/* Main Package Section */}
             <div className="container py-4 py-md-5">
                 <div className="row g-3 g-md-4 align-items-stretch">
+                    {/* ============ LEFT CARD ============ */}
                     <div className="col-12 col-lg-6">
+
+                        
                         <div className="h-100 p-4 p-md-5 text-white rounded-4 shadow-lg d-flex flex-column justify-content-center"
                             style={{ background: `linear-gradient(135deg, ${brandColor} 0%, #3d1f0a 100%)` }}>
-                                
-                                 {isVilla && isSoldOut && (
-                                <div className="mt-3 mb-5">
-                                    <span className="badge bg-danger px-4 py-2 rounded-pill " style={{ fontSize: '1rem' }}>
-                                       SOLD OUT
-                                    </span>
+                                 <h6 className="text-uppercase opacity-75 mb-2 mb-md-3" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Investment Opportunity</h6>
+
+                            {/* Package name */}
+                            <div
+                                className="mb-3 mb-md-4 pb-3"
+                                style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}
+                            >
+                                <small
+                                    className="text-uppercase text-white-50 d-block mb-1"
+                                    style={{ letterSpacing: '2px', fontSize: '0.72rem' }}
+                                >
+                                    <i className="bi bi-gem me-1"></i>Package
+                                </small>
+                                <div className="d-flex align-items-center flex-wrap gap-2">
+                                    <h2
+                                        className="fw-bold mb-0 text-uppercase"
+                                        style={{ fontSize: 'clamp(1.4rem, 4.5vw, 2.2rem)', letterSpacing: '1px' }}
+                                    >
+                                        {packageData.title}
+                                    </h2>
+                                    {isSoldOut && (
+                                        <span className="badge bg-danger px-3 py-2 rounded-pill" style={{ fontSize: '0.8rem' }}>
+                                            SOLD OUT
+                                        </span>
+                                    )}
                                 </div>
-                            )}
-                            <h6 className="text-uppercase opacity-75 mb-2 mb-md-3" style={{ letterSpacing: '1px', fontSize: '0.8rem' }}>Investment Oppurnity</h6>
-                            <h1 className="fw-bold mb-3 mb-md-4" style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}>Investment Package</h1>
-                            
-                            {/* Share Price - Always Show */}
-                            <div className="mb-3">
-                                <small className="text-white-50 d-block">Share Price</small>
-                                <h3 className="text-white mb-0" style={{ 
-                                    fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
-                                    textDecoration: 'line-through',
-                                    opacity: '0.7'
-                                }}>
-                                    ৳ {parseInt(packageData.share_price || 0).toLocaleString()}
-                                </h3>
                             </div>
-                            
-                            {/* For VILLA - Hide Discount Price, Show only Full Payment */}
+
+                           
+                            <h1 className="fw-bold mb-3 mb-md-4" style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}>Investment Package</h1>
+
+                            {/* Installment - Always Show */}
+                            <div className="mb-3">
+                                <small className="text-white-50 d-block mb-1">
+                                    Installment Price
+                                </small>
+                                <h4 className="fw-bold" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>৳ {parseInt(packageData.price).toLocaleString()}</h4>
+                            </div>
+
+
+                             {/* For VILLA - Hide Discount Price, Show only Full Payment */}
                             {isVilla ? (
                                 <div className="mb-3">
                                     <small className="text-white-50 d-block">Full Payment Price</small>
                                     <h3 className="text-warning mb-0" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>
-                                        ৳ {parseInt(packageData.discount || 0).toLocaleString()}
+                                        ৳ {parseInt(packageData.price).toLocaleString()}
                                     </h3>
                                 </div>
                             ) : (
                                 <div className="d-flex flex-wrap align-items-center gap-2 gap-md-3 mb-3">
-                                    <div>
-                                        <small className="text-white-50 d-block">Discount Price</small>
-                                        <h3 className="text-white mb-0" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)' }}>৳ {parseInt(packageData.price).toLocaleString()}</h3>
-                                    </div>
                                     {packageData.discount > 0 && (
                                         <div>
                                             <small className="text-white-50 d-block">Full Payment Price</small>
@@ -608,12 +617,24 @@ const PackageDetails = () => {
                                     )}
                                 </div>
                             )}
-                            
-                            {/* Sold Out Badge for VILLA */}
+
+                            {/* ✅ NEW: Installment Value — show only if exists */}
+                            {packageData.installment_value && (
+                                <div className="mb-3">
+                                    <small className="text-white-50 d-block mb-1">
+                                        Installment Value (36 months)
+                                    </small>
+                                    <h4 className="fw-bold" style={{ fontSize: 'clamp(1.1rem, 4vw, 1.6rem)' }}>
+                                        ৳ {parseInt(packageData.installment_value).toLocaleString()}
+                                    </h4>
+                                </div>
+                            )}
+
                            
                         </div>
                     </div>
 
+                    {/* ============ RIGHT CARD ============ */}
                     <div className="col-12 col-lg-6">
                         <div className="card border-0 shadow-sm p-3 p-md-4 h-100 rounded-4">
                             <h2 className="fw-bold mb-3 mb-md-4 border-bottom pb-2" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', color: brandColor }}>
@@ -621,21 +642,7 @@ const PackageDetails = () => {
                                 Package Summary
                             </h2>
                             <div className="row g-2 g-md-3 mb-3 mb-md-4">
-                                {/* Share Price - Always Show */}
-                                <div className="col-6">
-                                    <small className="text-muted d-block mb-1">
-                                        ৳ Share Price
-                                    </small>
-                                    <h4 className="fw-bold" style={{ 
-                                        fontSize: 'clamp(1rem, 3.5vw, 1.2rem)', 
-                                        color: brandColor,
-                                        textDecoration: 'line-through',
-                                        opacity: '0.6'
-                                    }}>
-                                        ৳ {parseInt(packageData.share_price || 0).toLocaleString()}
-                                    </h4>
-                                </div>
-                                
+
                                 {/* For VILLA - Show only Full Payment */}
                                 {isVilla ? (
                                     <div className="col-6">
@@ -650,13 +657,13 @@ const PackageDetails = () => {
                                     <>
                                         <div className="col-6">
                                             <small className="text-muted d-block mb-1">
-                                                ৳ Discount Price
+                                                Installment Price
                                             </small>
                                             <h4 className="fw-bold" style={{ fontSize: 'clamp(1rem, 3.5vw, 1.2rem)', color: brandColor }}>৳ {parseInt(packageData.price).toLocaleString()}</h4>
                                         </div>
                                         <div className="col-6">
                                             <small className="text-muted d-block mb-1">
-                                                <i className="bi bi-tag me-1"></i>Full Payment Price
+                                               Full Payment Price
                                             </small>
                                             <h4 className="fw-bold" style={{ fontSize: 'clamp(1rem, 3.5vw, 1.2rem)', color: brandColor }}>৳ {parseInt(packageData.discount || 0).toLocaleString()}</h4>
                                         </div>
@@ -680,44 +687,76 @@ const PackageDetails = () => {
                                 </div>
                             </div>
 
-                            {packageData.description && (
+                            {/* ✅ REPLACED: Description → Offers */}
+                            {offersList.length > 0 ? (
+                                <div className="mb-3 mb-md-4">
+                                    <div className="d-flex align-items-center mb-2">
+                                        <span className="badge me-2" style={{
+                                            backgroundColor: `${brandColor}15`,
+                                            color: brandColor,
+                                            fontSize: '0.7rem',
+                                            padding: '4px 10px',
+                                            borderRadius: '20px'
+                                        }}>
+                                            <i className="bi bi-gift-fill me-1"></i>OFFERS
+                                        </span>
+                                    </div>
+                                    <ul className="list-unstyled mb-0">
+                                        {offersList.map((offer, idx) => (
+                                            <li
+                                                key={offer.id ?? idx}
+                                                className="d-flex align-items-start mb-2"
+                                                style={{ fontSize: 'clamp(0.82rem, 3vw, 0.92rem)' }}
+                                            >
+                                                <i
+                                                    className="bi bi-check-circle-fill me-2 mt-1 flex-shrink-0"
+                                                    style={{ color: brandColor, fontSize: '0.85rem' }}
+                                                ></i>
+                                                <span className="text-dark" style={{ lineHeight: 1.5 }}>
+                                                    {offer.offer || offer.title || `Offer ${idx + 1}`}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ) : packageData.description ? (
                                 <p className="text-muted mb-3 mb-md-4" style={{ textAlign: 'justify', fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>
                                     <i className="bi bi-chat-quote me-2"></i>
                                     {packageData.description}
                                 </p>
-                            )}
+                            ) : null}
 
-                            {/* বাটন দুটো পাশাপাশি - প্রতিটি ৫০% প্রস্থ */}
+                            {/* বাটন দুটো পাশাপাশি */}
                             <div className="d-flex gap-2">
                                 <a
                                     href="tel:01768712230"
                                     className="btn text-white w-50 py-2 py-md-3 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2"
-                                    style={{ 
-                                        textDecoration: 'none', 
-                                        transition: 'all 0.3s ease', 
+                                    style={{
+                                        textDecoration: 'none',
+                                        transition: 'all 0.3s ease',
                                         fontSize: 'clamp(0.8rem, 3vw, 0.95rem)',
                                         backgroundColor: brandColor,
                                         border: 'none'
                                     }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3d1f0a'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = brandColor}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3d1f0a'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = brandColor}
                                 >
                                     <i className="bi bi-telephone-fill"></i>
                                     CALL NOW
                                 </a>
-                                
+
                                 <button
                                     onClick={openModal}
                                     className="btn text-white w-50 py-2 py-md-3 rounded-pill fw-bold shadow d-flex align-items-center justify-content-center gap-2"
-                                    style={{ 
-                                        textDecoration: 'none', 
-                                        transition: 'all 0.3s ease', 
+                                    style={{
+                                        textDecoration: 'none',
+                                        transition: 'all 0.3s ease',
                                         fontSize: 'clamp(0.8rem, 3vw, 0.95rem)',
                                         backgroundColor: brandColor,
                                         border: 'none'
                                     }}
-                                    onMouseEnter={(e) => e.target.style.backgroundColor = '#3d1f0a'}
-                                    onMouseLeave={(e) => e.target.style.backgroundColor = brandColor}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3d1f0a'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = brandColor}
                                 >
                                     <i className="bi bi-question-circle-fill"></i>
                                     QUERY
@@ -772,175 +811,63 @@ const PackageDetails = () => {
                 )}
             </div>
 
-            <Faqpage/>
+            <Faqpage />
 
             <Terms />
-
 
             <Footer />
 
             <style>{`
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                
-                .transition-fade {
-                    transition: opacity 0.8s ease-in-out;
-                }
-                
-                .hover-shadow:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-                }
-                
-                .transition-all {
-                    transition: all 0.3s ease;
-                }
-                
-                .animate-title {
-                    animation: fadeInUp 1s ease-out;
-                }
-                
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                .transition-fade { transition: opacity 0.8s ease-in-out; }
+                .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+                .transition-all { transition: all 0.3s ease; }
+                .animate-title { animation: fadeInUp 1s ease-out; }
                 @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
-                
-                /* Modal Styles */
                 .modal-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.6);
-                    backdrop-filter: blur(4px);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9998;
-                    animation: fadeIn 0.3s ease;
-                    padding: 20px;
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+                    display: flex; align-items: center; justify-content: center;
+                    z-index: 9998; animation: fadeIn 0.3s ease; padding: 20px;
                 }
-                
                 .modal-container {
-                    background: white;
-                    border-radius: 16px;
-                    max-width: 600px;
-                    width: 100%;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    animation: slideUp 0.3s ease;
+                    background: white; border-radius: 16px; max-width: 600px; width: 100%;
+                    max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease;
                     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
                 }
-                
                 .modal-header {
-                    padding: 20px 24px 16px;
-                    border-bottom: 1px solid #e9ecef;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    position: sticky;
-                    top: 0;
-                    background: white;
-                    border-radius: 16px 16px 0 0;
-                    z-index: 1;
+                    padding: 20px 24px 16px; border-bottom: 1px solid #e9ecef;
+                    display: flex; justify-content: space-between; align-items: center;
+                    position: sticky; top: 0; background: white;
+                    border-radius: 16px 16px 0 0; z-index: 1;
                 }
-                
-                .modal-title {
-                    font-size: 1.1rem;
-                    margin: 0;
-                }
-                
-                .modal-body {
-                    padding: 20px 24px 24px;
-                }
-                
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                
+                .modal-title { font-size: 1.1rem; margin: 0; }
+                .modal-body { padding: 20px 24px 24px; }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes slideUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
-                
-                /* Toast Animation */
                 @keyframes fadeInDown {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    from { opacity: 0; transform: translateY(-20px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
-                
-                .animate__fadeInDown {
-                    animation: fadeInDown 0.5s ease;
-                }
-                
-                body {
-                    margin: 0;
-                    padding: 0;
-                }
-                
+                .animate__fadeInDown { animation: fadeInDown 0.5s ease; }
+                body { margin: 0; padding: 0; }
                 @media (max-width: 768px) {
-                    button {
-                        cursor: pointer !important;
-                        -webkit-tap-highlight-color: transparent;
-                    }
-                    
-                    .btn, button {
-                        touch-action: manipulation;
-                    }
-                    
-                    .modal-container {
-                        margin: 10px;
-                        border-radius: 12px;
-                    }
-                    
-                    .modal-header {
-                        padding: 16px 18px 12px;
-                    }
-                    
-                    .modal-body {
-                        padding: 16px 18px 20px;
-                    }
+                    button { cursor: pointer !important; -webkit-tap-highlight-color: transparent; }
+                    .btn, button { touch-action: manipulation; }
+                    .modal-container { margin: 10px; border-radius: 12px; }
+                    .modal-header { padding: 16px 18px 12px; }
+                    .modal-body { padding: 16px 18px 20px; }
                 }
-                
-                ::-webkit-scrollbar {
-                    width: 8px;
-                }
-                
-                ::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                }
-                
-                ::-webkit-scrollbar-thumb {
-                    background: #888;
-                    border-radius: 4px;
-                }
-                
-                ::-webkit-scrollbar-thumb:hover {
-                    background: #555;
-                }
+                ::-webkit-scrollbar { width: 8px; }
+                ::-webkit-scrollbar-track { background: #f1f1f1; }
+                ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+                ::-webkit-scrollbar-thumb:hover { background: #555; }
             `}</style>
         </div>
     );

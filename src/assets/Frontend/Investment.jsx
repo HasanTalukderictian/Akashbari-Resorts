@@ -69,19 +69,20 @@ const PackageCard = ({ pkg, onInquire, isPopular, soldOut = false }) => (
             <h5 className="package-title">{pkg.title}</h5>
 
             <div className="price-info-list">
-                <div className="price-row">
-                    <span className="price-label">Share Price:</span>
-                    <span className="price-value-share">{formatTk(pkg.share_price)}</span>
-                </div>
+               
 
                 <div className="price-row highlight">
-                    <span className="price-label">Discount Price:</span>
+                    <span className="price-label">Share Price:</span>
                     <span className="price-value discount">{formatTk(pkg.price)}</span>
                 </div>
 
                 <div className="price-row">
                     <span className="price-label">Full Payment:</span>
                     <span className="price-value full-payment">{formatTk(pkg.discount)}</span>
+                </div>
+                <div className="price-row">
+                    <span className="price-label">Installment Value:</span>
+                    <span className="price-value full-payment">{formatTk(pkg.installment_value)}</span>
                 </div>
             </div>
 
